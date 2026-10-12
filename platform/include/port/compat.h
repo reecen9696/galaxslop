@@ -12,6 +12,14 @@
 // Declare the C library's printf family (including bionic's FORTIFY inline
 // wrappers) before the renames below, so the macros only affect game code.
 #include <stdio.h>
+// MSL's <cmath> defines FLT_EPSILON and friends; the NDK's libc++ <cmath>
+// pulls in <float.h>, Apple's and Emscripten's don't.
+#include <float.h>
+
+#if defined(__APPLE__) || defined(__EMSCRIPTEN__)
+// Bionic and glibc name the va_list base type __va_list; JSystem headers use it.
+typedef __builtin_va_list __va_list;
+#endif
 
 #ifdef __cplusplus
 extern "C" {
