@@ -246,3 +246,27 @@ x86_64, D-016, and Homebrew's libraries are arm64).
 Revisit: if WebGL2 frame time misses budget at P0-08, a WebGPU backend
 behind the same `gpu::Backend` interface is the next step (P5-03), not
 Aurora.
+
+## D-018 (2026-10-12, lane A): Puppets follow SMG's own ghost player; animations go over the wire as the game's u32 hash. Phase 2 game-side work may run natively in parallel with Phase 1
+What:
+- `RemotePlayerPuppet` (P2-05) is modelled on `GhostPlayer`
+  (`decomp/src/Game/Player/GhostPlayer.cpp`), the Cosmic Mario/Luigi race
+  ghost: a LiveActor with Mario's model, a full-body `XanimePlayer` and an
+  upper-body one (carried items), driven by per-frame packets. Take its
+  model/animation set-up and `receiveGhostPacket`'s application logic;
+  leave out the race manager, demos, power-star and hit-sensor parts.
+- PlayerState carries `anim_hash` (u32) instead of `anim_id` (u16):
+  capture is `MR::getHashCode(MarioActor::mMarioAnim->getXanimePlayer()->
+  getCurrentAnimationName())`, playback is
+  `XanimePlayer::changeAnimationByHash`, exactly as the ghost does
+  (update flag 0x2000). No animation table to maintain on either side.
+  NETCODE.md updated (52 -> 54 bytes forwarded).
+- P2-04 (capture) and P2-05 (puppet) are `parallel-ok`: the native build
+  plays Good Egg, so they can be built and tested natively (two desktop
+  clients and a local relay) while the browser build catches up. They
+  still need P2-01/P2-02/P2-03 for the network itself.
+Why: Nintendo already solved "draw a second Mario from recorded frames"
+for the race ghosts; GalaxyQuest already made that code run on PC.
+Waiting for the web build would idle lane A for no technical reason.
+Revisit: if puppet animation blending looks wrong, the ghost's weight
+tracks (`setAnimationWeight`, flag 0x0010's special cases) are the model.

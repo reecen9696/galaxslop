@@ -126,7 +126,7 @@ verified in the spec. Grep before you assume.
 
 - Transport: WebSocket to the relay. Binary frames. No WebRTC in Phases 2-3.
 - Each client sends its own `PlayerState` at 30 Hz: position (3x f32),
-  quaternion (4x f16), up-vector (3x f16), velocity (3x f16), anim id (u16),
+  quaternion (4x f16), up-vector (3x f16), velocity (3x f16), anim hash (u32, the game's own; D-018),
   anim frame (f16), flags (u16: character, powerup, grounded, spinning,
   visible), galaxy id (u16), scenario id (u8). About 48 bytes.
 - The relay forwards each state to every other client in the same room. It

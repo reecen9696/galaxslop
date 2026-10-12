@@ -331,23 +331,25 @@ with no desync complaints at 100 ms delay.
 - lane: A
 - status: open
 - owner:
-- blocked_by: P1-10
+- blocked_by: (native: none; D-018)
 - touches: decomp/src/Game/Player (one hook file, name it in the log before editing), net/capture
-- flags:
+- flags: parallel-ok
 - what: One `TARGET_WEB` hook after the player's update that copies position, rotation, up, velocity, current anim id and frame, powerup, grounded, spinning, galaxy and scenario into a plain struct `net/` reads. Find the right accessors; grep, don't guess. Document them in `net/capture/README.md`.
 - done when: the struct updates every frame with correct values in Good Egg (log a dump).
 - log:
+  - 2026-10-12 (A): accessors found (D-018): MR::getPlayerPos/getPlayerVelocity/getPlayerUpVec/getPlayerFrontVec (Game/Util/PlayerUtil.hpp); animation = MR::getHashCode(MarioAccess::getPlayerActor()->mMarioAnim->getXanimePlayer()->getCurrentAnimationName()).
 
 ### P2-05 RemotePlayerPuppet actor
 - lane: A
 - status: open
 - owner:
-- blocked_by: P2-03, P2-04
+- blocked_by: P2-04 (P2-03 for the network; a loopback test needs neither)
 - touches: net/puppet, decomp/src/Game/Scene (spawn hook only; name the file in the log)
-- flags:
+- flags: parallel-ok
 - what: `LiveActor` subclass with Mario and Luigi model loading (copy an NPC's pattern), animation player, Hermite interpolation at now-100ms, freeze/hide rules, tint by palette, galaxy/scenario gating. Spawn on scene enter for every known remote; despawn on scene exit. Heap budget measured and logged. For scale: smg-online draws up to 16 remote Marios inside real Wii memory, so 4 puppets fitting is expected, not a risk.
 - done when: a second tab's Mario is visible and moves smoothly in Good Egg.
 - log:
+  - 2026-10-12 (A): model it on GhostPlayer (Cosmic Mario ghost): XanimePlayer + upper-body player, changeAnimationByHash, receiveGhostPacket's apply logic. First milestone: a loopback puppet that replays the local player's captured state ~1 s late, no network.
 
 ### P2-06 Lobby screen
 - lane: A

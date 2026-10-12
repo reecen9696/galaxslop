@@ -44,7 +44,8 @@ f32  pos[3]
 f16  rot[4]         quaternion xyzw
 f16  up[3]          gravity up vector
 f16  vel[3]
-u16  anim_id
+u32  anim_hash      MR::getHashCode(current animation name); the
+                    receiver calls XanimePlayer::changeAnimationByHash (D-018)
 f16  anim_frame
 u16  flags          bit0 character, bit1 grounded, bit2 spinning,
                     bit3 visible, bits4-7 powerup, bit8 on_launch_star,
@@ -52,7 +53,7 @@ u16  flags          bit0 character, bit1 grounded, bit2 spinning,
 u16  galaxy_id
 u8   scenario_id
 ```
-52 bytes with the forwarded id.
+54 bytes with the forwarded id.
 
 ### ProgressEvent kinds
 
@@ -73,7 +74,7 @@ Phase 4 adds 100+ for objects.
 - Keep a ring of the last 32 states per remote player.
 - Render puppets at `now - 100 ms`. Find the two samples bracketing that
   time; Hermite interpolate pos with vel as tangents; slerp rot; lerp up;
-  snap anim when id changes, else lerp frame.
+  snap anim when the hash changes, else lerp frame.
 - No bracketing sample for 500 ms: freeze. 3 s: hide. New sample: show.
 - Draw puppet only if `galaxy_id` and `scenario_id` match local.
 - `in_cutscene` flag: hide puppet (they're in a demo we aren't in).
