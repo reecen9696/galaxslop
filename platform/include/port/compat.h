@@ -27,8 +27,9 @@
 #endif
 #endif
 
-#if defined(__APPLE__) || defined(__EMSCRIPTEN__)
-// Bionic and glibc name the va_list base type __va_list; JSystem headers use it.
+#if !defined(__ANDROID__)
+// Bionic names the va_list base type __va_list and JSystem headers use it;
+// Apple, Emscripten and glibc (__gnuc_va_list) don't.
 typedef __builtin_va_list __va_list;
 #endif
 
