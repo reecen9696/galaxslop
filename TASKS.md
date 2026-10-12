@@ -119,9 +119,10 @@ renders in Chromium; one human has seen it.
 
 ### P0-06 Emscripten build: compile and link
 - lane: A
-- status: open
-- owner:
-- blocked_by: P0-04, P0-11
+- status: in_progress
+- owner: B
+- started: 2026-10-12
+- blocked_by: P0-11 (done)
 - touches: CMakeLists.txt, platform/src/web, web/
 - flags:
 - what: `-DSMG_TARGET=web`. Emscripten toolchain file; emdawnwebgpu port for Aurora (D-014; `webcompiled` pins Emscripten 6.0.12 and uses JSPI instead of SharedArrayBuffer, which we may not need since GalaxyQuest's OS layer schedules its own threads; decide in P0-09). Starting flags (measure, don't trust): `-pthread -sPTHREAD_POOL_SIZE=4` (GalaxyQuest emulates OS threads in its own scheduler; real threads are only the frame builder and audio), `-sPROXY_TO_PTHREAD -sOFFSCREENCANVAS_SUPPORT` (D-005, with the main-thread fallback compiled in), `-sMAXIMUM_MEMORY=4GB -sALLOW_MEMORY_GROWTH` (D-013: the fixed 0x80000000 window needs >2 GB of address space; note Emscripten's >2 GB pointer caveats), `--use-port=emdawnwebgpu` (no `-sUSE_WEBGL2`; the fallback renderer would add `-sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2`). SMGwebport publishes no source or flags; its `shell.js` only shows what it exports (`web_audio_ring`, `web_input_update`, `web_shader_warmup`), which is a reasonable shape for our `platform/src/web` glue. A minimal `web/index.html` + Vite config with COOP/COEP headers that loads the wasm and shows console output.
