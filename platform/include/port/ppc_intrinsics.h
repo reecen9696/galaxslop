@@ -36,6 +36,12 @@ static inline unsigned int __rlwimi(unsigned int a, unsigned int s, int sh, int 
 }
 
 static inline int __abs(int x) { return x < 0 ? -x : x; }
+#if defined(__linux__) && !defined(__ANDROID__)
+// glibc's <math.h> declares extern __fabsf/__fabs; a static definition after
+// that keeps external linkage in C and every C file emits a global copy.
+#define __fabsf port_ppc_fabsf
+#define __fabs port_ppc_fabs
+#endif
 static inline float __fabsf(float x) { return fabsf(x); }
 static inline double __fabs(double x) { return fabs(x); }
 static inline float __fnabsf(float x) { return -fabsf(x); }
