@@ -19,7 +19,10 @@ jobs:
       - name: Build
         run: ninja -C build/native smg
       - name: Check the image sits at 0x98000000
-        run: otool -l build/native/smg | grep -A3 'segname __TEXT$' | grep -q 'vmaddr 0x0000000098000000'
+        run: |
+          otool -l build/native/smg | grep -A3 -E 'segname (__PAGEZERO|__TEXT)$'
+          file build/native/smg
+          otool -l build/native/smg | grep -A3 'segname __TEXT$' | grep -E 'vmaddr +0x0*98000000$'
 
   linux:
     runs-on: ubuntu-24.04

@@ -16,6 +16,17 @@
 // pulls in <float.h>, Apple's and Emscripten's don't.
 #include <float.h>
 
+// glibc: declare the C library's wide-string functions before the wcs*
+// renames below for the same reason (its <wchar.h> and libstdc++'s <cwchar>
+// clash with the renamed names if they arrive later).  Not on Apple, whose
+// <_wchar.h> poisons the wcs* names under -fshort-wchar, nor Bionic.
+#if defined(__linux__) && !defined(__ANDROID__)
+#include <wchar.h>
+#ifdef __cplusplus
+#include <cwchar>
+#endif
+#endif
+
 #if defined(__APPLE__) || defined(__EMSCRIPTEN__)
 // Bionic and glibc name the va_list base type __va_list; JSystem headers use it.
 typedef __builtin_va_list __va_list;
