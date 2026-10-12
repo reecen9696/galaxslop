@@ -19,6 +19,7 @@
 #include "Game/Util/MtxUtil.hpp"
 #include "Game/Util/ObjUtil.hpp"
 #include "Game/Util/PlayerUtil.hpp"
+#include "net/client/net_client.h"
 #include "port/port.h"
 #include "revolution/gx.h"
 
@@ -148,30 +149,38 @@ void RemotePlayerPuppet::draw() const {
 // waits for it, which deadlocks if called from the main thread's own frame
 // update (seen: GameScene::update -> ... -> FunctionAsyncExecutor::waitForEnd).
 namespace {
-void* sScene = nullptr;            // the GameScene the puppets belong to
-RemotePlayerPuppet* sLoopback = nullptr;
-bool sAdoptOnNextScene = false;    // created during init, before the scene ran
+void* sScene = nullptr;  // the GameScene the puppets belong to
+// One puppet per remote slot (net::netRemote), created during scene init and
+// hidden until that slot has a player here; the loopback test uses slot 0.
+RemotePlayerPuppet* sPuppets[net::kMaxRemotes] = {};
+bool sAdoptOnNextScene = false;  // created during init, before the scene ran
+
+const char* loopbackDelay() {
+    const char* v = getenv("PETARI_LOOPBACK");
+    return v && *v ? v : nullptr;
+}
 }  // namespace
 
-extern "C" int port_net_wants_puppets(void) {
-    const char* loopback = getenv("PETARI_LOOPBACK");
-    return loopback != nullptr && *loopback;
-}
+extern "C" int port_net_wants_puppets(void) { return loopbackDelay() != nullptr || net::netEnabled(); }
 
 extern "C" void port_net_puppets_create_for_scene(void) {
     if (!port_net_wants_puppets() || MR::isStageFileSelect()) {
         return;  // not on the title / file-select stage
     }
-    bool luigi = MR::isPlayerLuigi();
-    sLoopback = new RemotePlayerPuppet("RemotePlayerPuppet", luigi);
-    sLoopback->initWithoutIter();
+    int count = net::netEnabled() ? net::kMaxRemotes : 1;
+    for (int i = 0; i < net::kMaxRemotes; i++) {
+        sPuppets[i] = nullptr;
+    }
+    for (int i = 0; i < count; i++) {
+        sPuppets[i] = new RemotePlayerPuppet("RemotePlayerPuppet", false);
+        sPuppets[i]->initWithoutIter();
+    }
     sAdoptOnNextScene = true;
-    port_log("puppet: created for the new scene (%s)", luigi ? "Luigi" : "Mario");
+    port_log("puppet: %d created for the new scene", count);
 }
 
 extern "C" void port_net_puppets_update(void* pScene) {
-    static const char* loopback = getenv("PETARI_LOOPBACK");
-    if (!loopback || !*loopback) {
+    if (!port_net_wants_puppets()) {
         return;
     }
     if (pScene != sScene) {
@@ -179,18 +188,29 @@ extern "C" void port_net_puppets_update(void* pScene) {
         if (sAdoptOnNextScene) {
             sAdoptOnNextScene = false;
         } else {
-            sLoopback = nullptr;  // the old scene's actors died with its heap
+            for (RemotePlayerPuppet*& p : sPuppets) p = nullptr;  // the old scene's actors died with its heap
         }
     }
-    if (sLoopback == nullptr) {
-        return;
-    }
     NetPlayerCapture now;
-    if (!net_capture_latest(&now)) {
+    bool haveLocal = net_capture_latest(&now) != 0;
+
+    if (net::netEnabled()) {
+        net::netTick(haveLocal ? &now : nullptr);
+        for (int i = 0; i < net::kMaxRemotes; i++) {
+            if (sPuppets[i] != nullptr) {
+                const net::RemoteView& v = net::netRemote(i);
+                sPuppets[i]->applyState(v.pose, v.visible);
+            }
+        }
         return;
     }
-    int64_t delayNs = (int64_t)(atof(loopback) * 1e9);
-    NetPlayerCapture past;
-    bool valid = net_capture_at(now.timeNs - delayNs, &past) && past.stageHash == now.stageHash;
-    sLoopback->applyState(past, valid);
+    if (const char* delay = loopbackDelay()) {
+        if (sPuppets[0] == nullptr || !haveLocal) {
+            return;
+        }
+        int64_t delayNs = (int64_t)(atof(delay) * 1e9);
+        NetPlayerCapture past;
+        bool valid = net_capture_at(now.timeNs - delayNs, &past) && past.stageHash == now.stageHash;
+        sPuppets[0]->applyState(past, valid);
+    }
 }

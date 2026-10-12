@@ -1,5 +1,6 @@
-// The relay as a WebSocket server.  PORT (default 8787) and ALLOWED_ORIGINS
-// (comma-separated; unset = any, for local play) come from the environment.
+// The relay as a WebSocket server.  Environment: PORT (default 8787),
+// ALLOWED_ORIGINS (comma-separated; unset = any, for local play), ROOMS
+// (comma-separated permanent room codes, e.g. ROOMS=PLAY22).
 import { WebSocketServer, type WebSocket } from "ws";
 import { Relay, type Conn } from "./relay.ts";
 
@@ -8,7 +9,8 @@ export function startServer(port: number, log: (m: string) => void = console.log
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
-  const relay = new Relay({ log });
+  const fixedRooms = (process.env.ROOMS ?? "").split(",").filter((s) => s.trim());
+  const relay = new Relay({ log, fixedRooms });
   const wss = new WebSocketServer({
     port,
     maxPayload: 4096,

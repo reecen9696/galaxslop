@@ -165,6 +165,15 @@ describe("relay over WebSocket", () => {
 });
 
 describe("relay logic", () => {
+  it("fixed rooms can be joined by code from the start", () => {
+    const relay = new Relay({ fixedRooms: ["play22"] });
+    const sent: Uint8Array[] = [];
+    const conn: Conn = { send: (b) => sent.push(b), close: () => {} };
+    relay.connect(conn);
+    relay.message(conn, hello("A", "PLAY22"));
+    expect(decodeWelcome(sent[0]).roomCode).toBe("PLAY22");
+  });
+
   it("drops clients silent for 15 s and rate-limits beyond 60 messages a second", () => {
     let t = 0;
     const relay = new Relay({ now: () => t });

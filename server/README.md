@@ -14,7 +14,9 @@ npm run typecheck
 ```
 
 Environment: `PORT` (default 8787), `ALLOWED_ORIGINS` (comma-separated
-origins for the browser build; unset accepts any, for local play).
+origins for the browser build; unset accepts any, for local play), `ROOMS`
+(comma-separated permanent room codes, e.g. `ROOMS=PLAY22`, so everyone can
+join a known room without passing a code around).
 
 - `src/protocol.ts`: the wire format the relay reads and writes.
 - `src/relay.ts`: rooms (6-character codes without 0/O/1/I/L, max 5

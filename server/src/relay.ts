@@ -39,12 +39,16 @@ interface Client {
 
 interface Room {
   code: string;
+  fixed: boolean;
   hostId: number;
   players: Map<number, Client>;
   emptySince: number | null;
 }
 
 export interface RelayOptions {
+  // Permanent rooms that exist from the start and are never deleted (local
+  // play and tests: everyone joins by a known code).
+  fixedRooms?: string[];
   now?: () => number;
   random?: () => number;
   log?: (msg: string) => void;
@@ -61,6 +65,10 @@ export class Relay {
     this.now = opts.now ?? Date.now;
     this.random = opts.random ?? Math.random;
     this.log = opts.log ?? (() => {});
+    for (const code of opts.fixedRooms ?? []) {
+      const c = code.trim().toUpperCase();
+      if (c) this.rooms.set(c, { code: c, fixed: true, hostId: 0, players: new Map(), emptySince: null });
+    }
   }
 
   connect(conn: Conn): void {
@@ -117,7 +125,7 @@ export class Relay {
       }
     }
     for (const [code, room] of this.rooms) {
-      if (room.emptySince !== null && t - room.emptySince > ROOM_IDLE_MS) this.rooms.delete(code);
+      if (!room.fixed && room.emptySince !== null && t - room.emptySince > ROOM_IDLE_MS) this.rooms.delete(code);
     }
   }
 
@@ -194,7 +202,7 @@ export class Relay {
       code = "";
       for (let i = 0; i < 6; i++) code += CODE_ALPHABET[Math.floor(this.random() * CODE_ALPHABET.length)];
     } while (this.rooms.has(code));
-    const room: Room = { code, hostId: 0, players: new Map(), emptySince: null };
+    const room: Room = { code, fixed: false, hostId: 0, players: new Map(), emptySince: null };
     this.rooms.set(code, room);
     return room;
   }
