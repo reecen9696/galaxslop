@@ -6,7 +6,7 @@ one task per branch, update this file in the same PR as the code.
 
 Fields:
 - `id`: phase + number. Stable. Never renumber.
-- `lane`: A (Claude by default), B (Gemini by default), shared.
+- `lane`: A (Claude by default), B (OpenCode by default), shared.
 - `status`: open | in_progress | review | blocked | paused | done
 - `owner`: lane letter once claimed. Empty while open.
 - `blocked_by`: task ids that must be `done` first.
@@ -119,8 +119,8 @@ renders in Chromium; one human has seen it.
 
 ### P0-06 Emscripten build: compile and link
 - lane: A
-- status: in_progress
-- owner: B
+- status: open
+- owner:
 - started: 2026-10-12
 - blocked_by: P0-11 (done)
 - touches: CMakeLists.txt, platform/src/web, web/
