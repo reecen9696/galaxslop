@@ -283,14 +283,21 @@ void netTick(const NetPlayerCapture* local) {
         s.state = 1;
         s.connector = std::thread([&s] {
             PortHostAllocScope scope;
-            auto ws = std::make_unique<WsClient>();
             std::string error, url = getenv("SMG_RELAY");
+#if defined(__EMSCRIPTEN__)
+            // The browser build talks through the page's WebSocket (P2-03 web half).
+            port_log("net: no WebSocket transport in this build yet");
+            s.state = 3;
+            return;
+#else
+            auto ws = std::make_unique<WsClient>();
             if (!ws->connect(url, &error)) {
                 port_log("net: %s", error.c_str());
                 s.state = 3;
                 return;
             }
             s.transport = std::move(ws);
+#endif
             sendHello(s);
             port_log("net: connected to %s", url.c_str());
             s.state = 2;
