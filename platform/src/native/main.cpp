@@ -205,16 +205,19 @@ int main(int argc, char** argv) {
         if (seconds > 0 && now - start >= (long long)seconds * 1000) {
             break;
         }
-        bool scripted = eventCount > 0 || headless;
-        if (scripted) {
+        // Windowed: the keyboard and mouse always drive the pad, and an input
+        // script (PETARI_INPUT) adds its presses on top while an entry is
+        // active, so a script can get through the menus and leave the playing
+        // to you.  Headless: the script alone.
+        if (headless) {
             memset(&pad, 0, sizeof(pad));
             pad.connected = 1;
             pad.pointerDist = 2.0f;
-            portApplyInputScript(events, eventCount, (int)(now - start), &pad);
         }
-        if (!desktop_present_frame(&pad, !scripted)) {
+        if (!desktop_present_frame(&pad, !headless)) {
             break;
         }
+        portApplyInputScript(events, eventCount, (int)(now - start), &pad);
         port_input_set(0, &pad);
         if (!shots.empty() && now >= nextShot) {
             nextShot = now + shotEvery;  // skip, never queue, shots when behind
