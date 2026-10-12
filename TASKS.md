@@ -297,25 +297,27 @@ with no desync complaints at 100 ms delay.
 
 ### P2-01 PlayerState encoder/decoder
 - lane: B
-- status: open
-- owner:
+- status: in_progress
+- owner: A (lane B task; B is on P0-06, hand back any time)
 - blocked_by: P0-09
 - touches: net/state
 - flags: parallel-ok
 - what: Encode/decode per NETCODE.md. f16 helpers. Unit tests with round-trip and fuzz. No game dependency; pure C++.
 - done when: tests pass.
 - log:
+  - 2026-10-13 (A): claimed while B works on P0-06, to get two native clients seeing each other.
 
 ### P2-02 Relay server (local Node)
 - lane: B
-- status: open
-- owner:
+- status: in_progress
+- owner: A (lane B task; B is on P0-06, hand back any time)
 - blocked_by:
 - touches: server/
 - flags: parallel-ok
 - what: WebSocket server. Rooms by code. Hello/Welcome/Joined/Left. Relay PlayerState. Ping/Pong. Rate limit. Vitest with 5 fake clients. `npm run dev`.
 - done when: soak test (5 clients, 30 Hz, 10 min) drops nothing.
 - log:
+  - 2026-10-13 (A): claimed while B works on P0-06, to get two native clients seeing each other.
 
 ### P2-03 NetClient and SAB ring
 - lane: B
