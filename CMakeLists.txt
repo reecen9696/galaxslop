@@ -7,6 +7,13 @@ cmake_minimum_required(VERSION 3.24)
 if(APPLE AND NOT CMAKE_OSX_ARCHITECTURES)
   set(CMAKE_OSX_ARCHITECTURES x86_64 CACHE STRING "" FORCE)
 endif()
+# The linker only honours -no_pie/-image_base for some deployment targets
+# (a GitHub runner's default silently produced a PIE at 0x10000); pin one.
+# 11.0 is the first macOS with Rosetta.  A post-link check below fails the
+# build if the image still lands elsewhere.
+if(APPLE AND NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+  set(CMAKE_OSX_DEPLOYMENT_TARGET 11.0 CACHE STRING "" FORCE)
+endif()
 
 project(GalaxyQuest C CXX)
 
@@ -54,6 +61,11 @@ set(DECOMP_INCLUDES
 )
 
 set(PORT_DEFS TARGET_PC=1 NDEBUG=1 VERSION=0)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND NOT ANDROID)
+  # libstdc++ still declares unary_function, bind1st, mem_fun... in C++20;
+  # libc++ does not, and platform/include/port/msl_ext.hpp supplies MSL's.
+  list(APPEND PORT_DEFS _GLIBCXX_USE_DEPRECATED=0)
+endif()
 
 # Paths in the binaries (__FILE__, debug info) relative to the repository
 # and the NDK, not the machine that built them.
@@ -154,6 +166,9 @@ if(NOT ANDROID)
     # x86_64, not position independent: a 64 KiB __PAGEZERO instead of 4 GiB
     # and the image at 0x98000000.
     target_link_options(smg PRIVATE -Wl,-pagezero_size,0x10000 -Wl,-no_pie -Wl,-image_base,0x98000000)
+    add_custom_command(TARGET smg POST_BUILD
+      COMMAND sh -c "otool -l \"$1\" | grep -A3 'segname __TEXT$' | grep -Eq 'vmaddr +0x0*98000000$' || { echo 'smg: __TEXT is not at 0x98000000; the game would crash (D-016)'; otool -l \"$1\" | grep -A3 'segname __TEXT$'; exit 1; }" _ $<TARGET_FILE:smg>
+      VERBATIM)
   else()
     target_link_options(smg PRIVATE -no-pie -Wl,-Ttext-segment=0x98000000)
   endif()
