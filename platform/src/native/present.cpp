@@ -7,6 +7,7 @@
 
 #include <SDL3/SDL.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <string>
@@ -78,7 +79,17 @@ bool desktop_present_init(bool headless, int scale) {
     if (headless) {
         flags |= SDL_WINDOW_HIDDEN;
     }
-    sWindow = SDL_CreateWindow("Super Mario Galaxy (smg-coop)", 1280, 720, flags);
+    // SMG_WINDOW="x,y,w,h": where the window goes (two clients side by side).
+    int wx = -1, wy = -1, ww = 1280, wh = 720;
+    if (const char* geo = getenv("SMG_WINDOW")) {
+        sscanf(geo, "%d,%d,%d,%d", &wx, &wy, &ww, &wh);
+    }
+    char title[96];
+    snprintf(title, sizeof(title), "Super Mario Galaxy (smg-coop)%s%s", getenv("SMG_NAME") ? " - " : "", getenv("SMG_NAME") ? getenv("SMG_NAME") : "");
+    sWindow = SDL_CreateWindow(title, ww, wh, flags);
+    if (sWindow && wx >= 0 && wy >= 0) {
+        SDL_SetWindowPosition(sWindow, wx, wy);
+    }
     if (!sWindow) {
         port_log("present: SDL_CreateWindow failed: %s", SDL_GetError());
         return false;
