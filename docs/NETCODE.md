@@ -25,8 +25,8 @@ unless marked f16.
 | 0x03 | PlayerJoined | s->c | yes | u8 id, u8 name_len, name, u8 character, u8 tint |
 | 0x04 | PlayerLeft | s->c | yes | u8 id |
 | 0x10 | PlayerState | c->s->c | no | see below |
-| 0x20 | ProgressEvent | c->s | yes | u16 kind, u16 galaxy, u8 scenario, u16 arg |
-| 0x21 | ProgressLog | s->c | yes | u32 from_seq, u16 count, then count x (u32 seq, u8 origin_id, u16 kind, u16 galaxy, u8 scenario, u16 arg) |
+| 0x20 | ProgressEvent | c->s | yes | u16 kind, u32 stage_hash, u8 scenario, u16 arg |
+| 0x21 | ProgressLog | s->c | yes | u32 from_seq, u16 count, then count x (u32 seq, u8 origin_id, u16 kind, u32 stage_hash, u8 scenario, u16 arg) |
 | 0x22 | ProgressAck | c->s | yes | u32 seq |
 | 0x30 | Ping | both | no | u32 t |
 | 0x31 | Pong | both | no | u32 t |
@@ -89,8 +89,13 @@ Phase 4 adds 100+ for objects.
 - Ack the highest contiguous `seq` applied. Server resends from the next
   unacked seq every 2 s.
 - Local star-get: send `ProgressEvent` immediately and keep sending until
-  the server's next `ProgressLog` includes it (idempotent on the server by
-  `(origin_id, kind, galaxy, scenario, arg)`).
+  the server's next `ProgressLog` includes it. The server is idempotent on
+  `(kind, stage_hash, scenario, arg)`, i.e. on what happened, not who did
+  it: a star is a fact about the shared save, so a second player getting
+  it adds no entry and no second toast. A duplicate is answered with the
+  log from the sender's acked position, so it learns the event is in.
+- Events and the log are broadcast to everyone in the room, the sender
+  included (that is its confirmation). Implemented in `server/src/relay.ts`.
 - Join-in-progress: `Welcome` is followed by `ProgressLog` from seq 0.
 
 ## Server behaviour

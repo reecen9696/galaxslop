@@ -411,14 +411,15 @@ observatory state.
 
 ### P3-01 Progress log on the server
 - lane: B
-- status: open
-- owner:
+- status: review
+- owner: A (lane B task; B on P0-06)
 - blocked_by: P2-02
 - touches: server/
 - flags: parallel-ok
 - what: Append-only log per room. Dedup by (origin, kind, galaxy, scenario, arg). ProgressLog send on join and on append. Ack tracking and resend. Tests.
 - done when: tests cover join-in-progress and resend.
 - log:
+  - 2026-10-13 (A): relay progress log: append-only per room, dedup by (kind, stage, scenario, arg) not origin (NETCODE updated, rationale there), broadcast incl. sender, full log on join, ack tracking, resend every 2 s from first unacked, 200 entries per message. vitest covers dedup, late join, resend/ack. Client side is P3-02 (blocked on P3-00 save policy).
 
 ### P3-02 Star-get event capture and merge
 - lane: A

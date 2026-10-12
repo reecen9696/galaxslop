@@ -8,7 +8,11 @@ import {
   PLAYER_STATE_MIN,
   PROTO_VERSION,
   decodeHello,
+  decodeProgressEvent,
   encodeError,
+  encodeProgressLog,
+  MAX_LOG_PER_MESSAGE,
+  type LoggedEvent,
   encodePlayerJoined,
   encodePlayerLeft,
   encodeWelcome,
@@ -19,6 +23,7 @@ import {
 export const MAX_PLAYERS = 5;
 export const IDLE_DROP_MS = 15_000; // drop a client after 15 s of silence
 export const RATE_LIMIT_PER_S = 60; // messages per client per second (spec)
+export const RESEND_MS = 2000; // unacknowledged progress is resent this often
 const ROOM_IDLE_MS = 24 * 60 * 60 * 1000;
 // No 0/O, 1/I/L: room codes are read out loud.
 const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
@@ -35,6 +40,8 @@ interface Client {
   lastHeard: number;
   windowStart: number;
   windowCount: number;
+  acked: number; // highest contiguous progress seq the client confirmed (-1: none)
+  lastLogSent: number;
 }
 
 interface Room {
@@ -43,6 +50,8 @@ interface Room {
   hostId: number;
   players: Map<number, Client>;
   emptySince: number | null;
+  log: LoggedEvent[]; // append-only; seq = index
+  logKeys: Set<string>; // what has happened, whoever did it first
 }
 
 export interface RelayOptions {
@@ -67,13 +76,13 @@ export class Relay {
     this.log = opts.log ?? (() => {});
     for (const code of opts.fixedRooms ?? []) {
       const c = code.trim().toUpperCase();
-      if (c) this.rooms.set(c, { code: c, fixed: true, hostId: 0, players: new Map(), emptySince: null });
+      if (c) this.rooms.set(c, { code: c, fixed: true, hostId: 0, players: new Map(), emptySince: null, log: [], logKeys: new Set() });
     }
   }
 
   connect(conn: Conn): void {
     const t = this.now();
-    this.clients.set(conn, { conn, lastHeard: t, windowStart: t, windowCount: 0 });
+    this.clients.set(conn, { conn, lastHeard: t, windowStart: t, windowCount: 0, acked: -1, lastLogSent: 0 });
   }
 
   disconnect(conn: Conn): void {
@@ -109,8 +118,17 @@ export class Relay {
           conn.send(out);
         }
         break;
+      case Msg.ProgressEvent:
+        this.onProgressEvent(c, data);
+        break;
+      case Msg.ProgressAck:
+        if (data.length >= 5) {
+          const seq = new DataView(data.buffer, data.byteOffset, data.byteLength).getUint32(1, true);
+          if (c.room && seq < c.room.log.length && seq > c.acked) c.acked = seq;
+        }
+        break;
       default:
-        break; // progress messages arrive with P3-01
+        break;
     }
   }
 
@@ -123,6 +141,10 @@ export class Relay {
         c.conn.close();
         this.disconnect(c.conn);
       }
+    }
+    // Resend unacknowledged progress (NETCODE "Progress merge").
+    for (const c of this.clients.values()) {
+      if (c.room && c.acked + 1 < c.room.log.length && t - c.lastLogSent >= RESEND_MS) this.sendLog(c, c.acked + 1);
     }
     for (const [code, room] of this.rooms) {
       if (!room.fixed && room.emptySince !== null && t - room.emptySince > ROOM_IDLE_MS) this.rooms.delete(code);
@@ -171,6 +193,8 @@ export class Relay {
 
     const everyone = [...room.players.values()].map((p) => p.info!);
     c.conn.send(encodeWelcome(id, room.code, everyone));
+    c.acked = -1;
+    if (room.log.length > 0) this.sendLog(c, 0); // join-in-progress: the whole log
     const joined = encodePlayerJoined(info);
     for (const other of room.players.values()) if (other !== c) other.conn.send(joined);
     this.log(`${info.name} joined ${room.code} as ${id} (${room.players.size} players)`);
@@ -182,6 +206,42 @@ export class Relay {
     if (data.length < PLAYER_STATE_MIN || data.length > PLAYER_STATE_MAX) return;
     const out = forwardPlayerState(c.info.id, data);
     for (const other of room.players.values()) if (other !== c) other.conn.send(out);
+  }
+
+  private onProgressEvent(c: Client, data: Uint8Array): void {
+    const room = c.room;
+    if (!room || !c.info) return;
+    const e = decodeProgressEvent(data);
+    if (!e) return;
+    // Idempotent on what happened, not who did it: a star is a fact about the
+    // shared save, so a second player getting it adds nothing.
+    const key = `${e.kind}:${e.stageHash}:${e.scenario}:${e.arg}`;
+    if (room.logKeys.has(key)) {
+      this.sendLog(c, Math.max(0, c.acked + 1)); // the sender learns it is in
+      return;
+    }
+    room.logKeys.add(key);
+    const entry: LoggedEvent = { ...e, seq: room.log.length, origin: c.info.id };
+    room.log.push(entry);
+    const msg = encodeProgressLog(entry.seq, [entry]);
+    for (const p of room.players.values()) {
+      p.conn.send(msg);
+      p.lastLogSent = this.now();
+    }
+    this.log(`progress ${room.code}#${entry.seq} from ${c.info.name}: kind ${e.kind} stage ${e.stageHash.toString(16)}/${e.scenario} arg ${e.arg}`);
+  }
+
+  private sendLog(c: Client, from: number): void {
+    const room = c.room;
+    if (!room) return;
+    const events = room.log.slice(from, from + MAX_LOG_PER_MESSAGE);
+    if (events.length === 0) return;
+    c.conn.send(encodeProgressLog(from, events));
+    c.lastLogSent = this.now();
+  }
+
+  roomLog(code: string): LoggedEvent[] {
+    return this.rooms.get(code)?.log ?? [];
   }
 
   private leaveRoom(c: Client): void {
@@ -202,7 +262,7 @@ export class Relay {
       code = "";
       for (let i = 0; i < 6; i++) code += CODE_ALPHABET[Math.floor(this.random() * CODE_ALPHABET.length)];
     } while (this.rooms.has(code));
-    const room: Room = { code, fixed: false, hostId: 0, players: new Map(), emptySince: null };
+    const room: Room = { code, fixed: false, hostId: 0, players: new Map(), emptySince: null, log: [], logKeys: new Set() };
     this.rooms.set(code, room);
     return room;
   }

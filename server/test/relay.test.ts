@@ -1,8 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import WebSocket from "ws";
 import { startServer } from "../src/main.ts";
-import { ErrorCode, Msg, PROTO_VERSION, decodeWelcome, encodeHello } from "../src/protocol.ts";
-import { MAX_PLAYERS, Relay, type Conn } from "../src/relay.ts";
+import {
+  ErrorCode,
+  Msg,
+  PROTO_VERSION,
+  decodeProgressLog,
+  decodeWelcome,
+  encodeHello,
+  encodeProgressEvent,
+} from "../src/protocol.ts";
+import { MAX_PLAYERS, RESEND_MS, Relay, type Conn } from "../src/relay.ts";
 
 // A real WebSocket client that collects what it receives.
 class TestClient {
@@ -195,5 +203,83 @@ describe("relay logic", () => {
     expect(closed[1]).toBe(true);
     expect(sent[0].some((m) => m[0] === Msg.PlayerLeft && m[1] === 2)).toBe(true);
     expect(closed[0]).toBe(false);
+  });
+});
+
+describe("progress log (P3-01)", () => {
+  function setup() {
+    let t = 0;
+    const relay = new Relay({ now: () => t, fixedRooms: ["ROOM22"] });
+    const inbox: Uint8Array[][] = [];
+    const conns: Conn[] = [];
+    const join = (name: string) => {
+      const i = conns.length;
+      inbox.push([]);
+      const c: Conn = { send: (b) => inbox[i].push(b), close: () => {} };
+      conns.push(c);
+      relay.connect(c);
+      relay.message(c, hello(name, "ROOM22"));
+      return i;
+    };
+    const logs = (i: number) => inbox[i].filter((m) => m[0] === Msg.ProgressLog).map(decodeProgressLog);
+    const ack = (i: number, seq: number) => {
+      const b = new Uint8Array(5);
+      b[0] = Msg.ProgressAck;
+      new DataView(b.buffer).setUint32(1, seq, true);
+      relay.message(conns[i], b);
+    };
+    return { relay, conns, inbox, join, logs, ack, advance: (ms: number) => (t += ms) };
+  }
+  const star = (arg: number) => encodeProgressEvent({ kind: 1, stageHash: 0xe15ee5b8, scenario: 1, arg });
+
+  it("appends events, broadcasts them to everyone including the sender, and dedups by what happened", () => {
+    const { relay, conns, join, logs } = setup();
+    const a = join("A");
+    const b = join("B");
+    relay.message(conns[a], star(0));
+    relay.message(conns[b], star(0)); // same star, other player: not a new event
+    relay.message(conns[b], star(1));
+    expect(relay.roomLog("ROOM22").map((e) => [e.seq, e.origin, e.arg])).toEqual([
+      [0, 1, 0],
+      [1, 2, 1],
+    ]);
+    const seenByA = logs(a).flatMap((l) => l.events.map((e) => e.seq));
+    expect(new Set(seenByA)).toEqual(new Set([0, 1]));
+  });
+
+  it("sends the whole log to a late joiner", () => {
+    const { relay, conns, join, logs } = setup();
+    const a = join("A");
+    relay.message(conns[a], star(0));
+    relay.message(conns[a], star(1));
+    relay.message(conns[a], star(2));
+    const late = join("Late");
+    const first = logs(late)[0];
+    expect(first.fromSeq).toBe(0);
+    expect(first.events.map((e) => e.arg)).toEqual([0, 1, 2]);
+  });
+
+  it("resends from the first unacknowledged entry every 2 s until acked", () => {
+    const { relay, conns, join, logs, ack, advance, inbox } = setup();
+    const a = join("A");
+    const b = join("B");
+    relay.message(conns[a], star(0));
+    relay.message(conns[a], star(1));
+    ack(a, 1);
+    ack(b, 0);
+    inbox[a].length = 0;
+    inbox[b].length = 0;
+    advance(RESEND_MS);
+    relay.tick();
+    expect(logs(a)).toEqual([]); // A has everything
+    const resent = logs(b);
+    expect(resent.length).toBe(1);
+    expect(resent[0].fromSeq).toBe(1);
+    expect(resent[0].events.map((e) => e.seq)).toEqual([1]);
+    ack(b, 1);
+    inbox[b].length = 0;
+    advance(RESEND_MS);
+    relay.tick();
+    expect(logs(b)).toEqual([]);
   });
 });

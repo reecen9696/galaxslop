@@ -97,6 +97,84 @@ class Writer {
   }
 }
 
+// Shared progress (P3-01).  ProgressEvent c->s: u16 kind, u32 stage_hash,
+// u8 scenario, u16 arg.  ProgressLog s->c: u32 from_seq, u16 count, then
+// count x (u32 seq, u8 origin_id, u16 kind, u32 stage_hash, u8 scenario,
+// u16 arg).  ProgressAck c->s: u32 seq.
+export interface ProgressEvent {
+  kind: number;
+  stageHash: number;
+  scenario: number;
+  arg: number;
+}
+
+export interface LoggedEvent extends ProgressEvent {
+  seq: number;
+  origin: number;
+}
+
+export const PROGRESS_EVENT_SIZE = 1 + 2 + 4 + 1 + 2;
+export const MAX_LOG_PER_MESSAGE = 200;
+
+export function encodeProgressEvent(e: ProgressEvent): Uint8Array {
+  const b = new Uint8Array(PROGRESS_EVENT_SIZE);
+  const v = new DataView(b.buffer);
+  b[0] = Msg.ProgressEvent;
+  v.setUint16(1, e.kind, true);
+  v.setUint32(3, e.stageHash >>> 0, true);
+  b[7] = e.scenario;
+  v.setUint16(8, e.arg, true);
+  return b;
+}
+
+export function decodeProgressEvent(b: Uint8Array): ProgressEvent | null {
+  if (b.length < PROGRESS_EVENT_SIZE || b[0] !== Msg.ProgressEvent) return null;
+  const v = new DataView(b.buffer, b.byteOffset, b.byteLength);
+  return { kind: v.getUint16(1, true), stageHash: v.getUint32(3, true), scenario: b[7], arg: v.getUint16(8, true) };
+}
+
+const LOG_ENTRY_SIZE = 4 + 1 + 2 + 4 + 1 + 2;
+
+export function encodeProgressLog(fromSeq: number, events: LoggedEvent[]): Uint8Array {
+  const b = new Uint8Array(1 + 4 + 2 + events.length * LOG_ENTRY_SIZE);
+  const v = new DataView(b.buffer);
+  b[0] = Msg.ProgressLog;
+  v.setUint32(1, fromSeq, true);
+  v.setUint16(5, events.length, true);
+  let o = 7;
+  for (const e of events) {
+    v.setUint32(o, e.seq, true);
+    b[o + 4] = e.origin;
+    v.setUint16(o + 5, e.kind, true);
+    v.setUint32(o + 7, e.stageHash >>> 0, true);
+    b[o + 11] = e.scenario;
+    v.setUint16(o + 12, e.arg, true);
+    o += LOG_ENTRY_SIZE;
+  }
+  return b;
+}
+
+export function decodeProgressLog(b: Uint8Array): { fromSeq: number; events: LoggedEvent[] } {
+  const v = new DataView(b.buffer, b.byteOffset, b.byteLength);
+  if (b[0] !== Msg.ProgressLog) throw new Error("not ProgressLog");
+  const fromSeq = v.getUint32(1, true);
+  const n = v.getUint16(5, true);
+  const events: LoggedEvent[] = [];
+  let o = 7;
+  for (let i = 0; i < n; i++) {
+    events.push({
+      seq: v.getUint32(o, true),
+      origin: b[o + 4],
+      kind: v.getUint16(o + 5, true),
+      stageHash: v.getUint32(o + 7, true),
+      scenario: b[o + 11],
+      arg: v.getUint16(o + 12, true),
+    });
+    o += LOG_ENTRY_SIZE;
+  }
+  return { fromSeq, events };
+}
+
 export function encodeHello(h: Hello): Uint8Array {
   return new Writer().u8(Msg.Hello).u8(h.protoVer).str(h.name).u8(h.character).u8(h.tint).str(h.roomCode).bytes();
 }
