@@ -17,9 +17,32 @@
 #include "port/input.h"
 #include "port/port.h"
 
+#ifdef __APPLE__
+#include <objc/message.h>
+#include <objc/runtime.h>
+#endif
+
 extern "C" void port_headless_write_png(const char* path, const unsigned char* rgba, int w, int h);
 
 namespace {
+
+#ifdef __APPLE__
+// Opts out of App Nap, which throttles a hidden or backgrounded app with no
+// audio almost to a stop (seen: 57 fps -> 0.5 fps after ~30 s headless).  The
+// game must keep running when its window is not in front, above all in co-op.
+// [[NSProcessInfo processInfo] beginActivityWithOptions:reason:], via the
+// Objective-C runtime so this file stays C++.
+void disableAppNap() {
+    const unsigned long long kUserInitiated = 0x00FFFFFFull;   // NSActivityUserInitiated
+    const unsigned long long kLatencyCritical = 0xFF00000000ull;  // NSActivityLatencyCritical
+    id info = ((id(*)(id, SEL))objc_msgSend)((id)objc_getClass("NSProcessInfo"), sel_registerName("processInfo"));
+    id reason = ((id(*)(id, SEL, const char*))objc_msgSend)((id)objc_getClass("NSString"), sel_registerName("stringWithUTF8String:"),
+                                                            "Super Mario Galaxy is running");
+    id activity = ((id(*)(id, SEL, unsigned long long, id))objc_msgSend)(info, sel_registerName("beginActivityWithOptions:reason:"),
+                                                                        kUserInitiated | kLatencyCritical, reason);
+    ((id(*)(id, SEL))objc_msgSend)(activity, sel_registerName("retain"));  // held for the process's life
+}
+#endif
 
 // Native EFB size the recorder works in (headless_render.cpp's base size).
 const int kEfbW = 640, kEfbH = 456;
@@ -39,6 +62,9 @@ enum : uint32_t {
 
 bool desktop_present_init(bool headless, int scale) {
     sScale = scale > 0 ? scale : 2;
+#ifdef __APPLE__
+    disableAppNap();
+#endif
     if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD)) {
         port_log("present: SDL_Init failed: %s", SDL_GetError());
         return false;

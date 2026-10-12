@@ -212,7 +212,7 @@ int main(int argc, char** argv) {
         }
         port_input_set(0, &pad);
         if (!shots.empty() && now >= nextShot) {
-            nextShot += shotEvery;
+            nextShot = now + shotEvery;  // skip, never queue, shots when behind
             char path[1024];
             snprintf(path, sizeof(path), "%s/frame_%03d.png", shots.c_str(), shotIndex++);
             unsigned long long n = desktop_present_shot(path);
