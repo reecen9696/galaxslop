@@ -11,7 +11,8 @@
 #include "Game/Player/J3DModelX.hpp"
 #include "Game/Scene/SceneFunction.hpp"
 #include "Game/Util/ActorShadowUtil.hpp"
-#include "Game/Util/DemoUtil.hpp"
+#include "Game/Util/EventUtil.hpp"
+#include "Game/Util/SceneUtil.hpp"
 #include "Game/Util/LiveActorUtil.hpp"
 #include "Game/Util/MathUtil.hpp"
 #include "Game/Util/ModelUtil.hpp"
@@ -37,17 +38,9 @@ void RemotePlayerPuppet::init(const JMapInfoIter&) {
     initModelManagerWithAnm(model, nullptr, false);
     MR::connectToScene(this, MR::MovementType_Player, MR::CalcAnimType_Player, MR::DrawBufferType_None, MR::DrawType_Player);
     mVelocity.zero();
-
-    // GhostPlayer::initAnimation: the player's own animation table, so the
-    // captured hashes (MR::getHashCode of a player animation) resolve.
-    XanimeResourceTable* resource = MR::getPlayerXanimeResource();
-    mXanimePlayer = new XanimePlayer(MR::getJ3DModel(this), resource);
-    mXanimePlayer->duplicateSimpleGroup();
-    mModelManager->mXanimePlayer = mXanimePlayer;
-    mXanimePlayer->setDefaultAnimation(kBasicAnim);
-    mXanimePlayer->getCore()->enableJointTransform(MR::getJ3DModelData(this));
-    mXanimePlayerUpper = new XanimePlayer(MR::getJ3DModel(this), resource, mXanimePlayer);
-    mXanimePlayerUpper->changeAnimation(kBasicAnim);
+    // The animation players need the player's animation table, and the player
+    // does not exist yet during scene initialisation: initAnimation() runs on
+    // the first frame with state (applyState).
 
     MR::initShadowVolumeSphere(this, 50.0f);
     MR::invalidateClipping(this);
@@ -62,7 +55,27 @@ void RemotePlayerPuppet::appear() {
     MR::startBrk(this, model);
 }
 
+// GhostPlayer::initAnimation: the player's own animation table, so the
+// captured hashes (MR::getHashCode of a player animation) resolve.
+void RemotePlayerPuppet::initAnimation() {
+    XanimeResourceTable* resource = MR::getPlayerXanimeResource();
+    mXanimePlayer = new XanimePlayer(MR::getJ3DModel(this), resource);
+    mXanimePlayer->duplicateSimpleGroup();
+    mModelManager->mXanimePlayer = mXanimePlayer;
+    mXanimePlayer->setDefaultAnimation(kBasicAnim);
+    mXanimePlayer->getCore()->enableJointTransform(MR::getJ3DModelData(this));
+    mXanimePlayerUpper = new XanimePlayer(MR::getJ3DModel(this), resource, mXanimePlayer);
+    mXanimePlayerUpper->changeAnimation(kBasicAnim);
+}
+
 void RemotePlayerPuppet::applyState(const NetPlayerCapture& rState, bool valid) {
+    if (mXanimePlayer == nullptr) {
+        if (!MR::isExistMario()) {
+            mHidden = true;
+            return;
+        }
+        initAnimation();
+    }
     mHidden = !valid || (rState.flags & NET_CAPTURE_HIDDEN) != 0;
     if (mHidden) {
         return;
@@ -115,40 +128,50 @@ void RemotePlayerPuppet::draw() const {
 // ---------------------------------------------------------------------------
 // Per-scene management
 // ---------------------------------------------------------------------------
+// Puppets are created during scene initialisation, like every other actor:
+// ModelManager::init queues resource creation on the game's main thread and
+// waits for it, which deadlocks if called from the main thread's own frame
+// update (seen: GameScene::update -> ... -> FunctionAsyncExecutor::waitForEnd).
 namespace {
-void* sScene = nullptr;  // the GameScene the puppets belong to
+void* sScene = nullptr;            // the GameScene the puppets belong to
 RemotePlayerPuppet* sLoopback = nullptr;
+bool sAdoptOnNextScene = false;    // created during init, before the scene ran
 }  // namespace
+
+extern "C" int port_net_wants_puppets(void) {
+    const char* loopback = getenv("PETARI_LOOPBACK");
+    return loopback != nullptr && *loopback;
+}
+
+extern "C" void port_net_puppets_create_for_scene(void) {
+    if (!port_net_wants_puppets() || MR::isStageFileSelect()) {
+        return;  // not on the title / file-select stage
+    }
+    bool luigi = MR::isPlayerLuigi();
+    sLoopback = new RemotePlayerPuppet("RemotePlayerPuppet", luigi);
+    sLoopback->initWithoutIter();
+    sAdoptOnNextScene = true;
+    port_log("puppet: created for the new scene (%s)", luigi ? "Luigi" : "Mario");
+}
 
 extern "C" void port_net_puppets_update(void* pScene) {
     static const char* loopback = getenv("PETARI_LOOPBACK");
     if (!loopback || !*loopback) {
         return;
     }
-    static int sQuietFrames = 0;
     if (pScene != sScene) {
-        // A new scene: the old one's actors died with its heap.
         sScene = pScene;
-        sLoopback = nullptr;
-        sQuietFrames = 0;
+        if (sAdoptOnNextScene) {
+            sAdoptOnNextScene = false;
+        } else {
+            sLoopback = nullptr;  // the old scene's actors died with its heap
+        }
     }
-    // Create puppets only after 2 s of ordinary gameplay (no cutscene), well
-    // clear of the scene's own loading, as PETARI_STAGE's jump does.
-    if (MR::isDemoActive()) {
-        sQuietFrames = 0;
-    } else if (sQuietFrames < 120) {
-        sQuietFrames++;
+    if (sLoopback == nullptr) {
+        return;
     }
     NetPlayerCapture now;
     if (!net_capture_latest(&now)) {
-        return;
-    }
-    if (sLoopback == nullptr && sQuietFrames >= 120) {
-        sLoopback = new RemotePlayerPuppet("RemotePlayerPuppet", (now.flags & NET_CAPTURE_LUIGI) != 0);
-        sLoopback->initWithoutIter();
-        port_log("puppet: loopback puppet created (%.1f s behind)", atof(loopback));
-    }
-    if (sLoopback == nullptr) {
         return;
     }
     int64_t delayNs = (int64_t)(atof(loopback) * 1e9);

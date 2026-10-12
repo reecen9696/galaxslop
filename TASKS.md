@@ -342,14 +342,15 @@ with no desync complaints at 100 ms delay.
 
 ### P2-05 RemotePlayerPuppet actor
 - lane: A
-- status: open
-- owner:
+- status: in_progress
+- owner: A (solo)
 - blocked_by: P2-04 (P2-03 for the network; a loopback test needs neither)
 - touches: net/puppet, decomp/src/Game/Scene (spawn hook only; name the file in the log)
 - flags: parallel-ok
 - what: `LiveActor` subclass with Mario and Luigi model loading (copy an NPC's pattern), animation player, Hermite interpolation at now-100ms, freeze/hide rules, tint by palette, galaxy/scenario gating. Spawn on scene enter for every known remote; despawn on scene exit. Heap budget measured and logged. For scale: smg-online draws up to 16 remote Marios inside real Wii memory, so 4 puppets fitting is expected, not a risk.
 - done when: a second tab's Mario is visible and moves smoothly in Good Egg.
 - log:
+  - 2026-10-12: loopback milestone works natively: PETARI_LOOPBACK=1 draws a GhostMario puppet replaying the local player 1 s late in the prologue courtyard (screenshot: blue ghost trailing Mario). Lessons: (1) create puppets during scene init (SceneDataInitializer::initAfterScenarioSelected), never from the frame update: ModelManager::init waits on a main-thread job and deadlocks there; (2) add GhostMario/GhostLuigi to the stage's archive list (startStageFileLoadAfterScenarioSelected); (3) build the XanimePlayers on the first frame the player exists (the table is the player's); (4) skip the file-select stage. Next: animation sync check (does the hash map to the right motion?), then drive it from P2-03 instead of the loopback.
   - 2026-10-12 (A): model it on GhostPlayer (Cosmic Mario ghost): XanimePlayer + upper-body player, changeAnimationByHash, receiveGhostPacket's apply logic. First milestone: a loopback puppet that replays the local player's captured state ~1 s late, no network.
 
 ### P2-06 Lobby screen

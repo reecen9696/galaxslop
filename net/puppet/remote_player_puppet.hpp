@@ -23,6 +23,7 @@ public:
     virtual void calcAndSetBaseMtx();
     virtual void draw() const;
 
+    void initAnimation();
     // Pose for this frame; `valid` false hides the puppet.
     void applyState(const NetPlayerCapture& rState, bool valid);
 
@@ -38,3 +39,11 @@ public:
 // gameplay frame.  PETARI_LOOPBACK=<seconds>: one puppet replays the local
 // player's own capture that many seconds late (no network).
 extern "C" void port_net_puppets_update(void* pScene);
+
+// Creates this scene's puppets; called during scene initialisation
+// (SceneDataInitializer, TARGET_PC), where actors may be created.
+extern "C" void port_net_puppets_create_for_scene(void);
+
+// Whether this session draws remote players, so stage loading also mounts
+// the puppet models (SceneDataInitializer, TARGET_PC).
+extern "C" int port_net_wants_puppets(void);
