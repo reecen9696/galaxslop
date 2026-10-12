@@ -17,7 +17,7 @@ jobs:
       - name: Configure
         run: cmake -S . -B build/native -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
       - name: Build
-        run: ninja -C build/native smg
+        run: ninja -C build/native -k 0 smg  # all errors in one run
       - name: Check the image sits at 0x98000000
         run: |
           otool -l build/native/smg | grep -A3 -E 'segname (__PAGEZERO|__TEXT)$'
@@ -36,7 +36,7 @@ jobs:
       - name: Configure
         run: cmake -S . -B build/native -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
       - name: Build
-        run: ninja -C build/native smg
+        run: ninja -C build/native -k 0 smg  # all errors in one run
 
   tools:
     runs-on: ubuntu-24.04
