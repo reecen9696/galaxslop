@@ -10,12 +10,20 @@ and both work off the same board in `TASKS.md`.
 
 ## Read this first
 
-**The decompiled code in this repo does not contain the game.** Petari is
-source code only: no models, textures, levels, music or text. The game only
-runs when it has the data from a Super Mario Galaxy disc. That data is never
-committed here. Each person extracts their own disc once, cooks it with the
-tool in `tools/cook/`, and keeps the result in `game/` (gitignored). The
-browser build loads it from local storage on the user's machine.
+**We have all of the game's code. We have none of the game's data.**
+Petari (`decomp/`) is 100% of Super Mario Galaxy's logic, for all four
+regions. A game is code plus data, and the data (models, textures, level
+layouts, animations, music, text, movies: about 1 GB, 3.3 GB with movies)
+lives only on the disc. A decompilation cannot contain it and nobody can
+give it to you. That data is never committed here. Each person extracts
+their own disc once with Dolphin (~30 min), cooks it with the tool in
+`tools/cook/`, and keeps the result in `game/` (gitignored). The browser
+build loads it from local storage on the user's machine.
+
+Nothing about the port is an open research question: compiling Petari for
+PC was done by GalaxyQuest (all 44 galaxies load), running it in a browser
+was done by SMGwebport, the multiplayer model runs today as smg-online in
+Dolphin. What is left is the work on the board.
 
 If you don't have a disc dump yet, you can still do a lot of the work:
 everything in the platform layer, the renderer, the build system, the net
