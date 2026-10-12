@@ -40,6 +40,25 @@ jobs:
       - name: Build
         run: ninja -C build/native -k 0 smg  # all errors in one run
 
+  web:
+    # The browser build (docs/WEB.md).  Emscripten pinned to the version the
+    # port was brought up with.
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y ninja-build
+      - name: Emscripten
+        run: |
+          git clone --depth 1 https://github.com/emscripten-core/emsdk ~/emsdk
+          ~/emsdk/emsdk install 6.0.12 && ~/emsdk/emsdk activate 6.0.12
+      - name: Build (browser)
+        run: |
+          source ~/emsdk/emsdk_env.sh
+          emcmake cmake -S . -B build/web -G Ninja -DCMAKE_BUILD_TYPE=Release -DSMG_WEB_NODE=OFF
+          ninja -C build/web -k 0 smg
+      - name: Dev tools parse
+        run: node --check web/dev-server.mjs && node --check tools/web/smoke.mjs
+
   tools:
     runs-on: ubuntu-24.04
     steps:
