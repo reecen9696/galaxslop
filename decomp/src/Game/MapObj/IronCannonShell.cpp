@@ -88,7 +88,7 @@ void IronCannonLauncherPoint::initBullet() {
     mShellHolder = new CannonShellHolder(3);
 
     for (s32 i = 0; i < 3; i++) {
-        IronCannonShell* pShell = new IronCannonShell("キャノン弾砲台の弾");
+        IronCannonShell* pShell = new IronCannonShell("\x83\x4c\x83\x83\x83\x6d\x83\x93\x92\x65\x96\x43\x91\xe4\x82\xcc\x92\x65");
         pShell->initWithoutIter();
         pShell->makeActorDead();
         mShellHolder->registerCannonShell(pShell);

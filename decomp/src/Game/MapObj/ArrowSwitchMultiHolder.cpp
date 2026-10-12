@@ -13,7 +13,7 @@ namespace {
     }
 };  // namespace
 
-ArrowSwitchMultiHolder::ArrowSwitchMultiHolder() : DeriveActorGroup("複数方向矢印スイッチ管理", ::sMaxArrowSwitchMulti) {
+ArrowSwitchMultiHolder::ArrowSwitchMultiHolder() : DeriveActorGroup("\x95\xa1\x90\x94\x95\xfb\x8c\xfc\x96\xee\x88\xf3\x83\x58\x83\x43\x83\x62\x83\x60\x8a\xc7\x97\x9d", ::sMaxArrowSwitchMulti) {
 }
 
 ArrowSwitchMulti* ArrowSwitchMultiHolder::findSwitch(const JMapIdInfo* pIdInfo) {

@@ -44,9 +44,9 @@ void TrickRabbitSnowCollect::init(const JMapInfoIter& rIter) {
     mTimerLayout = new BombTimerLayout(true);
     mTimerLayout->initWithoutIter();
 
-    MR::initMultiActorCamera(this, rIter, &mCameraInfo, "ウサギと会話");
+    MR::initMultiActorCamera(this, rIter, &mCameraInfo, "\x83\x45\x83\x54\x83\x4d\x82\xc6\x89\xef\x98\x62");
 
-    mPowerStarDemoModel = MR::createPowerStarDemoModel(this, "パワースターデモモデル", mRabbit[2]->getBaseMtx());
+    mPowerStarDemoModel = MR::createPowerStarDemoModel(this, "\x83\x70\x83\x8f\x81\x5b\x83\x58\x83\x5e\x81\x5b\x83\x66\x83\x82\x83\x82\x83\x66\x83\x8b", mRabbit[2]->getBaseMtx());
     mPowerStarDemoModel->kill();
 
     initNerve(GET_NERVE(TrickRabbitFreeRunCollect, TrickRabbitSnowCollectNrvWait));
@@ -66,7 +66,7 @@ void TrickRabbitSnowCollect::initRabbits(const JMapInfoIter& rIter) {
         const char* childObjName;
         MR::getChildObjName(&childObjName, rIter, i);
 
-        mRabbit[i] = new TrickRabbitSnow("雪ウサギ");
+        mRabbit[i] = new TrickRabbitSnow("\x90\xe1\x83\x45\x83\x54\x83\x4d");
         mRabbit[i]->setListener(listener);
         MR::initChildObj(mRabbit[i], rIter, i);
     }
@@ -85,7 +85,7 @@ void TrickRabbitSnowCollect::setStartPosition() {
         MR::requestMovementOn(mRabbit[i]);
     }
 
-    MR::setPlayerLinkPosAndWait(this, "マリオ位置");
+    MR::setPlayerLinkPosAndWait(this, "\x83\x7d\x83\x8a\x83\x49\x88\xca\x92\x75");
 }
 
 void TrickRabbitSnowCollect::setFinishPosition() {
@@ -93,7 +93,7 @@ void TrickRabbitSnowCollect::setFinishPosition() {
         mRabbit[i]->setFinishPosition();
     }
 
-    MR::setPlayerLinkPosAndWait(this, "マリオ位置");
+    MR::setPlayerLinkPosAndWait(this, "\x83\x7d\x83\x8a\x83\x49\x88\xca\x92\x75");
 }
 
 void TrickRabbitSnowCollect::noticeCaught(TrickRabbitSnow* pSubject) {
@@ -126,7 +126,7 @@ void TrickRabbitSnowCollect::startSuccessDemo() {
     mIsDemo = true;
 
     MR::startSystemSE("SE_SY_TOTAL_COMPLETE");
-    MR::requestStartDemoMarioPuppetableWithoutCinemaFrame(this, "雪ウサギ集め成功",
+    MR::requestStartDemoMarioPuppetableWithoutCinemaFrame(this, "\x90\xe1\x83\x45\x83\x54\x83\x4d\x8f\x57\x82\xdf\x90\xac\x8c\xf7",
                                                           GET_NERVE(TrickRabbitFreeRunCollect, TrickRabbitSnowCollectNrvSuccessWipeOut),
                                                           GET_NERVE(TrickRabbitFreeRunCollect, TrickRabbitSnowCollectNrvTryDemo));
 }
@@ -138,7 +138,7 @@ void TrickRabbitSnowCollect::startFailedDemo() {
 
     mIsDemo = true;
 
-    MR::requestStartDemoMarioPuppetableWithoutCinemaFrame(this, "雪ウサギ集め失敗",
+    MR::requestStartDemoMarioPuppetableWithoutCinemaFrame(this, "\x90\xe1\x83\x45\x83\x54\x83\x4d\x8f\x57\x82\xdf\x8e\xb8\x94\x73",
                                                           GET_NERVE(TrickRabbitFreeRunCollect, TrickRabbitSnowCollectNrvFailedWipeOut),
                                                           GET_NERVE(TrickRabbitFreeRunCollect, TrickRabbitSnowCollectNrvTryDemo));
 }
@@ -161,7 +161,7 @@ void TrickRabbitSnowCollect::exeStartWipeOut() {
         return;
     }
 
-    MR::requestStartDemoMarioPuppetableWithoutCinemaFrame(this, "雪ウサギ開始",
+    MR::requestStartDemoMarioPuppetableWithoutCinemaFrame(this, "\x90\xe1\x83\x45\x83\x54\x83\x4d\x8a\x4a\x8e\x6e",
                                                           GET_NERVE(TrickRabbitFreeRunCollect, TrickRabbitSnowCollectNrvStartWipeIn),
                                                           GET_NERVE(TrickRabbitFreeRunCollect, TrickRabbitSnowCollectNrvTryDemo));
 }
@@ -170,7 +170,7 @@ void TrickRabbitSnowCollect::exeStartWipeIn() {
     if (MR::isFirstStep(this)) {
         MR::tryPlayerKillTakingActor();
         MR::startBckPlayer("BattleWait");
-        MR::startMultiActorCameraTargetPlayer(this, mCameraInfo, "ウサギと会話", 0);
+        MR::startMultiActorCameraTargetPlayer(this, mCameraInfo, "\x83\x45\x83\x54\x83\x4d\x82\xc6\x89\xef\x98\x62", 0);
         setStartPosition();
         MR::openWipeFade();
     }
@@ -211,8 +211,8 @@ void TrickRabbitSnowCollect::exeWaitHideSnow() {
     }
 
     if (isAllHideSnow) {
-        MR::endMultiActorCamera(this, mCameraInfo, "ウサギと会話", 0, -1);
-        MR::endDemo(this, "雪ウサギ開始");
+        MR::endMultiActorCamera(this, mCameraInfo, "\x83\x45\x83\x54\x83\x4d\x82\xc6\x89\xef\x98\x62", 0, -1);
+        MR::endDemo(this, "\x90\xe1\x83\x45\x83\x54\x83\x4d\x8a\x4a\x8e\x6e");
         setNerve(GET_NERVE(TrickRabbitFreeRunCollect, TrickRabbitSnowCollectNrvStart));
     }
 }
@@ -270,7 +270,7 @@ void TrickRabbitSnowCollect::exeFailedWipeIn() {
     if (MR::isFirstStep(this)) {
         setFinishPosition();
         MR::startBckPlayer("BattleWait");
-        MR::startMultiActorCameraTargetPlayer(this, mCameraInfo, "ウサギと会話", 0);
+        MR::startMultiActorCameraTargetPlayer(this, mCameraInfo, "\x83\x45\x83\x54\x83\x4d\x82\xc6\x89\xef\x98\x62", 0);
         MR::startLastStageBGM();
         MR::openWipeFade();
     }
@@ -285,8 +285,8 @@ void TrickRabbitSnowCollect::exeFailedWipeIn() {
 
 void TrickRabbitSnowCollect::exeFailedTalk() {
     if (MR::tryTalkForceWithoutDemoMarioPuppetableAtEnd(mMsgCtrl)) {
-        MR::endMultiActorCamera(this, mCameraInfo, "ウサギと会話", 1, -1);
-        MR::endDemo(this, "雪ウサギ集め失敗");
+        MR::endMultiActorCamera(this, mCameraInfo, "\x83\x45\x83\x54\x83\x4d\x82\xc6\x89\xef\x98\x62", 1, -1);
+        MR::endDemo(this, "\x90\xe1\x83\x45\x83\x54\x83\x4d\x8f\x57\x82\xdf\x8e\xb8\x94\x73");
         MR::startSoundPlayer("SE_PM_LAST_DAMAGE", -1);
         MR::forceKillPlayerByGroundRace();
         setNerve(GET_NERVE(TrickRabbitFreeRunCollect, TrickRabbitSnowCollectNrvEnd));
@@ -313,7 +313,7 @@ void TrickRabbitSnowCollect::exeSuccessWipeIn() {
     if (MR::isFirstStep(this)) {
         mTimerLayout->kill();
         MR::startBckPlayer("BattleWait");
-        MR::startMultiActorCameraTargetPlayer(this, mCameraInfo, "ウサギと会話", -1);
+        MR::startMultiActorCameraTargetPlayer(this, mCameraInfo, "\x83\x45\x83\x54\x83\x4d\x82\xc6\x89\xef\x98\x62", -1);
         MR::startLastStageBGM();
         MR::openWipeFade();
     }
@@ -358,8 +358,8 @@ void TrickRabbitSnowCollect::exeAppearPowerStar() {
     }
 
     if (MR::isEndPowerStarAppearDemo(this)) {
-        MR::endMultiActorCamera(this, mCameraInfo, "ウサギと会話", 1, -1);
-        MR::endDemo(this, "雪ウサギ集め成功");
+        MR::endMultiActorCamera(this, mCameraInfo, "\x83\x45\x83\x54\x83\x4d\x82\xc6\x89\xef\x98\x62", 1, -1);
+        MR::endDemo(this, "\x90\xe1\x83\x45\x83\x54\x83\x4d\x8f\x57\x82\xdf\x90\xac\x8c\xf7");
         setNerve(GET_NERVE(TrickRabbitFreeRunCollect, TrickRabbitSnowCollectNrvEnd));
     }
 }

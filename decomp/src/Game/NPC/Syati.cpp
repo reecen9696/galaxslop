@@ -57,7 +57,7 @@ Syati::Syati(const char* pName)
     _8C.set(0.0f, 0.0f, 0.0f, 1.0f);
     mMarioMoveLocalOffsetVec.zero();
     mBalloonFollowMtx.identity();
-    mPrizeRingGroup = new LiveActorGroup("リング保持", 5);
+    mPrizeRingGroup = new LiveActorGroup("\x83\x8a\x83\x93\x83\x4f\x95\xdb\x8e\x9d", 5);
 }
 
 void Syati::init(const JMapInfoIter& rIter) {
@@ -75,7 +75,7 @@ void Syati::init(const JMapInfoIter& rIter) {
         MR::declarePowerStar(this);
         initRailRider(rIter);
         MR::moveCoordAndTransToRailPoint(this, 0);
-        mRaceManagerLayout = new RaceManagerLayout("レース管理用レイアウト");
+        mRaceManagerLayout = new RaceManagerLayout("\x83\x8c\x81\x5b\x83\x58\x8a\xc7\x97\x9d\x97\x70\x83\x8c\x83\x43\x83\x41\x83\x45\x83\x67");
         mRaceManagerLayout->initWithoutIter();
     }
 
@@ -88,7 +88,7 @@ void Syati::init(const JMapInfoIter& rIter) {
     MR::calcModelBoundingRadius(&mClippingRange, this);
     MR::setClippingTypeSphere(this, mClippingRange);
     MR::validateClipping(this);
-    initEffectKeeper(1, nullptr, nullptr);
+    initEffectKeeper(1, 0, 0);
 
     if (mSwimMode) {
         MR::initEffectSyncBck(this, "Ripple", ::cBckForRipple);
@@ -122,7 +122,7 @@ void Syati::exeWait() {
     }
 
     if (MR::isOnSwitchA(this)) {
-        MR::requestStartDemoMarioPuppetable(this, "開始デモ", GET_NERVE(Syati, SyatiFadeoutStartEvent), GET_NERVE(Syati, SyatiWaitDemoStart));
+        MR::requestStartDemoMarioPuppetable(this, "\x8a\x4a\x8e\x6e\x83\x66\x83\x82", GET_NERVE(Syati, SyatiFadeoutStartEvent), GET_NERVE(Syati, SyatiWaitDemoStart));
     }
 }
 
@@ -201,7 +201,7 @@ void PlayerPoseSetterInWater::update() {
 void Syati::exeFadeinBeforeTalk() {
     if (MR::isFirstStep(this)) {
         MR::openWipeFade(-1);
-        MR::startMultiActorCameraTargetSelf(this, mActorCameraInfo, "会話", -1);
+        MR::startMultiActorCameraTargetSelf(this, mActorCameraInfo, "\x89\xef\x98\x62", -1);
         MR::startBck(this, "Talk");
         MR::startBtk(this, "Talk");
 
@@ -231,7 +231,7 @@ void Syati::exeTalkStartMission() {
     mPlayerPoseSetterInWater->update();
 
     if (MR::tryTalkForceWithoutDemoMarioPuppetableAtEnd(mTalkMessageCtrl)) {
-        MR::endMultiActorCamera(this, mActorCameraInfo, "会話", false, -1);
+        MR::endMultiActorCamera(this, mActorCameraInfo, "\x89\xef\x98\x62", false, -1);
         setNerve(GET_NERVE(Syati, SyatiReadyToStart));
     }
 }
@@ -241,7 +241,7 @@ void Syati::exeReadyToStart() {
         MR::invalidateClipping(this);
         resetScore();
         MR::requestMovementOn(mRaceManagerLayout);
-        MR::startMultiActorCameraTargetSelf(this, mActorCameraInfo, "開始デモ", -1);
+        MR::startMultiActorCameraTargetSelf(this, mActorCameraInfo, "\x8a\x4a\x8e\x6e\x83\x66\x83\x82", -1);
         MR::startBck(this, "TurnReverse");
         MR::startBtk(this, "Normal");
         MR::startBva(this, "Open");
@@ -275,8 +275,8 @@ void Syati::exeCountDown() {
     mPlayerPoseSetterInWater->update();
 
     if (!mRaceManagerLayout->isPlayCountAnim()) {
-        MR::endDemo(this, "開始デモ");
-        MR::endMultiActorCamera(this, mActorCameraInfo, "開始デモ", true, -1);
+        MR::endDemo(this, "\x8a\x4a\x8e\x6e\x83\x66\x83\x82");
+        MR::endMultiActorCamera(this, mActorCameraInfo, "\x8a\x4a\x8e\x6e\x83\x66\x83\x82", true, -1);
         MR::startSystemSE("SE_SY_RACE_START", -1, -1);
         setNerve(GET_NERVE(Syati, SyatiSwim));
     }
@@ -351,7 +351,7 @@ void Syati::exeWaitAllRingDisappear() {
     }
 
     if (mPrizeRingGroup->getLivingActorNum() == 0 && mPrizeRingCount != mNumRings) {
-        MR::requestStartDemoMarioPuppetable(this, "再挑戦デモ", GET_NERVE(Syati, SyatiFadeoutRetryEvent), GET_NERVE(Syati, SyatiWaitDemoStart));
+        MR::requestStartDemoMarioPuppetable(this, "\x8d\xc4\x92\xa7\x90\xed\x83\x66\x83\x82", GET_NERVE(Syati, SyatiFadeoutRetryEvent), GET_NERVE(Syati, SyatiWaitDemoStart));
     }
 }
 
@@ -370,8 +370,8 @@ void Syati::exeTalkRetryMission() {
     updateBlink();
 
     if (MR::tryTalkForceWithoutDemoMarioPuppetableAtEnd(mTalkMessageCtrl)) {
-        MR::endDemo(this, "再挑戦デモ");
-        MR::endMultiActorCamera(this, mActorCameraInfo, "会話", true, -1);
+        MR::endDemo(this, "\x8d\xc4\x92\xa7\x90\xed\x83\x66\x83\x82");
+        MR::endMultiActorCamera(this, mActorCameraInfo, "\x89\xef\x98\x62", true, -1);
         setNerve(GET_NERVE(Syati, SyatiForceKill));
     }
 }
@@ -479,8 +479,8 @@ void Syati::initTalking(const JMapInfoIter& rIter) {
     mTalkMessageCtrl = MR::createTalkCtrl(this, rIter, "SyatiRing", TVec3f(0.0f, 0.0f, 0.0f), mBalloonFollowMtx);
     MR::setDistanceToTalk(mTalkMessageCtrl, 2500.0f);
     mActorCameraInfo = MR::createActorCameraInfo(rIter);
-    MR::initMultiActorCamera(this, rIter, &mActorCameraInfo, "会話");
-    MR::initMultiActorCamera(this, rIter, &mActorCameraInfo, "開始デモ");
+    MR::initMultiActorCamera(this, rIter, &mActorCameraInfo, "\x89\xef\x98\x62");
+    MR::initMultiActorCamera(this, rIter, &mActorCameraInfo, "\x8a\x4a\x8e\x6e\x83\x66\x83\x82");
     MR::getJMapInfoArg1NoInit(rIter, &mHideOnShoreMode);
     const char* pObjectName = "";
     MR::getObjectName(&pObjectName, rIter);
@@ -593,7 +593,7 @@ void Syati::updateBlink() {
     if (mBlinkTimer < 0) {
         MR::startBva(this, "Blink");
         s16 frame = MR::getBvaCtrl(this)->mEnd;
-        u32 rand = MR::getRandom(0x78L, 0xF0L);
+        u32 rand = MR::getRandom(0x78, 0xF0);
         mBlinkTimer = frame + rand;
     } else if (MR::isBvaStopped(this)) {
         MR::startBva(this, "Open");

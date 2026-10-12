@@ -17,6 +17,14 @@ static u16 VolumeTable[] = {0,     2,     8,     18,    32,    50,    73,    99,
 
 static s32 WorkBuffer[16] __attribute__((aligned(32)));
 
+// One stereo frame of s16 samples.  The original clears with sizeof(s16*),
+// which is the same 4 bytes on the Wii but overruns the mix buffer on 64-bit.
+#ifdef TARGET_PC
+static const u32 kStereoFrameBytes = 2 * sizeof(s16);
+#else
+static const u32 kStereoFrameBytes = sizeof(s16*);
+#endif
+
 THPSimplePlayerStaticAudio THPSimplePlayerWrapper::mStaticAudioPlayer;
 THPSimplePlayerWrapper* THPSimplePlayerStaticAudio::mPlayer;
 
@@ -705,11 +713,11 @@ void THPSimplePlayerWrapper::mixAudio(s16* pDest, u32 sample) {
             s32 idx1 = (mAudioOutputIndex + 1) % 0x14;
             s32 idx2 = (mAudioOutputIndex + 2) % 0x14;
             if (!mAudioBuffer[idx1].validSample || !mAudioBuffer[idx2].validSample) {
-                MR::zeroMemory(pDest, sample * sizeof(s16*));
+                MR::zeroMemory(pDest, sample * kStereoFrameBytes);
                 return;
             }
         } else if (!mAudioBuffer[(mAudioOutputIndex + 1) % 0x14].validSample) {
-            MR::zeroMemory(pDest, sample * sizeof(s16*));
+            MR::zeroMemory(pDest, sample * kStereoFrameBytes);
             return;
         }
 
@@ -801,13 +809,13 @@ void THPSimplePlayerWrapper::mixAudio(s16* pDest, u32 sample) {
                 if (sample == 0)
                     break;
             } else {
-                MR::zeroMemory(pDest, sample * sizeof(s16*));
+                MR::zeroMemory(pDest, sample * kStereoFrameBytes);
                 return;
             }
         } while (true);
 
     } else {
-        MR::zeroMemory(pDest, sample * sizeof(s16*));
+        MR::zeroMemory(pDest, sample * kStereoFrameBytes);
     }
 }
 

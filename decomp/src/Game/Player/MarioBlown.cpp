@@ -43,11 +43,11 @@ bool MarioBlown::start() {
     _24 = false;
     _25 = false;
 
-    changeAnimation("壁ヒット", "基本");
-    playSound("声壁体当たり");
-    playSound("壁衝突");
+    changeAnimation("\x95\xc7\x83\x71\x83\x62\x83\x67", "\x8a\xee\x96\x7b");
+    playSound("\x90\xba\x95\xc7\x91\xcc\x93\x96\x82\xbd\x82\xe8");
+    playSound("\x95\xc7\x8f\xd5\x93\xcb");
 
-    playEffectTrans("壁ヒット", getPlayer()->getWallPos());
+    playEffectTrans("\x95\xc7\x83\x71\x83\x62\x83\x67", getPlayer()->getWallPos());
 
     getPlayer()->mMovementStates._1 = false;
     getPlayer()->mMovementStates.jumping = true;
@@ -73,7 +73,7 @@ bool MarioBlown::update() {
         addVelocity(_18);
         _18 += mActor->_240 * mActor->getConst().getTable()->mGravityBlown;
         if (mTimer > 120) {
-            changeAnimation("中ダメージ空中");
+            changeAnimation("\x92\x86\x83\x5f\x83\x81\x81\x5b\x83\x57\x8b\xf3\x92\x86");
         }
 
         if (mTimer > 60) {
@@ -94,9 +94,9 @@ bool MarioBlown::update() {
             }
 
             if (_14 != 2 || mTimer >= 3) {
-                playSound("吹っ飛び倒れ");
-                changeAnimation("壁ヒット着地");
-                playEffect("共通壁ヒット着地");
+                playSound("\x90\x81\x82\xc1\x94\xf2\x82\xd1\x93\x7c\x82\xea");
+                changeAnimation("\x95\xc7\x83\x71\x83\x62\x83\x67\x92\x85\x92\x6e");
+                playEffect("\x8b\xa4\x92\xca\x95\xc7\x83\x71\x83\x62\x83\x67\x92\x85\x92\x6e");
                 MR::vecKillElement(_18, mActor->_240, &_18);
             }
 
@@ -114,7 +114,7 @@ bool MarioBlown::update() {
         addVelocity(_18);
         _18.mult(0.95f);
 
-        if (!isAnimationRun("壁ヒット着地")) {
+        if (!isAnimationRun("\x95\xc7\x83\x71\x83\x62\x83\x67\x92\x85\x92\x6e")) {
             return false;
         }
 
@@ -144,10 +144,10 @@ bool MarioBlown::close() {
         getPlayer()->stopJump();
     }
 
-    stopAnimation("壁ヒット");
+    stopAnimation("\x95\xc7\x83\x71\x83\x62\x83\x67");
 
     if (_25) {
-        stopAnimation("壁ヒット着地", "基本");
+        stopAnimation("\x95\xc7\x83\x71\x83\x62\x83\x67\x92\x85\x92\x6e", "\x8a\xee\x96\x7b");
     }
 
     mActor->setBlendMtxTimer(6);

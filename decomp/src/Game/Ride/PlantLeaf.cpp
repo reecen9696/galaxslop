@@ -29,7 +29,7 @@ namespace {
 };  // namespace
 
 PlantLeaf::PlantLeaf(f32 leafCoord, const TVec3f& rPosition, const TVec3f& rGrowDirection, f32 leafSize)
-    : LiveActor("葉（伸び植物）"), mSpringCoord(), mSpringSpeed(), mLeafCoord(leafCoord), mLeafSize(leafSize), mSide(1.0f, 0.0f, 0.0f),
+    : LiveActor("\x97\x74\x81\x69\x90\x4c\x82\xd1\x90\x41\x95\xa8\x81\x6a"), mSpringCoord(), mSpringSpeed(), mLeafCoord(leafCoord), mLeafSize(leafSize), mSide(1.0f, 0.0f, 0.0f),
       mUp(0.0f, 1.0f, 0.0f), mFront(rGrowDirection) {
     mPosition.set(rPosition);
     MR::makeAxisFrontUp(&mSide, &mUp, mFront, mUp);

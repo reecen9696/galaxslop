@@ -80,7 +80,7 @@ void Koopa::init(const JMapInfoIter& rIter) {
     KoopaFunction::endFaceCtrlDirect(this);
 
     MR::initShadowFromCSV(this, "Shadow");
-    MR::invalidateShadowGroup(this, "デモ用");
+    MR::invalidateShadowGroup(this, "\x83\x66\x83\x82\x97\x70");
 
     MR::onCalcGravity(this);
 

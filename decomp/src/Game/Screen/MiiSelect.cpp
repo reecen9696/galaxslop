@@ -432,7 +432,7 @@ void MiiSelect::onSelectDummy() {
 namespace MiiSelectSub {
     Page::Page(MiiSelect* pHost) : mHost(pHost), _20(true) {
         for (u32 i = 0; i < ARRAY_SIZE(mIconArray); i++) {
-            mIconArray[i] = new MiiSelectIcon(-1, -1, -1, "Miiセレクト用アイコン");
+            mIconArray[i] = new MiiSelectIcon(-1, -1, -1, "Mii\x83\x5a\x83\x8c\x83\x4e\x83\x67\x97\x70\x83\x41\x83\x43\x83\x52\x83\x93");
         }
     }
 

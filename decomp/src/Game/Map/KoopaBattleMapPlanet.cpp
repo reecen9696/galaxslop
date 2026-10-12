@@ -99,7 +99,7 @@ void KoopaBattleMapPlanet::exeDemoGrandStarAppear() {
 }
 
 void KoopaBattleMapPlanet::createPlate() {
-    mDamagePlateGroup = new LiveActorGroup("ダメージプレートＧ", 6);
+    mDamagePlateGroup = new LiveActorGroup("\x83\x5f\x83\x81\x81\x5b\x83\x57\x83\x76\x83\x8c\x81\x5b\x83\x67\x82\x66", 6);
     mDamagePlateGroup->initWithoutIter();
 
     for (s32 idx = 0; idx < 6; idx++) {
@@ -110,7 +110,7 @@ void KoopaBattleMapPlanet::createPlate() {
 
         mBaseMtx.mult(vec, vec);
 
-        KoopaBattleMapDamagePlate* pDamagePlate = new KoopaBattleMapDamagePlate("クッパダメージプレート");
+        KoopaBattleMapDamagePlate* pDamagePlate = new KoopaBattleMapDamagePlate("\x83\x4e\x83\x62\x83\x70\x83\x5f\x83\x81\x81\x5b\x83\x57\x83\x76\x83\x8c\x81\x5b\x83\x67");
         pDamagePlate->mPosition.set(vec);
         pDamagePlate->initWithoutIter();
 
@@ -127,7 +127,7 @@ void KoopaBattleMapPlanet::createPlate() {
         return;
     }
 
-    mCoinPlateGroup = new LiveActorGroup("コインプレートＧ", 4);
+    mCoinPlateGroup = new LiveActorGroup("\x83\x52\x83\x43\x83\x93\x83\x76\x83\x8c\x81\x5b\x83\x67\x82\x66", 4);
     mCoinPlateGroup->initWithoutIter();
 
     for (s32 idx = 0; idx < 4; idx++) {
@@ -138,14 +138,14 @@ void KoopaBattleMapPlanet::createPlate() {
 
         mBaseMtx.mult(vec, vec);
 
-        KoopaBattleMapCoinPlate* pCoinPlate = new KoopaBattleMapCoinPlate("クッパコインプレート");
+        KoopaBattleMapCoinPlate* pCoinPlate = new KoopaBattleMapCoinPlate("\x83\x4e\x83\x62\x83\x70\x83\x52\x83\x43\x83\x93\x83\x76\x83\x8c\x81\x5b\x83\x67");
         pCoinPlate->mPosition.set(vec);
         pCoinPlate->initWithoutIter();
 
         mCoinPlateGroup->registerActor(pCoinPlate);
     }
 
-    mPlateGroup = new LiveActorGroup("プレートＧ", 4);
+    mPlateGroup = new LiveActorGroup("\x83\x76\x83\x8c\x81\x5b\x83\x67\x82\x66", 4);
     mPlateGroup->initWithoutIter();
 
     for (s32 idx = 0; idx < 4; idx++) {
@@ -156,7 +156,7 @@ void KoopaBattleMapPlanet::createPlate() {
 
         mBaseMtx.mult(vec, vec);
 
-        KoopaBattleMapPlate* pCoinPlate = new KoopaBattleMapPlate("クッパプレート");
+        KoopaBattleMapPlate* pCoinPlate = new KoopaBattleMapPlate("\x83\x4e\x83\x62\x83\x70\x83\x76\x83\x8c\x81\x5b\x83\x67");
         pCoinPlate->mPosition.set(vec);
         pCoinPlate->initWithoutIter();
 

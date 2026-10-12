@@ -17,7 +17,7 @@ namespace NrvKoopaSubSequenceBattle {
 };  // namespace NrvKoopaSubSequenceBattle
 
 KoopaSubSequenceBattle::KoopaSubSequenceBattle(Koopa* pKoopa, KoopaSequencer* pSequencer, KoopaBattleBase* pBattleBase)
-    : ActorStateBase< Koopa >("Sequence[戦闘]", pKoopa), mSequencer(pSequencer), mBattleBase(pBattleBase) {
+    : ActorStateBase< Koopa >("Sequence[\x90\xed\x93\xac]", pKoopa), mSequencer(pSequencer), mBattleBase(pBattleBase) {
     initNerve(GET_NERVE(KoopaSubSequenceBattle, KoopaSubSequenceBattleNrvBattleLv1));
 }
 

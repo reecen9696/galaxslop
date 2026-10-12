@@ -34,7 +34,7 @@ namespace {
 };  // namespace
 
 MoviePlayerSimple::MoviePlayerSimple()
-    : LayoutActor("ムービープレイヤー", true), JKRDisposer(), mMovie(nullptr), mPlayerWrapper(nullptr), _44(false), _45(false) {
+    : LayoutActor("\x83\x80\x81\x5b\x83\x72\x81\x5b\x83\x76\x83\x8c\x83\x43\x83\x84\x81\x5b", true), JKRDisposer(), mMovie(nullptr), mPlayerWrapper(nullptr), _44(false), _45(false) {
     mMovie = new Movie();
     mMovie->mMovieName = "";
     mMovie->mBuffer = nullptr;
@@ -56,7 +56,7 @@ MoviePlayerSimple::~MoviePlayerSimple() {
 void MoviePlayerSimple::init(const JMapInfoIter& rIter) {
     MR::connectToSceneMovie(this);
 
-    mPlayerWrapper = new THPSimplePlayerWrapper("THPシンプルプレイヤーのラッパ");
+    mPlayerWrapper = new THPSimplePlayerWrapper("THP\x83\x56\x83\x93\x83\x76\x83\x8b\x83\x76\x83\x8c\x83\x43\x83\x84\x81\x5b\x82\xcc\x83\x89\x83\x62\x83\x70");
     mPlayerWrapper->init(0);
 
     mHeap = JKRExpHeap::create(calcNeedMemoryForMovieWorks(), MR::getCurrentHeap(), true);

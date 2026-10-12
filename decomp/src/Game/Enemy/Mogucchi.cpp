@@ -76,7 +76,7 @@ void Mogucchi::init(const JMapInfoIter& rIter) {
 
 void Mogucchi::initAfterPlacement() {
     MR::moveCoordToNearestPos(this, mPosition);
-    MR::calcGravityVector(this, MR::getRailPos(this), &mRailGravity, nullptr, nullptr);
+    MR::calcGravityVector(this, MR::getRailPos(this), &mRailGravity, nullptr, 0);
     updatePosition();
     updateReferenceMtx();
 }
@@ -276,7 +276,7 @@ void Mogucchi::createMogucchiHill() {
     }
 
     // "Mogucchi hill"
-    mHill = new MogucchiHill(this, railLength, "モグッチ塚");
+    mHill = new MogucchiHill(this, railLength, "\x83\x82\x83\x4f\x83\x62\x83\x60\x92\xcb");
     mHill->initWithoutIter();
     if (railLength > 5) {
         mHill->setAppearNum(mHill->_94 - 5);
@@ -300,7 +300,7 @@ void Mogucchi::updateStrollSpeed() {
 
 void Mogucchi::reflectStarPointer2P() {
     // "Weak"
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         if (!mIsStoppedByP2) {
             mIsStoppedByP2 = true;
             MR::startDPDHitSound();
@@ -335,7 +335,7 @@ void Mogucchi::updatePosition() {
 
 void Mogucchi::createHole() {
     // "Mogucchi hole"
-    mHole = new ModelObj("モグッチ穴", "MogucchiHole", mNewHolePos, MR::DrawBufferType_MapObjStrongLight, -2, -2, false);
+    mHole = new ModelObj("\x83\x82\x83\x4f\x83\x62\x83\x60\x8c\x8a", "MogucchiHole", mNewHolePos, MR::DrawBufferType_MapObjStrongLight, -2, -2, false);
     mHole->initWithoutIter();
 }
 

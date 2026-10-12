@@ -37,8 +37,8 @@ namespace {
     const s32 cCapHideStartStep = 21;
     const s32 cCapHideEndStep = 221;
     const s32 cFallStartFrameGrandStar = 360;
-    const char* const cDemoMovePartName = "移動";
-    const char* const cDemoWaitPartName = "ウェイト";
+    const char* const cDemoMovePartName = "\x88\xda\x93\xae";
+    const char* const cDemoWaitPartName = "\x83\x45\x83\x46\x83\x43\x83\x67";
 };  // namespace
 
 namespace {
@@ -73,18 +73,18 @@ void StarReturnDemoStarter::init(const JMapInfoIter& rIter) {
     mStageResultInformer = new StageResultInformer();
     mStageResultInformer->initWithoutIter();
 
-    mPowerStar = createSubModel("スターモデル", ::isGrandStar() ? "GrandStar" : "PowerStar", false);
-    mLuma = createSubModel("チコモデル", "SpinTico", false);
+    mPowerStar = createSubModel("\x83\x58\x83\x5e\x81\x5b\x83\x82\x83\x66\x83\x8b", ::isGrandStar() ? "GrandStar" : "PowerStar", false);
+    mLuma = createSubModel("\x83\x60\x83\x52\x83\x82\x83\x66\x83\x8b", "SpinTico", false);
 
     if (!MR::isPlayerLuigi()) {
-        mHair = createSubModel("髪の毛モデル", "MarioHair", true);
+        mHair = createSubModel("\x94\xaf\x82\xcc\x96\xd1\x83\x82\x83\x66\x83\x8b", "MarioHair", true);
     }
 
     mReturnDemoRailMove = new ReturnDemoRailMove(this, mPowerStar, rIter, ::isGrandStar(), &mTransform);
 
-    tryRegisterDemo("グランドスター帰還[２回目以降]", rIter);
-    tryRegisterDemo("パワースター帰還", rIter);
-    tryRegisterDemo("天文ドームスター帰還", rIter);
+    tryRegisterDemo("\x83\x4f\x83\x89\x83\x93\x83\x68\x83\x58\x83\x5e\x81\x5b\x8b\x41\x8a\xd2[\x82\x51\x89\xf1\x96\xda\x88\xc8\x8d\x7e]", rIter);
+    tryRegisterDemo("\x83\x70\x83\x8f\x81\x5b\x83\x58\x83\x5e\x81\x5b\x8b\x41\x8a\xd2", rIter);
+    tryRegisterDemo("\x93\x56\x95\xb6\x83\x68\x81\x5b\x83\x80\x83\x58\x83\x5e\x81\x5b\x8b\x41\x8a\xd2", rIter);
 
     initNerve(GET_NERVE(StarReturnDemoStarter, StarReturnDemoStarterNrvAppearWait));
     makeActorDead();
@@ -95,7 +95,7 @@ void StarReturnDemoStarter::appear() {
     mReturnDemoRailMove->posToStart();
     PowerStar::setupColorAtResultSequence(mPowerStar, ::isGrandStar());
 
-    if (MR::isDemoActive("天文ドームスター帰還")) {
+    if (MR::isDemoActive("\x93\x56\x95\xb6\x83\x68\x81\x5b\x83\x80\x83\x58\x83\x5e\x81\x5b\x8b\x41\x8a\xd2")) {
         MR::onDrawSpinDriverPathAtOpa();
     }
 

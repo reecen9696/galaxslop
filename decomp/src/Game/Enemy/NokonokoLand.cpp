@@ -90,7 +90,7 @@ namespace NrvNokonokoLand {
 }  // namespace NrvNokonokoLand
 
 NokonokoLand::NokonokoLand(const char* pName)
-    : LiveActor(pName), mJetTurtle(new JetTurtle("陸ノコ用ジェット亀")), mRailPointPassChecker(new MapPartsRailPointPassChecker(this)),
+    : LiveActor(pName), mJetTurtle(new JetTurtle("\x97\xa4\x83\x6d\x83\x52\x97\x70\x83\x57\x83\x46\x83\x62\x83\x67\x8b\x54")), mRailPointPassChecker(new MapPartsRailPointPassChecker(this)),
       mAnimScaleController(nullptr), mBindStarPointerState(nullptr), mTurtleType(0), mAppearPos(gZeroVec), mTurnAxis(TVec3f(0.0f, 1.0f, 0.0f)) {
     mTargetQuat.set(0.0f, 0.0f, 0.0f, 1.0f);
 }
@@ -375,7 +375,7 @@ bool NokonokoLand::tryRattle() {
 }
 
 bool NokonokoLand::tryBindStarPointer() {
-    if (!MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (!MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         return false;
     }
     if (!isStateWalk()) {

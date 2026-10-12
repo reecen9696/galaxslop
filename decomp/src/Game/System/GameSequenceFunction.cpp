@@ -277,7 +277,7 @@ namespace GameSequenceFunction {
     }
 
     void storeSceneStartGameDataHolder() {
-        if (!GameDataFunction::isPassedStoryEvent("チコガイドデモ終了") || GameDataFunction::hasGrandStar(1)) {
+        if (!GameDataFunction::isPassedStoryEvent("\x83\x60\x83\x52\x83\x4b\x83\x43\x83\x68\x83\x66\x83\x82\x8f\x49\x97\xb9") || GameDataFunction::hasGrandStar(1)) {
             ::getSaveDataHandleSequence()->backupCurrentUserFile();
         }
     }
@@ -294,7 +294,7 @@ namespace GameSequenceFunction {
     void startGameDataSaveSequence(bool isConfirmRemind, bool isSaveAndQuitMsg) {
         ::getGameSequenceProgress()->getGalaxyCometScheduler()->updateStateToGameData();
 
-        if (GameDataFunction::isPassedStoryEvent("ピーチ城浮上後") && !GameDataFunction::hasGrandStar(1)) {
+        if (GameDataFunction::isPassedStoryEvent("\x83\x73\x81\x5b\x83\x60\x8f\xe9\x95\x82\x8f\xe3\x8c\xe3") && !GameDataFunction::hasGrandStar(1)) {
             ::getSaveDataHandleSequence()->startSaveBackup(isConfirmRemind, isSaveAndQuitMsg);
         } else {
             ::getSaveDataHandleSequence()->startSave(isConfirmRemind, isSaveAndQuitMsg);

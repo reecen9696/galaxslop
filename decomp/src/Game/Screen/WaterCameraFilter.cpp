@@ -42,7 +42,7 @@ namespace {
 static GXColor sDefaultColor;
 
 WaterCameraFilter::WaterCameraFilter()
-    : LiveActor("水中カメラフィルター"), mWaterAlpha(), mWavePhase(), mWaterColor(::sDefaultColor), mScreenTex(), mFilterTex() {
+    : LiveActor("\x90\x85\x92\x86\x83\x4a\x83\x81\x83\x89\x83\x74\x83\x42\x83\x8b\x83\x5e\x81\x5b"), mWaterAlpha(), mWavePhase(), mWaterColor(::sDefaultColor), mScreenTex(), mFilterTex() {
 }
 
 void WaterCameraFilter::init(const JMapInfoIter& rIter) {

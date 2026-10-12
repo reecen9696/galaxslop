@@ -157,7 +157,7 @@ void Mario::startStep(const TVec3f& rVec) {
         }
     }
 
-    setTrans(rVec, "階段");
+    setTrans(rVec, "\x8a\x4b\x92\x69");
     changeStatus(mStep);
     _3D0 = 0;
     const f32 zero = 0.0f;

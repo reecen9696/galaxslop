@@ -302,7 +302,7 @@ void HammerHeadPackun::exeNumb() {
         mJointRumbler->start();
     }
 
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         mNumbTime = 0;
     }
 
@@ -342,7 +342,7 @@ inline bool HammerHeadPackun::checkBlowAttack() const {
 
 void HammerHeadPackun::attackSensor(HitSensor* pSender, HitSensor* pReceiver) {
     if (!checkBlowAttack() && MR::isSensor(pSender, "blow") && MR::getSensorHost(pReceiver) &&
-        !strcmp(MR::getSensorHost(pReceiver)->mName, "パンチングキノコ")) {
+        !strcmp(MR::getSensorHost(pReceiver)->mName, "\x83\x70\x83\x93\x83\x60\x83\x93\x83\x4f\x83\x4c\x83\x6d\x83\x52")) {
         f32 recvRadius = pReceiver->mRadius;
         f32 sendRadius = pSender->mRadius;
         f32 temp = recvRadius / (sendRadius + recvRadius);
@@ -454,7 +454,7 @@ void HammerHeadPackun::initShadow() {
 }
 
 inline s32 JMapInfo_getEntries(const JMapInfo* jmap) {
-    return jmap->mData ? jmap->mData->mNumEntries : nullptr;
+    return jmap->mData ? jmap->mData->mNumEntries : 0;
 }
 
 inline bool JMapInfo_inRange(const JMapInfoIter& rIter) {
@@ -462,7 +462,7 @@ inline bool JMapInfo_inRange(const JMapInfoIter& rIter) {
 }
 
 void HammerHeadPackun::initLeaf(const JMapInfoIter& rIter) {
-    mLeafModel = new PartsModel(this, "パックンの葉", "PackunLeaf", nullptr, 18, false);
+    mLeafModel = new PartsModel(this, "\x83\x70\x83\x62\x83\x4e\x83\x93\x82\xcc\x97\x74", "PackunLeaf", nullptr, 18, false);
     MR::initLightCtrl(mLeafModel);
     s32 arg = -1;
     if (JMapInfo_inRange(rIter)) {
@@ -570,7 +570,7 @@ void HammerHeadPackun::verticalizeFrontVec() {
 }
 
 bool HammerHeadPackun::tryShiftNumb() {
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         setNerve(GET_NERVE_ANON(HammerHeadPackunNrvNumb));
         return true;
     }

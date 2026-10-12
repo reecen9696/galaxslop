@@ -385,12 +385,12 @@ void AudMePlayingParamsHolder::setResource(void* pRes) {
 
     mNumEntries = numEntries;
 
-    const char** offsets = (const char**)((s32)pRes + namesOff);
-    mParams = (AudMePlayingParams*)((s32)pRes + entryOff);
+    u32* offsets = (u32*)((u8*)pRes + namesOff);
+    mParams = (AudMePlayingParams*)((u8*)pRes + entryOff);
 
     for (u32 i = 0; i < numEntries; i++) {
-        offsets[i] += (s32)pRes;
+        offsets[i] += (u32)(uintptr_t)pRes;
     }
 
-    mNames = (const char**)offsets;
+    mNames = (PTR32(const char)*)offsets;
 }

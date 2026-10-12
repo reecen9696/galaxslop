@@ -70,7 +70,7 @@ void SubmarineVolcanoBigColumn::exeWait() {
 
 void SubmarineVolcanoBigColumn::exeBreak() {
     if (MR::isFirstStep(this)) {
-        MR::startRumbleWithShakeCameraWeak(this, "強", "弱", ::sShakeDistance, FLOAT_MAX);
+        MR::startRumbleWithShakeCameraWeak(this, "\x8b\xad", "\x8e\xe3", ::sShakeDistance, FLOAT_MAX);
         MR::hideModel(this);
         MR::invalidateHitSensors(this);
         MR::invalidateCollisionParts(this);
@@ -106,7 +106,7 @@ bool SubmarineVolcanoBigColumn::receiveMsgEnemyAttack(u32 msg, HitSensor* pSende
 void SubmarineVolcanoBigColumn::initBreakModel(const char* pModelName) {
     char modelName[256];
     snprintf(modelName, sizeof(modelName), "%sBreak", pModelName);
-    mBreakModel = MR::createModelObjMapObj("海底火山石柱壊れモデル", modelName, getBaseMtx());
+    mBreakModel = MR::createModelObjMapObj("\x8a\x43\x92\xea\x89\xce\x8e\x52\x90\xce\x92\x8c\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", modelName, getBaseMtx());
     MR::invalidateClipping(mBreakModel);
     mBreakModel->makeActorDead();
 }

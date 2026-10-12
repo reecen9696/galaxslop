@@ -9,8 +9,8 @@ namespace {
     static const f32 sFireRadius = 90.0f;
 };  // namespace
 
-KoopaBattleStairsBase::KoopaBattleStairsBase(Koopa* pKoopa) : NerveExecutor("クッパ戦（階段の戦い）"), mKoopa(pKoopa), mStairsGroup() {
-    mStairsGroup = new LiveActorGroup("階段保持", 128);
+KoopaBattleStairsBase::KoopaBattleStairsBase(Koopa* pKoopa) : NerveExecutor("\x83\x4e\x83\x62\x83\x70\x90\xed\x81\x69\x8a\x4b\x92\x69\x82\xcc\x90\xed\x82\xa2\x81\x6a"), mKoopa(pKoopa), mStairsGroup() {
+    mStairsGroup = new LiveActorGroup("\x8a\x4b\x92\x69\x95\xdb\x8e\x9d", 128);
     mStairsGroup->initWithoutIter();
 }
 

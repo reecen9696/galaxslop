@@ -5,7 +5,7 @@
 
 class ElectricRailPoint : public LiveActor {
 public:
-    ElectricRailPoint(const char* name = "電撃レール点");
+    ElectricRailPoint(const char* name = "\x93\x64\x8c\x82\x83\x8c\x81\x5b\x83\x8b\x93\x5f");
 
     virtual ~ElectricRailPoint();
     virtual void init(const JMapInfoIter&);

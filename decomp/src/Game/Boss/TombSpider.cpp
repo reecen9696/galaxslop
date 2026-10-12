@@ -106,7 +106,7 @@ void TombSpider::exeWaitPlayer() {
 
     if (mDemo->isStartDemoGateOpen()) {
         setNerve(GET_NERVE(TombSpider, TombSpiderNrvWaitDemo));
-        MR::requestStartDemoMarioPuppetable(this, "ゲートオープンデモ[トゥームスパイダー]", GET_NERVE(TombSpider, TombSpiderNrvDemoGateOpen),
+        MR::requestStartDemoMarioPuppetable(this, "\x83\x51\x81\x5b\x83\x67\x83\x49\x81\x5b\x83\x76\x83\x93\x83\x66\x83\x82[\x83\x67\x83\x44\x81\x5b\x83\x80\x83\x58\x83\x70\x83\x43\x83\x5f\x81\x5b]", GET_NERVE(TombSpider, TombSpiderNrvDemoGateOpen),
                                             nullptr);
     }
 }
@@ -122,7 +122,7 @@ void TombSpider::exeDemoGateOpen() {
 void TombSpider::exeActionCocoon() {
     if (MR::updateActorState(this, mActionCocoon)) {
         setNerve(GET_NERVE(TombSpider, TombSpiderNrvWaitDemo));
-        MR::requestStartDemoMarioPuppetable(this, "出現", GET_NERVE(TombSpider, TombSpiderNrvDemoCocoonBreak), nullptr);
+        MR::requestStartDemoMarioPuppetable(this, "\x8f\x6f\x8c\xbb", GET_NERVE(TombSpider, TombSpiderNrvDemoCocoonBreak), nullptr);
     }
 }
 
@@ -152,7 +152,7 @@ void TombSpider::exeDemoBattle1stStartJumpToPlayer() {
 void TombSpider::exeAction1st() {
     if (MR::updateActorState(this, mAction1st)) {
         setNerve(GET_NERVE(TombSpider, TombSpiderNrvWaitDemo));
-        MR::requestStartDemoMarioPuppetable(this, "１回戦終了", GET_NERVE(TombSpider, TombSpiderNrvDemoBattle1stEnd), nullptr);
+        MR::requestStartDemoMarioPuppetable(this, "\x82\x50\x89\xf1\x90\xed\x8f\x49\x97\xb9", GET_NERVE(TombSpider, TombSpiderNrvDemoBattle1stEnd), nullptr);
     }
 }
 
@@ -179,7 +179,7 @@ void TombSpider::exeDemoBattle2ndStart() {
 void TombSpider::exeAction2nd() {
     if (MR::updateActorState(this, mAction2nd)) {
         setNerve(GET_NERVE(TombSpider, TombSpiderNrvWaitDemo));
-        MR::requestStartDemoMarioPuppetable(this, "死亡", GET_NERVE(TombSpider, TombSpiderNrvDemoDeath), nullptr);
+        MR::requestStartDemoMarioPuppetable(this, "\x8e\x80\x96\x53", GET_NERVE(TombSpider, TombSpiderNrvDemoDeath), nullptr);
     }
 }
 

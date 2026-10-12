@@ -151,7 +151,7 @@ void ButtonPaneController::decide() {
 }
 
 bool ButtonPaneController::isPointingPaneDirect() const {
-    return MR::isStarPointerPointingPane(mHost, mBoundingPaneName, 0, true, "弱");
+    return MR::isStarPointerPointingPane(mHost, mBoundingPaneName, 0, true, "\x8e\xe3");
 }
 
 bool ButtonPaneController::startAnimAtFirstStep(const char* pAnimName) {
@@ -181,7 +181,7 @@ void ButtonPaneController::setNerveAtAnimStopped(const Nerve* pNerve) {
 }
 
 bool ButtonPaneController::isPointingPane() const {
-    return mIsPointing && MR::isStarPointerPointingPane(mHost, mBoundingPaneName, 0, true, "弱");
+    return mIsPointing && MR::isStarPointerPointingPane(mHost, mBoundingPaneName, 0, true, "\x8e\xe3");
 }
 
 bool ButtonPaneController::tryPointing(bool param1) {

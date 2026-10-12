@@ -898,12 +898,22 @@ public:
     union {
         /* 0xB98 */ u32 _B98;
         struct {
+#if defined(__MWERKS__) || defined(__BIG_ENDIAN__)
             unsigned mSmoke : 1;
             unsigned mSnow : 1;
             unsigned _2 : 1;
             unsigned mSlopeSlip : 1;
             unsigned mIsStationary : 1;
             unsigned mBeeWind : 1;
+#else
+            unsigned : 26;
+            unsigned mBeeWind : 1;
+            unsigned mIsStationary : 1;
+            unsigned mSlopeSlip : 1;
+            unsigned _2 : 1;
+            unsigned mSnow : 1;
+            unsigned mSmoke : 1;
+#endif
         } mEffectFlags;
     };
     /* 0xB9C */ u16 _B9C;

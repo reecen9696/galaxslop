@@ -20,7 +20,7 @@ namespace NrvMapPartsRailGuideDrawer {
 }  // namespace NrvMapPartsRailGuideDrawer
 
 MapPartsRailGuideDrawer::MapPartsRailGuideDrawer(LiveActor* pHost, const char* pModelName)
-    : MapPartsFunction(pHost, "ガイド描画"), mGuidePoints(), mGuideType(), mRailId(-1), mModelName(pModelName) {
+    : MapPartsFunction(pHost, "\x83\x4b\x83\x43\x83\x68\x95\x60\x89\xe6"), mGuidePoints(), mGuideType(), mRailId(-1), mModelName(pModelName) {
 }
 
 void MapPartsRailGuideDrawer::init(const JMapInfoIter& rIter) {

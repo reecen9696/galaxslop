@@ -25,7 +25,7 @@ namespace {
 };  // namespace
 
 OdhConverter::OdhConverter()
-    : LayoutActor("ODH-jpeg変換", true), mCaptureWidth(::cCaptureWidth), mCaptureHeight(::cCaptureHeight), mLimitSize(::cLimitSize),
+    : LayoutActor("ODH-jpeg\x95\xcf\x8a\xb7", true), mCaptureWidth(::cCaptureWidth), mCaptureHeight(::cCaptureHeight), mLimitSize(::cLimitSize),
       mIsRequestedCapture(false), mImage(nullptr), mCaptureImage(nullptr) {
 }
 
@@ -105,7 +105,7 @@ namespace MR {
 
     u32 getOdhImageSize() {
         if (!isExistSceneObj(SceneObj_OdhConverter)) {
-            return nullptr;
+            return 0;
         }
 
         return ::getConverter()->getImageSize();

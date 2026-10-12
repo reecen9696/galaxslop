@@ -29,7 +29,7 @@ namespace NrvBossStinkBugActionSequencer {
 };  // namespace NrvBossStinkBugActionSequencer
 
 BossStinkBugActionSequencer::BossStinkBugActionSequencer(BossStinkBug* pStinkBug, const JMapInfoIter& rIter)
-    : NerveExecutor("ボスカメムシアクション管理"), mStinkBug(pStinkBug), mCurrentAction(nullptr), mOpeningDemo(nullptr), mActionGround(nullptr),
+    : NerveExecutor("\x83\x7b\x83\x58\x83\x4a\x83\x81\x83\x80\x83\x56\x83\x41\x83\x4e\x83\x56\x83\x87\x83\x93\x8a\xc7\x97\x9d"), mStinkBug(pStinkBug), mCurrentAction(nullptr), mOpeningDemo(nullptr), mActionGround(nullptr),
       mFlyDemo(nullptr), mActionFlyLow(nullptr), mAngryDemo(nullptr), mActionFlyHigh(nullptr), mFinishDemo(nullptr) {
     mOpeningDemo = new BossStinkBugOpeningDemo(pStinkBug, rIter);
     mActionGround = new BossStinkBugActionGround(pStinkBug);

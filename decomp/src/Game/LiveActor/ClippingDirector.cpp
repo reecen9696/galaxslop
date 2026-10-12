@@ -7,8 +7,8 @@
 #include "Game/Util/JMapUtil.hpp"
 #include "Game/Util/ObjUtil.hpp"
 
-ClippingDirector::ClippingDirector() : NameObj("クリッピング指揮"), mJudge(nullptr), mActorHolder(nullptr), mGroupHolder(nullptr) {
-    mJudge = new ClippingJudge("クリッピング判定者");
+ClippingDirector::ClippingDirector() : NameObj("\x83\x4e\x83\x8a\x83\x62\x83\x73\x83\x93\x83\x4f\x8e\x77\x8a\xf6"), mJudge(nullptr), mActorHolder(nullptr), mGroupHolder(nullptr) {
+    mJudge = new ClippingJudge("\x83\x4e\x83\x8a\x83\x62\x83\x73\x83\x93\x83\x4f\x94\xbb\x92\xe8\x8e\xd2");
     mJudge->initWithoutIter();
 
     mActorHolder = new ClippingActorHolder();

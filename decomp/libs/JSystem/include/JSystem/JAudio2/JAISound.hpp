@@ -76,6 +76,7 @@ public:
 
     /* 0x00 */ union {
         u32 mComposite;
+#if defined(__MWERKS__) || defined(__BIG_ENDIAN__)
         struct {
             union {
                 u16 value;
@@ -86,6 +87,19 @@ public:
             } type;
             u16 waveID;
         } info;
+#else
+        // Same value layout as big-endian: section:8 | group:8 | wave:16.
+        struct {
+            u16 waveID;
+            union {
+                u16 value;
+                struct {
+                    u8 groupID;
+                    u8 sectionID;
+                } parts;
+            } type;
+        } info;
+#endif
     } mID;
 };
 

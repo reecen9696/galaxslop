@@ -142,8 +142,8 @@ void Kameck::initDemo(const JMapInfoIter& rIter) {
         return;
     }
 
-    MR::registerDemoActionFunctor(this, MR::Functor(this, &Kameck::startDemoAppear), "ザコカメック登場");
-    MR::registerDemoActionFunctor(this, MR::Functor(this, &Kameck::killForce), "ザコカメック強制死亡");
+    MR::registerDemoActionFunctor(this, MR::Functor(this, &Kameck::startDemoAppear), "\x83\x55\x83\x52\x83\x4a\x83\x81\x83\x62\x83\x4e\x93\x6f\x8f\xea");
+    MR::registerDemoActionFunctor(this, MR::Functor(this, &Kameck::killForce), "\x83\x55\x83\x52\x83\x4a\x83\x81\x83\x62\x83\x4e\x8b\xad\x90\xa7\x8e\x80\x96\x53");
     makeActorDead();
 }
 

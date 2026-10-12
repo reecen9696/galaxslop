@@ -323,6 +323,6 @@ namespace DemoFunction {
     }
 
     bool isDemoPartTalk(const char* pDemoName) {
-        return MR::isEqualSubString(pDemoName, "会話");
+        return MR::isEqualSubString(pDemoName, "\x89\xef\x98\x62");
     }
 };  // namespace DemoFunction

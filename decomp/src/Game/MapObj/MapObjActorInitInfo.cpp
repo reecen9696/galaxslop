@@ -6,8 +6,8 @@
 #include "revolution/os.h"
 
 void MapObjActorInitInfo_FORCE_MATCH_STRINGS() {
-    OSReport("地形オブジェ");
-    OSReport("惑星");
+    OSReport("\x92\x6e\x8c\x60\x83\x49\x83\x75\x83\x57\x83\x46");
+    OSReport("\x98\x66\x90\xaf");
 }
 
 MapObjActorInitInfo::MapObjActorInitInfo()
@@ -239,7 +239,7 @@ void MapObjActorUtil::setupInitInfoSeesaw(MapObjActorInitInfo* pInitInfo, const 
 }
 
 void MapObjActorUtil::setupInitInfoSimpleMapObj(MapObjActorInitInfo* pInitInfo) {
-    pInitInfo->setupHioNode("地形オブジェ");
+    pInitInfo->setupHioNode("\x92\x6e\x8c\x60\x83\x49\x83\x75\x83\x57\x83\x46");
     pInitInfo->setupDefaultPos();
     pInitInfo->setupConnectToScene();
     pInitInfo->setupEffect();
@@ -250,7 +250,7 @@ void MapObjActorUtil::setupInitInfoSimpleMapObj(MapObjActorInitInfo* pInitInfo) 
 }
 
 void MapObjActorUtil::setupInitInfoPlanet(MapObjActorInitInfo* pInitInfo) {
-    pInitInfo->setupHioNode("惑星");
+    pInitInfo->setupHioNode("\x98\x66\x90\xaf");
     pInitInfo->setupDefaultPos();
     pInitInfo->setupConnectToScene();
     pInitInfo->setupEffect();

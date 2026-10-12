@@ -52,7 +52,7 @@ void RainCloud::init(const JMapInfoIter& rIter) {
 
     if (!mNoRain) {
         mRainCylinderMtx.set(getBaseMtx());
-        mCloudCylinder = new ModelObj("雨雲雨範囲", "RainCloudCylinder", mRainCylinderMtx, -2, -2, -2, false);
+        mCloudCylinder = new ModelObj("\x89\x4a\x89\x5f\x89\x4a\x94\xcd\x88\xcd", "RainCloudCylinder", mRainCylinderMtx, -2, -2, -2, false);
         mCloudCylinder->initWithoutIter();
         MR::invalidateClipping(mCloudCylinder);
     }
@@ -116,7 +116,7 @@ void RainCloud::init(const JMapInfoIter& rIter) {
     mClippingCenter.scaleAdd(0.5f * mRainLength, mGravity, mPosition);
     MR::setClippingTypeSphere(this, boundRadius, &mClippingCenter);
     MR::setGroupClipping(this, rIter, 16);
-    MR::joinToGroupArray(this, rIter, "雲集団", 16);
+    MR::joinToGroupArray(this, rIter, "\x89\x5f\x8f\x57\x92\x63", 16);
     MR::startBck(this, "Wait");
 
     if (!mNoRain) {

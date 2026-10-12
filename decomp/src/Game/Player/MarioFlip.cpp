@@ -8,7 +8,7 @@
 
 bool Mario::doFlipJump(const TVec3f& rVec) {
     // FIXME: regswap
-    if (isAnimationRun("壁はじき")) {
+    if (isAnimationRun("\x95\xc7\x82\xcd\x82\xb6\x82\xab")) {
         return false;
     }
 
@@ -18,7 +18,7 @@ bool Mario::doFlipJump(const TVec3f& rVec) {
     vec -= getGravityVec()->scaleInline(mActor->mConst->getTable()->mWallSpinHopGround);
     tryForcePowerJump(vec, true);
 
-    changeAnimation("壁はじき");
+    changeAnimation("\x95\xc7\x82\xcd\x82\xb6\x82\xab");
 
     stopPunch();
     mMovementStates._2B = true;
@@ -34,13 +34,13 @@ bool Mario::doFlipBackRoll(const TVec3f& rVec) {
 
     if (doFlipLarge(vec20)) {
         checkDamage();
-        changeAnimationNonStop("後転ふっとび");
+        changeAnimationNonStop("\x8c\xe3\x93\x5d\x82\xd3\x82\xc1\x82\xc6\x82\xd1");
 
-        mDamage->setStrings("後転ふっとび空中", "後転ふっとび着地");
+        mDamage->setStrings("\x8c\xe3\x93\x5d\x82\xd3\x82\xc1\x82\xc6\x82\xd1\x8b\xf3\x92\x86", "\x8c\xe3\x93\x5d\x82\xd3\x82\xc1\x82\xc6\x82\xd1\x92\x85\x92\x6e");
 
         TVec3f vec28;
         MR::vecKillElement(rVec, getAirGravityVec(), &vec28);
-        setFrontVecKeepUp(-vec28, static_cast< u32 >(12l));
+        setFrontVecKeepUp(-vec28, static_cast< u32 >(12));
 
         return true;
     }
@@ -54,11 +54,11 @@ bool MarioFlip::start() {
     _24 = 0.0f;
     _28 = -0.75f;
 
-    changeAnimation("はねとばされ");
+    changeAnimation("\x82\xcd\x82\xcb\x82\xc6\x82\xce\x82\xb3\x82\xea");
 
-    playSound("声小ダメージ");
-    playSound("壁衝突");
-    playEffect("ダメージ");
+    playSound("\x90\xba\x8f\xac\x83\x5f\x83\x81\x81\x5b\x83\x57");
+    playSound("\x95\xc7\x8f\xd5\x93\xcb");
+    playEffect("\x83\x5f\x83\x81\x81\x5b\x83\x57");
     startPadVib(2);
 
     addVelocity(_18);
@@ -68,7 +68,7 @@ bool MarioFlip::start() {
 
 bool MarioFlip::update() {
     if (_12 == 0) {
-        changeAnimationNonStop("はねとばされ");
+        changeAnimationNonStop("\x82\xcd\x82\xcb\x82\xc6\x82\xce\x82\xb3\x82\xea");
     }
 
     _12++;
@@ -93,7 +93,7 @@ bool MarioFlip::update() {
     case 0:
         _24 += _28;
         _28 *= 0.98f;
-        playSound("はねとばされ");
+        playSound("\x82\xcd\x82\xcb\x82\xc6\x82\xce\x82\xb3\x82\xea");
         addVelocity(velocity);
         _18.scale(mActor->mConst->getTable()->mFlipFriction1);
         if (_12 == mActor->mConst->getTable()->mFlipTimer1) {
@@ -104,7 +104,7 @@ bool MarioFlip::update() {
     case 1:
         _24 += _28;
         _28 *= 0.97f;
-        playSound("はねとばされ");
+        playSound("\x82\xcd\x82\xcb\x82\xc6\x82\xce\x82\xb3\x82\xea");
         if (!getPlayer()->mMovementStates._1) {
             return false;
         }
@@ -120,17 +120,17 @@ bool MarioFlip::update() {
         addVelocity(velocity);
         _18.scale(mActor->mConst->getTable()->mFlipFriction2);
         _28 *= 0.97f;
-        playSound("はねとばされ");
+        playSound("\x82\xcd\x82\xcb\x82\xc6\x82\xce\x82\xb3\x82\xea");
         _24 += _28;
         if (MR::isAngleBetween(_24, -0.1f, 0.1f)) {
-            changeAnimation("はねとばされ終了");
+            changeAnimation("\x82\xcd\x82\xcb\x82\xc6\x82\xce\x82\xb3\x82\xea\x8f\x49\x97\xb9");
             _14++;
         }
 
         break;
     case 3:
         _24 = 0.0f;
-        if (!isAnimationRun("はねとばされ終了")) {
+        if (!isAnimationRun("\x82\xcd\x82\xcb\x82\xc6\x82\xce\x82\xb3\x82\xea\x8f\x49\x97\xb9")) {
             return false;
         }
 
@@ -145,8 +145,8 @@ bool MarioFlip::update() {
         f32 incoming = MR::vecKillElement(_18, normal, &tangent);
         if (incoming < 0.0f) {
             stopAnimation(nullptr);
-            changeAnimationNonStop("はねとばされ");
-            playEffectTrans("壁ヒット", getPlayer()->getWallPos());
+            changeAnimationNonStop("\x82\xcd\x82\xcb\x82\xc6\x82\xce\x82\xb3\x82\xea");
+            playEffectTrans("\x95\xc7\x83\x71\x83\x62\x83\x67", getPlayer()->getWallPos());
             _18 = tangent + normal * -incoming * 1.2f;
             addVelocity(_18, 2.0f);
             _28 *= 1.2f;
@@ -239,8 +239,8 @@ void MarioFlip::setVec(const TVec3f& rVec) {
 bool MarioFlip::close() {
     setYangleOffset(0.0f);
 
-    stopAnimation("はねとばされ");
-    stopAnimation("はねとばされ終了");
+    stopAnimation("\x82\xcd\x82\xcb\x82\xc6\x82\xce\x82\xb3\x82\xea");
+    stopAnimation("\x82\xcd\x82\xcb\x82\xc6\x82\xce\x82\xb3\x82\xea\x8f\x49\x97\xb9");
 
     if (mActor->mHealth == 0) {
         if (!getPlayer()->getMovementStates()._1) {

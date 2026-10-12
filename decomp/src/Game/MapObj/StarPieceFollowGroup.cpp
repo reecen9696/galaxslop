@@ -46,7 +46,7 @@ void StarPieceFollowGroup::init(const JMapInfoIter& rIter) {
     mPieces = new StarPiece*[mNumPiecesTotal];
     _90 = new TVec3f[mNumPiecesTotal];
     for (int i = 0; i < mNumPiecesTotal; i++) {
-        mPieces[i] = new StarPiece("フォロースターピース");
+        mPieces[i] = new StarPiece("\x83\x74\x83\x48\x83\x8d\x81\x5b\x83\x58\x83\x5e\x81\x5b\x83\x73\x81\x5b\x83\x58");
         mPieces[i]->initWithoutIter();
         mPieces[i]->makeActorDead();
     }

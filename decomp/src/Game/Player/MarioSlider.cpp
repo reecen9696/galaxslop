@@ -89,10 +89,10 @@ void Mario::startSlider() {
         if (getPlayer()->mMovementStates._B) {
             if (getPlayer()->mMovementStates.jumping) {
                 mDrawStates._14 = true;
-                playSound("尻ドロップ着地");
-                playSound("声尻ドロップ着地");
-                playEffectRT("属性尻ドロップ", _368, mPosition);
-                startPadVib("最強");
+                playSound("\x90\x4b\x83\x68\x83\x8d\x83\x62\x83\x76\x92\x85\x92\x6e");
+                playSound("\x90\xba\x90\x4b\x83\x68\x83\x8d\x83\x62\x83\x76\x92\x85\x92\x6e");
+                playEffectRT("\x91\xae\x90\xab\x90\x4b\x83\x68\x83\x8d\x83\x62\x83\x76", _368, mPosition);
+                startPadVib("\x8d\xc5\x8b\xad");
                 startCamVib(0);
                 MR::removeAllClingingKarikari();
             }
@@ -109,7 +109,7 @@ bool MarioSlider::start() {
     MR::vecKillElement(_14, getPlayer()->_368, &_14);
     _20 = getFrontVec();
     getPlayer()->cancelSquatMode();
-    changeAnimation("スライダー尻", "スライダー尻");
+    changeAnimation("\x83\x58\x83\x89\x83\x43\x83\x5f\x81\x5b\x90\x4b", "\x83\x58\x83\x89\x83\x43\x83\x5f\x81\x5b\x90\x4b");
     _40 = 10;
     _38 = 0.0f;
     _3C = 0.0f;
@@ -196,7 +196,7 @@ bool MarioSlider::update() {
             }
 
             calcWallHit();
-            playSound("坂滑り");
+            playSound("\x8d\xe2\x8a\x8a\x82\xe8");
             return true;
         }
     }
@@ -206,11 +206,11 @@ bool MarioSlider::update() {
 
 bool MarioSlider::close() {
     if (getPlayer()->isSwimming()) {
-        stopAnimation("スライダー尻");
+        stopAnimation("\x83\x58\x83\x89\x83\x43\x83\x5f\x81\x5b\x90\x4b");
     } else if (getPlayer()->mMovementStates.jumping) {
-        stopAnimation("スライダー尻", "落下");
+        stopAnimation("\x83\x58\x83\x89\x83\x43\x83\x5f\x81\x5b\x90\x4b", "\x97\x8e\x89\xba");
     } else {
-        stopAnimation("スライダー尻", "基本");
+        stopAnimation("\x83\x58\x83\x89\x83\x43\x83\x5f\x81\x5b\x90\x4b", "\x8a\xee\x96\x7b");
     }
 
     return true;

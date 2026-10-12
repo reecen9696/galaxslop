@@ -226,10 +226,10 @@ void OceanSphere::exeWait() {
 }
 
 void OceanSphere::exeRiseUp() {
-    f32 rate = MR::calcDemoPartStepRate("湧き水上昇");
+    f32 rate = MR::calcDemoPartStepRate("\x97\x4e\x82\xab\x90\x85\x8f\xe3\x8f\xb8");
     mRadius = 1000.0f + (rate * (mRadiusTarget - 1000.0f));
 
-    if (MR::isDemoPartLastStep("湧き水上昇")) {
+    if (MR::isDemoPartLastStep("\x97\x4e\x82\xab\x90\x85\x8f\xe3\x8f\xb8")) {
         setNerve(GET_NERVE(OceanSphere, OceanSphereNrvWait));
     }
 }

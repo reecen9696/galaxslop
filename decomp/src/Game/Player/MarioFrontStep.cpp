@@ -72,7 +72,7 @@ bool Mario::doFrontStep() {
 }
 
 bool MarioFrontStep::start() {
-    changeAnimation("前壁ウエイト");
+    changeAnimation("\x91\x4f\x95\xc7\x83\x45\x83\x47\x83\x43\x83\x67");
 
     mActor->setBlendMtxTimer(10);
 
@@ -137,7 +137,7 @@ bool MarioFrontStep::update() {
 }
 
 bool MarioFrontStep::close() {
-    stopAnimation("前壁ウエイト");
+    stopAnimation("\x91\x4f\x95\xc7\x83\x45\x83\x47\x83\x43\x83\x67");
 
     getPlayer()->lockGroundCheck(this, false);
 

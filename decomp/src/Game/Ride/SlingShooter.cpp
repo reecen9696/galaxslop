@@ -103,13 +103,13 @@ void SlingShooter::init(const JMapInfoIter& rIter) {
 
     initNerve(GET_NERVE(SlingShooter, SlingShooterNrvFree));
 
-    mCameraTargetMtx = new CameraTargetMtx("カメラターゲットダミー");
+    mCameraTargetMtx = new CameraTargetMtx("\x83\x4a\x83\x81\x83\x89\x83\x5e\x81\x5b\x83\x51\x83\x62\x83\x67\x83\x5f\x83\x7e\x81\x5b");
     mCameraInfo = MR::createActorCameraInfo(rIter);
 
-    MR::declareEventCamera(mCameraInfo, "プレーヤー射出者[ウェイト]");  // player launcher [wait]
-    MR::declareEventCamera(mCameraInfo, "プレーヤー射出者[狙い中]");    // player launcher [aim]
-    MR::declareEventCamera(mCameraInfo, "プレーヤー射出者[攻撃中]");    // player launcher [attack]
-    MR::declareEventCamera(mCameraInfo, "キノピオ射出者[狙い中]");      // kinopio launcher [aim]
+    MR::declareEventCamera(mCameraInfo, "\x83\x76\x83\x8c\x81\x5b\x83\x84\x81\x5b\x8e\xcb\x8f\x6f\x8e\xd2[\x83\x45\x83\x46\x83\x43\x83\x67]");  // player launcher [wait]
+    MR::declareEventCamera(mCameraInfo, "\x83\x76\x83\x8c\x81\x5b\x83\x84\x81\x5b\x8e\xcb\x8f\x6f\x8e\xd2[\x91\x5f\x82\xa2\x92\x86]");    // player launcher [aim]
+    MR::declareEventCamera(mCameraInfo, "\x83\x76\x83\x8c\x81\x5b\x83\x84\x81\x5b\x8e\xcb\x8f\x6f\x8e\xd2[\x8d\x55\x8c\x82\x92\x86]");    // player launcher [attack]
+    MR::declareEventCamera(mCameraInfo, "\x83\x4c\x83\x6d\x83\x73\x83\x49\x8e\xcb\x8f\x6f\x8e\xd2[\x91\x5f\x82\xa2\x92\x86]");      // kinopio launcher [aim]
 
     makeActorAppeared();
 }
@@ -145,8 +145,8 @@ void SlingShooter::exeFreeInvalid() {
 void SlingShooter::exeLand() {
     if (MR::isFirstStep(this)) {
         if (!mIsKinopioAttached) {
-            MR::startBckPlayer("SpiderCocoonLand", 1L);
-            MR::startEventCamera(mCameraInfo, "プレーヤー射出者[ウェイト]", CameraTargetArg(mCameraTargetMtx), -1);
+            MR::startBckPlayer("SpiderCocoonLand", 1);
+            MR::startEventCamera(mCameraInfo, "\x83\x76\x83\x8c\x81\x5b\x83\x84\x81\x5b\x8e\xcb\x8f\x6f\x8e\xd2[\x83\x45\x83\x46\x83\x43\x83\x67]", CameraTargetArg(mCameraTargetMtx), -1);
         } else {
             MR::startBckWithInterpole(mRider, "CocoonLand", 1);
         }
@@ -221,10 +221,10 @@ void SlingShooter::exeAim() {
         endCommandStream();
 
         if (!mIsKinopioAttached) {
-            MR::endEventCamera(mCameraInfo, "プレーヤー射出者[狙い中]", true, -1);
-            MR::startEventCamera(mCameraInfo, "プレーヤー射出者[ウェイト]", CameraTargetArg(mCameraTargetMtx), -1);
+            MR::endEventCamera(mCameraInfo, "\x83\x76\x83\x8c\x81\x5b\x83\x84\x81\x5b\x8e\xcb\x8f\x6f\x8e\xd2[\x91\x5f\x82\xa2\x92\x86]", true, -1);
+            MR::startEventCamera(mCameraInfo, "\x83\x76\x83\x8c\x81\x5b\x83\x84\x81\x5b\x8e\xcb\x8f\x6f\x8e\xd2[\x83\x45\x83\x46\x83\x43\x83\x67]", CameraTargetArg(mCameraTargetMtx), -1);
         } else if (mIsKinopioCameraFocused) {
-            MR::endEventCamera(mCameraInfo, "キノピオ射出者[狙い中]", true, -1);
+            MR::endEventCamera(mCameraInfo, "\x83\x4c\x83\x6d\x83\x73\x83\x49\x8e\xcb\x8f\x6f\x8e\xd2[\x91\x5f\x82\xa2\x92\x86]", true, -1);
         }
 
         MR::offBind(this);
@@ -241,7 +241,7 @@ void SlingShooter::exeAttack() {
 
     if (tryAttackMap() || MR::isStep(this, ::sStepBindAttack)) {
         if (!mIsKinopioAttached) {
-            MR::endEventCamera(mCameraInfo, "プレーヤー射出者[攻撃中]", true, -1);
+            MR::endEventCamera(mCameraInfo, "\x83\x76\x83\x8c\x81\x5b\x83\x84\x81\x5b\x8e\xcb\x8f\x6f\x8e\xd2[\x8d\x55\x8c\x82\x92\x86]", true, -1);
             endBindAndPlayerNoJump(this);
             endBind();
         } else {
@@ -275,7 +275,7 @@ void SlingShooter::exeAttackSuccess() {
         }
 
         if (!mIsKinopioAttached) {
-            MR::endEventCamera(mCameraInfo, "プレーヤー射出者[攻撃中]", true, -1);
+            MR::endEventCamera(mCameraInfo, "\x83\x76\x83\x8c\x81\x5b\x83\x84\x81\x5b\x8e\xcb\x8f\x6f\x8e\xd2[\x8d\x55\x8c\x82\x92\x86]", true, -1);
             MR::startBckPlayer("AirRotation");
             endBindAndPlayerNoJump(this);
             endBind();
@@ -345,7 +345,7 @@ void SlingShooter::attackSensor(HitSensor* pSender, HitSensor* pReceiver) {
 
         if (!mIsKinopioAttached) {
             MR::startBckPlayer("WallHit");
-            MR::endEventCamera(mCameraInfo, "プレーヤー射出者[攻撃中]", true, -1);
+            MR::endEventCamera(mCameraInfo, "\x83\x76\x83\x8c\x81\x5b\x83\x84\x81\x5b\x8e\xcb\x8f\x6f\x8e\xd2[\x8d\x55\x8c\x82\x92\x86]", true, -1);
 
             TVec3f jumpVec(0.0f, 0.0f, 0.0f);
             MR::endBindAndPlayerJump(this, jumpVec, 0);
@@ -373,9 +373,9 @@ bool SlingShooter::receiveMsgEnemyAttack(u32 msg, HitSensor* pSender, HitSensor*
             }
 
             endCommandStream();
-            MR::endEventCamera(mCameraInfo, "プレーヤー射出者[ウェイト]", true, -1);
-            MR::endEventCamera(mCameraInfo, "プレーヤー射出者[狙い中]", true, -1);
-            MR::endEventCamera(mCameraInfo, "プレーヤー射出者[攻撃中]", true, -1);
+            MR::endEventCamera(mCameraInfo, "\x83\x76\x83\x8c\x81\x5b\x83\x84\x81\x5b\x8e\xcb\x8f\x6f\x8e\xd2[\x83\x45\x83\x46\x83\x43\x83\x67]", true, -1);
+            MR::endEventCamera(mCameraInfo, "\x83\x76\x83\x8c\x81\x5b\x83\x84\x81\x5b\x8e\xcb\x8f\x6f\x8e\xd2[\x91\x5f\x82\xa2\x92\x86]", true, -1);
+            MR::endEventCamera(mCameraInfo, "\x83\x76\x83\x8c\x81\x5b\x83\x84\x81\x5b\x8e\xcb\x8f\x6f\x8e\xd2[\x8d\x55\x8c\x82\x92\x86]", true, -1);
 
             mPosition.z = mPlayerZ;
             MR::setPlayerPos(mPosition);
@@ -498,12 +498,12 @@ void SlingShooter::calcBaseMtx(TPos3f* pBaseMtx) {
 bool SlingShooter::updateWait() {
     mPosition.set(*mBasePos);
 
-    if (MR::isStarPointerPointing(this, WPAD_CHAN0, true, "弱")) {
+    if (MR::isStarPointerPointing(this, WPAD_CHAN0, true, "\x8e\xe3")) {
         MR::requestStarPointerModeBlueStarReady(this);
     }
 
     bool set;
-    if (MR::isStarPointerPointing(this, WPAD_CHAN0, true, "弱") && MR::testCorePadTriggerA(WPAD_CHAN0) &&
+    if (MR::isStarPointerPointing(this, WPAD_CHAN0, true, "\x8e\xe3") && MR::testCorePadTriggerA(WPAD_CHAN0) &&
         MR::tryStartStarPointerCommandStream(this, &mPosition, WPAD_CHAN0, false)) {
         set = true;
     } else {
@@ -523,10 +523,10 @@ bool SlingShooter::updateWait() {
         MR::calcStarPointerPosOnPlane(&mPointerPos, *mNeutralPos, TVec3f(0.0f, 0.0f, 1.0f), mPadChannel, false);
 
         if (!mIsKinopioAttached) {
-            MR::endEventCamera(mCameraInfo, "プレーヤー射出者[ウェイト]", true, -1);
-            MR::startEventCamera(mCameraInfo, "プレーヤー射出者[狙い中]", CameraTargetArg(mCameraTargetMtx), -1);
+            MR::endEventCamera(mCameraInfo, "\x83\x76\x83\x8c\x81\x5b\x83\x84\x81\x5b\x8e\xcb\x8f\x6f\x8e\xd2[\x83\x45\x83\x46\x83\x43\x83\x67]", true, -1);
+            MR::startEventCamera(mCameraInfo, "\x83\x76\x83\x8c\x81\x5b\x83\x84\x81\x5b\x8e\xcb\x8f\x6f\x8e\xd2[\x91\x5f\x82\xa2\x92\x86]", CameraTargetArg(mCameraTargetMtx), -1);
         } else if (mIsKinopioCameraFocused) {
-            MR::startEventCameraNoTarget(mCameraInfo, "キノピオ射出者[狙い中]", -1);
+            MR::startEventCameraNoTarget(mCameraInfo, "\x83\x4c\x83\x6d\x83\x73\x83\x49\x8e\xcb\x8f\x6f\x8e\xd2[\x91\x5f\x82\xa2\x92\x86]", -1);
         }
         setNerve(GET_NERVE(SlingShooter, SlingShooterNrvAim));
         return true;
@@ -615,7 +615,7 @@ void SlingShooter::updateActorMtx() {
 
 bool SlingShooter::tryCancel() {
     if (!mIsKinopioAttached && MR::isPadSwing(WPAD_CHAN0) && MR::isGreaterStep(this, 10)) {
-        MR::endEventCamera(mCameraInfo, "プレーヤー射出者[ウェイト]", true, -1);
+        MR::endEventCamera(mCameraInfo, "\x83\x76\x83\x8c\x81\x5b\x83\x84\x81\x5b\x8e\xcb\x8f\x6f\x8e\xd2[\x83\x45\x83\x46\x83\x43\x83\x67]", true, -1);
         MR::startBckPlayer("Spin2nd");
         MR::emitEffect(this, "Stick");
         MR::startSound(mRider, "SE_PV_JUMP_S");
@@ -637,10 +637,10 @@ bool SlingShooter::tryRelease() {
         endCommandStream();
 
         if (mIsKinopioAttached) {
-            MR::endEventCamera(mCameraInfo, "キノピオ射出者[狙い中]", true, -1);
+            MR::endEventCamera(mCameraInfo, "\x83\x4c\x83\x6d\x83\x73\x83\x49\x8e\xcb\x8f\x6f\x8e\xd2[\x91\x5f\x82\xa2\x92\x86]", true, -1);
         } else {
-            MR::endEventCamera(mCameraInfo, "プレーヤー射出者[狙い中]", true, -1);
-            MR::startEventCamera(mCameraInfo, "プレーヤー射出者[ウェイト]", CameraTargetArg(mCameraTargetMtx), -1);
+            MR::endEventCamera(mCameraInfo, "\x83\x76\x83\x8c\x81\x5b\x83\x84\x81\x5b\x8e\xcb\x8f\x6f\x8e\xd2[\x91\x5f\x82\xa2\x92\x86]", true, -1);
+            MR::startEventCamera(mCameraInfo, "\x83\x76\x83\x8c\x81\x5b\x83\x84\x81\x5b\x8e\xcb\x8f\x6f\x8e\xd2[\x83\x45\x83\x46\x83\x43\x83\x67]", CameraTargetArg(mCameraTargetMtx), -1);
         }
         setNerve(GET_NERVE(SlingShooter, SlingShooterNrvWait));
         return true;
@@ -676,14 +676,14 @@ bool SlingShooter::tryRelease() {
 
     if (!mIsKinopioAttached) {
         MR::startBckPlayer("CocoonFly");
-        MR::endEventCamera(mCameraInfo, "プレーヤー射出者[狙い中]", true, -1);
-        MR::startEventCameraNoTarget(mCameraInfo, "プレーヤー射出者[攻撃中]", -1);
+        MR::endEventCamera(mCameraInfo, "\x83\x76\x83\x8c\x81\x5b\x83\x84\x81\x5b\x8e\xcb\x8f\x6f\x8e\xd2[\x91\x5f\x82\xa2\x92\x86]", true, -1);
+        MR::startEventCameraNoTarget(mCameraInfo, "\x83\x76\x83\x8c\x81\x5b\x83\x84\x81\x5b\x8e\xcb\x8f\x6f\x8e\xd2[\x8d\x55\x8c\x82\x92\x86]", -1);
         MR::startSound(mRider, "SE_PV_JUMP_JOY");
         MR::validatePlayerSensor();
     } else {
         MR::startSound(mRider, "SE_SV_KINOPIO_TALK_GLAD_FLY");
         if (mIsKinopioCameraFocused) {
-            MR::endEventCamera(mCameraInfo, "キノピオ射出者[狙い中]", true, -1);
+            MR::endEventCamera(mCameraInfo, "\x83\x4c\x83\x6d\x83\x73\x83\x49\x8e\xcb\x8f\x6f\x8e\xd2[\x91\x5f\x82\xa2\x92\x86]", true, -1);
         }
     }
 

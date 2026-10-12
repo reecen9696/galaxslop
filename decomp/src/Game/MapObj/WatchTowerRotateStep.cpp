@@ -97,7 +97,7 @@ void WatchTowerRotateStep::initLift(const JMapInfoIter& rIter) {
     for (s32 i = 0; i < LIFT_NUM; i++) {
         MtxPtr mtx = MR::getJointMtx(this, i + 1);
 
-        mLift[i] = new PartsModel(this, "物見の塔リフト", "WatchTowerRotateStepLift", mtx, -1, false);
+        mLift[i] = new PartsModel(this, "\x95\xa8\x8c\xa9\x82\xcc\x93\x83\x83\x8a\x83\x74\x83\x67", "WatchTowerRotateStepLift", mtx, -1, false);
         mLift[i]->mIsCalcOwnMtx = false;
 
         MR::initCollisionParts(mLift[i], "WatchTowerRotateStepLift", getSensor(nullptr), nullptr);

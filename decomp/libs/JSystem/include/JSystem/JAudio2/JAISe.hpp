@@ -22,6 +22,9 @@ public:
         /* 0x274 */ JAISoundStrategyMgr< JAISe >* mSoundStrategyMgr;
         /* 0x278 */ JAISoundStrategy< JAISe >* mSoundStrategy;
         /* 0x27c */ JAITempoMgr mTempoMgr;
+#ifdef TARGET_PC
+        s32 mPortStoppingFrames;  // PETARI_SELOG
+#endif
     };
 
     virtual s32 getNumChild() const;

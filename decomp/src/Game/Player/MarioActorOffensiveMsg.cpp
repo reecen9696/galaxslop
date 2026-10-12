@@ -53,7 +53,7 @@ void MarioActor::attackOrPushSensor(HitSensor* pSensor, f32 distance) {
     } else {
         if (_3E5 && _945 < 15) {
             if (distance < radius + mSensorRadiusSpinStorm) {
-                if (selectAction("スピンアタック") < 4) {
+                if (selectAction("\x83\x58\x83\x73\x83\x93\x83\x41\x83\x5e\x83\x62\x83\x4e") < 4) {
                     pSensor->receiveMessage(ACTMES_SPIN_STORM_RANGE, getSensor("body"));
                 }
 
@@ -65,7 +65,7 @@ void MarioActor::attackOrPushSensor(HitSensor* pSensor, f32 distance) {
                     pull = true;
                 }
             }
-        } else if (isAnimationRun("ファイアスピン") && distance < radius + mSensorRadiusSpinStorm) {
+        } else if (isAnimationRun("\x83\x74\x83\x40\x83\x43\x83\x41\x83\x58\x83\x73\x83\x93") && distance < radius + mSensorRadiusSpinStorm) {
             pSensor->receiveMessage(ACTMES_SPIN_STORM_RANGE, getSensor("body"));
         }
     }
@@ -441,7 +441,7 @@ bool MarioActor::tryGetItem(HitSensor* pSensor) {
             return false;
         }
 
-        if (!isActionOk("カメ持ち")) {
+        if (!isActionOk("\x83\x4a\x83\x81\x8e\x9d\x82\xbf")) {
             return false;
         }
 
@@ -467,7 +467,7 @@ bool MarioActor::tryGetItem(HitSensor* pSensor) {
             return false;
         }
 
-        if (!isActionOk("カメ持ち")) {
+        if (!isActionOk("\x83\x4a\x83\x81\x8e\x9d\x82\xbf")) {
             return false;
         }
 
@@ -683,15 +683,15 @@ void MarioActor::sendWallTouch(HitSensor* pReceiver, HitSensor* pSender) {
 }
 
 bool MarioActor::sendMsgUpperPunch(HitSensor* pSensor) {
-    if (!isActionOk("アッパーパンチ")) {
+    if (!isActionOk("\x83\x41\x83\x62\x83\x70\x81\x5b\x83\x70\x83\x93\x83\x60")) {
         return false;
     }
 
     if (pSensor != nullptr && !MR::isDead(pSensor->mHost) && pSensor->receiveMessage(ACTMES_PLAYER_UPPER_PUNCH, getSensor("body"))) {
-        playSound("声蹴り", -1);
+        playSound("\x90\xba\x8f\x52\x82\xe8", -1);
 
         if (!mMario->isSwimming()) {
-            changeAnimation("アッパーパンチ");
+            changeAnimation("\x83\x41\x83\x62\x83\x70\x81\x5b\x83\x70\x83\x93\x83\x60");
         }
 
         return true;

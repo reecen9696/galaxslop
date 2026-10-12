@@ -56,7 +56,7 @@ void KameckTurtle::init(const JMapInfoIter& rIter) {
 }
 
 void KameckTurtle::initJetTurtle() {
-    mTurtle = new JetTurtle("カメックビーム用ジェット亀");
+    mTurtle = new JetTurtle("\x83\x4a\x83\x81\x83\x62\x83\x4e\x83\x72\x81\x5b\x83\x80\x97\x70\x83\x57\x83\x46\x83\x62\x83\x67\x8b\x54");
     mTurtle->initWithoutIter();
     mTurtle->becomeSlowType();
 

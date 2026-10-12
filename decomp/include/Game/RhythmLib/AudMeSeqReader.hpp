@@ -38,6 +38,7 @@ public:
         return *(mSeqBuff + addr);
     }
 
+#ifdef __MWERKS__
     u16 get16(u32 addr) const {
         return *(u16*)(mSeqBuff + addr);
     }
@@ -49,6 +50,23 @@ public:
     u32 get32(u32 addr) const {
         return *(u32*)(mSeqBuff + addr);
     }
+#else
+    // Sequence byte code stays big-endian.
+    u16 get16(u32 addr) const {
+        const u8* p = mSeqBuff + addr;
+        return (u16)((p[0] << 8) | p[1]);
+    }
+
+    u32 get24(u32 addr) const {
+        const u8* p = mSeqBuff + addr;
+        return ((u32)p[0] << 16) | ((u32)p[1] << 8) | p[2];
+    }
+
+    u32 get32(u32 addr) const {
+        const u8* p = mSeqBuff + addr;
+        return ((u32)p[0] << 24) | ((u32)p[1] << 16) | ((u32)p[2] << 8) | p[3];
+    }
+#endif
 
     u8* getCur() {
         return mSeqCursor;

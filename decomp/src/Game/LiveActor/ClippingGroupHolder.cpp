@@ -119,7 +119,7 @@ ClippingInfoGroup::~ClippingInfoGroup() {
 ClippingGroupHolder::~ClippingGroupHolder() {
 }
 
-ClippingGroupHolder::ClippingGroupHolder() : NameObj("クリッピングアクター保持") {
+ClippingGroupHolder::ClippingGroupHolder() : NameObj("\x83\x4e\x83\x8a\x83\x62\x83\x73\x83\x93\x83\x4f\x83\x41\x83\x4e\x83\x5e\x81\x5b\x95\xdb\x8e\x9d") {
     mNumGroups = 0;
     mInfoGroups = 0;
     mInfoGroups = new ClippingInfoGroup*[0x40];

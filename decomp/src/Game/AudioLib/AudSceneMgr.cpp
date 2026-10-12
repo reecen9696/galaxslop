@@ -232,6 +232,13 @@ bool AudSceneMgr::isLoadDoneStaticResource() {
     if (isLoaded0 && isLoaded1 && isLoaded2 && isLoaded3 && isLoaded4 && isLoaded5 && isLoaded6 && isLoaded8 && isLoaded11) {
         loadDone = true;
     }
+#ifdef TARGET_PC
+    static int sPolls = 0;
+    if (!loadDone && ++sPolls % 600 == 0) {
+        port_log("AudSceneMgr: static waves pending: %d%d%d%d%d%d%d %d %d", isLoaded0, isLoaded1, isLoaded2, isLoaded3, isLoaded4,
+                 isLoaded5, isLoaded6, isLoaded8, isLoaded11);
+    }
+#endif
 
     return loadDone;
 }

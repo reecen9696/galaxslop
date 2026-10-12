@@ -678,7 +678,7 @@ void MR::declarePowerStar(const NameObj* pObj, s32 id) {
 }
 
 void MR::declarePowerStarCoin100() {
-    declareEventPowerStar("１００枚コイン", -1, true);
+    declareEventPowerStar("\x82\x50\x82\x4f\x82\x4f\x96\x87\x83\x52\x83\x43\x83\x93", -1, true);
 }
 
 void MR::appearPowerStarContinueCurrentDemo(const NameObj* pObj, const TVec3f& rParam2) {
@@ -710,7 +710,7 @@ void MR::requestAppearPowerStar(const NameObj* pObj, const LiveActor* pActor, f3
 }
 
 void MR::requestAppearPowerStarCoin100() {
-    appearEventPowerStar("１００枚コイン", -1, nullptr, false, false);
+    appearEventPowerStar("\x82\x50\x82\x4f\x82\x4f\x96\x87\x83\x52\x83\x43\x83\x93", -1, nullptr, false, false);
 }
 
 bool MR::isEndPowerStarAppearDemo(const NameObj* pObj) {
@@ -805,7 +805,7 @@ void MR::initStarPieceGetCSSound() {
 BenefitItemOneUp* MR::createKinokoOneUp() {
     BenefitItemOneUp* pKinokoOneUp;
 
-    pKinokoOneUp = new BenefitItemOneUp("１ＵＰキノコ(create)");
+    pKinokoOneUp = new BenefitItemOneUp("\x82\x50\x82\x74\x82\x6f\x83\x4c\x83\x6d\x83\x52(create)");
     pKinokoOneUp->initWithoutIter();
     pKinokoOneUp->makeActorDead();
 
@@ -835,7 +835,7 @@ void MR::appearKinokoOneUpPop(BenefitItemObj* pBenefitObj, MtxPtr pMtx, f32 spee
 BenefitItemLifeUp* MR::createKinokoSuper() {
     BenefitItemLifeUp* pKinokoSuper;
 
-    pKinokoSuper = new BenefitItemLifeUp("スーパーキノコ");
+    pKinokoSuper = new BenefitItemLifeUp("\x83\x58\x81\x5b\x83\x70\x81\x5b\x83\x4c\x83\x6d\x83\x52");
     pKinokoSuper->initWithoutIter();
     pKinokoSuper->makeActorDead();
 
@@ -859,31 +859,31 @@ bool MR::tryRumblePad(const void* pParam1, const char* pPatternName, s32 channel
 }
 
 bool MR::tryRumblePadVeryStrongLong(const void* pParam1, s32 channel) {
-    return WPadFunction::getWPadRumble(channel)->vibratePatternIfNotExist(pParam1, "最強【長】");
+    return WPadFunction::getWPadRumble(channel)->vibratePatternIfNotExist(pParam1, "\x8d\xc5\x8b\xad\x81\x79\x92\xb7\x81\x7a");
 }
 
 bool MR::tryRumblePadVeryStrong(const void* pParam1, s32 channel) {
-    return WPadFunction::getWPadRumble(channel)->vibratePatternIfNotExist(pParam1, "最強");
+    return WPadFunction::getWPadRumble(channel)->vibratePatternIfNotExist(pParam1, "\x8d\xc5\x8b\xad");
 }
 
 bool MR::tryRumblePadStrong(const void* pParam1, s32 channel) {
-    return WPadFunction::getWPadRumble(channel)->vibratePatternIfNotExist(pParam1, "強");
+    return WPadFunction::getWPadRumble(channel)->vibratePatternIfNotExist(pParam1, "\x8b\xad");
 }
 
 bool MR::tryRumblePadMiddle(const void* pParam1, s32 channel) {
-    return WPadFunction::getWPadRumble(channel)->getRumbleInstance()->vibratePatternIfNotExist(pParam1, "中");
+    return WPadFunction::getWPadRumble(channel)->getRumbleInstance()->vibratePatternIfNotExist(pParam1, "\x92\x86");
 }
 
 bool MR::tryRumblePadWeak(const void* pParam1, s32 channel) {
-    return WPadFunction::getWPadRumble(channel)->vibratePatternIfNotExist(pParam1, "弱");
+    return WPadFunction::getWPadRumble(channel)->vibratePatternIfNotExist(pParam1, "\x8e\xe3");
 }
 
 bool MR::tryRumblePadVeryWeak(const void* pParam1, s32 channel) {
-    return WPadFunction::getWPadRumble(channel)->vibratePatternIfNotExist(pParam1, "微弱");
+    return WPadFunction::getWPadRumble(channel)->vibratePatternIfNotExist(pParam1, "\x94\xf7\x8e\xe3");
 }
 
 bool MR::tryRumbleDefaultHit(const void* pParam1, s32 channel) {
-    return WPadFunction::getWPadRumble(channel)->vibratePatternIfNotExist(pParam1, "強");
+    return WPadFunction::getWPadRumble(channel)->vibratePatternIfNotExist(pParam1, "\x8b\xad");
 }
 
 void MR::shakeCameraVeryStrong() {

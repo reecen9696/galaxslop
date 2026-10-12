@@ -326,7 +326,7 @@ bool Kanina::receiveMsgPlayerAttack(u32 msg, HitSensor* pSender, HitSensor* pRec
         }
 
         if (receiveTrample(pSender, pReceiver)) {
-            MR::tryRumblePad(this, "中", WPAD_CHAN0);
+            MR::tryRumblePad(this, "\x92\x86", WPAD_CHAN0);
             return true;
         }
     }
@@ -486,7 +486,7 @@ void Kanina::startRunAwayLevelSound() {
 
 bool Kanina::receiveHipDrop(HitSensor* pSender, HitSensor* pReceiver) {
     if (receiveTrample(pSender, pReceiver)) {
-        MR::tryRumblePad(this, "中", WPAD_CHAN0);
+        MR::tryRumblePad(this, "\x92\x86", WPAD_CHAN0);
         MR::sendMsgAwayJump(pSender, pReceiver);
         return true;
     }
@@ -689,7 +689,7 @@ bool Kanina::tryTurn() {
 }
 
 bool Kanina::tryPointing() {
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         setNerve(GET_NERVE(Kanina, HostTypePointing));
         return true;
     }
@@ -923,7 +923,7 @@ void Kanina::exeDamageHipDrop() {
 
         MR::startBtp(this, "Swoon");
         MR::startSound(this, "SE_EM_STOMPED_S");
-        MR::tryRumblePad(this, "強", WPAD_CHAN0);
+        MR::tryRumblePad(this, "\x8b\xad", WPAD_CHAN0);
         MR::invalidateHitSensors(this);
     }
 
@@ -1014,12 +1014,12 @@ void Kanina::exePointing() {
         MR::startDPDHitSound();
     }
 
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         MR::startDPDFreezeLevelSound(this);
         MR::tryEmitEffect(this, "Touch");
     }
 
-    if (!MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (!MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         setNerve(GET_NERVE(Kanina, HostTypePointingEnd));
     }
 }

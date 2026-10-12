@@ -42,10 +42,10 @@ void LavaStrangeRock::init(const JMapInfoIter& rIter) {
 
     if (MR::isEqualString(objName, "LavaStrangeRockTable")) {
         mRockType = Type_2;
-        setName("溶岩奇岩台形");
+        setName("\x97\x6e\x8a\xe2\x8a\xef\x8a\xe2\x91\xe4\x8c\x60");
     } else if (MR::isEqualString(objName, "LavaStrangeRockL")) {
         mRockType = Type_1;
-        setName("溶岩奇岩大");
+        setName("\x97\x6e\x8a\xe2\x8a\xef\x8a\xe2\x91\xe5");
     } else {
         mRockType = Type_0;
     }

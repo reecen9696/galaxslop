@@ -60,7 +60,7 @@ namespace NrvDinoPackunBattleVs2Lv1 {
     NEW_NERVE(DinoPackunBattleVs2Lv1NrvDamage, DinoPackunBattleVs2Lv1, Damage);
 };  // namespace NrvDinoPackunBattleVs2Lv1
 
-DinoPackunBattleVs2Lv1::DinoPackunBattleVs2Lv1(DinoPackun* pPackun) : DinoPackunAction("ラスト", pPackun) {
+DinoPackunBattleVs2Lv1::DinoPackunBattleVs2Lv1(DinoPackun* pPackun) : DinoPackunAction("\x83\x89\x83\x58\x83\x67", pPackun) {
     mStateDamage = nullptr;
     mStateAwake = nullptr;
     mTrackFireHolder = nullptr;

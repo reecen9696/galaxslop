@@ -96,7 +96,7 @@ void FluffWind::init(const JMapInfoIter& rIter) {
         TVec3f dir;
         MR::calcRailPosAndDirectionAtCoord(&pos, &dir, this, currentRailPos);
 
-        FluffWindEffect* effect = new FluffWindEffect("わたげエフェクト");
+        FluffWindEffect* effect = new FluffWindEffect("\x82\xed\x82\xbd\x82\xb0\x83\x47\x83\x74\x83\x46\x83\x4e\x83\x67");
         effect->initEffectInfo(pos, dir, TVec3f(0.0f, 1.0f, 0.0f), "FluffWind", -1.0f);
         effect->initWithoutIter();
 
@@ -117,7 +117,7 @@ void FluffWind::makeActorDead() {
     LiveActor::makeActorDead();
 }
 
-FluffWindHolder::FluffWindHolder() : LiveActorGroup("わたげ風", 8) {
+FluffWindHolder::FluffWindHolder() : LiveActorGroup("\x82\xed\x82\xbd\x82\xb0\x95\x97", 8) {
 }
 
 void FluffWindHolder::calcWindInfo(const TVec3f& rPosition, TVec3f* pWindDirection, f32* pWindDistance) const {

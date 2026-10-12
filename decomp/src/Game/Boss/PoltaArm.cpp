@@ -56,12 +56,12 @@ void PoltaArm::init(const JMapInfoIter& rIter) {
 }
 
 void PoltaArm::initPartsModel() {
-    mBreakModel = MR::createModelObjEnemy("壊れモデル", "PoltaArmBreak", _98);
+    mBreakModel = MR::createModelObjEnemy("\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "PoltaArmBreak", _98);
     mBreakModel->initWithoutIter();
     MR::initLightCtrl(mBreakModel);
     MR::invalidateClipping(mBreakModel);
     mBreakModel->makeActorDead();
-    mFormationModel = MR::createModelObjEnemy("合体演出岩モデル", "PoltaFormationRock", getBaseMtx());
+    mFormationModel = MR::createModelObjEnemy("\x8d\x87\x91\xcc\x89\x89\x8f\x6f\x8a\xe2\x83\x82\x83\x66\x83\x8b", "PoltaFormationRock", getBaseMtx());
     mFormationModel->initWithoutIter();
     MR::initLightCtrl(mFormationModel);
     MR::invalidateClipping(mFormationModel);

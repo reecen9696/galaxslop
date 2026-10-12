@@ -15,7 +15,7 @@ KirairaChain::~KirairaChain() {
 }
 
 KirairaChain::KirairaChain(const LiveActor* pHost)
-    : LiveActor("キライラの鎖"), mHost(pHost), mIsCut(), mCutPos(0.0f, 0.0f, 0.0f), mRailStart(0.0f, 0.0f, 0.0f), mRailEnd(0.0f, 0.0f, 0.0f),
+    : LiveActor("\x83\x4c\x83\x89\x83\x43\x83\x89\x82\xcc\x8d\xbd"), mHost(pHost), mIsCut(), mCutPos(0.0f, 0.0f, 0.0f), mRailStart(0.0f, 0.0f, 0.0f), mRailEnd(0.0f, 0.0f, 0.0f),
       mFixPointTopDir(1.0f, 0.0f, 0.0f), mFixPointBottomDir(1.0f, 0.0f, 0.0f), mPointCount(), mPoints(), _138(), mAccelPointIdx(),
       mAccelTimer(), mAccel(0.0f, 0.0f, 0.0f), mClippingCenter(0.0f, 0.0f, 0.0f), mModelDrawer(), mFixPointTop(),
       mFixPointBottom() {
@@ -191,11 +191,11 @@ void KirairaChain::updatePoints() {
 
 void KirairaChain::control() {
     if (mAccelTimer <= 0) {
-        mAccelPointIdx = MR::getRandom(0L, mPointCount - 1);
+        mAccelPointIdx = MR::getRandom(0, mPointCount - 1);
         if (MR::isExistRail(mHost)) {
-            mAccelTimer = MR::getRandom(3L, 10L);
+            mAccelTimer = MR::getRandom(3, 10);
         } else {
-            mAccelTimer = MR::getRandom(5L, 10L);
+            mAccelTimer = MR::getRandom(5, 10);
         }
 
         mAccel.set< f32 >(MR::getRandom(-0.3f, 0.3f), MR::getRandom(-0.3f, 0.3f), MR::getRandom(-0.3f, 0.3f));
@@ -210,11 +210,11 @@ void KirairaChain::init(const JMapInfoIter& rIter) {
     MR::connectToScene(this, MR::MovementType_MapObj, -1, -1, MR::DrawType_KirairaChain);
     initPoints();
 
-    mModelDrawer = new SimpleJ3DModelDrawer(this, "キライラの鎖描画", "KirairaChain", -1);
+    mModelDrawer = new SimpleJ3DModelDrawer(this, "\x83\x4c\x83\x89\x83\x43\x83\x89\x82\xcc\x8d\xbd\x95\x60\x89\xe6", "KirairaChain", -1);
     mModelDrawer->initWithoutIter();
 
-    mFixPointTop = MR::createModelObjEnemy("キライラの固定点[Top]", "KirairaFixPointTop", mFixPointTopMtx.toMtxPtr());
-    mFixPointBottom = MR::createModelObjEnemy("キライラの固定点[Bottom]", "KirairaFixPointBottom", mFixPointBottomMtx.toMtxPtr());
+    mFixPointTop = MR::createModelObjEnemy("\x83\x4c\x83\x89\x83\x43\x83\x89\x82\xcc\x8c\xc5\x92\xe8\x93\x5f[Top]", "KirairaFixPointTop", mFixPointTopMtx.toMtxPtr());
+    mFixPointBottom = MR::createModelObjEnemy("\x83\x4c\x83\x89\x83\x43\x83\x89\x82\xcc\x8c\xc5\x92\xe8\x93\x5f[Bottom]", "KirairaFixPointBottom", mFixPointBottomMtx.toMtxPtr());
 
     mFixPointTop->appear();
     mFixPointBottom->appear();

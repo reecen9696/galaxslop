@@ -10,7 +10,7 @@ namespace NrvIconAButton {
     NEW_NERVE(IconAButtonNrvTerm, IconAButton, Term);
 };  // namespace NrvIconAButton
 
-IconAButton::IconAButton(bool connectToScene, bool connectToPause) : LayoutActor("Aボタンアイコン", true), mFollowPos(0.0f, 0.0f), mFollowActor() {
+IconAButton::IconAButton(bool connectToScene, bool connectToPause) : LayoutActor("A\x83\x7b\x83\x5e\x83\x93\x83\x41\x83\x43\x83\x52\x83\x93", true), mFollowPos(0.0f, 0.0f), mFollowActor() {
     if (connectToScene) {
         if (connectToPause) {
             MR::connectToSceneLayoutOnPause(this);

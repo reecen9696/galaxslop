@@ -7,7 +7,7 @@ void SunshadeMapHolder_FORCE_MATCH_SDATA2() {
     (void)1.0f;
 }
 
-SunshadeMapHolder::SunshadeMapHolder() : NameObj("日よけコリジョン管理"), _C(0.0f, 1.0f, 0.0f) {
+SunshadeMapHolder::SunshadeMapHolder() : NameObj("\x93\xfa\x82\xe6\x82\xaf\x83\x52\x83\x8a\x83\x57\x83\x87\x83\x93\x8a\xc7\x97\x9d"), _C(0.0f, 1.0f, 0.0f) {
 }
 
 namespace MR {

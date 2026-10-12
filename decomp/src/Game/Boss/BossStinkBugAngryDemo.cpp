@@ -21,7 +21,7 @@ namespace NrvBossStinkBugAngryDemo {
 };  // namespace NrvBossStinkBugAngryDemo
 
 BossStinkBugAngryDemo::BossStinkBugAngryDemo(BossStinkBug* pHost, const JMapInfoIter& rIter)
-    : BossStinkBugActionBase("終了デモ", pHost), mDemoPositionController(nullptr) {
+    : BossStinkBugActionBase("\x8f\x49\x97\xb9\x83\x66\x83\x82", pHost), mDemoPositionController(nullptr) {
     initNerve(GET_NERVE(BossStinkBugAngryDemo, BossStinkBugAngryDemoNrvDemo));
     mDemoPositionController = new DemoPositionController("BossStinkBugDemo", rIter);
     mDemoPositionController->initAnimCamera("AngryDemo");
@@ -30,7 +30,7 @@ BossStinkBugAngryDemo::BossStinkBugAngryDemo(BossStinkBug* pHost, const JMapInfo
 void BossStinkBugAngryDemo::appear() {
     ActorStateBase::appear();
     setNerve(GET_NERVE(BossStinkBugAngryDemo, BossStinkBugAngryDemoNrvTryStart));
-    MR::requestStartDemoMarioPuppetable(this, getHost(), "ボスカメムシ怒りデモ", GET_NERVE(BossStinkBugAngryDemo, BossStinkBugAngryDemoNrvDemo),
+    MR::requestStartDemoMarioPuppetable(this, getHost(), "\x83\x7b\x83\x58\x83\x4a\x83\x81\x83\x80\x83\x56\x93\x7b\x82\xe8\x83\x66\x83\x82", GET_NERVE(BossStinkBugAngryDemo, BossStinkBugAngryDemoNrvDemo),
                                         nullptr);
 }
 
@@ -62,7 +62,7 @@ void BossStinkBugAngryDemo::exeDemo() {
 
     if (MR::isBckStopped(getHost())) {
         mDemoPositionController->endDemo("AngryDemo");
-        MR::endDemo(getHost(), "ボスカメムシ怒りデモ");
+        MR::endDemo(getHost(), "\x83\x7b\x83\x58\x83\x4a\x83\x81\x83\x80\x83\x56\x93\x7b\x82\xe8\x83\x66\x83\x82");
         kill();
     }
 }

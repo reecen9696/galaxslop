@@ -29,7 +29,14 @@ namespace JUtility {
         }
 
         void set(u32 u32Color) {
+#if defined(__MWERKS__) || defined(__BIG_ENDIAN__)
             *reinterpret_cast< u32* >(&r) = u32Color;
+#else
+            r = u8(u32Color >> 24);
+            g = u8(u32Color >> 16);
+            b = u8(u32Color >> 8);
+            a = u8(u32Color);
+#endif
         }
 
         operator u32() const {
@@ -37,7 +44,11 @@ namespace JUtility {
         }
 
         u32 toUInt32() const {
+#if defined(__MWERKS__) || defined(__BIG_ENDIAN__)
             return *reinterpret_cast< const u32* >(&r);
+#else
+            return (u32(r) << 24) | (u32(g) << 16) | (u32(b) << 8) | u32(a);
+#endif
         }
 
         void set(GXColor gxColor) {

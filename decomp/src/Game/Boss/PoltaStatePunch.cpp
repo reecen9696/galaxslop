@@ -15,7 +15,7 @@ namespace NrvPoltaStatePunch {
 };  // namespace NrvPoltaStatePunch
 
 PoltaStatePunch::PoltaStatePunch(Polta* pPolta)
-    : ActorStateBase< Polta >("[state]地面叩き攻撃", pPolta), mIsLeftArmActor(true), mIsActionAffectBody(true) {
+    : ActorStateBase< Polta >("[state]\x92\x6e\x96\xca\x92\x40\x82\xab\x8d\x55\x8c\x82", pPolta), mIsLeftArmActor(true), mIsActionAffectBody(true) {
     initNerve(GET_NERVE(PoltaStatePunch, PoltaStatePunchNrvStart));
 }
 

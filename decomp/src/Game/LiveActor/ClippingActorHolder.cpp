@@ -10,7 +10,7 @@ namespace {
     static int sActorNumMax = 2560;
 };  // namespace
 
-ClippingActorHolder::ClippingActorHolder() : NameObj("クリッピングアクター保持"), mActorNum(), _10(), _14(), _18(), _1C(), mViewGroupCtrl() {
+ClippingActorHolder::ClippingActorHolder() : NameObj("\x83\x4e\x83\x8a\x83\x62\x83\x73\x83\x93\x83\x4f\x83\x41\x83\x4e\x83\x5e\x81\x5b\x95\xdb\x8e\x9d"), mActorNum(), _10(), _14(), _18(), _1C(), mViewGroupCtrl() {
     _10 = new ClippingActorInfoList(::sActorNumMax);
     _14 = new ClippingActorInfoList(::sActorNumMax);
     _18 = new ClippingActorInfoList(::sActorNumMax);

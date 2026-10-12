@@ -123,11 +123,11 @@ s32 GameDataHolder::getPictureBookChapterCanRead() const {
 }
 
 s32 GameDataHolder::getPictureBookChapterAlreadyRead() const {
-    return mEventValueChecker->getValue("絵本既読章");
+    return mEventValueChecker->getValue("\x8a\x47\x96\x7b\x8a\xf9\x93\xc7\x8f\xcd");
 }
 
 void GameDataHolder::setPictureBookChapterAlreadyRead(int value) {
-    setGameEventValue("絵本既読章", value);
+    setGameEventValue("\x8a\x47\x96\x7b\x8a\xf9\x93\xc7\x8f\xcd", value);
 }
 
 void GameDataHolder::setRaceBestTime(const char* pName, u32 value) {
@@ -154,7 +154,7 @@ u32 GameDataHolder::getRaceBestTime(const char* pName) const {
 
 void GameDataHolder::addMissPoint(int points) {
     u32 value = mEventValueChecker->getValue("MissPointForLetter");
-    u32 newValue = MR::clamp(value + points, 0l, 20l);
+    u32 newValue = MR::clamp(value + points, 0, 20);
 
     setGameEventValue("MissPointForLetter", newValue);
 }

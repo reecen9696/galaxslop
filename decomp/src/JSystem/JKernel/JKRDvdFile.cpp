@@ -98,7 +98,8 @@ s32 JKRDvdFile::sync(void) {
 }
 
 void JKRDvdFile::doneProcess(s32 id, DVDFileInfo* fileInfo) {
-    JKRDvdFile* dvdFile = *(JKRDvdFile**)((u8*)fileInfo + 0x3c);
+    // mDvdFile follows mFileInfo (0x3C bytes later on the Wii).
+    JKRDvdFile* dvdFile = *(JKRDvdFile**)((u8*)fileInfo + (offsetof(JKRDvdFile, mDvdFile) - offsetof(JKRDvdFile, mFileInfo)));
     OSSendMessage(&dvdFile->mMessageQueue2, (OSMessage)(intptr_t)id, OS_MESSAGE_NOBLOCK);
 }
 

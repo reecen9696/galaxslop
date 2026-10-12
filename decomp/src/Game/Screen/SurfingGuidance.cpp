@@ -18,7 +18,7 @@ namespace {
     NEW_NERVE(SurfingGuidanceFadeOut, SurfingGuidance, FadeOut);
 }  // namespace
 
-SurfingGuidance::SurfingGuidance() : LayoutActor("サーフィンガイダンス", true), _20(), _24(), _2C() {
+SurfingGuidance::SurfingGuidance() : LayoutActor("\x83\x54\x81\x5b\x83\x74\x83\x42\x83\x93\x83\x4b\x83\x43\x83\x5f\x83\x93\x83\x58", true), _20(), _24(), _2C() {
 }
 
 void SurfingGuidance::init(const JMapInfoIter& rIter) {

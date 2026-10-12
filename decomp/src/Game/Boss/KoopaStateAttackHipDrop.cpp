@@ -50,14 +50,14 @@ void KoopaStateAttackHipDrop_FORCE_MATCH_SDATA2() {
 }
 
 KoopaStateAttackHipDrop::KoopaStateAttackHipDrop(Koopa* pKoopa)
-    : ActorStateBase< Koopa >("State[ヒップドロップ攻撃]", pKoopa), mGroundPosition(0.0f, 0.0f, 0.0f), mMaxAttacks(1), mAttacks(), mAttackDelay(30),
+    : ActorStateBase< Koopa >("State[\x83\x71\x83\x62\x83\x76\x83\x68\x83\x8d\x83\x62\x83\x76\x8d\x55\x8c\x82]", pKoopa), mGroundPosition(0.0f, 0.0f, 0.0f), mMaxAttacks(1), mAttacks(), mAttackDelay(30),
       mJumpTime() {
 }
 
 void KoopaStateAttackHipDrop::init() {
-    KoopaFunction::initKoopaCamera(mHost, "ヒップドロップ攻撃");
-    KoopaFunction::initKoopaCamera(mHost, "ヒップドロップ着地");
-    KoopaFunction::initKoopaCamera(mHost, "ヒップドロップ着地（マリオ痺れ）");
+    KoopaFunction::initKoopaCamera(mHost, "\x83\x71\x83\x62\x83\x76\x83\x68\x83\x8d\x83\x62\x83\x76\x8d\x55\x8c\x82");
+    KoopaFunction::initKoopaCamera(mHost, "\x83\x71\x83\x62\x83\x76\x83\x68\x83\x8d\x83\x62\x83\x76\x92\x85\x92\x6e");
+    KoopaFunction::initKoopaCamera(mHost, "\x83\x71\x83\x62\x83\x76\x83\x68\x83\x8d\x83\x62\x83\x76\x92\x85\x92\x6e\x81\x69\x83\x7d\x83\x8a\x83\x49\xe1\x83\x82\xea\x81\x6a");
 
     initNerve(GET_NERVE(KoopaStateAttackHipDrop, KoopaStateAttackHipDropNrvRun));
 
@@ -102,9 +102,9 @@ void KoopaStateAttackHipDrop::appear() {
 }
 
 void KoopaStateAttackHipDrop::kill() {
-    KoopaFunction::endKoopaCamera(mHost, "ヒップドロップ攻撃", false, -1);
-    KoopaFunction::endKoopaCamera(mHost, "ヒップドロップ着地", false, -1);
-    KoopaFunction::endKoopaCamera(mHost, "ヒップドロップ着地（マリオ痺れ）", false, -1);
+    KoopaFunction::endKoopaCamera(mHost, "\x83\x71\x83\x62\x83\x76\x83\x68\x83\x8d\x83\x62\x83\x76\x8d\x55\x8c\x82", false, -1);
+    KoopaFunction::endKoopaCamera(mHost, "\x83\x71\x83\x62\x83\x76\x83\x68\x83\x8d\x83\x62\x83\x76\x92\x85\x92\x6e", false, -1);
+    KoopaFunction::endKoopaCamera(mHost, "\x83\x71\x83\x62\x83\x76\x83\x68\x83\x8d\x83\x62\x83\x76\x92\x85\x92\x6e\x81\x69\x83\x7d\x83\x8a\x83\x49\xe1\x83\x82\xea\x81\x6a", false, -1);
 
     MR::invalidateHitSensor(mHost, "AttackHipDrop");
 
@@ -147,7 +147,7 @@ bool KoopaStateAttackHipDrop::isEnableGuard() const {
 void KoopaStateAttackHipDrop::exeRun() {
     if (MR::isFirstStep(this)) {
         MR::startAction(mHost, "Run");
-        KoopaFunction::startKoopaCamera(mHost, "ヒップドロップ攻撃");
+        KoopaFunction::startKoopaCamera(mHost, "\x83\x71\x83\x62\x83\x76\x83\x68\x83\x8d\x83\x62\x83\x76\x8d\x55\x8c\x82");
     }
 
     MR::moveAndTurnToPlayer(mHost, &mHost->mFront, ::sParamRunStart);
@@ -187,7 +187,7 @@ void KoopaStateAttackHipDrop::exeJumpUp() {
         MR::restrictVelocity(mHost, ::sJumpUpSpeedFrontMax);
         MR::addVelocityJump(mHost, ::sJumpUpSpeedUp);
 
-        KoopaFunction::startKoopaCamera(mHost, "ヒップドロップ攻撃");
+        KoopaFunction::startKoopaCamera(mHost, "\x83\x71\x83\x62\x83\x76\x83\x68\x83\x8d\x83\x62\x83\x76\x8d\x55\x8c\x82");
     }
 
     MR::addVelocityToGravity(mHost, ::sJumpUpGravity);
@@ -272,7 +272,7 @@ void KoopaStateAttackHipDrop::exeJumpAttackDown() {
 
     KoopaFunction::emitKoopaShockWave(mHost);
 
-    KoopaFunction::startKoopaCamera(mHost, "ヒップドロップ着地");
+    KoopaFunction::startKoopaCamera(mHost, "\x83\x71\x83\x62\x83\x76\x83\x68\x83\x8d\x83\x62\x83\x76\x92\x85\x92\x6e");
     MR::startSound(mHost, "SE_BM_KOOPA_LAND");
 
     setNerve(GET_NERVE(KoopaStateAttackHipDrop, KoopaStateAttackHipDropNrvLand));

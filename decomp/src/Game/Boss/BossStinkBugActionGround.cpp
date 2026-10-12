@@ -34,7 +34,7 @@ namespace NrvBossStinkBugGroundBattle {
     NEW_NERVE(BossStinkBugActionGroundNrvTurn, BossStinkBugActionGround, Turn);
 };  // namespace NrvBossStinkBugGroundBattle
 
-BossStinkBugActionGround::BossStinkBugActionGround(BossStinkBug* pStinkBug) : BossStinkBugActionBase("ボスカメムシ地上戦", pStinkBug) {
+BossStinkBugActionGround::BossStinkBugActionGround(BossStinkBug* pStinkBug) : BossStinkBugActionBase("\x83\x7b\x83\x58\x83\x4a\x83\x81\x83\x80\x83\x56\x92\x6e\x8f\xe3\x90\xed", pStinkBug) {
     initNerve(GET_NERVE(BossStinkBugGroundBattle, BossStinkBugActionGroundNrvWalk));
 }
 

@@ -12,7 +12,7 @@ namespace NrvGreenCaterpillarBig {
 };  // namespace NrvGreenCaterpillarBig
 
 GreenCaterpillarBigBody::GreenCaterpillarBigBody(LiveActor* pCaterpillar, MtxPtr mtx)
-    : ModelObj("オオムイムイ体", "GreenCaterpillarBigBody", mtx, -2, -2, -2, false) {
+    : ModelObj("\x83\x49\x83\x49\x83\x80\x83\x43\x83\x80\x83\x43\x91\xcc", "GreenCaterpillarBigBody", mtx, -2, -2, -2, false) {
     mCaterpillar = pCaterpillar;
     mFrontVec.x = 0.0f;
     mFrontVec.y = 0.0f;

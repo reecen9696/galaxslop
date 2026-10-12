@@ -133,7 +133,7 @@ void StarPointerDirector::createLayout() {
         mStarPointerLayouts[channel].mDirector = this;
     }
 
-    mGuidance = new StarPointerGuidance("スターポインタガイダンス");
+    mGuidance = new StarPointerGuidance("\x83\x58\x83\x5e\x81\x5b\x83\x7c\x83\x43\x83\x93\x83\x5e\x83\x4b\x83\x43\x83\x5f\x83\x93\x83\x58");
     mGuidance->initWithoutIter();
 }
 

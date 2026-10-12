@@ -21,7 +21,7 @@ namespace NrvYesNoController {
 };  // namespace NrvYesNoController
 
 YesNoController::YesNoController(LayoutActor* pHost)
-    : NerveExecutor("はい／いいえ選択制御"), mHost(pHost), _C(), mButtonYesPaneCtrl(), mButtonNoPaneCtrl(), mCursorSE(), mYesSE(), mNoSE() {
+    : NerveExecutor("\x82\xcd\x82\xa2\x81\x5e\x82\xa2\x82\xa2\x82\xa6\x91\x49\x91\xf0\x90\xa7\x8c\xe4"), mHost(pHost), _C(), mButtonYesPaneCtrl(), mButtonNoPaneCtrl(), mCursorSE(), mYesSE(), mNoSE() {
     mButtonYesPaneCtrl = new ButtonPaneController(mHost, "Right", "BoxRight", 0, true);
     mButtonYesPaneCtrl->_22 = false;
 
@@ -131,6 +131,14 @@ void YesNoController::exeSelecting() {
     if (!mButtonNoPaneCtrl->isPointing()) {
         deleteEffectIfExist("LeftText");
     }
+
+#ifdef TARGET_PC
+    // The answer is the player's: a cutscene fast-forward stops here, and
+    // the A it pressed does not choose.
+    if (port_skip_interrupt()) {
+        return;
+    }
+#endif
 
     if (trySelect()) {
         setNerve(GET_NERVE(YesNoController, YesNoControllerNrvDecided));

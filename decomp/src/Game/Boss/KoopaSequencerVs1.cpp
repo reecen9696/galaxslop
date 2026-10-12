@@ -33,7 +33,7 @@ namespace NrvKoopaSequencerVs1 {
     NEW_NERVE(KoopaSequencerVs1NrvWaitDemo, KoopaSequencerVs1, WaitDemo);
 };  // namespace NrvKoopaSequencerVs1
 
-KoopaSequencerVs1::KoopaSequencerVs1() : KoopaSequencer("クッパ戦（Ｖｓ１進行役）", 1), mSubSequenceBattle(), mBattleMain() {
+KoopaSequencerVs1::KoopaSequencerVs1() : KoopaSequencer("\x83\x4e\x83\x62\x83\x70\x90\xed\x81\x69\x82\x75\x82\x93\x82\x50\x90\x69\x8d\x73\x96\xf0\x81\x6a", 1), mSubSequenceBattle(), mBattleMain() {
 }
 
 void KoopaSequencerVs1::init(Koopa* pKoopa, const JMapInfoIter& rIter) {
@@ -43,21 +43,21 @@ void KoopaSequencerVs1::init(Koopa* pKoopa, const JMapInfoIter& rIter) {
 
     mBattleStairs = new KoopaBattleStairsVs1(mKoopa);
 
-    mBattleMain = new KoopaBattleMain("クッパ戦闘（Ｖｓ１）", mKoopa);
+    mBattleMain = new KoopaBattleMain("\x83\x4e\x83\x62\x83\x70\x90\xed\x93\xac\x81\x69\x82\x75\x82\x93\x82\x50\x81\x6a", mKoopa);
     mBattleMain->init();
 
     mSubSequenceBattle = new KoopaSubSequenceBattle(mKoopa, this, mBattleMain);
     mSubSequenceBattle->init();
 
-    MR::initDemoSheetTalkAnim(mKoopa, rIter, "クッパＶｓ１本戦開始", "DemoKoopaVs1Start", nullptr);
-    MR::initDemoSheetTalkAnim(mKoopa, rIter, "クッパＶｓ１ダウン", "DemoKoopaVs1Down", nullptr);
+    MR::initDemoSheetTalkAnim(mKoopa, rIter, "\x83\x4e\x83\x62\x83\x70\x82\x75\x82\x93\x82\x50\x96\x7b\x90\xed\x8a\x4a\x8e\x6e", "DemoKoopaVs1Start", nullptr);
+    MR::initDemoSheetTalkAnim(mKoopa, rIter, "\x83\x4e\x83\x62\x83\x70\x82\x75\x82\x93\x82\x50\x83\x5f\x83\x45\x83\x93", "DemoKoopaVs1Down", nullptr);
 
     MR::declareStarPiece(mKoopa, 30);
 }
 
 void KoopaSequencerVs1::exeBattleStairs() {
     if (MR::isFirstStep(this)) {
-        KoopaFunction::setKoopaPos(mKoopa, "階段の戦い０（クッパ）");
+        KoopaFunction::setKoopaPos(mKoopa, "\x8a\x4b\x92\x69\x82\xcc\x90\xed\x82\xa2\x82\x4f\x81\x69\x83\x4e\x83\x62\x83\x70\x81\x6a");
     }
 
     mBattleStairs->update();
@@ -67,10 +67,10 @@ void KoopaSequencerVs1::exeBattleStairs() {
 
         setNerve(GET_NERVE(KoopaSequencerVs1, KoopaSequencerVs1NrvWaitDemo));
 
-        KoopaFunction::setKoopaPos(mKoopa, "デモ中心");
-        MR::setPlayerPosAndWait("デモ中心");
+        KoopaFunction::setKoopaPos(mKoopa, "\x83\x66\x83\x82\x92\x86\x90\x53");
+        MR::setPlayerPosAndWait("\x83\x66\x83\x82\x92\x86\x90\x53");
 
-        MR::requestStartTimeKeepDemoMarioPuppetable(this, mKoopa, "クッパＶｓ１本戦開始",
+        MR::requestStartTimeKeepDemoMarioPuppetable(this, mKoopa, "\x83\x4e\x83\x62\x83\x70\x82\x75\x82\x93\x82\x50\x96\x7b\x90\xed\x8a\x4a\x8e\x6e",
                                                     GET_NERVE(KoopaSequencerVs1, KoopaSequencerVs1NrvDemoBattleStart), nullptr, nullptr);
 
         MR::overlayWithPreviousScreen(2);
@@ -81,13 +81,13 @@ void KoopaSequencerVs1::exeDemoBattleStart() {
     if (MR::isFirstStep(this)) {
         KoopaFunction::endFaceCtrl(mKoopa, -1);
 
-        MR::invalidateShadowGroup(mKoopa, "戦闘用");
-        MR::validateShadowGroup(mKoopa, "デモ用");
+        MR::invalidateShadowGroup(mKoopa, "\x90\xed\x93\xac\x97\x70");
+        MR::validateShadowGroup(mKoopa, "\x83\x66\x83\x82\x97\x70");
     }
 
     if (MR::isDemoLastStep()) {
-        MR::validateShadowGroup(mKoopa, "戦闘用");
-        MR::invalidateShadowGroup(mKoopa, "デモ用");
+        MR::validateShadowGroup(mKoopa, "\x90\xed\x93\xac\x97\x70");
+        MR::invalidateShadowGroup(mKoopa, "\x83\x66\x83\x82\x97\x70");
 
         KoopaFunction::startFaceCtrl(mKoopa);
 
@@ -109,11 +109,11 @@ void KoopaSequencerVs1::exeWaitDemoBattleEnd() {
     if (MR::isFirstStep(this)) {
         KoopaFunction::getKoopaPlanetShadow(mKoopa)->kill();
 
-        KoopaFunction::setKoopaPos(mKoopa, "デモ中心");
+        KoopaFunction::setKoopaPos(mKoopa, "\x83\x66\x83\x82\x92\x86\x90\x53");
 
         setNerve(GET_NERVE(KoopaSequencerVs1, KoopaSequencerVs1NrvWaitDemo));
 
-        MR::requestStartTimeKeepDemoMarioPuppetable(this, mKoopa, "クッパＶｓ１ダウン",
+        MR::requestStartTimeKeepDemoMarioPuppetable(this, mKoopa, "\x83\x4e\x83\x62\x83\x70\x82\x75\x82\x93\x82\x50\x83\x5f\x83\x45\x83\x93",
                                                     GET_NERVE(KoopaSequencerVs1, KoopaSequencerVs1NrvDemoBattleEnd), nullptr, nullptr);
     }
 }
@@ -136,7 +136,7 @@ void KoopaSequencerVs1::exeDemoBattleEnd() {
         MR::overlayWithPreviousScreen(3);
 
         TVec3f namePos;
-        MR::findNamePos("デモ中心", &namePos, nullptr);
+        MR::findNamePos("\x83\x66\x83\x82\x92\x86\x90\x53", &namePos, nullptr);
 
         MR::startAfterBossBGM();
 

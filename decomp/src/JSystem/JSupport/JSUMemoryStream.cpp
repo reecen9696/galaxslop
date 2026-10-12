@@ -13,7 +13,7 @@ u32 JSUMemoryInputStream::readData(void* pDest, s32 length) {
         length = mLength - mPosition;
     }
     if (length > 0) {
-        memcpy(pDest, (void*)((int)mBuffer + mPosition), length);
+        memcpy(pDest, (const u8*)mBuffer + mPosition, length);
         mPosition += length;
     }
     return length;
@@ -52,7 +52,7 @@ s32 JSUMemoryOutputStream::writeData(const void* pSrc, s32 length) {
         length = mLength - mPosition;
     }
     if (length > 0) {
-        memcpy((void*)((int)mBuffer + mPosition), pSrc, length);
+        memcpy((u8*)mBuffer + mPosition, pSrc, length);
         mPosition += length;
     }
     return length;

@@ -30,7 +30,7 @@ void MapPartsRailMover_FORCE_SDATA2() {
 }
 
 MapPartsRailMover::MapPartsRailMover(LiveActor* pActor)
-    : MapPartsFunction(pActor, "レイル移動"), mRailPointPassChecker(), mMoveConditionType(), mMoveStopType(1), mSignMotionType(), _28(gZeroVec) {
+    : MapPartsFunction(pActor, "\x83\x8c\x83\x43\x83\x8b\x88\xda\x93\xae"), mRailPointPassChecker(), mMoveConditionType(), mMoveStopType(1), mSignMotionType(), _28(gZeroVec) {
     _34 = 0.0f;
     mStopTime = 0;
     mSpeed = 0.0f;

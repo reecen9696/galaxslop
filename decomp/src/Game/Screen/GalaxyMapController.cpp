@@ -85,7 +85,7 @@ void GalaxyMapController::init(const JMapInfoIter& rIter) {
     mPowerStarList->initWithoutIter();
     mPowerStarList->kill();
 
-    mBackButton = new BackButton("戻る", 0);
+    mBackButton = new BackButton("\x96\xdf\x82\xe9", 0);
     mBackButton->initWithoutIter();
     mBackButton->kill();
 
@@ -95,7 +95,7 @@ void GalaxyMapController::init(const JMapInfoIter& rIter) {
 
     mMapBackground = new GalaxyMapBackground();
 
-    mWipe = new WipeFade("フェードワイプ", Color8(0, 0, 0, 255));
+    mWipe = new WipeFade("\x83\x74\x83\x46\x81\x5b\x83\x68\x83\x8f\x83\x43\x83\x76", Color8(0, 0, 0, 255));
     mWipe->initWithoutIter();
 
     {
@@ -104,7 +104,7 @@ void GalaxyMapController::init(const JMapInfoIter& rIter) {
         _38 = new JUTTexture(getFbWidth() / 2, MR::getScreenHeight() / 2, GX_TF_RGB565);
     }
 
-    if (MR::startFunctionAsyncExecuteOnMainThread(MR::Functor(this, GalaxyMapController::capture), "GalaxyMapController::capture")) {
+    if (MR::startFunctionAsyncExecuteOnMainThread(MR::Functor(this, &GalaxyMapController::capture), "GalaxyMapController::capture")) {
         MR::waitForEndFunctionAsyncExecute("GalaxyMapController::capture");
     }
 

@@ -18,7 +18,7 @@ namespace NrvPoltaStateGenerateBombTeresa {
 };  // namespace NrvPoltaStateGenerateBombTeresa
 
 PoltaStateGroundRockAttack::PoltaStateGroundRockAttack(Polta* pPolta)
-    : ActorStateBase< Polta >("[state]ポルタ地面岩攻撃", pPolta), _10(4), _14(false) {
+    : ActorStateBase< Polta >("[state]\x83\x7c\x83\x8b\x83\x5e\x92\x6e\x96\xca\x8a\xe2\x8d\x55\x8c\x82", pPolta), _10(4), _14(false) {
     initNerve(GET_NERVE(PoltaStateGenerateBombTeresa, PoltaStateGroundRockAttackNrvSign));
 }
 

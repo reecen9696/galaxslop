@@ -174,7 +174,7 @@ namespace MR {
     }
 }  // namespace MR
 
-FurDrawManager::FurDrawManager(u8 capacity) : NameObj("ファー描画マネージャ") {
+FurDrawManager::FurDrawManager(u8 capacity) : NameObj("\x83\x74\x83\x40\x81\x5b\x95\x60\x89\xe6\x83\x7d\x83\x6c\x81\x5b\x83\x57\x83\x83") {
     mCounts[0] = 0;
     mCounts[1] = 0;
     mFurCtrls[0] = new FurCtrl*[capacity];
@@ -211,7 +211,7 @@ void FurCtrl::setupFur(J3DModel* pModel, ResTIMG* pLength, ResTIMG* pIndirect, R
 
     for (s32 i = 0; i < mNumLayers; i++) {
         char name[16];
-        sprintf(name, "レイヤ %d", i);
+        sprintf(name, "\x83\x8c\x83\x43\x83\x84 %d", i);
         J3DModel2* pLayer = new J3DModel2(mModel);
         pLayer->setVtxShader(mShader, componentSize);
         mLayerModels[i] = pLayer;
@@ -234,7 +234,7 @@ void FurCtrl::setupFurClone(J3DModel* pModel, FurCtrl* pOther) {
 
     for (u32 i = 0; i < mNumLayers; i++) {
         char name[32];
-        sprintf(name, "レイヤ(コピー) %d", i);
+        sprintf(name, "\x83\x8c\x83\x43\x83\x84(\x83\x52\x83\x73\x81\x5b) %d", i);
         J3DModel2* pLayer = new J3DModel2(mModel);
         *pLayer->getVertexBuffer() = *pOther->mLayerModels[i]->getVertexBuffer();
         mLayerModels[i] = pLayer;
@@ -294,33 +294,33 @@ namespace MR {
                 position++;
             }
 
-            scan32(line, "レイヤ数", &pParam->mNumLayers);
-            scanf32(line, "毛長さ", &pParam->mLength);
-            scanf32(line, "長さ偏差", &pParam->mLengthCurve);
-            scanf32(line, "ズレ(indirect)", &pParam->mIndirect);
-            scanf32(line, "ズレ偏差", &pParam->mIndirectCurve);
-            scanf32(line, "明るさ(毛先)", &pParam->mBrightnessTip);
-            scanf32(line, "明るさ(毛元)", &pParam->mBrightnessRoot);
-            scanf32(line, "明るさ偏差", &pParam->mBrightnessCurve);
-            scanf32(line, "透明度(毛先)", &pParam->mAlphaTip);
-            scanf32(line, "透明度(毛元)", &pParam->mAlphaRoot);
-            scanf32(line, "透明度偏差", &pParam->mAlphaCurve);
-            scanf32(line, "透明度・地肌(毛先)", &pParam->mSkinAlphaTip);
-            scanf32(line, "透明度・地肌(毛元)", &pParam->mSkinAlphaRoot);
-            scanf32(line, "透明度・地肌偏差", &pParam->mSkinAlphaCurve);
-            scanf32(line, "密度マップスケール", &pParam->mFurUVScale);
-            scanf32(line, "ベースマップスケール", &pParam->mBodyUVScale);
-            scanu8x4(line, "混合カラー", &pParam->mColor.r);
-            scanf32x4(line, "植毛密度", pParam->mDensity);
-            scanf32x4(line, "植毛太さ", pParam->mThickness);
-            scanu8x4(line, "混合比", pParam->mLengthMap);
-            scan32(line, "ライト0スイッチ", &lightMask);
-            scan32(line, "ライト0マテリアル", &matIntensity);
-            scan32(line, "ライト0アンビエント", &ambIntensity);
-            scan32(line, "ライト1スイッチ", &specularLightMask);
-            scan32(line, "ライト1マテリアル", &specularMatIntensity);
-            scan32(line, "ライト1アンビエント", &specularAmbIntensity);
-            scan32(line, "ライトカラーソース", &colorSource);
+            scan32(line, "\x83\x8c\x83\x43\x83\x84\x90\x94", &pParam->mNumLayers);
+            scanf32(line, "\x96\xd1\x92\xb7\x82\xb3", &pParam->mLength);
+            scanf32(line, "\x92\xb7\x82\xb3\x95\xce\x8d\xb7", &pParam->mLengthCurve);
+            scanf32(line, "\x83\x59\x83\x8c(indirect)", &pParam->mIndirect);
+            scanf32(line, "\x83\x59\x83\x8c\x95\xce\x8d\xb7", &pParam->mIndirectCurve);
+            scanf32(line, "\x96\xbe\x82\xe9\x82\xb3(\x96\xd1\x90\xe6)", &pParam->mBrightnessTip);
+            scanf32(line, "\x96\xbe\x82\xe9\x82\xb3(\x96\xd1\x8c\xb3)", &pParam->mBrightnessRoot);
+            scanf32(line, "\x96\xbe\x82\xe9\x82\xb3\x95\xce\x8d\xb7", &pParam->mBrightnessCurve);
+            scanf32(line, "\x93\xa7\x96\xbe\x93\x78(\x96\xd1\x90\xe6)", &pParam->mAlphaTip);
+            scanf32(line, "\x93\xa7\x96\xbe\x93\x78(\x96\xd1\x8c\xb3)", &pParam->mAlphaRoot);
+            scanf32(line, "\x93\xa7\x96\xbe\x93\x78\x95\xce\x8d\xb7", &pParam->mAlphaCurve);
+            scanf32(line, "\x93\xa7\x96\xbe\x93\x78\x81\x45\x92\x6e\x94\xa7(\x96\xd1\x90\xe6)", &pParam->mSkinAlphaTip);
+            scanf32(line, "\x93\xa7\x96\xbe\x93\x78\x81\x45\x92\x6e\x94\xa7(\x96\xd1\x8c\xb3)", &pParam->mSkinAlphaRoot);
+            scanf32(line, "\x93\xa7\x96\xbe\x93\x78\x81\x45\x92\x6e\x94\xa7\x95\xce\x8d\xb7", &pParam->mSkinAlphaCurve);
+            scanf32(line, "\x96\xa7\x93\x78\x83\x7d\x83\x62\x83\x76\x83\x58\x83\x50\x81\x5b\x83\x8b", &pParam->mFurUVScale);
+            scanf32(line, "\x83\x78\x81\x5b\x83\x58\x83\x7d\x83\x62\x83\x76\x83\x58\x83\x50\x81\x5b\x83\x8b", &pParam->mBodyUVScale);
+            scanu8x4(line, "\x8d\xac\x8d\x87\x83\x4a\x83\x89\x81\x5b", &pParam->mColor.r);
+            scanf32x4(line, "\x90\x41\x96\xd1\x96\xa7\x93\x78", pParam->mDensity);
+            scanf32x4(line, "\x90\x41\x96\xd1\x91\xbe\x82\xb3", pParam->mThickness);
+            scanu8x4(line, "\x8d\xac\x8d\x87\x94\xe4", pParam->mLengthMap);
+            scan32(line, "\x83\x89\x83\x43\x83\x67""0\x83\x58\x83\x43\x83\x62\x83\x60", &lightMask);
+            scan32(line, "\x83\x89\x83\x43\x83\x67""0\x83\x7d\x83\x65\x83\x8a\x83\x41\x83\x8b", &matIntensity);
+            scan32(line, "\x83\x89\x83\x43\x83\x67""0\x83\x41\x83\x93\x83\x72\x83\x47\x83\x93\x83\x67", &ambIntensity);
+            scan32(line, "\x83\x89\x83\x43\x83\x67""1\x83\x58\x83\x43\x83\x62\x83\x60", &specularLightMask);
+            scan32(line, "\x83\x89\x83\x43\x83\x67""1\x83\x7d\x83\x65\x83\x8a\x83\x41\x83\x8b", &specularMatIntensity);
+            scan32(line, "\x83\x89\x83\x43\x83\x67""1\x83\x41\x83\x93\x83\x72\x83\x47\x83\x93\x83\x67", &specularAmbIntensity);
+            scan32(line, "\x83\x89\x83\x43\x83\x67\x83\x4a\x83\x89\x81\x5b\x83\x5c\x81\x5b\x83\x58", &colorSource);
             pLight->mLightMask = lightMask;
             pLight->mMatIntensity = matIntensity;
             pLight->mAmbIntensity = ambIntensity;

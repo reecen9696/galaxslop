@@ -300,6 +300,12 @@ namespace CameraLocalUtil {
             return false;
         }
 
+#ifdef TARGET_PC
+        // The invert_camera setting: left and right swapped.
+        if (port_input_camera_inverted()) {
+            return MR::testCorePadTriggerRight(WPAD_CHAN0);
+        }
+#endif
         return MR::testCorePadTriggerLeft(WPAD_CHAN0);
     }
 
@@ -312,6 +318,11 @@ namespace CameraLocalUtil {
             return false;
         }
 
+#ifdef TARGET_PC
+        if (port_input_camera_inverted()) {
+            return MR::testCorePadTriggerLeft(WPAD_CHAN0);
+        }
+#endif
         return MR::testCorePadTriggerRight(WPAD_CHAN0);
     }
 

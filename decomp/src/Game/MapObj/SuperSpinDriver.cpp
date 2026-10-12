@@ -145,7 +145,7 @@ void SuperSpinDriver::initEmptyModel() {
         return;
     }
 
-    mEmptyModel = MR::createModelObjMapObjStrongLight("無効モデル", "SuperSpinDriverEmpty", getBaseMtx());
+    mEmptyModel = MR::createModelObjMapObjStrongLight("\x96\xb3\x8c\xf8\x83\x82\x83\x66\x83\x8b", "SuperSpinDriverEmpty", getBaseMtx());
     MR::startBtp(mEmptyModel, "SuperSpinDriverEmpty");
     MR::setBtpFrameAndStop(mEmptyModel, mColor);
     MR::initShadowVolumeFlatModel(mEmptyModel, "SuperSpinDriverShadow", MR::getJointMtx(this, "Outside"));
@@ -206,7 +206,7 @@ void SuperSpinDriver::initColor() {
 }
 
 void SuperSpinDriver::initOperateRing() {
-    mOperateRing = new SpinDriverOperateRing("操作リング");
+    mOperateRing = new SpinDriverOperateRing("\x91\x80\x8d\xec\x83\x8a\x83\x93\x83\x4f");
     mOperateRing->initWithoutIter();
 }
 
@@ -223,7 +223,7 @@ void SuperSpinDriver::initAppearState(const JMapInfoIter& rIter) {
         isAppear = false;
     }
 
-    if (MR::joinToGroupArray(this, rIter, "惑星出現", 32)) {
+    if (MR::joinToGroupArray(this, rIter, "\x98\x66\x90\xaf\x8f\x6f\x8c\xbb", 32)) {
         mSpinDriverCamera->initAppearCamera(rIter, this);
         isAppear = false;
     }
@@ -238,7 +238,7 @@ void SuperSpinDriver::initAppearState(const JMapInfoIter& rIter) {
 
     if (respawnType == 1) {
         _168 = 0;
-        mAlreadyDoneFlagIdx = MR::setupAlreadyDoneFlag("ドライバ出現済み", rIter, &_168);
+        mAlreadyDoneFlagIdx = MR::setupAlreadyDoneFlag("\x83\x68\x83\x89\x83\x43\x83\x6f\x8f\x6f\x8c\xbb\x8d\xcf\x82\xdd", rIter, &_168);
     } else {
         _168 = 0;
         mAlreadyDoneFlagIdx = -1;
@@ -494,7 +494,7 @@ void SuperSpinDriver::requestAppear() {
     MR::invalidateClipping(this);
 
     if (mSpinDriverCamera->isUseAppearCamera(this)) {
-        MR::requestStartDemo(this, "出現", GET_NERVE(SuperSpinDriver, SuperSpinDriverNrvAppear),
+        MR::requestStartDemo(this, "\x8f\x6f\x8c\xbb", GET_NERVE(SuperSpinDriver, SuperSpinDriverNrvAppear),
                              GET_NERVE(SuperSpinDriver, SuperSpinDriverNrvTryDemo));
     } else {
         setNerve(GET_NERVE(SuperSpinDriver, SuperSpinDriverNrvAppear));
@@ -505,7 +505,7 @@ void SuperSpinDriver::requestEmptyAppear() {
     MR::invalidateClipping(this);
 
     if (mSpinDriverCamera->isUseAppearCamera(this)) {
-        MR::requestStartDemo(this, "出現", GET_NERVE(SuperSpinDriver, SuperSpinDriverNrvEmptyAppear),
+        MR::requestStartDemo(this, "\x8f\x6f\x8c\xbb", GET_NERVE(SuperSpinDriver, SuperSpinDriverNrvEmptyAppear),
                              GET_NERVE(SuperSpinDriver, SuperSpinDriverNrvTryDemo));
     } else {
         setNerve(GET_NERVE(SuperSpinDriver, SuperSpinDriverNrvEmptyAppear));
@@ -568,7 +568,7 @@ void SuperSpinDriver::exeEmptyAppear() {
 
             if (mSpinDriverCamera->isUseAppearCamera(this)) {
                 mSpinDriverCamera->endAppearCamera(this);
-                MR::endDemoWaitCameraInterpolating(this, "出現");
+                MR::endDemoWaitCameraInterpolating(this, "\x8f\x6f\x8c\xbb");
             }
         }
     }
@@ -615,7 +615,7 @@ void SuperSpinDriver::exeAppear() {
 
             if (mSpinDriverCamera->isUseAppearCamera(this)) {
                 mSpinDriverCamera->endAppearCamera(this);
-                MR::endDemoWaitCameraInterpolating(this, "出現");
+                MR::endDemoWaitCameraInterpolating(this, "\x8f\x6f\x8c\xbb");
             }
         }
     }
@@ -712,6 +712,9 @@ void SuperSpinDriver::exeShootStart() {
         MR::startBckPlayer("SuperSpinDriverStart", "SuperSpinDriverShoot");
         _118 = _C4;
         updateBindActorPoseToShoot(1.0f);
+#ifdef TARGET_PC
+        port_vr_transit_begin(this);
+#endif
     }
 
     f32 rate = MR::calcNerveRate(this, 15);
@@ -804,6 +807,9 @@ void SuperSpinDriver::updateShootMotion() {
 }
 
 void SuperSpinDriver::cancelBind() {
+#ifdef TARGET_PC
+    port_vr_transit_end(this);
+#endif
     if (mBindActor != nullptr) {
         MR::endBindAndPlayerJump(this, _D0, 0);
         mBindActor = nullptr;
@@ -813,6 +819,9 @@ void SuperSpinDriver::cancelBind() {
 }
 
 void SuperSpinDriver::endBind() {
+#ifdef TARGET_PC
+    port_vr_transit_end(this);
+#endif
     MR::endBindAndSpinDriverJump(this, _D0);
     mBindActor = nullptr;
     mSpinDriverCamera->end();

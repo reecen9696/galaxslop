@@ -1,4 +1,4 @@
-#include <cmath>
+#include <math.h>
 #include "private/xf_mem.h"
 #include "revolution/gx.h"
 #include "revolution/gx/GXRegs.h"
@@ -163,7 +163,7 @@ void GXInitSpecularDirHA(GXLightObj* lt_obj, f32 nx, f32 ny, f32 nz, f32 hx, f32
 
 void GXInitLightColor(GXLightObj* lt_obj, GXColor color) {
     GX_SETUP_LIGHT(obj, lt_obj)
-    obj->Color = *(u32*)(&color);
+    obj->Color = GX_BE_U32(&color);
 }
 
 static inline u32 ConvLightID2Num(GXLightID id) {
@@ -202,7 +202,18 @@ static inline void WriteLightObjPS(const register GXLightObjInt* lt_obj, registe
     }
 }
 #else
-static inline void WriteLightObjPS(const GXLightObjInt* lt_obj, void* dest);
+static inline void WriteLightObjPS(const GXLightObjInt* lt_obj, void* dest) {
+    int i;
+    (void)dest;
+    GX_WRITE_U32(0);
+    GX_WRITE_U32(0);
+    GX_WRITE_U32(0);
+    GX_WRITE_U32(lt_obj->Color);
+    for (i = 0; i < 3; i++) GX_WRITE_F32(lt_obj->a[i]);
+    for (i = 0; i < 3; i++) GX_WRITE_F32(lt_obj->k[i]);
+    for (i = 0; i < 3; i++) GX_WRITE_F32(lt_obj->lpos[i]);
+    for (i = 0; i < 3; i++) GX_WRITE_F32(lt_obj->ldir[i]);
+}
 #endif
 
 void GXLoadLightObjImm(const GXLightObj* lt_obj, GXLightID light) {
@@ -224,13 +235,13 @@ void GXSetChanAmbColor(GXChannelID chan, GXColor amb_color) {
     switch (chan) {
     case GX_COLOR0:
         reg = gx->ambColor[GX_COLOR0];
-        rgb = ((*(u32*)(&amb_color)) >> 8);
+        rgb = ((GX_BE_U32(&amb_color)) >> 8);
         SC_XF_AMBIENT0_F_SET_RGB(reg, rgb);
         colIdx = 0;
         break;
     case GX_COLOR1:
         reg = gx->ambColor[GX_COLOR1];
-        rgb = ((*(u32*)(&amb_color)) >> 8);
+        rgb = ((GX_BE_U32(&amb_color)) >> 8);
         SC_XF_AMBIENT1_F_SET_RGB(reg, rgb);
         colIdx = 1;
         break;
@@ -245,11 +256,11 @@ void GXSetChanAmbColor(GXChannelID chan, GXColor amb_color) {
         colIdx = 1;
         break;
     case GX_COLOR0A0:
-        SC_XF_AMBIENT0_F_SET_RGBA(reg, *(u32*)(&amb_color));
+        SC_XF_AMBIENT0_F_SET_RGBA(reg, GX_BE_U32(&amb_color));
         colIdx = 0;
         break;
     case GX_COLOR1A1:
-        SC_XF_AMBIENT1_F_SET_RGBA(reg, *(u32*)(&amb_color));
+        SC_XF_AMBIENT1_F_SET_RGBA(reg, GX_BE_U32(&amb_color));
         colIdx = 1;
         break;
     default:
@@ -266,14 +277,14 @@ void GXSetChanMatColor(GXChannelID chan, GXColor mat_color) {
     switch (chan) {
     case GX_COLOR0:
         reg = gx->matColor[GX_COLOR0];
-        rgb = ((*(u32*)(&mat_color)) >> 8);
+        rgb = ((GX_BE_U32(&mat_color)) >> 8);
         SC_XF_MATERIAL0_F_SET_RGB(reg, rgb);
         colIdx = 0;
         break;
 
     case GX_COLOR1:
         reg = gx->matColor[GX_COLOR1];
-        rgb = ((*(u32*)(&mat_color)) >> 8);
+        rgb = ((GX_BE_U32(&mat_color)) >> 8);
         SC_XF_MATERIAL1_F_SET_RGB(reg, rgb);
         colIdx = 1;
         break;
@@ -291,12 +302,12 @@ void GXSetChanMatColor(GXChannelID chan, GXColor mat_color) {
         break;
 
     case GX_COLOR0A0:
-        SC_XF_MATERIAL0_F_SET_RGBA(reg, *(u32*)(&mat_color));
+        SC_XF_MATERIAL0_F_SET_RGBA(reg, GX_BE_U32(&mat_color));
         colIdx = 0;
         break;
 
     case GX_COLOR1A1:
-        SC_XF_MATERIAL1_F_SET_RGBA(reg, *(u32*)(&mat_color));
+        SC_XF_MATERIAL1_F_SET_RGBA(reg, GX_BE_U32(&mat_color));
         colIdx = 1;
         break;
 

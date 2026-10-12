@@ -55,7 +55,7 @@ void KoopaFireStairs::init(const JMapInfoIter& rIter) {
 
     MR::invalidateClipping(this);
 
-    mBreakModel = MR::createModelObjEnemy("クッパメテオ（壊れ）", "MeteorStrikeBreak", getBaseMtx());
+    mBreakModel = MR::createModelObjEnemy("\x83\x4e\x83\x62\x83\x70\x83\x81\x83\x65\x83\x49\x81\x69\x89\xf3\x82\xea\x81\x6a", "MeteorStrikeBreak", getBaseMtx());
     mBreakModel->kill();
     MR::invalidateClipping(mBreakModel);
 

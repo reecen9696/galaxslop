@@ -4,7 +4,7 @@
 
 class CameraGround : public Camera {
 public:
-    CameraGround(const char* pName = "地面カメラ");
+    CameraGround(const char* pName = "\x92\x6e\x96\xca\x83\x4a\x83\x81\x83\x89");
 
     virtual void reset();
     virtual CameraTargetObj* calc();

@@ -491,8 +491,8 @@ static void xml_resolve_refs(tXML_ST *p_st)
 	UINT8 *p_sc;
 	UINT8 *p_start;
 	UINT8 *p_tmp;
-	unsigned long ch_code;
-	unsigned long tmp_code;
+	unsigned int ch_code;
+	unsigned int tmp_code;
 	INT8 i;
 	UINT8 resolved;
 	UINT16 len_left = p_st->value.len;

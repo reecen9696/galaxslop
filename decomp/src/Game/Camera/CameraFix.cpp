@@ -10,7 +10,7 @@ void CameraFix_FORCE_MATCH_SDATA2() {
 }
 
 CameraFix::CameraFix(const char* pName) : Camera(pName), mWPoint(0.0f, 0.0f, 0.0f), mAxis(0.0f, 0.0f, -2500.0f), mUp(0.0f, 1.0f, 0.0f) {
-    mTarget = new CameraTargetMtx("カメラターゲットダミー");
+    mTarget = new CameraTargetMtx("\x83\x4a\x83\x81\x83\x89\x83\x5e\x81\x5b\x83\x51\x83\x62\x83\x67\x83\x5f\x83\x7e\x81\x5b");
 }
 
 void CameraFix::reset() {

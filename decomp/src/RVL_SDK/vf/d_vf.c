@@ -187,7 +187,7 @@ s32 VFUnmountDrive(const char* i_drive) {
     return err;
 }
 
-s8* VF_path2handleidx(long* o_handle_idx_p, const char* i_path_p) {
+s8* VF_path2handleidx(int* o_handle_idx_p, const char* i_path_p) {
     s8 drive[8];
     const s8* str_p;
     s32 idx;

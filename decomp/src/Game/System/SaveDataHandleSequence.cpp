@@ -32,7 +32,7 @@ namespace {
 };  // namespace
 
 SaveDataHandleSequence::SaveDataHandleSequence()
-    : NerveExecutor("セーブ/ロード"), mSysConfigFile(), mCurrentUserFile(), mBackupUserFile(), mSaveDataHandler(), mNANDErrorSequence(),
+    : NerveExecutor("\x83\x5a\x81\x5b\x83\x75/\x83\x8d\x81\x5b\x83\x68"), mSysConfigFile(), mCurrentUserFile(), mBackupUserFile(), mSaveDataHandler(), mNANDErrorSequence(),
       mSysInfoWindowConfirm(), mSysInfoWindowSave(), _24(), mIsConfirmRemind(), mIsSaveAndQuitMsg(), _2A(), _2B(), _2C(), mWorkUserFile(),
       mNerveForError(), mTempBuffer(), mOnSaveSuccessFunc(), mJustBeforeSaveFunc(), mSaveIcon() {
     mTempBuffer = new (32) u8[SaveDataHandler::getEnoughtTempBufferSize()];

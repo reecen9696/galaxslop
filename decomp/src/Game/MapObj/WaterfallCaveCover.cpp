@@ -21,7 +21,7 @@ namespace NrvWaterfallCaveCover {
 void WaterfallCaveCover::init(const JMapInfoIter& rIter) {
     MapObjActor::init(rIter);
     MapObjActorInitInfo rInitInfo;
-    rInitInfo.setupHioNode("地形オブジェ");
+    rInitInfo.setupHioNode("\x92\x6e\x8c\x60\x83\x49\x83\x75\x83\x57\x83\x46");
     rInitInfo.setupDefaultPos();
     rInitInfo.setupConnectToScene();
     rInitInfo.setupSound(4);
@@ -49,7 +49,7 @@ void WaterfallCaveCover::exeBreak() {
         MR::invalidateHitSensor(this, "body");
         MR::invalidateCollisionParts(this);
         MapObjActorUtil::startBreak(this);
-        MR::startRumbleWithShakeCameraStrong(this, "中", "弱", 1000.0f, FLOAT_MAX);
+        MR::startRumbleWithShakeCameraStrong(this, "\x92\x86", "\x8e\xe3", 1000.0f, FLOAT_MAX);
         MR::startSound(this, "SE_OJ_WATERFALL_COVER_BREAK");
     }
 

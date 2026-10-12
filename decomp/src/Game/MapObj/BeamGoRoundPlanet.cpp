@@ -15,7 +15,7 @@ void BeamGoRoundPlanet_FORCE_MATCH_SDATA2() {
     (void)0.0f;
 }
 
-BeamGoRoundBeam::BeamGoRoundBeam(MtxPtr pMtx) : LiveActor("ビームゴーラウンドビーム") {
+BeamGoRoundBeam::BeamGoRoundBeam(MtxPtr pMtx) : LiveActor("\x83\x72\x81\x5b\x83\x80\x83\x53\x81\x5b\x83\x89\x83\x45\x83\x93\x83\x68\x83\x72\x81\x5b\x83\x80") {
     mModelDrawer = nullptr;
     mBloomModel = nullptr;
     mBeamJointMtx = pMtx;
@@ -28,8 +28,8 @@ void BeamGoRoundBeam::init(const JMapInfoIter& rIter) {
     initHitSensor(1);
     MR::addHitSensorCallbackEnemyAttack(this, "beam", 4, 100.0f);
     initEffectKeeper(0, nullptr, false);
-    mModelDrawer = new VolumeModelDrawer("ビームボリューム", "BeamGoRoundBeamVolume", getBaseMtx());
-    mBloomModel = MR::createModelObjBloomModel("ビームブルーム", "BeamGoRoundBeamBloom", getBaseMtx());
+    mModelDrawer = new VolumeModelDrawer("\x83\x72\x81\x5b\x83\x80\x83\x7b\x83\x8a\x83\x85\x81\x5b\x83\x80", "BeamGoRoundBeamVolume", getBaseMtx());
+    mBloomModel = MR::createModelObjBloomModel("\x83\x72\x81\x5b\x83\x80\x83\x75\x83\x8b\x81\x5b\x83\x80", "BeamGoRoundBeamBloom", getBaseMtx());
     MR::setClippingTypeSphereContainsModelBoundingBox(this, 100.0f);
     MR::startAllAnim(this, "BeamGoRoundBeam");
     makeActorAppeared();
@@ -76,7 +76,7 @@ BeamGoRoundPlanet::BeamGoRoundPlanet(const char* pName) : MapObjActor(pName) {
 void BeamGoRoundPlanet::init(const JMapInfoIter& rIter) {
     MapObjActor::init(rIter);
     MapObjActorInitInfo info;
-    info.setupHioNode("惑星");
+    info.setupHioNode("\x98\x66\x90\xaf");
     info.setupDefaultPos();
     info.setupConnectToScene();
     info.setupEffect(nullptr);

@@ -14,9 +14,9 @@ public:
 
     virtual bool becomeCurrent(const char*) = 0;
     virtual void* getResource(const char*) = 0;
-    virtual void* getResource(unsigned long, const char*) = 0;
-    virtual u32 readResource(void*, unsigned long, const char*) = 0;
-    virtual u32 readResource(void*, unsigned long, unsigned long, const char*) = 0;
+    virtual void* getResource(unsigned int, const char*) = 0;
+    virtual u32 readResource(void*, unsigned int, const char*) = 0;
+    virtual u32 readResource(void*, unsigned int, unsigned int, const char*) = 0;
     virtual void removeResourceAll() = 0;
     virtual bool removeResource(void*) = 0;
     virtual bool detachResource(void*) = 0;

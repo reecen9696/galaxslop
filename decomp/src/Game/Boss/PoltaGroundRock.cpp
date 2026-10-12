@@ -45,7 +45,7 @@ void PoltaGroundRock::init(const JMapInfoIter& rIter) {
 }
 
 void PoltaGroundRock::initBreakModel() {
-    mBreakModel = MR::createModelObjEnemy("壊れモデル", "PoltaGroundRockBreak", getBaseMtx());
+    mBreakModel = MR::createModelObjEnemy("\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "PoltaGroundRockBreak", getBaseMtx());
     mBreakModel->initWithoutIter();
     MR::initLightCtrl(mBreakModel);
     MR::invalidateClipping(mBreakModel);

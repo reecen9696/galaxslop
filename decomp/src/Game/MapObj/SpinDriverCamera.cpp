@@ -21,13 +21,13 @@ void SpinDriverCamera::startAppearCamera(LiveActor* pActor, const TVec3f& a2, co
         return;
     }
 
-    mAppearCameraFrame = MR::getMultiActorCameraFrames(pActor, mCameraInfo, "出現イベント用");
+    mAppearCameraFrame = MR::getMultiActorCameraFrames(pActor, mCameraInfo, "\x8f\x6f\x8c\xbb\x83\x43\x83\x78\x83\x93\x83\x67\x97\x70");
 
     if (mAppearCameraFrame <= 0) {
         return;
     }
 
-    MR::startMultiActorCameraTargetOther(pActor, mCameraInfo, "出現イベント用", CameraTargetArg(mTargetMtx), -1);
+    MR::startMultiActorCameraTargetOther(pActor, mCameraInfo, "\x8f\x6f\x8c\xbb\x83\x43\x83\x78\x83\x93\x83\x67\x97\x70", CameraTargetArg(mTargetMtx), -1);
 
     TPos3f upPos;
     MR::makeMtxUpFrontPos(&upPos, a2, a3, a4);
@@ -43,7 +43,7 @@ void SpinDriverCamera::endAppearCamera(LiveActor* pActor) {
         return;
     }
 
-    MR::endMultiActorCamera(pActor, mCameraInfo, "出現イベント用", false, -1);
+    MR::endMultiActorCamera(pActor, mCameraInfo, "\x8f\x6f\x8c\xbb\x83\x43\x83\x78\x83\x93\x83\x67\x97\x70", false, -1);
 }
 
 s32 SpinDriverCamera::getAppearCameraFrames() const {
@@ -116,7 +116,7 @@ bool SpinDriverCamera::isUseAppearCamera(LiveActor* pActor) const {
         return false;
     }
 
-    return MR::getMultiActorCameraFrames(pActor, mCameraInfo, "出現イベント用") > 0;
+    return MR::getMultiActorCameraFrames(pActor, mCameraInfo, "\x8f\x6f\x8c\xbb\x83\x43\x83\x78\x83\x93\x83\x67\x97\x70") > 0;
 }
 
 void SpinDriverCamera::init(const JMapInfoIter& rIter, LiveActor* pActor) {
@@ -133,7 +133,7 @@ void SpinDriverCamera::init(const JMapInfoIter& rIter, LiveActor* pActor) {
     mCamera->setUp(pActor->mName, new ActorCameraInfo(rIter), arg3);
     mCamera->setEndCameraTypeAtLanding();
 
-    mTargetMtx = new CameraTargetMtx("カメラターゲットダミー");
+    mTargetMtx = new CameraTargetMtx("\x83\x4a\x83\x81\x83\x89\x83\x5e\x81\x5b\x83\x51\x83\x62\x83\x67\x83\x5f\x83\x7e\x81\x5b");
 }
 
 void SpinDriverCamera::initAppearCamera(const JMapInfoIter& rIter, LiveActor* pActor) {
@@ -143,7 +143,7 @@ void SpinDriverCamera::initAppearCamera(const JMapInfoIter& rIter, LiveActor* pA
         return;
     }
 
-    MR::initMultiActorCamera(pActor, rIter, &mCameraInfo, "出現イベント用");
+    MR::initMultiActorCamera(pActor, rIter, &mCameraInfo, "\x8f\x6f\x8c\xbb\x83\x43\x83\x78\x83\x93\x83\x67\x97\x70");
 
-    mAppearCameraFrame = MR::getMultiActorCameraFrames(pActor, mCameraInfo, "出現イベント用");
+    mAppearCameraFrame = MR::getMultiActorCameraFrames(pActor, mCameraInfo, "\x8f\x6f\x8c\xbb\x83\x43\x83\x78\x83\x93\x83\x67\x97\x70");
 }

@@ -610,7 +610,7 @@ void WaterRoad::init(const JMapInfoIter& rIter) {
     MR::setClippingFarMax(this);
 
     bool hasDemo = MR::tryRegisterDemoCast(this, rIter);
-    MR::initMultiActorCamera(this, rIter, &mCameraInfo, "バインド中");
+    MR::initMultiActorCamera(this, rIter, &mCameraInfo, "\x83\x6f\x83\x43\x83\x93\x83\x68\x92\x86");
     MR::useStageSwitchWriteA(this, rIter);
     if (hasDemo) {
         makeActorDead();
@@ -628,7 +628,7 @@ void WaterRoad::appear() {
         MR::onSwitchA(this);
     }
 
-    if (MR::isDemoPartActive("ウォーターロード成長")) {
+    if (MR::isDemoPartActive("\x83\x45\x83\x48\x81\x5b\x83\x5e\x81\x5b\x83\x8d\x81\x5b\x83\x68\x90\xac\x92\xb7")) {
         setNerve(GET_NERVE(WaterRoad, WaterRoadNrvDemoGrowUp));
     } else {
         setNerve(GET_NERVE(WaterRoad, WaterRoadNrvDemoStart));
@@ -705,7 +705,7 @@ void WaterRoad::exeDemoStart() {
     MR::startLevelSound(this, "SE_OJ_LV_WATER_ROAD_APPEAR");
     MR::startAtmosphereLevelSE("SE_AT_LV_EARTHQUAKE");
 
-    if (MR::isDemoPartLastStep("ウォーターロード出現")) {
+    if (MR::isDemoPartLastStep("\x83\x45\x83\x48\x81\x5b\x83\x5e\x81\x5b\x83\x8d\x81\x5b\x83\x68\x8f\x6f\x8c\xbb")) {
         setNerve(GET_NERVE(WaterRoad, WaterRoadNrvDemoGrowUp));
     }
 }
@@ -718,12 +718,12 @@ void WaterRoad::exeDemoGrowUp() {
         MR::tryRumblePadVeryStrong(this, WPAD_CHAN0);
     }
 
-    updateDemo(MR::calcDemoPartStepRate("ウォーターロード成長"));
+    updateDemo(MR::calcDemoPartStepRate("\x83\x45\x83\x48\x81\x5b\x83\x5e\x81\x5b\x83\x8d\x81\x5b\x83\x68\x90\xac\x92\xb7"));
 
     MR::startLevelSound(this, "SE_OJ_LV_WATER_ROAD_GROW");
     MR::startAtmosphereLevelSE("SE_AT_LV_EARTHQUAKE");
 
-    if (MR::isDemoPartLastStep("ウォーターロード成長")) {
+    if (MR::isDemoPartLastStep("\x83\x45\x83\x48\x81\x5b\x83\x5e\x81\x5b\x83\x8d\x81\x5b\x83\x68\x90\xac\x92\xb7")) {
         MR::deleteEffect(this, "Top");
         MR::emitEffect(this, "End");
         setNerve(GET_NERVE(WaterRoad, WaterRoadNrvDemoWaitEnd));
@@ -785,7 +785,7 @@ bool WaterRoad::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pReceive
 
         mRider = MR::getSensorHost(pSender);
         MR::moveCoordToNearestPos(this, mRider->mPosition);
-        MR::startMultiActorCameraTargetPlayer(this, mCameraInfo, "バインド中", -1);
+        MR::startMultiActorCameraTargetPlayer(this, mCameraInfo, "\x83\x6f\x83\x43\x83\x93\x83\x68\x92\x86", -1);
         setNerve(GET_NERVE(WaterRoad, WaterRoadNrvRideStart));
         return true;
     }
@@ -814,7 +814,7 @@ bool WaterRoad::updateRide() {
         MR::startSound(mRider, "SE_OJ_WATER_ROAD_BIND_END");
         MR::startSound(mRider, "SE_PV_JUMP_M");
         MR::endBindAndPlayerJump(this, TVec3f(0.0f, 0.0f, 0.0f), 0);
-        MR::endMultiActorCamera(this, mCameraInfo, "バインド中", true, -1);
+        MR::endMultiActorCamera(this, mCameraInfo, "\x83\x6f\x83\x43\x83\x93\x83\x68\x92\x86", true, -1);
         mRider = nullptr;
         setNerve(GET_NERVE(WaterRoad, WaterRoadNrvDisappear));
         return true;

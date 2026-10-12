@@ -55,7 +55,7 @@ AnimScaleParam::AnimScaleParam() {
     _30 = 0.25f;
 }
 
-AnimScaleController::AnimScaleController(AnimScaleParam* pScaleParam) : NerveExecutor("スケールアニメコントロール\00") {
+AnimScaleController::AnimScaleController(AnimScaleParam* pScaleParam) : NerveExecutor("\x83\x58\x83\x50\x81\x5b\x83\x8b\x83\x41\x83\x6a\x83\x81\x83\x52\x83\x93\x83\x67\x83\x8d\x81\x5b\x83\x8b\00") {
     _8 = pScaleParam;
     _C.set(1.0f);
     _18 = 0.0f;

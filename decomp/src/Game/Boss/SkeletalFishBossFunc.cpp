@@ -3,7 +3,7 @@
 #include <cstdio>
 
 namespace {
-    static const char* sNamePosName = "ガード出現ポイント";
+    static const char* sNamePosName = "\x83\x4b\x81\x5b\x83\x68\x8f\x6f\x8c\xbb\x83\x7c\x83\x43\x83\x93\x83\x67";
 };  // namespace
 
 s32 SkeletalFishBossFunc::getNearestGuardPosID(const TVec3f& rVec) {

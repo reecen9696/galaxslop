@@ -32,7 +32,7 @@ void CoinReplica::removeCoin() {
 }
 
 void CoinReplica::init(const JMapInfoIter& rIter) {
-    mCoin = static_cast< Coin* >(MR::createCoin(this, "コイン(レプリカ用)"));
+    mCoin = static_cast< Coin* >(MR::createCoin(this, "\x83\x52\x83\x43\x83\x93(\x83\x8c\x83\x76\x83\x8a\x83\x4a\x97\x70)"));
     MR::initDefaultPos(mCoin, rIter);
     mCoin->initWithoutIter();
     mCoin->appearNonActive();

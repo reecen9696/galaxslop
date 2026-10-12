@@ -70,7 +70,7 @@ void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
     SC_TEV_FOG_PARAM_3_SET_FSEL(fog3, fsel);
     SC_TEV_FOG_PARAM_3_SET_RID(fog3, 0xF1);
 
-    rgba = *(u32*)(&color);
+    rgba = GX_BE_U32(&color);
     SC_TEV_FOG_COLOR_SET_RGB(fogclr, (rgba >> 8));
     SC_TEV_FOG_COLOR_SET_RID(fogclr, 0xF2);
 

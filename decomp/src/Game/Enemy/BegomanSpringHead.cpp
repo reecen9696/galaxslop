@@ -19,7 +19,7 @@ void BegomanHead::calcAndSetBaseMtx() {
     MR::setBaseScale(this, scale);
 }
 
-BegomanSpringHead::BegomanSpringHead(LiveActor* pActor, MtxPtr pMtx) : BegomanHead(pActor, "バネ頭", "BegomanSpringHead", pMtx, 10, false) {
+BegomanSpringHead::BegomanSpringHead(LiveActor* pActor, MtxPtr pMtx) : BegomanHead(pActor, "\x83\x6f\x83\x6c\x93\xaa", "BegomanSpringHead", pMtx, 10, false) {
 }
 
 BegomanHead::~BegomanHead() {

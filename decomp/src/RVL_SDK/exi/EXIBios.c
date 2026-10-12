@@ -22,13 +22,13 @@
 #define EXI_0CR_TLEN_SHIFT      4
 
 #define EXI_0CR_GET_TSTART(exi_0cr) \
-        ((((unsigned long)(exi_0cr)) & 0x00000001) >> EXI_0CR_TSTART_SHIFT)
+        ((((unsigned int)(exi_0cr)) & 0x00000001) >> EXI_0CR_TSTART_SHIFT)
 
 #define EXI_0CR(tstart, dma, rw, tlen) \
-        ((((unsigned long)(tstart)) << 0) | \
-         (((unsigned long)(dma)) << 1) | \
-         (((unsigned long)(rw)) << 2) | \
-         (((unsigned long)(tlen)) << 4))
+        ((((unsigned int)(tstart)) << 0) | \
+         (((unsigned int)(dma)) << 1) | \
+         (((unsigned int)(rw)) << 2) | \
+         (((unsigned int)(tlen)) << 4))
 
 extern BOOL __OSInIPL;
 

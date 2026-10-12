@@ -7,7 +7,7 @@
 #include "Game/Util/ObjUtil.hpp"
 #include <revolution/gx/GXVert.h>
 
-OceanBowlBloomDrawer::OceanBowlBloomDrawer(OceanBowl* pHost) : NameObj("オーシャンボウル[ブルーム描画]"), mHost(pHost) {
+OceanBowlBloomDrawer::OceanBowlBloomDrawer(OceanBowl* pHost) : NameObj("\x83\x49\x81\x5b\x83\x56\x83\x83\x83\x93\x83\x7b\x83\x45\x83\x8b[\x83\x75\x83\x8b\x81\x5b\x83\x80\x95\x60\x89\xe6]"), mHost(pHost) {
 }
 
 void OceanBowlBloomDrawer::init(const JMapInfoIter&) {

@@ -66,14 +66,14 @@ struct SmokeEffectEntry {
 };
 
 MaterialEffectEntry cMaterialEffectTable[] = {
-    {"属性尻ドロップ",
+    {"\x91\xae\x90\xab\x90\x4b\x83\x68\x83\x8d\x83\x62\x83\x76",
      0x00000000,
      {"HipDropSmoke", "HipDropWater", "HipDropFlower", "HipDropSand", "HipDropSnow", "MudCircle", "HoneyCircle"},
      nullptr,
      nullptr},
-    {"属性ハチ風", 0x03000000, {"Hovering", "HoveringWater", "Hovering", "Hovering", "Hovering", "Hovering", "Hovering"}, nullptr, nullptr},
-    {"属性スピン", 0x00000000, {nullptr, "WaterSpin", "FlowerSpin", "SandSpin", "SnowSpin", "MudCircle", "HoneyCircle"}, nullptr, nullptr},
-    {"属性ステージイン",
+    {"\x91\xae\x90\xab\x83\x6e\x83\x60\x95\x97", 0x03000000, {"Hovering", "HoveringWater", "Hovering", "Hovering", "Hovering", "Hovering", "Hovering"}, nullptr, nullptr},
+    {"\x91\xae\x90\xab\x83\x58\x83\x73\x83\x93", 0x00000000, {nullptr, "WaterSpin", "FlowerSpin", "SandSpin", "SnowSpin", "MudCircle", "HoneyCircle"}, nullptr, nullptr},
+    {"\x91\xae\x90\xab\x83\x58\x83\x65\x81\x5b\x83\x57\x83\x43\x83\x93",
      0x00000000,
      {"StageStartGroundSmoke", nullptr, nullptr, "StageStartGroundSand", nullptr, nullptr, nullptr},
      nullptr,
@@ -363,26 +363,26 @@ void MarioActor::stopMaterialEffect(const char* pName) {
     }
 }
 
-SmokeEffectEntry cSmokeTable[] = {{"共通着地普通", 0x08000000, 1.0f, 1.0f, 0x00000400, 0, 0, 0, nullptr, 0, {0, 0, 0}},
-                                  {"共通着地大", 0x03000000, 1.5f, 1.0f, 0x00000400, 0, 0, 0, nullptr, 0, {0, 0, 0}},
-                                  {"共通壁ジャンプ", 0x03000000, 1.0f, 1.0f, 0x00000300, 0, 0, 0, nullptr, 0, {0, 0, 0}},
-                                  {"共通砂煙レベル", 0x07000000, 0.65f, 1.0f, 0x00000000, 0, 0, 0, nullptr, 0, {0, 0, 0}},
-                                  {"共通壁手擦り", 0x01000000, 0.35f, 1.0f, 0x02010000, 0, 0, 0, nullptr, 0, {0, 0, 0}},
-                                  {"共通壁上昇", 0x01000000, 1.0f, 1.0f, 0x00000200, 0, 0, 0, nullptr, 0, {0, 0, 0}},
-                                  {"共通スリップ坂", 0x02000000, 0.35f, 1.0f, 0x00010000, 2, 0, 0, nullptr, 0, {0, 0, 0}},
-                                  {"共通スリップ空転", 0x00000000, 1.0f, 1.0f, 0x00000000, 0, 0, 0, nullptr, 0, {0, 0, 0}},
-                                  {"共通スリップ坂制動", 0x02000000, 0.5f, 1.0f, 0x00000000, 2, 0, 0, nullptr, 0, {0, 0, 0}},
-                                  {"共通壁ヒット着地", 0x03000000, 1.0f, 1.0f, 0x00000400, 0, 0, 0, nullptr, 0, {0, 0, 0}},
-                                  {"共通ダメージ着地", 0x03000000, 1.0f, 1.0f, 0x00000400, 0, 0, 0, nullptr, 0, {0, 0, 0}},
-                                  {"共通地上スピン", 0x03000000, 0.9f, 1.0f, 0x00000400, 0, 0, 0, nullptr, 0, {0, 0, 0}},
-                                  {"共通ブレーキ", 0x02000000, 0.65f, 1.0f, 0x00010000, 15, 0, 0, nullptr, 0, {0, 0, 0}},
-                                  {"共通ハイジャンプ", 0x02000000, 0.65f, 1.0f, 0x00010000, 6, 0, 0, nullptr, 0, {0, 0, 0}},
-                                  {"共通ブラックホール", 0x01000000, 0.65f, 1.0f, 0x03030000, 0, 0, 0, nullptr, 0, {0, 0, 0}},
-                                  {"共通引き戻し着地", 0x03000000, 1.2f, 1.0f, 0x00000400, 0, 0, 0, nullptr, 0, {0, 0, 0}},
-                                  {"共通水底接触", 0x01000000, 6.0f, 0.5f, 0x00000400, 0, 0, 0, nullptr, 0, {0, 0, 0}},
-                                  {"共通跳躍", 0x08000000, 1.0f, 1.0f, 0x00000C00, 0, 0, 0, nullptr, 0, {0, 0, 0}},
-                                  {"共通ひこうき雲", 0x03000000, 0.3f, 0.2f, 0x00010000, 0, 0, 0, nullptr, 0, {0, 0, 0}},
-                                  {"共通ひこうきブースト", 0x00000000, 2.0f, 1.0f, 0x00000000, 0, 0, 0, nullptr, 0, {0, 0, 0}},
+SmokeEffectEntry cSmokeTable[] = {{"\x8b\xa4\x92\xca\x92\x85\x92\x6e\x95\x81\x92\xca", 0x08000000, 1.0f, 1.0f, 0x00000400, 0, 0, 0, nullptr, 0, {0, 0, 0}},
+                                  {"\x8b\xa4\x92\xca\x92\x85\x92\x6e\x91\xe5", 0x03000000, 1.5f, 1.0f, 0x00000400, 0, 0, 0, nullptr, 0, {0, 0, 0}},
+                                  {"\x8b\xa4\x92\xca\x95\xc7\x83\x57\x83\x83\x83\x93\x83\x76", 0x03000000, 1.0f, 1.0f, 0x00000300, 0, 0, 0, nullptr, 0, {0, 0, 0}},
+                                  {"\x8b\xa4\x92\xca\x8d\xbb\x89\x8c\x83\x8c\x83\x78\x83\x8b", 0x07000000, 0.65f, 1.0f, 0x00000000, 0, 0, 0, nullptr, 0, {0, 0, 0}},
+                                  {"\x8b\xa4\x92\xca\x95\xc7\x8e\xe8\x8e\x43\x82\xe8", 0x01000000, 0.35f, 1.0f, 0x02010000, 0, 0, 0, nullptr, 0, {0, 0, 0}},
+                                  {"\x8b\xa4\x92\xca\x95\xc7\x8f\xe3\x8f\xb8", 0x01000000, 1.0f, 1.0f, 0x00000200, 0, 0, 0, nullptr, 0, {0, 0, 0}},
+                                  {"\x8b\xa4\x92\xca\x83\x58\x83\x8a\x83\x62\x83\x76\x8d\xe2", 0x02000000, 0.35f, 1.0f, 0x00010000, 2, 0, 0, nullptr, 0, {0, 0, 0}},
+                                  {"\x8b\xa4\x92\xca\x83\x58\x83\x8a\x83\x62\x83\x76\x8b\xf3\x93\x5d", 0x00000000, 1.0f, 1.0f, 0x00000000, 0, 0, 0, nullptr, 0, {0, 0, 0}},
+                                  {"\x8b\xa4\x92\xca\x83\x58\x83\x8a\x83\x62\x83\x76\x8d\xe2\x90\xa7\x93\xae", 0x02000000, 0.5f, 1.0f, 0x00000000, 2, 0, 0, nullptr, 0, {0, 0, 0}},
+                                  {"\x8b\xa4\x92\xca\x95\xc7\x83\x71\x83\x62\x83\x67\x92\x85\x92\x6e", 0x03000000, 1.0f, 1.0f, 0x00000400, 0, 0, 0, nullptr, 0, {0, 0, 0}},
+                                  {"\x8b\xa4\x92\xca\x83\x5f\x83\x81\x81\x5b\x83\x57\x92\x85\x92\x6e", 0x03000000, 1.0f, 1.0f, 0x00000400, 0, 0, 0, nullptr, 0, {0, 0, 0}},
+                                  {"\x8b\xa4\x92\xca\x92\x6e\x8f\xe3\x83\x58\x83\x73\x83\x93", 0x03000000, 0.9f, 1.0f, 0x00000400, 0, 0, 0, nullptr, 0, {0, 0, 0}},
+                                  {"\x8b\xa4\x92\xca\x83\x75\x83\x8c\x81\x5b\x83\x4c", 0x02000000, 0.65f, 1.0f, 0x00010000, 15, 0, 0, nullptr, 0, {0, 0, 0}},
+                                  {"\x8b\xa4\x92\xca\x83\x6e\x83\x43\x83\x57\x83\x83\x83\x93\x83\x76", 0x02000000, 0.65f, 1.0f, 0x00010000, 6, 0, 0, nullptr, 0, {0, 0, 0}},
+                                  {"\x8b\xa4\x92\xca\x83\x75\x83\x89\x83\x62\x83\x4e\x83\x7a\x81\x5b\x83\x8b", 0x01000000, 0.65f, 1.0f, 0x03030000, 0, 0, 0, nullptr, 0, {0, 0, 0}},
+                                  {"\x8b\xa4\x92\xca\x88\xf8\x82\xab\x96\xdf\x82\xb5\x92\x85\x92\x6e", 0x03000000, 1.2f, 1.0f, 0x00000400, 0, 0, 0, nullptr, 0, {0, 0, 0}},
+                                  {"\x8b\xa4\x92\xca\x90\x85\x92\xea\x90\xda\x90\x47", 0x01000000, 6.0f, 0.5f, 0x00000400, 0, 0, 0, nullptr, 0, {0, 0, 0}},
+                                  {"\x8b\xa4\x92\xca\x92\xb5\x96\xf4", 0x08000000, 1.0f, 1.0f, 0x00000C00, 0, 0, 0, nullptr, 0, {0, 0, 0}},
+                                  {"\x8b\xa4\x92\xca\x82\xd0\x82\xb1\x82\xa4\x82\xab\x89\x5f", 0x03000000, 0.3f, 0.2f, 0x00010000, 0, 0, 0, nullptr, 0, {0, 0, 0}},
+                                  {"\x8b\xa4\x92\xca\x82\xd0\x82\xb1\x82\xa4\x82\xab\x83\x75\x81\x5b\x83\x58\x83\x67", 0x00000000, 2.0f, 1.0f, 0x00000000, 0, 0, 0, nullptr, 0, {0, 0, 0}},
                                   {nullptr, 0, 0.0f, 0.0f, 0, 0, 0, 0, nullptr, 0, {0, 0, 0}}};
 
 void MarioActor::initCommonEffect() {
@@ -719,88 +719,88 @@ void MarioActor::initEffect() {
     initCommonEffect();
     initMaterialEffect();
 
-    MR::setEffectName(this, "SlipUp", "スリップアップ");
-    MR::setEffectName(this, "WallSpark", "壁スパーク");
-    MR::setEffectName(this, "Damage", "ダメージ");
-    MR::setEffectName(this, "StepOn", "ふみつぶし");
-    MR::setEffectName(this, "SuperSpinDriverEnd", "スーパースピンドライバ終了");
-    MR::setEffectName(this, "BringBubble", "引き戻し泡");
-    MR::setEffectName(this, "BringBubbleBreak", "引き戻し泡破裂");
-    MR::setEffectName(this, "WaterSplashRight", "水はね右");
-    MR::setEffectName(this, "WaterSplashLeft", "水はね左");
-    MR::setEffectName(this, "WaterSplashSRight", "水はね右弱");
-    MR::setEffectName(this, "WaterSplashSLeft", "水はね左弱");
-    MR::setEffectName(this, "SpinLightBurst", "スピンライト消去");
-    MR::setEffectName(this, "ElectricDamage", "ビリビリ");
-    MR::setEffectName(this, "FireDamageSmoke", "炎ダメージ煙");
-    MR::setEffectName(this, "BlueFireDamageSmoke", "炎ダメージ青煙");
-    MR::setEffectName(this, "SpinLight", "スピンライト");
-    MR::setEffectName(this, "IceMarioSpinLight", "アイススピン");
-    MR::setEffectName(this, "FireMarioSpinLight", "ファイアスピン");
-    MR::setEffectName(this, "BeeMarioSpinLight", "ハチスピン");
-    MR::setEffectName(this, "BeeLuigiSpinLight", "ハチルイージスピン");
-    MR::setEffectName(this, "Sweat", "いい汗");
-    MR::setEffectName(this, "CarryStartShort", "ひろいクイック");
-    MR::setEffectName(this, "AirRecover", "酸素回復");
-    MR::setEffectName(this, "Invincible", "無敵中");
-    MR::setEffectHostSRT(this, "無敵中", &mPosition, nullptr, nullptr);
-    MR::setEffectName(this, "Ice", "アイス中");
-    MR::setEffectHostSRT(this, "アイス中", &mPosition, nullptr, nullptr);
-    MR::setEffectName(this, "FireBallThrow", "ファイアボール投げ");
-    MR::setEffectName(this, "Throw", "こうら投げ");
-    MR::setEffectName(this, "DieBuryBody", "砂埋まり体");
-    MR::setEffectName(this, "DieBuryHand", "砂埋まり手");
-    MR::setEffectName(this, "DieDeathMudBody", "泥埋まり体");
-    MR::setEffectName(this, "DieDeathMudHand", "泥埋まり手");
-    MR::setEffectName(this, "SpinLightConcentrate", "スピン許可");
-    MR::setEffectName(this, "FooMarioHandGlowL", "フーマリオグロー左");
-    MR::setEffectName(this, "FooMarioHandGlowR", "フーマリオグロー右");
-    MR::setEffectName(this, "FooMarioBrakeLampL", "フーマリオブレーキ左");
-    MR::setEffectName(this, "FooMarioBrakeLampR", "フーマリオブレーキ右");
-    MR::setEffectName(this, "FooMarioEndL", "フーマリオ解除左");
-    MR::setEffectName(this, "FooMarioEndR", "フーマリオ解除右");
-    MR::setEffectName(this, "WallHit", "壁ヒット");
-    MR::setEffectName(this, "BarrierBound", "結界ヒット");
-    MR::setEffectName(this, "WaterBound", "水壁ヒット");
-    MR::setEffectName(this, "IceWallJump", "氷壁ジャンプ");
-    MR::setEffectHostSRT(this, "氷壁ジャンプ", nullptr, nullptr, nullptr);
-    MR::setEffectName(this, "CeilingCrash", "天井ヒット");
-    MR::setEffectName(this, "Coin", "コイン");
-    MR::setEffectName(this, "PunchHit", "パンチヒット");
-    MR::setEffectName(this, "WaterRipple", "水波紋");
-    MR::setEffectName(this, "SwimWaitRipple", "水面ウエイト波紋");
-    MR::setEffectHostSRT(this, "水面ウエイト波紋", &_BAC, &_BB8, nullptr);
-    MR::setEffectName(this, "SwimSpinLight", "水泳スピン");
-    MR::setEffectName(this, "DiveBubble", "水面Ｚ沈降");
+    MR::setEffectName(this, "SlipUp", "\x83\x58\x83\x8a\x83\x62\x83\x76\x83\x41\x83\x62\x83\x76");
+    MR::setEffectName(this, "WallSpark", "\x95\xc7\x83\x58\x83\x70\x81\x5b\x83\x4e");
+    MR::setEffectName(this, "Damage", "\x83\x5f\x83\x81\x81\x5b\x83\x57");
+    MR::setEffectName(this, "StepOn", "\x82\xd3\x82\xdd\x82\xc2\x82\xd4\x82\xb5");
+    MR::setEffectName(this, "SuperSpinDriverEnd", "\x83\x58\x81\x5b\x83\x70\x81\x5b\x83\x58\x83\x73\x83\x93\x83\x68\x83\x89\x83\x43\x83\x6f\x8f\x49\x97\xb9");
+    MR::setEffectName(this, "BringBubble", "\x88\xf8\x82\xab\x96\xdf\x82\xb5\x96\x41");
+    MR::setEffectName(this, "BringBubbleBreak", "\x88\xf8\x82\xab\x96\xdf\x82\xb5\x96\x41\x94\x6a\x97\xf4");
+    MR::setEffectName(this, "WaterSplashRight", "\x90\x85\x82\xcd\x82\xcb\x89\x45");
+    MR::setEffectName(this, "WaterSplashLeft", "\x90\x85\x82\xcd\x82\xcb\x8d\xb6");
+    MR::setEffectName(this, "WaterSplashSRight", "\x90\x85\x82\xcd\x82\xcb\x89\x45\x8e\xe3");
+    MR::setEffectName(this, "WaterSplashSLeft", "\x90\x85\x82\xcd\x82\xcb\x8d\xb6\x8e\xe3");
+    MR::setEffectName(this, "SpinLightBurst", "\x83\x58\x83\x73\x83\x93\x83\x89\x83\x43\x83\x67\x8f\xc1\x8b\x8e");
+    MR::setEffectName(this, "ElectricDamage", "\x83\x72\x83\x8a\x83\x72\x83\x8a");
+    MR::setEffectName(this, "FireDamageSmoke", "\x89\x8a\x83\x5f\x83\x81\x81\x5b\x83\x57\x89\x8c");
+    MR::setEffectName(this, "BlueFireDamageSmoke", "\x89\x8a\x83\x5f\x83\x81\x81\x5b\x83\x57\x90\xc2\x89\x8c");
+    MR::setEffectName(this, "SpinLight", "\x83\x58\x83\x73\x83\x93\x83\x89\x83\x43\x83\x67");
+    MR::setEffectName(this, "IceMarioSpinLight", "\x83\x41\x83\x43\x83\x58\x83\x58\x83\x73\x83\x93");
+    MR::setEffectName(this, "FireMarioSpinLight", "\x83\x74\x83\x40\x83\x43\x83\x41\x83\x58\x83\x73\x83\x93");
+    MR::setEffectName(this, "BeeMarioSpinLight", "\x83\x6e\x83\x60\x83\x58\x83\x73\x83\x93");
+    MR::setEffectName(this, "BeeLuigiSpinLight", "\x83\x6e\x83\x60\x83\x8b\x83\x43\x81\x5b\x83\x57\x83\x58\x83\x73\x83\x93");
+    MR::setEffectName(this, "Sweat", "\x82\xa2\x82\xa2\x8a\xbe");
+    MR::setEffectName(this, "CarryStartShort", "\x82\xd0\x82\xeb\x82\xa2\x83\x4e\x83\x43\x83\x62\x83\x4e");
+    MR::setEffectName(this, "AirRecover", "\x8e\x5f\x91\x66\x89\xf1\x95\x9c");
+    MR::setEffectName(this, "Invincible", "\x96\xb3\x93\x47\x92\x86");
+    MR::setEffectHostSRT(this, "\x96\xb3\x93\x47\x92\x86", &mPosition, nullptr, nullptr);
+    MR::setEffectName(this, "Ice", "\x83\x41\x83\x43\x83\x58\x92\x86");
+    MR::setEffectHostSRT(this, "\x83\x41\x83\x43\x83\x58\x92\x86", &mPosition, nullptr, nullptr);
+    MR::setEffectName(this, "FireBallThrow", "\x83\x74\x83\x40\x83\x43\x83\x41\x83\x7b\x81\x5b\x83\x8b\x93\x8a\x82\xb0");
+    MR::setEffectName(this, "Throw", "\x82\xb1\x82\xa4\x82\xe7\x93\x8a\x82\xb0");
+    MR::setEffectName(this, "DieBuryBody", "\x8d\xbb\x96\x84\x82\xdc\x82\xe8\x91\xcc");
+    MR::setEffectName(this, "DieBuryHand", "\x8d\xbb\x96\x84\x82\xdc\x82\xe8\x8e\xe8");
+    MR::setEffectName(this, "DieDeathMudBody", "\x93\x44\x96\x84\x82\xdc\x82\xe8\x91\xcc");
+    MR::setEffectName(this, "DieDeathMudHand", "\x93\x44\x96\x84\x82\xdc\x82\xe8\x8e\xe8");
+    MR::setEffectName(this, "SpinLightConcentrate", "\x83\x58\x83\x73\x83\x93\x8b\x96\x89\xc2");
+    MR::setEffectName(this, "FooMarioHandGlowL", "\x83\x74\x81\x5b\x83\x7d\x83\x8a\x83\x49\x83\x4f\x83\x8d\x81\x5b\x8d\xb6");
+    MR::setEffectName(this, "FooMarioHandGlowR", "\x83\x74\x81\x5b\x83\x7d\x83\x8a\x83\x49\x83\x4f\x83\x8d\x81\x5b\x89\x45");
+    MR::setEffectName(this, "FooMarioBrakeLampL", "\x83\x74\x81\x5b\x83\x7d\x83\x8a\x83\x49\x83\x75\x83\x8c\x81\x5b\x83\x4c\x8d\xb6");
+    MR::setEffectName(this, "FooMarioBrakeLampR", "\x83\x74\x81\x5b\x83\x7d\x83\x8a\x83\x49\x83\x75\x83\x8c\x81\x5b\x83\x4c\x89\x45");
+    MR::setEffectName(this, "FooMarioEndL", "\x83\x74\x81\x5b\x83\x7d\x83\x8a\x83\x49\x89\xf0\x8f\x9c\x8d\xb6");
+    MR::setEffectName(this, "FooMarioEndR", "\x83\x74\x81\x5b\x83\x7d\x83\x8a\x83\x49\x89\xf0\x8f\x9c\x89\x45");
+    MR::setEffectName(this, "WallHit", "\x95\xc7\x83\x71\x83\x62\x83\x67");
+    MR::setEffectName(this, "BarrierBound", "\x8c\x8b\x8a\x45\x83\x71\x83\x62\x83\x67");
+    MR::setEffectName(this, "WaterBound", "\x90\x85\x95\xc7\x83\x71\x83\x62\x83\x67");
+    MR::setEffectName(this, "IceWallJump", "\x95\x58\x95\xc7\x83\x57\x83\x83\x83\x93\x83\x76");
+    MR::setEffectHostSRT(this, "\x95\x58\x95\xc7\x83\x57\x83\x83\x83\x93\x83\x76", nullptr, nullptr, nullptr);
+    MR::setEffectName(this, "CeilingCrash", "\x93\x56\x88\xe4\x83\x71\x83\x62\x83\x67");
+    MR::setEffectName(this, "Coin", "\x83\x52\x83\x43\x83\x93");
+    MR::setEffectName(this, "PunchHit", "\x83\x70\x83\x93\x83\x60\x83\x71\x83\x62\x83\x67");
+    MR::setEffectName(this, "WaterRipple", "\x90\x85\x94\x67\x96\xe4");
+    MR::setEffectName(this, "SwimWaitRipple", "\x90\x85\x96\xca\x83\x45\x83\x47\x83\x43\x83\x67\x94\x67\x96\xe4");
+    MR::setEffectHostSRT(this, "\x90\x85\x96\xca\x83\x45\x83\x47\x83\x43\x83\x67\x94\x67\x96\xe4", &_BAC, &_BB8, nullptr);
+    MR::setEffectName(this, "SwimSpinLight", "\x90\x85\x89\x6a\x83\x58\x83\x73\x83\x93");
+    MR::setEffectName(this, "DiveBubble", "\x90\x85\x96\xca\x82\x79\x92\xbe\x8d\x7e");
     MR::addEffect(this, "WaterColumnS");
-    MR::setEffectName(this, "WaterColumnS", "水面ジャンプ水柱");
-    MR::setEffectName(this, "SurfaceWave", "水面泳ぎ");
-    MR::setEffectHostSRT(this, "水面泳ぎ", &_BAC, &_BB8, nullptr);
-    MR::setEffectName(this, "BodyBubble", "水中身体泡");
-    MR::setEffectName(this, "MouthBubble", "水中口泡");
-    MR::setEffectName(this, "SeaSmoke", "水底接触");
-    MR::setEffectName(this, "Metamorphosis", "変身");
-    MR::setEffectName(this, "MetamorphosisEnd", "変身解除");
-    MR::setEffectName(this, "BeeFlowerPollen", "ハチ花くっつき");
-    MR::setEffectHostSRT(this, "ハチ花くっつき", nullptr, nullptr, nullptr);
-    MR::setEffectName(this, "SkateL", "スケート左");
-    MR::setEffectName(this, "SkateR", "スケート右");
-    MR::setEffectName(this, "IceJumpLand", "スケート着地");
+    MR::setEffectName(this, "WaterColumnS", "\x90\x85\x96\xca\x83\x57\x83\x83\x83\x93\x83\x76\x90\x85\x92\x8c");
+    MR::setEffectName(this, "SurfaceWave", "\x90\x85\x96\xca\x89\x6a\x82\xac");
+    MR::setEffectHostSRT(this, "\x90\x85\x96\xca\x89\x6a\x82\xac", &_BAC, &_BB8, nullptr);
+    MR::setEffectName(this, "BodyBubble", "\x90\x85\x92\x86\x90\x67\x91\xcc\x96\x41");
+    MR::setEffectName(this, "MouthBubble", "\x90\x85\x92\x86\x8c\xfb\x96\x41");
+    MR::setEffectName(this, "SeaSmoke", "\x90\x85\x92\xea\x90\xda\x90\x47");
+    MR::setEffectName(this, "Metamorphosis", "\x95\xcf\x90\x67");
+    MR::setEffectName(this, "MetamorphosisEnd", "\x95\xcf\x90\x67\x89\xf0\x8f\x9c");
+    MR::setEffectName(this, "BeeFlowerPollen", "\x83\x6e\x83\x60\x89\xd4\x82\xad\x82\xc1\x82\xc2\x82\xab");
+    MR::setEffectHostSRT(this, "\x83\x6e\x83\x60\x89\xd4\x82\xad\x82\xc1\x82\xc2\x82\xab", nullptr, nullptr, nullptr);
+    MR::setEffectName(this, "SkateL", "\x83\x58\x83\x50\x81\x5b\x83\x67\x8d\xb6");
+    MR::setEffectName(this, "SkateR", "\x83\x58\x83\x50\x81\x5b\x83\x67\x89\x45");
+    MR::setEffectName(this, "IceJumpLand", "\x83\x58\x83\x50\x81\x5b\x83\x67\x92\x85\x92\x6e");
 
-    MR::setEffectHostSRT(this, "天井ヒット", nullptr, nullptr, nullptr);
-    MR::setEffectHostSRT(this, "壁ヒット", nullptr, nullptr, nullptr);
-    MR::setEffectHostSRT(this, "パンチヒット", nullptr, nullptr, nullptr);
+    MR::setEffectHostSRT(this, "\x93\x56\x88\xe4\x83\x71\x83\x62\x83\x67", nullptr, nullptr, nullptr);
+    MR::setEffectHostSRT(this, "\x95\xc7\x83\x71\x83\x62\x83\x67", nullptr, nullptr, nullptr);
+    MR::setEffectHostSRT(this, "\x83\x70\x83\x93\x83\x60\x83\x71\x83\x62\x83\x67", nullptr, nullptr, nullptr);
     MR::setEffectHostSRT(this, "FlowerSpin", nullptr, nullptr, nullptr);
-    MR::setEffectHostSRT(this, "水波紋", nullptr, nullptr, nullptr);
-    MR::setEffectHostSRT(this, "結界ヒット", nullptr, nullptr, nullptr);
-    MR::setEffectHostSRT(this, "水壁ヒット", nullptr, nullptr, nullptr);
+    MR::setEffectHostSRT(this, "\x90\x85\x94\x67\x96\xe4", nullptr, nullptr, nullptr);
+    MR::setEffectHostSRT(this, "\x8c\x8b\x8a\x45\x83\x71\x83\x62\x83\x67", nullptr, nullptr, nullptr);
+    MR::setEffectHostSRT(this, "\x90\x85\x95\xc7\x83\x71\x83\x62\x83\x67", nullptr, nullptr, nullptr);
 
-    MR::setEffectName(this, "Blur", "ワープポッドブラー");
-    MR::setEffectName(this, "SpinRing", "スピンリング");
-    MR::setEffectName(this, "Vanish", "ブラックホール消滅");
+    MR::setEffectName(this, "Blur", "\x83\x8f\x81\x5b\x83\x76\x83\x7c\x83\x62\x83\x68\x83\x75\x83\x89\x81\x5b");
+    MR::setEffectName(this, "SpinRing", "\x83\x58\x83\x73\x83\x93\x83\x8a\x83\x93\x83\x4f");
+    MR::setEffectName(this, "Vanish", "\x83\x75\x83\x89\x83\x62\x83\x4e\x83\x7a\x81\x5b\x83\x8b\x8f\xc1\x96\xc5");
 
     {
-        const char* groupName = "雪煙レベル";
+        const char* groupName = "\x90\xe1\x89\x8c\x83\x8c\x83\x78\x83\x8b";
         mEffectKeeper->registerEffect("CrestGetFlyC", _D1C.toMtxPtr(), groupName, nullptr);
     }
 
@@ -809,70 +809,70 @@ void MarioActor::initEffect() {
     const TVec3f* pos = &mPosition;
 
     {
-        const char* groupName = "スイングフライ";
+        const char* groupName = "\x83\x58\x83\x43\x83\x93\x83\x4f\x83\x74\x83\x89\x83\x43";
         mEffectKeeper->registerEffect("CommonPhotonDustCircle", pos, rot, scale, groupName);
     }
 
     {
-        const char* groupName = "宇宙遊泳";
+        const char* groupName = "\x89\x46\x92\x88\x97\x56\x89\x6a";
         mEffectKeeper->registerEffect("MarioSpaceDust", pos, rot, scale, groupName);
     }
 
     {
-        const char* groupName = "ジャンプフェアリー";
+        const char* groupName = "\x83\x57\x83\x83\x83\x93\x83\x76\x83\x74\x83\x46\x83\x41\x83\x8a\x81\x5b";
         mEffectKeeper->registerEffect("CrestGetFlyC", pos, rot, scale, groupName);
     }
 
     {
-        const char* groupName = "Bダッシュ";
+        const char* groupName = "B\x83\x5f\x83\x62\x83\x56\x83\x85";
         mEffectKeeper->registerEffect("MiniPandaSpinLoopLeg", pos, rot, scale, groupName);
     }
 
     {
-        const char* groupName = "インダイレクトテスト";
+        const char* groupName = "\x83\x43\x83\x93\x83\x5f\x83\x43\x83\x8c\x83\x4e\x83\x67\x83\x65\x83\x58\x83\x67";
         mEffectKeeper->registerEffect("IndTest", pos, rot, scale, groupName);
     }
 
     {
-        const char* groupName = "ラケット消去";
+        const char* groupName = "\x83\x89\x83\x50\x83\x62\x83\x67\x8f\xc1\x8b\x8e";
         mEffectKeeper->registerEffect("TestMarioBaobabooPowerDown", _DAC.toMtxPtr(), groupName, nullptr);
     }
 
     {
-        const char* groupName = "チャージ完了";
+        const char* groupName = "\x83\x60\x83\x83\x81\x5b\x83\x57\x8a\xae\x97\xb9";
         mEffectKeeper->registerEffect("TornadoChargeEnd", pos, rot, scale, groupName);
     }
 
     {
-        const char* groupName = "チャージ中";
+        const char* groupName = "\x83\x60\x83\x83\x81\x5b\x83\x57\x92\x86";
         mEffectKeeper->registerEffect("TornadoCharge", pos, rot, scale, groupName);
     }
 
     {
-        const char* groupName = "チャージ切れ";
+        const char* groupName = "\x83\x60\x83\x83\x81\x5b\x83\x57\x90\xd8\x82\xea";
         mEffectKeeper->registerEffect("AppleHit", pos, rot, scale, groupName);
     }
 
-    MR::setEffectName(this, "LandRubber", "特殊着地");
-    MR::setEffectName(this, "DieDarkMatter", "ダークマター死亡");
-    MR::setEffectName(this, "HopperMarioHipDropBlur", "ホッパー尻落");
-    MR::setEffectName(this, "HopperLuigiHipDropBlur", "ホッパー尻落ルイージ");
-    MR::setEffectName(this, "HipDropBlur", "尻落");
-    MR::setEffectName(this, "HipDropBlurLuigi", "尻落ルイージ");
-    MR::setEffectName(this, "GetAgain", "アイテム再ゲット");
+    MR::setEffectName(this, "LandRubber", "\x93\xc1\x8e\xea\x92\x85\x92\x6e");
+    MR::setEffectName(this, "DieDarkMatter", "\x83\x5f\x81\x5b\x83\x4e\x83\x7d\x83\x5e\x81\x5b\x8e\x80\x96\x53");
+    MR::setEffectName(this, "HopperMarioHipDropBlur", "\x83\x7a\x83\x62\x83\x70\x81\x5b\x90\x4b\x97\x8e");
+    MR::setEffectName(this, "HopperLuigiHipDropBlur", "\x83\x7a\x83\x62\x83\x70\x81\x5b\x90\x4b\x97\x8e\x83\x8b\x83\x43\x81\x5b\x83\x57");
+    MR::setEffectName(this, "HipDropBlur", "\x90\x4b\x97\x8e");
+    MR::setEffectName(this, "HipDropBlurLuigi", "\x90\x4b\x97\x8e\x83\x8b\x83\x43\x81\x5b\x83\x57");
+    MR::setEffectName(this, "GetAgain", "\x83\x41\x83\x43\x83\x65\x83\x80\x8d\xc4\x83\x51\x83\x62\x83\x67");
 
     {
-        const char* groupName = "パンチブラー左";
+        const char* groupName = "\x83\x70\x83\x93\x83\x60\x83\x75\x83\x89\x81\x5b\x8d\xb6";
         mEffectKeeper->registerEffect("MarioPunchLBlur", pos, rot, scale, groupName);
     }
 
-    MR::getEffect(this, "パンチブラー左")->forceFollowOn();
+    MR::getEffect(this, "\x83\x70\x83\x93\x83\x60\x83\x75\x83\x89\x81\x5b\x8d\xb6")->forceFollowOn();
     {
-        const char* groupName = "パンチブラー右";
+        const char* groupName = "\x83\x70\x83\x93\x83\x60\x83\x75\x83\x89\x81\x5b\x89\x45";
         mEffectKeeper->registerEffect("MarioPunchRBlur", pos, rot, scale, groupName);
     }
 
-    MR::getEffect(this, "パンチブラー右")->forceFollowOn();
+    MR::getEffect(this, "\x83\x70\x83\x93\x83\x60\x83\x75\x83\x89\x81\x5b\x89\x45")->forceFollowOn();
 
     mEffectKeeper->finalizeSort();
 
@@ -1107,17 +1107,17 @@ void MarioActor::updateEffect() {
     }
 
     if (effectA) {
-        playEffect("共通砂煙レベル");
+        playEffect("\x8b\xa4\x92\xca\x8d\xbb\x89\x8c\x83\x8c\x83\x78\x83\x8b");
     } else if (!effectA) {
         if (mEffectFlags.mSmoke != 0) {
-            stopEffect("共通砂煙レベル");
+            stopEffect("\x8b\xa4\x92\xca\x8d\xbb\x89\x8c\x83\x8c\x83\x78\x83\x8b");
         }
     }
 
     if (effectB && mEffectFlags.mSnow == 0) {
-        playEffect("雪煙レベル");
+        playEffect("\x90\xe1\x89\x8c\x83\x8c\x83\x78\x83\x8b");
     } else if (!effectB && mEffectFlags.mSnow != 0) {
-        stopEffect("雪煙レベル");
+        stopEffect("\x90\xe1\x89\x8c\x83\x8c\x83\x78\x83\x8b");
     }
 
     mEffectFlags.mSmoke = effectA;
@@ -1130,10 +1130,10 @@ void MarioActor::updateEffect() {
     }
 
     if (effectA) {
-        playEffect("共通スリップ坂");
+        playEffect("\x8b\xa4\x92\xca\x83\x58\x83\x8a\x83\x62\x83\x76\x8d\xe2");
     } else if (!effectA) {
         if (mEffectFlags.mSlopeSlip != 0) {
-            stopEffect("共通スリップ坂");
+            stopEffect("\x8b\xa4\x92\xca\x83\x58\x83\x8a\x83\x62\x83\x76\x8d\xe2");
         }
     }
 
@@ -1141,7 +1141,7 @@ void MarioActor::updateEffect() {
 
     if ((mHealth <= 1 || mWaterLife <= 1) && !MR::isDemoActive() && !MR::isPowerStarGetDemoActive() && !MR::isGalaxyDarkCometAppearInCurrentStage() &&
         MR::isPermitSE() && isEnableNerveChange()) {
-        playSound("ライフ警告", -1);
+        playSound("\x83\x89\x83\x43\x83\x74\x8c\x78\x8d\x90", -1);
     }
 
     s32 nearZero = 0;
@@ -1150,15 +1150,15 @@ void MarioActor::updateEffect() {
     }
 
     if (!nearZero && mEffectFlags.mIsStationary) {
-        playEffect("宇宙遊泳");
+        playEffect("\x89\x46\x92\x88\x97\x56\x89\x6a");
     } else if (nearZero && !mEffectFlags.mIsStationary) {
-        stopEffect("宇宙遊泳");
+        stopEffect("\x89\x46\x92\x88\x97\x56\x89\x6a");
     }
 
     mEffectFlags.mIsStationary = nearZero;
 
     if (!isJumping() && _934 == 0) {
-        MR::deleteEffect(this, "ジャンプフェアリー");
+        MR::deleteEffect(this, "\x83\x57\x83\x83\x83\x93\x83\x76\x83\x74\x83\x46\x83\x41\x83\x8a\x81\x5b");
     }
 
     mMarioEffect->doCubeEffect();
@@ -1178,10 +1178,10 @@ void MarioActor::updateEffect() {
     }
 
     if (effectC) {
-        playEffectRT("属性ハチ風", mMario->_368, mMario->mShadowPos);
+        playEffectRT("\x91\xae\x90\xab\x83\x6e\x83\x60\x95\x97", mMario->_368, mMario->mShadowPos);
     } else {
         if (mEffectFlags.mBeeWind) {
-            stopEffect("属性ハチ風");
+            stopEffect("\x91\xae\x90\xab\x83\x6e\x83\x60\x95\x97");
         }
     }
 
@@ -1223,7 +1223,7 @@ void MarioEffect::playSwingEffect() {
     }
 
     Mario* mario = getPlayer();
-    playEffectRT("属性スピン", mario->_368, getTrans());
+    playEffectRT("\x91\xae\x90\xab\x83\x58\x83\x73\x83\x93", mario->_368, getTrans());
 }
 
 void MarioEffect::doCubeEffect() {
@@ -1291,9 +1291,9 @@ void MarioActor::stopSpinTicoEffect(bool force) {
     _946 = 0;
 
     if (force) {
-        stopEffectForce("スピンリング");
+        stopEffectForce("\x83\x58\x83\x73\x83\x93\x83\x8a\x83\x93\x83\x4f");
     } else {
-        stopEffect("スピンリング");
+        stopEffect("\x83\x58\x83\x73\x83\x93\x83\x8a\x83\x93\x83\x4f");
     }
 }
 

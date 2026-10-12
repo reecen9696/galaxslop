@@ -46,9 +46,9 @@ void MarioAnimator::controlWaitAnimation() {
         weights[2] = angle / 0.7853982f;
         weights[3] = 1.0f - weights[2];
         if (sideSlope < 0.0f) {
-            mXanimePlayer->changeTrackAnimation(2, "坂右ウエイト");
+            mXanimePlayer->changeTrackAnimation(2, "\x8d\xe2\x89\x45\x83\x45\x83\x47\x83\x43\x83\x67");
         } else {
-            mXanimePlayer->changeTrackAnimation(2, "坂左ウエイト");
+            mXanimePlayer->changeTrackAnimation(2, "\x8d\xe2\x8d\xb6\x83\x45\x83\x47\x83\x43\x83\x67");
         }
 
         if (getPlayer()->_10._F) {
@@ -68,9 +68,9 @@ void MarioAnimator::controlWaitAnimation() {
         weights[2] = angle / 0.7853982f;
         weights[3] = 1.0f - weights[2];
         if (frontSlope < 0.0f) {
-            mXanimePlayer->changeTrackAnimation(2, "坂前ウエイト");
+            mXanimePlayer->changeTrackAnimation(2, "\x8d\xe2\x91\x4f\x83\x45\x83\x47\x83\x43\x83\x67");
         } else {
-            mXanimePlayer->changeTrackAnimation(2, "坂後ウエイト");
+            mXanimePlayer->changeTrackAnimation(2, "\x8d\xe2\x8c\xe3\x83\x45\x83\x47\x83\x43\x83\x67");
         }
 
         if (getPlayer()->_10._F) {
@@ -96,8 +96,8 @@ void MarioAnimator::stopWaitAnimation() {
         return;
     }
 
-    if (isAnimationRun("基本")) {
-        mXanimePlayer->changeTrackAnimation(2, "ラン");
+    if (isAnimationRun("\x8a\xee\x96\x7b")) {
+        mXanimePlayer->changeTrackAnimation(2, "\x83\x89\x83\x93");
     }
 }
 
@@ -198,10 +198,10 @@ bool MarioWait::checkStart() {
 bool MarioWait::start() {
     switch (_12) {
     case 0:
-        changeAnimation("特殊ウエイト1A");
+        changeAnimation("\x93\xc1\x8e\xea\x83\x45\x83\x47\x83\x43\x83\x67""1A");
         break;
     case 1:
-        changeAnimation("戦闘ウエイト");
+        changeAnimation("\x90\xed\x93\xac\x83\x45\x83\x47\x83\x43\x83\x67");
         break;
     }
 
@@ -257,7 +257,7 @@ bool MarioWait::update() {
                 if (_16 == duration) {
                     _16 = 0;
                     _14++;
-                    changeAnimation("特殊ウエイト1B");
+                    changeAnimation("\x93\xc1\x8e\xea\x83\x45\x83\x47\x83\x43\x83\x67""1B");
                 }
             }
 
@@ -276,9 +276,9 @@ bool MarioWait::update() {
 }
 
 bool MarioWait::close() {
-    stopSound("声あくび", 0);
-    stopSound("声いびき１", 0);
-    stopSound("声いびき２", 0);
+    stopSound("\x90\xba\x82\xa0\x82\xad\x82\xd1", 0);
+    stopSound("\x90\xba\x82\xa2\x82\xd1\x82\xab\x82\x50", 0);
+    stopSound("\x90\xba\x82\xa2\x82\xd1\x82\xab\x82\x51", 0);
     _16 = 0;
     return true;
 }

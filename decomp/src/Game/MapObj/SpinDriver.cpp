@@ -61,7 +61,7 @@ void SpinDriver_FORCE_MATCH_STRINGS() {
     MR::isEqualString("SpinDriver", "SpinDriver");
     MR::isEqualString("body", "body");
     MR::isEqualString("SpinDriverShadow", "SpinDriverShadow");
-    MR::isEqualString("出現", "出現");
+    MR::isEqualString("\x8f\x6f\x8c\xbb", "\x8f\x6f\x8c\xbb");
     MR::isEqualString("SE_PM_SPIN_ATTACK", "SE_PM_SPIN_ATTACK");
     MR::isEqualString("Water", "Water");
     MR::isEqualString("SE_PM_SPIN_DRV_IN_WATER_1", "SE_PM_SPIN_DRV_IN_WATER_1");
@@ -252,7 +252,7 @@ void SpinDriver::appear() {
     MR::invalidateClipping(this);
 
     if (mSpinDriverCamera->isUseAppearCamera(this)) {
-        MR::requestStartDemo(this, "出現", GET_NERVE(SpinDriver, SpinDriverNrvAppear), GET_NERVE(SpinDriver, SpinDriverNrvTryDemo));
+        MR::requestStartDemo(this, "\x8f\x6f\x8c\xbb", GET_NERVE(SpinDriver, SpinDriverNrvAppear), GET_NERVE(SpinDriver, SpinDriverNrvTryDemo));
     } else {
         setNerve(GET_NERVE(SpinDriver, SpinDriverNrvAppear));
     }
@@ -387,6 +387,9 @@ bool SpinDriver::tryShoot() {
 
 bool SpinDriver::tryEndShoot() {
     if (mShootPath == nullptr || MR::isGreaterStep(this, _124)) {
+#ifdef TARGET_PC
+        port_vr_transit_end(this);
+#endif
         MR::endBindAndSpinDriverJump(this, _C4);
 
         _8C = 0;
@@ -465,7 +468,7 @@ void SpinDriver::exeAppear() {
         setNerve(GET_NERVE(SpinDriver, SpinDriverNrvWait));
 
         if (mSpinDriverCamera->isUseAppearCamera(this)) {
-            MR::endDemoWaitCameraInterpolating(this, "出現");
+            MR::endDemoWaitCameraInterpolating(this, "\x8f\x6f\x8c\xbb");
             mSpinDriverCamera->endAppearCamera(this);
         }
     }
@@ -552,6 +555,9 @@ void SpinDriver::exeShootStart() {
         MR::startBpk(this, "Active");
 
         startCamera();
+#ifdef TARGET_PC
+        port_vr_transit_begin(this);
+#endif
     }
 
     if (MR::isStep(this, 4)) {
@@ -706,6 +712,9 @@ bool SpinDriver::startBind(HitSensor* pSensor) {
 }
 
 void SpinDriver::cancelBind() {
+#ifdef TARGET_PC
+    port_vr_transit_end(this);
+#endif
     if (_8C != nullptr) {
         MR::endBindAndPlayerJump(this, _C4, 0);
 

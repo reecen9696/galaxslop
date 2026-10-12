@@ -88,14 +88,14 @@ namespace {
 };  // namespace
 
 void TombSpiderParts::initParts() {
-    mGlandFrontL = ::createGland(mParent, "毒腺[左前]", TVec3f(30.0f, 0.0f, -10.0f), TVec3f(-35.0f, -5.0f, 0.0f), "FrontL");
-    mGlandFrontR = ::createGland(mParent, "毒腺[右前]", TVec3f(-30.0f, 0.0f, -10.0f), TVec3f(-35.0f, 5.0f, 0.0f), "FrontR");
-    mGlandRearL = ::createGland(mParent, "毒腺[左後]", TVec3f(30.0f, 0.0f, -10.0f), TVec3f(-33.0f, -5.0f, 0.0f), "RearL");
-    mGlandRearR = ::createGland(mParent, "毒腺[右後]", TVec3f(-30.0f, 0.0f, -10.0f), TVec3f(-33.0f, 5.0f, 0.0f), "RearR");
+    mGlandFrontL = ::createGland(mParent, "\x93\xc5\x91\x42[\x8d\xb6\x91\x4f]", TVec3f(30.0f, 0.0f, -10.0f), TVec3f(-35.0f, -5.0f, 0.0f), "FrontL");
+    mGlandFrontR = ::createGland(mParent, "\x93\xc5\x91\x42[\x89\x45\x91\x4f]", TVec3f(-30.0f, 0.0f, -10.0f), TVec3f(-35.0f, 5.0f, 0.0f), "FrontR");
+    mGlandRearL = ::createGland(mParent, "\x93\xc5\x91\x42[\x8d\xb6\x8c\xe3]", TVec3f(30.0f, 0.0f, -10.0f), TVec3f(-33.0f, -5.0f, 0.0f), "RearL");
+    mGlandRearR = ::createGland(mParent, "\x93\xc5\x91\x42[\x89\x45\x8c\xe3]", TVec3f(-30.0f, 0.0f, -10.0f), TVec3f(-33.0f, 5.0f, 0.0f), "RearR");
 
-    mVitalSpotC = ::createVitalSpot(mParent, "急所[中]", TVec3f(0.0f, 0.0f, -320.0f), TVec3f(0.0f, 180.0f, 0.0f), "Body5");
-    mVitalSpotL = ::createVitalSpot(mParent, "急所[左]", TVec3f(130.0f, -280.0f, -200.0f), TVec3f(10.0f, 167.0f, 0.0f), "Body1");
-    mVitalSpotR = ::createVitalSpot(mParent, "急所[右]", TVec3f(130.0f, 280.0f, -200.0f), TVec3f(-10.0f, 167.0f, 0.0f), "Body1");
+    mVitalSpotC = ::createVitalSpot(mParent, "\x8b\x7d\x8f\x8a[\x92\x86]", TVec3f(0.0f, 0.0f, -320.0f), TVec3f(0.0f, 180.0f, 0.0f), "Body5");
+    mVitalSpotL = ::createVitalSpot(mParent, "\x8b\x7d\x8f\x8a[\x8d\xb6]", TVec3f(130.0f, -280.0f, -200.0f), TVec3f(10.0f, 167.0f, 0.0f), "Body1");
+    mVitalSpotR = ::createVitalSpot(mParent, "\x8b\x7d\x8f\x8a[\x89\x45]", TVec3f(130.0f, 280.0f, -200.0f), TVec3f(-10.0f, 167.0f, 0.0f), "Body1");
 
     mThreadAttacherWing = new TombSpiderThreadAttacher(mParent, "WingL", ::sAttachBodyBackRadius, ::sAttachBodyBackOffset);
     mThreadAttacherWing->initWithoutIter();

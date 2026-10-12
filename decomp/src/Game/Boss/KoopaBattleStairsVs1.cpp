@@ -30,10 +30,10 @@ namespace {
     static const s32 sStepJumpToNextPosLoop = 60;
     static const f32 sJumpHeight = 1000.0f;
     static const f32 sTurnSpeed = 2.0f;
-    static const char* sKoopaPosName0 = "階段の戦い０（クッパ）";
-    static const char* sKoopaPosName1 = "階段の戦い１（クッパ）";
-    static const char* sKoopaPosName2 = "階段の戦い２（クッパ）";
-    static const char* sKoopaPosNameEnd = "デモ中心";
+    static const char* sKoopaPosName0 = "\x8a\x4b\x92\x69\x82\xcc\x90\xed\x82\xa2\x82\x4f\x81\x69\x83\x4e\x83\x62\x83\x70\x81\x6a";
+    static const char* sKoopaPosName1 = "\x8a\x4b\x92\x69\x82\xcc\x90\xed\x82\xa2\x82\x50\x81\x69\x83\x4e\x83\x62\x83\x70\x81\x6a";
+    static const char* sKoopaPosName2 = "\x8a\x4b\x92\x69\x82\xcc\x90\xed\x82\xa2\x82\x51\x81\x69\x83\x4e\x83\x62\x83\x70\x81\x6a";
+    static const char* sKoopaPosNameEnd = "\x83\x66\x83\x82\x92\x86\x90\x53";
 };  // namespace
 
 namespace NrvKoopaBattleStairsVs1 {
@@ -90,7 +90,7 @@ s32 KoopaBattleStairsVs1::registerStair(KoopaBattleMapStair* pBattleMapStair) {
 }
 
 void KoopaBattleStairsVs1::exeWaitDemo() {
-    if (MR::tryStartDemo(mKoopa, "階段の戦い開始デモ")) {
+    if (MR::tryStartDemo(mKoopa, "\x8a\x4b\x92\x69\x82\xcc\x90\xed\x82\xa2\x8a\x4a\x8e\x6e\x83\x66\x83\x82")) {
         KoopaFunction::startKoopaAnimCamera(mKoopa, "DemoBattleStairsStart", ::sAnimCameraInterpoleFrame);
         KoopaFunction::endFaceCtrl(mKoopa, -1);
 
@@ -122,7 +122,7 @@ void KoopaBattleStairsVs1::exeDemo() {
 
     if (MR::isBckStopped(mKoopa)) {
         KoopaFunction::endKoopaAnimCamera(mKoopa, "DemoBattleStairsStart", 0);
-        MR::endDemo(mKoopa, "階段の戦い開始デモ");
+        MR::endDemo(mKoopa, "\x8a\x4b\x92\x69\x82\xcc\x90\xed\x82\xa2\x8a\x4a\x8e\x6e\x83\x66\x83\x82");
 
         MR::onSwitchB(KoopaFunction::getKoopaSwitchKeeper(mKoopa));
 

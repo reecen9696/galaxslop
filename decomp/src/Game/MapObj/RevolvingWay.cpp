@@ -58,7 +58,7 @@ void RevolvingWay::exeWait() {
 
 void RevolvingWay::addAccelMoment() {
     TVec3f rotateMoment;
-    if (MR::isStarPointerPointing(this, 0, true, "弱") && MR::testCorePadButtonB(WPAD_CHAN0) &&
+    if (MR::isStarPointerPointing(this, 0, true, "\x8e\xe3") && MR::testCorePadButtonB(WPAD_CHAN0) &&
         MR::calcStarPointerStrokeRotateMoment(&rotateMoment, mPosition, mRadius, 0)) {
         mFriction += rotateMoment * 0.04f;
         f32 mag = mFriction.length();

@@ -12,18 +12,18 @@
 #include "Game/Util/ScreenUtil.hpp"
 #include "Game/Util/SequenceUtil.hpp"
 
-EventSequencer::EventSequencer() : NameObj("イベントシーケンサー"), mSequence() {
+EventSequencer::EventSequencer() : NameObj("\x83\x43\x83\x78\x83\x93\x83\x67\x83\x56\x81\x5b\x83\x50\x83\x93\x83\x54\x81\x5b"), mSequence() {
     MR::connectToSceneMapObjMovement(this);
     mHashTable = new HashSortTable(16);
 }
 
 void EventSequencer::init(const JMapInfoIter& rIter) {
-    addEventSequence< EventDown >("マリオダウン");
-    addEventSequence< EventAbyss >("マリオ奈落");
-    addEventSequence< EventFireDown >("マリオ炎ダウン");
-    addEventSequence< EventRaceDown >("レース負け");
-    addEventSequence< EventGhostRaceDown >("ゴーストレース負け");
-    addEventSequence< EventGameOver >("ゲームオーバー");
+    addEventSequence< EventDown >("\x83\x7d\x83\x8a\x83\x49\x83\x5f\x83\x45\x83\x93");
+    addEventSequence< EventAbyss >("\x83\x7d\x83\x8a\x83\x49\x93\xde\x97\x8e");
+    addEventSequence< EventFireDown >("\x83\x7d\x83\x8a\x83\x49\x89\x8a\x83\x5f\x83\x45\x83\x93");
+    addEventSequence< EventRaceDown >("\x83\x8c\x81\x5b\x83\x58\x95\x89\x82\xaf");
+    addEventSequence< EventGhostRaceDown >("\x83\x53\x81\x5b\x83\x58\x83\x67\x83\x8c\x81\x5b\x83\x58\x95\x89\x82\xaf");
+    addEventSequence< EventGameOver >("\x83\x51\x81\x5b\x83\x80\x83\x49\x81\x5b\x83\x6f\x81\x5b");
 
     mHashTable->sort();
 }
@@ -41,7 +41,7 @@ void EventSequencer::movement() {
 }
 
 void EventSequencer::startEvent(const char* pName) {
-    EventSequence* sequence;
+    EventSequence* sequence = nullptr;  // the table stores 32-bit values (low half of the pointer)
     if (mHashTable->search(pName, reinterpret_cast< u32* >(&sequence))) {
         mSequence = sequence;
         mSequenceFrame = 0;

@@ -101,7 +101,7 @@ void BombBird::init(const JMapInfoIter& rIter) {
     mSpinHitController = new SpinHitController(this, 25, 20, 4, 1.5f, 30.0f, 40.0f, 3, false);
 
     for (BombBirdBomb** it = mBombs.begin(); it < mBombs.end(); it++) {
-        *it = new BombBirdBomb("バクダン鳥のボム");
+        *it = new BombBirdBomb("\x83\x6f\x83\x4e\x83\x5f\x83\x93\x92\xb9\x82\xcc\x83\x7b\x83\x80");
         (*it)->initWithoutIter();
         (*it)->makeActorDead();
     }

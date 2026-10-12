@@ -458,7 +458,7 @@ bool PackunPetit::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pRecei
 }
 
 void PackunPetit::initBlowModel() {
-    mBlownModel = MR::createModelObjMapObjStrongLight("吹っ飛びモデル", "PackunPetitHead", nullptr);
+    mBlownModel = MR::createModelObjMapObjStrongLight("\x90\x81\x82\xc1\x94\xf2\x82\xd1\x83\x82\x83\x66\x83\x8b", "PackunPetitHead", nullptr);
     mBlownModel->initWithoutIter();
     MR::initShadowVolumeSphere(mBlownModel, 70.0f);
     MR::invalidateClipping(mBlownModel);

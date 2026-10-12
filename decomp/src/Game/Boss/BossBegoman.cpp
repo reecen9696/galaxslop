@@ -173,7 +173,7 @@ void BossBegoman::init(const JMapInfoIter& rIter) {
     mBabyFollowers = new BegomanBaby*[mBabyFollowerNum];
 
     for (int i = 0; i < mBabyFollowerNum; i++) {
-        BegomanBaby* newBaby = new BegomanBaby("子分ベビー");
+        BegomanBaby* newBaby = new BegomanBaby("\x8e\x71\x95\xaa\x83\x78\x83\x72\x81\x5b");
         mBabyFollowers[i] = newBaby;
         newBaby->mHost = this;
         newBaby->mPosition.set(this->mPosition);
@@ -185,7 +185,7 @@ void BossBegoman::init(const JMapInfoIter& rIter) {
     mSpikeFollowers = new BegomanSpike*[mSpikeFollowerNum];
 
     for (int i = 0; i < mSpikeFollowerNum; i++) {
-        BegomanSpike* spike = new BegomanSpike("子分トゲ");
+        BegomanSpike* spike = new BegomanSpike("\x8e\x71\x95\xaa\x83\x67\x83\x51");
         mSpikeFollowers[i] = spike;
         spike->mPosition.set(this->mPosition);
         spike->initWithoutIter();

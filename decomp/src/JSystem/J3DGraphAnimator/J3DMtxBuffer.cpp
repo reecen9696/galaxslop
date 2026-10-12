@@ -215,6 +215,38 @@ void J3DMtxBuffer::calcWeightEnvelopeMtx() {
     __REGISTER f32 var_f24;
     __REGISTER f32* var_r7 = J3DUnit01;
 
+#ifndef __MWERKS__
+    // weightAnmMtx[e] = sum over the envelope's joints of weight * (anmMtx[joint] * invJointMtx[joint]).
+    {
+        const u16* pIdx = mJointTree->getWEvlpMixMtxIndex();
+        const f32* pWeight = mJointTree->getWEvlpMixWeight();
+        int envNum = mJointTree->getWEvlpMtxNum();
+        for (int e = 0; e < envNum; e++) {
+            u8* pEnvScale = &mpEvlpScaleFlagArr[e];
+            *pEnvScale = 1;
+            Mtx acc;
+            for (int r = 0; r < 3; r++) {
+                acc[r][0] = acc[r][1] = acc[r][2] = acc[r][3] = 0.0f;
+            }
+            int envMixNum = mJointTree->getWEvlpMixMtxNum(e);
+            int k = 0;
+            do {
+                u16 jointIdx = *pIdx++;
+                f32 w = *pWeight++;
+                Mtx prod;
+                PSMTXConcat(mpAnmMtx[jointIdx], mJointTree->getInvJointMtx(jointIdx), prod);
+                for (int r = 0; r < 3; r++) {
+                    for (int c = 0; c < 4; c++) {
+                        acc[r][c] += prod[r][c] * w;
+                    }
+                }
+                *pEnvScale &= mpScaleFlagArr[jointIdx];
+            } while (++k < envMixNum);
+            PSMTXCopy(acc, mpWeightEvlpMtx[e]);
+        }
+    }
+#else
+
     i = -1;
     max = mJointTree->getWEvlpMtxNum();
     indices = mJointTree->getWEvlpMixMtxIndex() - 1;
@@ -302,6 +334,7 @@ void J3DMtxBuffer::calcWeightEnvelopeMtx() {
             ps_merge00 var_f30, var_f24, var_f24
         }
     }
+#endif
 }
 
 void J3DMtxBuffer::calcDrawMtx(u32 mdlFlag, Vec const& param_1, Mtx const& param_2) {

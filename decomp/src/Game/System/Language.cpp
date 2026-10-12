@@ -139,7 +139,27 @@ namespace MR {
             }
         }
 
+#ifdef TARGET_PC
+        // The decompiled executable is the Korean build (row 4); pick the row
+        // of the disc the data comes from (game code "RMGx" at 0x80000000).
+        s32 row = 4;
+        switch (reinterpret_cast< const char* >(OSPhysicalToCached(0))[3]) {
+        case 'J':
+            row = 0;
+            break;
+        case 'E':
+            row = 1;
+            break;
+        case 'P':
+            row = 2;
+            break;
+        default:
+            break;
+        }
+        return ::cSCLanguage2GameLanguageTable[row][i];
+#else
         return ::cSCLanguage2GameLanguageTable[4][i];
+#endif
     }
 
     u32 getLanguage() {
@@ -163,8 +183,13 @@ namespace MR {
     }
 
     const char* getCurrentRegionPrefix() {
+#ifdef TARGET_PC
+        char prefix[3];  // extractString writes a terminator after the 2 characters
+        MR::extractString(prefix, getCurrentLanguagePrefix(), 2, 3);
+#else
         char prefix[2];
         MR::extractString(prefix, getCurrentLanguagePrefix(), sizeof(prefix), 3);
+#endif
 
         if (MR::isEqualString(prefix, "Jp")) {
             return "Jp";

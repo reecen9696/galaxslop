@@ -263,14 +263,14 @@ void Shellfish::initItem(const JMapInfoIter& rIter) {
 }
 
 void Shellfish::initCoin(const JMapInfoIter&) {
-    mItem = static_cast< Coin* >(MR::createCoin(this, "コイン"));
+    mItem = static_cast< Coin* >(MR::createCoin(this, "\x83\x52\x83\x43\x83\x93"));
     mItem->initWithoutIter();
 }
 
 void Shellfish::initYellowChip(const JMapInfoIter& rIter) {
     s32 groupId;
     MR::getJMapInfoArg0WithInit(rIter, &groupId);
-    YellowChip* chip = new YellowChip("イエローチップ");
+    YellowChip* chip = new YellowChip("\x83\x43\x83\x47\x83\x8d\x81\x5b\x83\x60\x83\x62\x83\x76");
     chip->setHost(this);
     chip->setGroupID(groupId);
     mItem = chip;
@@ -280,7 +280,7 @@ void Shellfish::initYellowChip(const JMapInfoIter& rIter) {
 void Shellfish::initBlueChip(const JMapInfoIter& rIter) {
     s32 groupId;
     MR::getJMapInfoArg0WithInit(rIter, &groupId);
-    BlueChip* chip = new BlueChip("ブルーチップ");
+    BlueChip* chip = new BlueChip("\x83\x75\x83\x8b\x81\x5b\x83\x60\x83\x62\x83\x76");
     chip->setHost(this);
     chip->setGroupID(groupId);
     mItem = chip;
@@ -288,7 +288,7 @@ void Shellfish::initBlueChip(const JMapInfoIter& rIter) {
 }
 
 void Shellfish::initKinokoOneUp(const JMapInfoIter&) {
-    mItem = new BenefitItemOneUp("１ＵＰキノコ");
+    mItem = new BenefitItemOneUp("\x82\x50\x82\x74\x82\x6f\x83\x4c\x83\x6d\x83\x52");
     mItem->initWithoutIter();
 }
 

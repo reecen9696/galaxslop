@@ -8,7 +8,7 @@ namespace {
     }
 };  // namespace
 
-BossAccessor::BossAccessor() : NameObj("ボスへのアクセス"), mBoss() {
+BossAccessor::BossAccessor() : NameObj("\x83\x7b\x83\x58\x82\xd6\x82\xcc\x83\x41\x83\x4e\x83\x5a\x83\x58"), mBoss() {
 }
 
 namespace BossAccess {

@@ -4,7 +4,7 @@
 
 class CameraFooFighter : public Camera {
 public:
-    CameraFooFighter(const char* pName = "フーファイター");
+    CameraFooFighter(const char* pName = "\x83\x74\x81\x5b\x83\x74\x83\x40\x83\x43\x83\x5e\x81\x5b");
 
     virtual void reset();
     virtual CameraTargetObj* calc();

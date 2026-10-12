@@ -50,7 +50,7 @@ void StrayTico::init(const JMapInfoIter& rIter) {
     initBinder(60.0f, 20.0f, 0);
     MR::offBind(this);
 
-    mItemBubbleModel = MR::createPartsModelMapObj(this, "アワ", "ItemBubble", nullptr);
+    mItemBubbleModel = MR::createPartsModelMapObj(this, "\x83\x41\x83\x8f", "ItemBubble", nullptr);
     mItemBubbleModel->initFixedPosition(TVec3f(0.0f, 0.0f, 0.0f), TVec3f(0.0f, 0.0f, 0.0f), nullptr);
 
     MR::registerDemoSimpleCastAll(mItemBubbleModel);

@@ -36,7 +36,7 @@ namespace NrvScenarioSelectStar {
 };  // namespace NrvScenarioSelectStar
 
 ScenarioSelectStar::ScenarioSelectStar(EffectSystem* pSystem)
-    : MultiSceneActor("シナリオ選択のスター", "PowerStar", false), mStarCollectedStatus(0), mScenarioNo(1), mStarId(0), mIsPointing(false),
+    : MultiSceneActor("\x83\x56\x83\x69\x83\x8a\x83\x49\x91\x49\x91\xf0\x82\xcc\x83\x58\x83\x5e\x81\x5b", "PowerStar", false), mStarCollectedStatus(0), mScenarioNo(1), mStarId(0), mIsPointing(false),
       mRotateSpeed(0.0f), mBasePos(gZeroVec), mTranslationOnSelect(gZeroVec), mAppearFrame(::cAppearFrame), mScaleOnSelect(1.0f) {
     initEffect(pSystem, 0, "ScenarioStar");
 }

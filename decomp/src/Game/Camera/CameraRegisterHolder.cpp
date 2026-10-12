@@ -5,9 +5,9 @@ namespace {
     // static const char* sMtxRegHioName =
     // static const char* sVecRegHioName =
     // static const char* sFltRegHioName =
-    static const char* sDummyMtxRegName = "ダミーマトリクス";
-    static const char* sDummyVecRegName = "ダミーベクトル";
-    static const char* sDummyFloatRegName = "ダミー浮動小数";
+    static const char* sDummyMtxRegName = "\x83\x5f\x83\x7e\x81\x5b\x83\x7d\x83\x67\x83\x8a\x83\x4e\x83\x58";
+    static const char* sDummyVecRegName = "\x83\x5f\x83\x7e\x81\x5b\x83\x78\x83\x4e\x83\x67\x83\x8b";
+    static const char* sDummyFloatRegName = "\x83\x5f\x83\x7e\x81\x5b\x95\x82\x93\xae\x8f\xac\x90\x94";
 };  // namespace
 
 CameraRegisterHolder::CameraRegisterHolder(const char* pName) : NameObj(pName) {

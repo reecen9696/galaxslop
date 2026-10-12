@@ -188,7 +188,7 @@ void JUTException::panic_f(const char* file, int line, const char* format, ...) 
     va_list args;
     va_start(args, format);
     panic_f_va(file, line, format, args);
-    va_end();
+    va_end(args);
 }
 
 #define __signbit(x) ((*reinterpret_cast< unsigned char* >(&(x))) & 0x80)

@@ -42,7 +42,7 @@ namespace NrvDriftWood {
 void DriftWood::init(const JMapInfoIter& rIter) {
     MapObjActor::init(rIter);
     MapObjActorInitInfo info;
-    info.setupHioNode("地形オブジェ");
+    info.setupHioNode("\x92\x6e\x8c\x60\x83\x49\x83\x75\x83\x57\x83\x46");
     info.setupDefaultPos();
     info.setupConnectToScene();
     info.setupHitSensor();
@@ -54,7 +54,7 @@ void DriftWood::init(const JMapInfoIter& rIter) {
     MR::moveCoordAndTransToNearestRailPos(this);
     mRailDirection.set(MR::getRailDirection(this));
     getSensor(nullptr)->setType(ATYPE_EYE);
-    mWaveSoundTimer = MR::getRandom(30l, 90l);
+    mWaveSoundTimer = MR::getRandom(30, 90);
     f32 radius = 0.0f;
     MR::calcModelBoundingRadius(&radius, this);
     MR::initAndSetRailClipping(&mRailClipping, this, 100.0f, radius);
@@ -73,7 +73,7 @@ void DriftWood::exeWait() {
 
     if (mWaveSoundTimer <= 0) {
         MR::startSound(this, "SE_OJ_DRIFT_WOOD_WAVE");
-        mWaveSoundTimer = MR::getRandom(30l, 90l);
+        mWaveSoundTimer = MR::getRandom(30, 90);
     } else {
         mWaveSoundTimer--;
     }

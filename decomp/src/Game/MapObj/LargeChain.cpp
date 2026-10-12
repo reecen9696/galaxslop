@@ -101,8 +101,8 @@ namespace {
 }  // namespace
 
 void LargeChain::createChainParts() {
-    _8C = new LargeChainParts("固定鎖 下");
-    _90 = new LargeChainParts("固定鎖 上");
+    _8C = new LargeChainParts("\x8c\xc5\x92\xe8\x8d\xbd \x89\xba");
+    _90 = new LargeChainParts("\x8c\xc5\x92\xe8\x8d\xbd \x8f\xe3");
     mChainArray = ::createChainArray(mChainCount);
 
     for (u32 i = 0; i < mChainCount; i++) {

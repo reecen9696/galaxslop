@@ -41,6 +41,16 @@ void SpkSpeakerCtrl::setup() {
 
     OSCreateAlarm(&sSpeakerAlarm);
     OSSetPeriodicAlarm(&sSpeakerAlarm, OSGetTime(), OSNanosecondsToTicks(6666667), SpkSpeakerCtrl::updateSpeaker);
+#ifdef TARGET_PC
+    // Remotes that connected before the speaker system existed (the emulated
+    // remote is there from the first read) would otherwise stay silent.
+    for (int i = 0; i < WPAD_MAX_CONTROLLERS; i++) {
+        u32 type;
+        if (WPADProbe(i, &type) == WPAD_ERR_NONE) {
+            SpkSpeakerCtrl::connect(i);
+        }
+    }
+#endif
 }
 
 void SpkSpeakerCtrl::connect(s32 padChannel) {
@@ -221,7 +231,7 @@ void SpkSpeakerCtrl::updateSpeaker(OSAlarm*, OSContext*) {
                 }
 
                 const s16* samples = sMixingBuffer->getSamples(i);
-                u8 data[16];
+                u8 data[24];  // 40 samples encode to 20 bytes
                 WENCGetEncodeData(&inf.mWENCInfo, flags, samples, 40, data);
                 WPADSendStreamData(i, data, 20);
 

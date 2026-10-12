@@ -196,7 +196,7 @@ void StringSpider::init(const JMapInfoIter& rIter) {
 
     mFixedPos = new FixedPosition((MtxPtr) nullptr, TVec3f(0.0f, 0.0f, 0.0f), TVec3f(0.0f, 0.0f, 0.0f));
     MR::setGroupClipping(this, rIter, 16);
-    mString = new StringSpiderString("ストリングスパイダーの糸");
+    mString = new StringSpiderString("\x83\x58\x83\x67\x83\x8a\x83\x93\x83\x4f\x83\x58\x83\x70\x83\x43\x83\x5f\x81\x5b\x82\xcc\x8e\x85");
     MR::resetPosition(mString, mPosition);
     mString->makeActorAppeared();
     makeActorAppeared();
@@ -300,7 +300,7 @@ void StringSpider::reactDPD() {
         _BC--;
     }
 
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         if (!_B8 && _BC == 0) {
             TVec2f screenVel = *MR::getStarPointerScreenVelocity(1);
             if (screenVel.length() < 20.0f) {

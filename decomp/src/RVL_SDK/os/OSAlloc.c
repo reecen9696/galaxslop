@@ -10,11 +10,11 @@ typedef struct HeapDesc HeapDesc;
 struct Cell {
     Cell* prev;  // 0x0
     Cell* next;  // 0x4
-    long size;   // 0x8
+    int size;   // 0x8
 };
 
 struct HeapDesc {
-    long size;
+    int size;
     Cell* free;
     Cell* allocated;
 };
@@ -96,14 +96,14 @@ void* OSAllocFromHeap(int heap, u32 size) {
     HeapDesc* desc;
     Cell* cell;
     Cell* newCell;
-    long leftSize;
+    int leftSize;
 
     desc = &HeapArray[heap];
     size += 32;
     size = ROUND(size, 32);
 
     for (cell = desc->free; cell != 0; cell = cell->next) {
-        if ((long)size <= cell->size) {
+        if ((int)size <= cell->size) {
             break;
         }
     }

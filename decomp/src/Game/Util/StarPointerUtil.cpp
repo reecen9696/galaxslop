@@ -72,6 +72,11 @@ namespace {
     }
 
     void onReaction(u64 touchID, s32 channel, bool enableTouch, bool disableShoot, bool singleTouch) {
+#ifdef TARGET_PC
+        if (channel == WPAD_CHAN0) {
+            port_vr_pointer_touched(touchID);
+        }
+#endif
         StarPointerLayout* layout = StarPointerFunction::getStarPointerDirector()->getStarPointerLayout(channel);
         if (layout != nullptr) {
             layout->mNewTouchedID = touchID;
@@ -549,6 +554,34 @@ namespace MR {
         return &::getStarPointerController(channel)->mWorldPos;
     }
 
+#ifdef TARGET_PC
+    bool calcVrPointerAimEnd(TVec3f* pEnd, f32* pReach, s32 channel) {
+        f32 o[3], d[3];
+        if (channel != WPAD_CHAN0 || !port_vr_pointer_ray(o, d)) {
+            return false;
+        }
+        TVec3f origin(o[0], o[1], o[2]);
+        TVec3f dir(d[0], d[1], d[2]);
+        // The pointer's world position lies on the ray (see
+        // StarPointerController::storeDataFromCallback).
+        TVec3f toHit(::getStarPointerController(channel)->mWorldPos);
+        toHit.sub(origin);
+        TVec3f toPlayer(*MR::getPlayerPos());
+        toPlayer.sub(origin);
+        f32 openSpace = 3000.0f + toPlayer.length();
+        f32 reach = toHit.dot(dir);
+        if (!(reach > 0.0f) || reach > openSpace) {
+            reach = openSpace;
+        }
+        pEnd->set(origin);
+        pEnd->add(dir * reach);
+        if (pReach != nullptr) {
+            *pReach = reach;
+        }
+        return true;
+    }
+#endif
+
     void calcStarPointerWorldPointingPos(TVec3f* pPos, const TVec3f& rPos, s32 channel) {
         f32 camZ = MR::calcCameraDistanceZ(rPos);
         MR::calcWorldPositionFromScreen(pPos, ::getStarPointerController(channel)->mPastInfo.mPos, camZ);
@@ -862,6 +895,13 @@ namespace MR {
         ::getStarPointerOnOffController()->requestMode(pRequester, StarPointerMode_BigBubble);
         ::getStarPointerDirector()->mNozzleAimPos.set(rPosition);
     }
+
+#ifdef TARGET_PC
+    // Current pointer mode, for the VR layer.
+    s32 getStarPointerModeForPort() {
+        return ::getStarPointerOnOffController()->mMode;
+    }
+#endif
 
     bool isStarPointerModeBlueStarReady() {
         return ::getStarPointerOnOffController()->compareMode(StarPointerMode_BlueStarReady);

@@ -22,7 +22,7 @@ namespace NrvMapPartsRailRotator {
 }  // namespace NrvMapPartsRailRotator
 
 MapPartsRailRotator::MapPartsRailRotator(LiveActor* pHost)
-    : MapPartsFunction(pHost, "レイル回転"), mRotateAxis(), mRotateType(), mRotateSpeed(), mTargetAngle(), mAngle(), mHostRotateMtx() {
+    : MapPartsFunction(pHost, "\x83\x8c\x83\x43\x83\x8b\x89\xf1\x93\x5d"), mRotateAxis(), mRotateType(), mRotateSpeed(), mTargetAngle(), mAngle(), mHostRotateMtx() {
     _2C.identity();
     _5C.identity();
 }

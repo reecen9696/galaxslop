@@ -61,7 +61,7 @@ void ScenarioStarter::init(const JMapInfoIter& rIter) {
     initHitSensor(1);
     MR::addHitSensor(this, "body", ACTMES_GROUP_LOD_LOW, 8, 200.0f, TVec3f(0.0f));
     MR::invalidateClipping(this);
-    mWelcomeLayout = MR::createSimpleLayout("Welcome表示", "Welcome", 1);
+    mWelcomeLayout = MR::createSimpleLayout("Welcome\x95\x5c\x8e\xa6", "Welcome", 1);
     mWelcomeLayout->kill();
     MR::registerDemoSimpleCastAll(mWelcomeLayout);
     mTitle = new ScenarioTitle();
@@ -326,6 +326,12 @@ bool ScenarioStarter::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pR
 }
 
 bool ScenarioStarter::trySkipTrigger() const {
+#ifdef TARGET_PC
+    // Also on the first visit, once A has been held (port_skip_context).
+    if (MR::isGreaterStep(this, 10) && MR::isLessStep(this, _F8) && port_skip_take(PORT_SKIP_STARTER)) {
+        return true;
+    }
+#endif
     bool result;
     if (!MR::isAlreadyVisitedCurrentStageAndScenario()) {
         result = false;

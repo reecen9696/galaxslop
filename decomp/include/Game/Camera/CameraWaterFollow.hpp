@@ -4,7 +4,7 @@
 
 class CameraWaterFollow : public Camera {
 public:
-    CameraWaterFollow(const char* pName = "水中フォロー");
+    CameraWaterFollow(const char* pName = "\x90\x85\x92\x86\x83\x74\x83\x48\x83\x8d\x81\x5b");
 
     virtual void reset();
     virtual CameraTargetObj* calc();

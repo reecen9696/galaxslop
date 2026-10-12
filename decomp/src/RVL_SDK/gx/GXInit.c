@@ -65,7 +65,9 @@ static OSShutdownFunctionInfo GXShutdownFuncInfo = {__GXShutdown, 127};
 
 static void EnableWriteGatherPipe(void) {
     u32 hid2 = PPCMfhid2();
+#ifdef __MWERKS__
     PPCMtwpar((u32)OSUncachedToPhysical((void*)0xCC008000));
+#endif
     hid2 |= 0x40000000;
     PPCMthid2(hid2);
 }
@@ -206,10 +208,21 @@ GXFifoObj* GXInit(void* base, u32 size) {
     gx->tcsManEnab = 0;
     gx->tevTcEnab = 0;
     GXSetMisc(GX_MT_XF_FLUSH, GX_XF_FLUSH_NONE);
+#ifdef __MWERKS__
     __piReg = (void*)OSPhysicalToUncached(0x0c003000);
     __cpReg = (void*)OSPhysicalToUncached(0x0c000000);
     __peReg = (void*)OSPhysicalToUncached(0x0c001000);
     __memReg = (void*)OSPhysicalToUncached(0x0c004000);
+#else
+    /* No memory-mapped GPU on the host: the port keeps shadow register files. */
+    {
+        extern volatile u32 __PortGXPIRegs[0x400], __PortGXCPRegs[0x400], __PortGXPERegs[0x400], __PortGXMEMRegs[0x400];
+        __piReg = __PortGXPIRegs;
+        __cpReg = __PortGXCPRegs;
+        __peReg = __PortGXPERegs;
+        __memReg = __PortGXMEMRegs;
+    }
+#endif
 
     __GXFifoInit();
     GXInitFifoBase(&FifoObj, base, size);

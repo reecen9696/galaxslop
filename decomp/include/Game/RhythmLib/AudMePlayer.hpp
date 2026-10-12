@@ -27,7 +27,7 @@ public:
 
     /* 0x0 */ u32 mNumEntries;
     /* 0x4 */ AudMePlayingParams* mParams;
-    /* 0x8 */ const char** mNames;
+    /* 0x8 */ PTR32(const char)* mNames;  // 4-byte name slots in the ME table file
 };
 
 class AudMe : public JSULink< AudMe >, public JASPoolAllocObject< AudMe > {

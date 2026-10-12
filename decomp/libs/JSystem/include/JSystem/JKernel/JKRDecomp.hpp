@@ -27,18 +27,18 @@ public:
 
 class JKRDecomp : public JKRThread {
 public:
-    JKRDecomp(long);
+    JKRDecomp(int);
     virtual ~JKRDecomp();
 
     virtual void* run();
 
-    static JKRDecomp* create(long);
-    static JKRDecompCommand* prepareCommand(unsigned char*, unsigned char*, unsigned long, unsigned long, void (*)(unsigned long));
+    static JKRDecomp* create(int);
+    static JKRDecompCommand* prepareCommand(unsigned char*, unsigned char*, unsigned int, unsigned int, void (*)(unsigned int));
     static void sendCommand(JKRDecompCommand*);
     static bool sync(JKRDecompCommand*, int);
-    static bool orderSync(unsigned char*, unsigned char*, unsigned long, unsigned long);
-    static void decode(unsigned char*, unsigned char*, unsigned long, unsigned long);
-    static void decodeSZP(unsigned char*, unsigned char*, unsigned long, unsigned long);
+    static bool orderSync(unsigned char*, unsigned char*, unsigned int, unsigned int);
+    static void decode(unsigned char*, unsigned char*, unsigned int, unsigned int);
+    static void decodeSZP(unsigned char*, unsigned char*, unsigned int, unsigned int);
     static void decodeSZS(u8*, u8*, u32, u32);
     static EJKRCompression checkCompressed(unsigned char*);
 

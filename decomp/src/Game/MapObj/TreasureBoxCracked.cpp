@@ -319,7 +319,7 @@ void TreasureBoxCracked::initItem(const JMapInfoIter& rIter) {
     }
 
     if (mItemType == 1) {
-        mItem = static_cast< LiveActor* >(MR::createCoin(this, "コイン"));
+        mItem = static_cast< LiveActor* >(MR::createCoin(this, "\x83\x52\x83\x43\x83\x93"));
     } else if (mItemType == 2) {
         mItem = initYellowChip(rIter);
     } else if (mItemType == 3) {
@@ -327,9 +327,9 @@ void TreasureBoxCracked::initItem(const JMapInfoIter& rIter) {
     } else if (mItemType == 4) {
         mItem = initKinokoOneUp(rIter);
     } else if (mItemType == 5) {
-        mItem = new BenefitItemLifeUp("ライフＵＰキノコ");
+        mItem = new BenefitItemLifeUp("\x83\x89\x83\x43\x83\x74\x82\x74\x82\x6f\x83\x4c\x83\x6d\x83\x52");
     } else if (mItemType == 6) {
-        mItem = new AirBubble("空気泡");
+        mItem = new AirBubble("\x8b\xf3\x8b\x43\x96\x41");
     }
 
     initItemTrans();
@@ -367,7 +367,7 @@ void TreasureBoxCracked::initItemTrans() {
 LiveActor* TreasureBoxCracked::initYellowChip(const JMapInfoIter& rIter) {
     s32 groupId;
     MR::getJMapInfoArg0WithInit(rIter, &groupId);
-    YellowChip* chip = new YellowChip("イエローチップ");
+    YellowChip* chip = new YellowChip("\x83\x43\x83\x47\x83\x8d\x81\x5b\x83\x60\x83\x62\x83\x76");
     chip->setHost(this);
     chip->setGroupID(groupId);
     return chip;
@@ -376,14 +376,14 @@ LiveActor* TreasureBoxCracked::initYellowChip(const JMapInfoIter& rIter) {
 LiveActor* TreasureBoxCracked::initBlueChip(const JMapInfoIter& rIter) {
     s32 groupId;
     MR::getJMapInfoArg0WithInit(rIter, &groupId);
-    BlueChip* chip = new BlueChip("ブルーチップ");
+    BlueChip* chip = new BlueChip("\x83\x75\x83\x8b\x81\x5b\x83\x60\x83\x62\x83\x76");
     chip->setHost(this);
     chip->setGroupID(groupId);
     return chip;
 }
 
 LiveActor* TreasureBoxCracked::initKinokoOneUp(const JMapInfoIter& rIter) {
-    return new BenefitItemOneUp("１ＵＰキノコ");
+    return new BenefitItemOneUp("\x82\x50\x82\x74\x82\x6f\x83\x4c\x83\x6d\x83\x52");
 }
 
 bool TreasureBoxCracked::checkItemPos() {

@@ -63,7 +63,7 @@ public:
 
 class MarioLauncherLayout : public LayoutActor {
 public:
-    MarioLauncherLayout() : LayoutActor("移動用砲台用レイアウト", true), mLayout() {
+    MarioLauncherLayout() : LayoutActor("\x88\xda\x93\xae\x97\x70\x96\x43\x91\xe4\x97\x70\x83\x8c\x83\x43\x83\x41\x83\x45\x83\x67", true), mLayout() {
     }
 
     virtual void init(const JMapInfoIter& rIter);
@@ -76,7 +76,7 @@ public:
 
     void initLayout() {
         initLayoutManager("Telescope", 1);
-        mLayout = new SimpleLayout("移動用砲台照準", "Sight", 1, -1);
+        mLayout = new SimpleLayout("\x88\xda\x93\xae\x97\x70\x96\x43\x91\xe4\x8f\xc6\x8f\x80", "Sight", 1, -1);
         mLayout->kill();
     }
 

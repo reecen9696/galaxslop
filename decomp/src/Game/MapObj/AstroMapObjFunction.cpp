@@ -301,11 +301,11 @@ bool AstroMapObjFunction::tryRegisterMultiDemoAndFunction(const char* pObjName, 
     const char* demoName = nullptr;
 
     if (MR::isEqualString(modelName, ::cAstroDomeEntranceNameTable[1])) {
-        demoName = "グランドスター１帰還";
+        demoName = "\x83\x4f\x83\x89\x83\x93\x83\x68\x83\x58\x83\x5e\x81\x5b\x82\x50\x8b\x41\x8a\xd2";
     } else if (MR::isEqualString(modelName, ::cAstroDomeEntranceNameTable[3])) {
-        demoName = "グランドスター３帰還";
+        demoName = "\x83\x4f\x83\x89\x83\x93\x83\x68\x83\x58\x83\x5e\x81\x5b\x82\x52\x8b\x41\x8a\xd2";
     } else if (MR::isEqualString(modelName, ::cAstroDomeEntranceNameTable[5])) {
-        demoName = "グランドスター５帰還";
+        demoName = "\x83\x4f\x83\x89\x83\x93\x83\x68\x83\x58\x83\x5e\x81\x5b\x82\x54\x8b\x41\x8a\xd2";
     }
 
     if (demoName != nullptr && MR::isDemoExist(demoName) && MR::tryRegisterDemoCast(pActor, demoName, rIter)) {

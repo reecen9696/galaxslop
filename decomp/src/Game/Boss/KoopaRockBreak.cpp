@@ -2,7 +2,7 @@
 #include "Game/Scene/SceneFunction.hpp"
 #include "Game/Util/LiveActorUtil.hpp"
 
-KoopaRockBreak::KoopaRockBreak(LiveActor* pActor) : PartsModel(pActor, "岩壊れモデル", "KoopaRockBreak", nullptr, MR::DrawBufferType_Enemy, false) {
+KoopaRockBreak::KoopaRockBreak(LiveActor* pActor) : PartsModel(pActor, "\x8a\xe2\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "KoopaRockBreak", nullptr, MR::DrawBufferType_Enemy, false) {
 }
 
 void KoopaRockBreak::init(const JMapInfoIter& rIter) {

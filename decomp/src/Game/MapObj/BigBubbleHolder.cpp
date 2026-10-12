@@ -143,7 +143,7 @@ bool MR::isPlayerBindedBigBubble() {
 
 void BigBubbleHolder::init(const JMapInfoIter& rIter) {
     for (s32 idx = 0; idx < 16; idx++) {
-        mBubbles[idx] = new BigBubble("オオアワ[共有]");
+        mBubbles[idx] = new BigBubble("\x83\x49\x83\x49\x83\x41\x83\x8f[\x8b\xa4\x97\x4c]");
         mBubbles[idx]->initWithoutIter();
     }
 }

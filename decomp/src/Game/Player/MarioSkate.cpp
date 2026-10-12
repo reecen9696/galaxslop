@@ -70,7 +70,7 @@ bool MarioSkate::postureCtrl(MtxPtr pMtx) {
 void MarioSkate::exitJump() {
     _18 = 1;
     getPlayer()->tryJump();
-    playSound("スケートジャンプ");
+    playSound("\x83\x58\x83\x50\x81\x5b\x83\x67\x83\x57\x83\x83\x83\x93\x83\x76");
 }
 
 bool MarioSkate::start() {
@@ -83,28 +83,28 @@ bool MarioSkate::start() {
     _24 = 0.0f;
     _1A = 0;
 
-    if (isAnimationRun("スケートアクセルジャンプ") || isAnimationRun("スケートジャンプ2") || isAnimationRun("スケートジャンプ3")) {
+    if (isAnimationRun("\x83\x58\x83\x50\x81\x5b\x83\x67\x83\x41\x83\x4e\x83\x5a\x83\x8b\x83\x57\x83\x83\x83\x93\x83\x76") || isAnimationRun("\x83\x58\x83\x50\x81\x5b\x83\x67\x83\x57\x83\x83\x83\x93\x83\x76""2") || isAnimationRun("\x83\x58\x83\x50\x81\x5b\x83\x67\x83\x57\x83\x83\x83\x93\x83\x76""3")) {
         _1D = 1;
-        changeAnimation(nullptr, "基本");
-        changeAnimationNonStop("スケート着地");
-        playEffect("スケート右");
-        playEffect("スケート左");
-        playSound("スケート着地");
+        changeAnimation(nullptr, "\x8a\xee\x96\x7b");
+        changeAnimationNonStop("\x83\x58\x83\x50\x81\x5b\x83\x67\x92\x85\x92\x6e");
+        playEffect("\x83\x58\x83\x50\x81\x5b\x83\x67\x89\x45");
+        playEffect("\x83\x58\x83\x50\x81\x5b\x83\x67\x8d\xb6");
+        playSound("\x83\x58\x83\x50\x81\x5b\x83\x67\x92\x85\x92\x6e");
         _19 = 0;
         _20 = 0.0f;
     } else {
         _20 = 0.0f;
         if (getPlayer()->mTargetWalkSpeedIndex < 3) {
             _1A = 1;
-            changeAnimationNonStop("アイスひねり静止");
+            changeAnimationNonStop("\x83\x41\x83\x43\x83\x58\x82\xd0\x82\xcb\x82\xe8\x90\xc3\x8e\x7e");
         } else {
-            changeAnimationNonStop("アイスひねり");
-            playEffect("スケート左");
+            changeAnimationNonStop("\x83\x41\x83\x43\x83\x58\x82\xd0\x82\xcb\x82\xe8");
+            playEffect("\x83\x58\x83\x50\x81\x5b\x83\x67\x8d\xb6");
         }
 
-        playSound("スケートスピン");
-        playSound("スピンジャンプ");
-        playSound("声スピン");
+        playSound("\x83\x58\x83\x50\x81\x5b\x83\x67\x83\x58\x83\x73\x83\x93");
+        playSound("\x83\x58\x83\x73\x83\x93\x83\x57\x83\x83\x83\x93\x83\x76");
+        playSound("\x90\xba\x83\x58\x83\x73\x83\x93");
     }
 
     return true;
@@ -142,11 +142,11 @@ bool MarioSkate::update() {
         _19 = reverse;
         _1C = 1;
         _1B = 1 - _1B;
-        playSound("声壁押し");
+        playSound("\x90\xba\x95\xc7\x89\x9f\x82\xb5");
     }
 
     getPlayer()->updateWalkSpeed();
-    if (isAnimationRun("スケート着地")) {
+    if (isAnimationRun("\x83\x58\x83\x50\x81\x5b\x83\x67\x92\x85\x92\x6e")) {
         if (isAnimationTerminate(nullptr)) {
             _1C = 1;
         }
@@ -159,12 +159,12 @@ bool MarioSkate::update() {
     }
 
     if (mActor->isRequestSpin()) {
-        if (_1D && (!isAnimationRun("アイスひねり移動") || isAnimationTerminate(nullptr))) {
+        if (_1D && (!isAnimationRun("\x83\x41\x83\x43\x83\x58\x82\xd0\x82\xcb\x82\xe8\x88\xda\x93\xae") || isAnimationTerminate(nullptr))) {
             stopAnimation(nullptr);
-            changeAnimationNonStop("アイスひねり移動");
-            playSound("スケートスピン");
-            playSound("スピンジャンプ");
-            playSound("声パンチ");
+            changeAnimationNonStop("\x83\x41\x83\x43\x83\x58\x82\xd0\x82\xcb\x82\xe8\x88\xda\x93\xae");
+            playSound("\x83\x58\x83\x50\x81\x5b\x83\x67\x83\x58\x83\x73\x83\x93");
+            playSound("\x83\x58\x83\x73\x83\x93\x83\x57\x83\x83\x83\x93\x83\x76");
+            playSound("\x90\xba\x83\x70\x83\x93\x83\x60");
             if (getPlayer()->mWalkSpeed < 1.25f) {
                 getPlayer()->mWalkSpeed = 1.5f * getPlayer()->mWalkSpeed;
             }
@@ -180,8 +180,8 @@ bool MarioSkate::update() {
         getPlayer()->mWalkSpeed = 1.2f * getStickP();
     }
 
-    if (speed > 0.0f && !isAnimationRun("基本")) {
-        playSound("スケート滑り");
+    if (speed > 0.0f && !isAnimationRun("\x8a\xee\x96\x7b")) {
+        playSound("\x83\x58\x83\x50\x81\x5b\x83\x67\x8a\x8a\x82\xe8");
     }
 
     if (_19) {
@@ -236,25 +236,25 @@ bool MarioSkate::update() {
                     switch (_1B) {
                     case 0:
                         if (_19) {
-                            changeAnimationNonStop("氷上後行右");
+                            changeAnimationNonStop("\x95\x58\x8f\xe3\x8c\xe3\x8d\x73\x89\x45");
                         } else {
-                            changeAnimationNonStop("氷上力行左");
+                            changeAnimationNonStop("\x95\x58\x8f\xe3\x97\xcd\x8d\x73\x8d\xb6");
                         }
 
-                        playEffect("スケート左");
-                        stopEffect("スケート右");
-                        playSound("スケート足");
+                        playEffect("\x83\x58\x83\x50\x81\x5b\x83\x67\x8d\xb6");
+                        stopEffect("\x83\x58\x83\x50\x81\x5b\x83\x67\x89\x45");
+                        playSound("\x83\x58\x83\x50\x81\x5b\x83\x67\x91\xab");
                         break;
                     case 1:
                         if (_19) {
-                            changeAnimationNonStop("氷上後行左");
+                            changeAnimationNonStop("\x95\x58\x8f\xe3\x8c\xe3\x8d\x73\x8d\xb6");
                         } else {
-                            changeAnimationNonStop("氷上力行右");
+                            changeAnimationNonStop("\x95\x58\x8f\xe3\x97\xcd\x8d\x73\x89\x45");
                         }
 
-                        playEffect("スケート右");
-                        stopEffect("スケート左");
-                        playSound("スケート足");
+                        playEffect("\x83\x58\x83\x50\x81\x5b\x83\x67\x89\x45");
+                        stopEffect("\x83\x58\x83\x50\x81\x5b\x83\x67\x8d\xb6");
+                        playSound("\x83\x58\x83\x50\x81\x5b\x83\x67\x91\xab");
                         break;
                     }
                 }
@@ -266,7 +266,7 @@ bool MarioSkate::update() {
 
     f32 animationSpeed = 1.0f;
     f32 animationScale = 1.0f - 0.5f * (1.0f - getStickP());
-    if (!isAnimationRun("スケート着地")) {
+    if (!isAnimationRun("\x83\x58\x83\x50\x81\x5b\x83\x67\x92\x85\x92\x6e")) {
         getAnimator()->setSpeed(animationSpeed * animationScale);
     }
 
@@ -292,13 +292,13 @@ bool MarioSkate::close() {
         if (!_1A) {
             switch (getPlayer()->_430) {
             case 1:
-                changeAnimationNonStop("スケートジャンプ2");
+                changeAnimationNonStop("\x83\x58\x83\x50\x81\x5b\x83\x67\x83\x57\x83\x83\x83\x93\x83\x76""2");
                 break;
             case 2:
-                changeAnimationNonStop("スケートジャンプ3");
+                changeAnimationNonStop("\x83\x58\x83\x50\x81\x5b\x83\x67\x83\x57\x83\x83\x83\x93\x83\x76""3");
                 break;
             default:
-                changeAnimationNonStop("スケートアクセルジャンプ");
+                changeAnimationNonStop("\x83\x58\x83\x50\x81\x5b\x83\x67\x83\x41\x83\x4e\x83\x5a\x83\x8b\x83\x57\x83\x83\x83\x93\x83\x76");
                 break;
             }
 
@@ -310,12 +310,12 @@ bool MarioSkate::close() {
             getPlayer()->setJumpVec(velocity);
         }
     } else if (getPlayer()->mMovementStates._1) {
-        stopAnimation(nullptr, "基本");
+        stopAnimation(nullptr, "\x8a\xee\x96\x7b");
     } else {
-        stopAnimation(nullptr, "落下");
+        stopAnimation(nullptr, "\x97\x8e\x89\xba");
     }
 
-    stopEffect("スケート左");
-    stopEffect("スケート右");
+    stopEffect("\x83\x58\x83\x50\x81\x5b\x83\x67\x8d\xb6");
+    stopEffect("\x83\x58\x83\x50\x81\x5b\x83\x67\x89\x45");
     return true;
 }

@@ -70,5 +70,5 @@ s32 ScenePlayingResult::getStarPieceNum() const {
 ScenePlayingResult::~ScenePlayingResult() {
 }
 
-ScenePlayingResult::ScenePlayingResult() : NameObj("プレイ結果保持"), mCoinNum(0), mPurpleCoinNum(0) {
+ScenePlayingResult::ScenePlayingResult() : NameObj("\x83\x76\x83\x8c\x83\x43\x8c\x8b\x89\xca\x95\xdb\x8e\x9d"), mCoinNum(0), mPurpleCoinNum(0) {
 }

@@ -19,7 +19,7 @@ SideSpikeMoveStep::SideSpikeMoveStep(const char* pName)
 void SideSpikeMoveStep::init(const JMapInfoIter& rIter) {
     MapObjActor::init(rIter);
     MapObjActorInitInfo info;
-    info.setupHioNode("地形オブジェ");
+    info.setupHioNode("\x92\x6e\x8c\x60\x83\x49\x83\x75\x83\x57\x83\x46");
     info.setupDefaultPos();
     info.setupConnectToScene();
     info.setupGroupClipping(32);

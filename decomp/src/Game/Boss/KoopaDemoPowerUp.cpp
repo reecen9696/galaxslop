@@ -27,12 +27,12 @@ namespace NrvKoopaDemoPowerUp {
 KoopaDemoPowerUp::~KoopaDemoPowerUp() {
 }
 
-KoopaDemoPowerUp::KoopaDemoPowerUp(Koopa* pKoopa) : ActorStateBase< Koopa >("Demo[パワーアップ]", pKoopa) {
+KoopaDemoPowerUp::KoopaDemoPowerUp(Koopa* pKoopa) : ActorStateBase< Koopa >("Demo[\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76]", pKoopa) {
 }
 
 void KoopaDemoPowerUp::init() {
-    KoopaFunction::initKoopaCamera(getHost(), "パワーアップデモ");
-    KoopaFunction::initKoopaCamera(getHost(), "最終パワーアップデモ");
+    KoopaFunction::initKoopaCamera(getHost(), "\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76\x83\x66\x83\x82");
+    KoopaFunction::initKoopaCamera(getHost(), "\x8d\xc5\x8f\x49\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76\x83\x66\x83\x82");
 
     MR::createCenterScreenBlur();
     initNerve(GET_NERVE(KoopaDemoPowerUp, KoopaDemoPowerUpNrvWaitDemo));
@@ -47,36 +47,36 @@ void KoopaDemoPowerUp::appear() {
 void KoopaDemoPowerUp::kill() {
     mIsDead = true;
 
-    KoopaFunction::endKoopaCamera(getHost(), "パワーアップデモ", false, -1);
-    KoopaFunction::endKoopaCamera(getHost(), "最終パワーアップデモ", false, -1);
+    KoopaFunction::endKoopaCamera(getHost(), "\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76\x83\x66\x83\x82", false, -1);
+    KoopaFunction::endKoopaCamera(getHost(), "\x8d\xc5\x8f\x49\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76\x83\x66\x83\x82", false, -1);
 }
 
 void KoopaDemoPowerUp::exeWaitDemo() {
-    if (!MR::tryStartDemoMarioPuppetable(getHost(), "パワーアップデモ")) {
+    if (!MR::tryStartDemoMarioPuppetable(getHost(), "\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76\x83\x66\x83\x82")) {
         return;
     }
 
     if (KoopaFunction::isKoopaVs1(getHost()) || KoopaFunction::isKoopaVs2(getHost())) {
-        KoopaFunction::setKoopaPos(getHost(), "パワーアップデモ（クッパ）");
-        MR::setPlayerPosAndWait("パワーアップデモ（マリオ）");
+        KoopaFunction::setKoopaPos(getHost(), "\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76\x83\x66\x83\x82\x81\x69\x83\x4e\x83\x62\x83\x70\x81\x6a");
+        MR::setPlayerPosAndWait("\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76\x83\x66\x83\x82\x81\x69\x83\x7d\x83\x8a\x83\x49\x81\x6a");
 
         if (KoopaFunction::isKoopaLv3(getHost())) {
             MR::startAction(getHost(), "DemoKoopaPowerUpFinal");
-            KoopaFunction::startKoopaTargetCamera(getHost(), "最終パワーアップデモ");
+            KoopaFunction::startKoopaTargetCamera(getHost(), "\x8d\xc5\x8f\x49\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76\x83\x66\x83\x82");
 
             MR::onSwitchB(KoopaFunction::getKoopaPowerUpSwitch(getHost()));
         } else {
             MR::startAction(getHost(), "DemoKoopaPowerUp");
-            KoopaFunction::startKoopaTargetCamera(getHost(), "パワーアップデモ");
+            KoopaFunction::startKoopaTargetCamera(getHost(), "\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76\x83\x66\x83\x82");
 
             MR::onSwitchA(KoopaFunction::getKoopaPowerUpSwitch(getHost()));
         }
     } else {
-        KoopaFunction::setKoopaPos(getHost(), "パワーアップデモＬｖ３（クッパ）");
-        MR::setPlayerPosAndWait("パワーアップデモＬｖ３（マリオ）");
+        KoopaFunction::setKoopaPos(getHost(), "\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76\x83\x66\x83\x82\x82\x6b\x82\x96\x82\x52\x81\x69\x83\x4e\x83\x62\x83\x70\x81\x6a");
+        MR::setPlayerPosAndWait("\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76\x83\x66\x83\x82\x82\x6b\x82\x96\x82\x52\x81\x69\x83\x7d\x83\x8a\x83\x49\x81\x6a");
 
         MR::startAction(getHost(), "DemoKoopaPowerUpFinal");
-        KoopaFunction::startKoopaTargetCamera(getHost(), "最終パワーアップデモ");
+        KoopaFunction::startKoopaTargetCamera(getHost(), "\x8d\xc5\x8f\x49\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76\x83\x66\x83\x82");
 
         MR::onSwitchA(KoopaFunction::getKoopaPowerUpSwitch(getHost()));
     }
@@ -106,12 +106,12 @@ void KoopaDemoPowerUp::exeDemo() {
     }
 
     if (KoopaFunction::isKoopaVs3(mHost) || KoopaFunction::isKoopaLv3(mHost)) {
-        KoopaFunction::endKoopaCamera(mHost, "最終パワーアップデモ", false, -1);
+        KoopaFunction::endKoopaCamera(mHost, "\x8d\xc5\x8f\x49\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76\x83\x66\x83\x82", false, -1);
     } else {
-        KoopaFunction::endKoopaCamera(mHost, "パワーアップデモ", false, -1);
+        KoopaFunction::endKoopaCamera(mHost, "\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76\x83\x66\x83\x82", false, -1);
     }
 
-    MR::endDemo(mHost, "パワーアップデモ");
+    MR::endDemo(mHost, "\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76\x83\x66\x83\x82");
 
     TVec3f gravity;
     gravity.negate(mHost->mGravity);

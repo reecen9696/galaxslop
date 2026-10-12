@@ -6,7 +6,7 @@
 #include "Game/Util/LiveActorUtil.hpp"
 #include "Game/Util/ObjUtil.hpp"
 
-OceanRingBloomDrawer::OceanRingBloomDrawer(OceanRing* pRing) : NameObj("オーシャンリング[ブルーム描画]") {
+OceanRingBloomDrawer::OceanRingBloomDrawer(OceanRing* pRing) : NameObj("\x83\x49\x81\x5b\x83\x56\x83\x83\x83\x93\x83\x8a\x83\x93\x83\x4f[\x83\x75\x83\x8b\x81\x5b\x83\x80\x95\x60\x89\xe6]") {
     mRing = pRing;
 }
 

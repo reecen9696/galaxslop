@@ -588,10 +588,10 @@ bool MapObjActor::tryCreateBreakModel(const MapObjActorInitInfo& rInfo) {
 
     if (MR::isEqualString(mObjectName, "SandUpDownTowerBreakableWallB")) {
         MtxPtr baseMtx = getBaseMtx();
-        mModelObj = MR::createModelObjMapObj("壊れモデル", buf, baseMtx);
+        mModelObj = MR::createModelObjMapObj("\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", buf, baseMtx);
     } else {
         MtxPtr baseMtx = getBaseMtx();
-        mModelObj = MR::createModelObjMapObjStrongLight("壊れモデル", buf, baseMtx);
+        mModelObj = MR::createModelObjMapObjStrongLight("\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", buf, baseMtx);
     }
 
     mModelObj->makeActorDead();

@@ -28,10 +28,10 @@ bool MarioSukekiyo::postureCtrl(MtxPtr pMtx) {
 }
 
 bool MarioSukekiyo::start() {
-    playSound("スケキヨ開始");
+    playSound("\x83\x58\x83\x50\x83\x4c\x83\x88\x8a\x4a\x8e\x6e");
     Mario* player = getPlayer();
-    playEffectRT("属性尻ドロップ", player->_368, getTrans());
-    startPadVib("最強");
+    playEffectRT("\x91\xae\x90\xab\x90\x4b\x83\x68\x83\x8d\x83\x62\x83\x76", player->_368, getTrans());
+    startPadVib("\x8d\xc5\x8b\xad");
     startCamVib(3);
     mActor->_F44 = 0;
     _14 = getPlayer()->_368;
@@ -43,10 +43,10 @@ bool MarioSukekiyo::start() {
     getPlayer()->stopWalk();
 
     if (mStatusId == MarioStatus_Sukekiyo) {
-        changeAnimation("スケキヨ");
+        changeAnimation("\x83\x58\x83\x50\x83\x4c\x83\x88");
     } else {
-        playSound("声足埋まり開始");
-        changeAnimation("埋まり");
+        playSound("\x90\xba\x91\xab\x96\x84\x82\xdc\x82\xe8\x8a\x4a\x8e\x6e");
+        changeAnimation("\x96\x84\x82\xdc\x82\xe8");
     }
 
     return true;
@@ -71,14 +71,14 @@ bool MarioSukekiyo::update() {
 
     if (_4A) {
         if (mStatusId == MarioStatus_Sukekiyo) {
-            changeAnimation("スケキヨ脱出", "基本");
-            playSound("声スケキヨ終了");
+            changeAnimation("\x83\x58\x83\x50\x83\x4c\x83\x88\x92\x45\x8f\x6f", "\x8a\xee\x96\x7b");
+            playSound("\x90\xba\x83\x58\x83\x50\x83\x4c\x83\x88\x8f\x49\x97\xb9");
         } else {
-            changeAnimation("埋まり脱出", "基本");
-            playSound("声足埋まり終了");
+            changeAnimation("\x96\x84\x82\xdc\x82\xe8\x92\x45\x8f\x6f", "\x8a\xee\x96\x7b");
+            playSound("\x90\xba\x91\xab\x96\x84\x82\xdc\x82\xe8\x8f\x49\x97\xb9");
         }
 
-        playSound("スケキヨ終了");
+        playSound("\x83\x58\x83\x50\x83\x4c\x83\x88\x8f\x49\x97\xb9");
     }
 
     return true;
@@ -87,6 +87,6 @@ bool MarioSukekiyo::update() {
 bool MarioSukekiyo::close() {
     getPlayer()->stopWalk();
     mActor->_F44 = 1;
-    stopAnimation(nullptr, "基本");
+    stopAnimation(nullptr, "\x8a\xee\x96\x7b");
     return true;
 }

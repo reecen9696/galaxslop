@@ -10,7 +10,7 @@ namespace TrickRabbitUtil {
     FootPrint* createRabbitFootPrint(LiveActor* pActor) {
         FootPrint* footPrint;
 
-        footPrint = new FootPrint("ウサギ足跡", 64);
+        footPrint = new FootPrint("\x83\x45\x83\x54\x83\x4d\x91\xab\x90\xd5", 64);
         footPrint->mMinPrintDistance = 100.0f;
         footPrint->setTexture(MR::getTexFromArc("RabbitFootprint.bti", pActor));
         footPrint->_2C = 0.0f;

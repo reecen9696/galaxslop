@@ -22,7 +22,7 @@ namespace {
 };  // namespace
 
 WaterAreaHolder::WaterAreaHolder()
-    : NameObj("水エリア保持"), mNumOceanBowls(0), mOceanBowls(nullptr), mNumOceanRings(0), mOceanRings(nullptr), mNumOceanSpheres(0),
+    : NameObj("\x90\x85\x83\x47\x83\x8a\x83\x41\x95\xdb\x8e\x9d"), mNumOceanBowls(0), mOceanBowls(nullptr), mNumOceanRings(0), mOceanRings(nullptr), mNumOceanSpheres(0),
       mOceanSpheres(nullptr), mNumWhirlPools(0), mWhirlPools(nullptr), mNumWhirlPoolAccelerators(0), mWhirlPoolAccelerators(nullptr),
       mCamInWater(false), mCameraFilter(nullptr), mUseBloom(false) {
     mWaterInfo.clear();

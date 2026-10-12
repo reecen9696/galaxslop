@@ -71,9 +71,9 @@ void Rosetta::init(const JMapInfoIter& rIter) {
     MR::startBrk(this, "Normal");
     MR::getJMapInfoArg0NoInit(rIter, &mObjArg0);
     AstroDemoFunction::tryRegisterAstroDemoAll(this, rIter);
-    MR::tryRegisterDemoCast(this, "赤いスター", rIter);
-    MR::tryRegisterDemoCast(this, "チコガイドデモ", rIter);
-    MR::tryRegisterDemoCast(this, "エピローグデモ", rIter);
+    MR::tryRegisterDemoCast(this, "\x90\xd4\x82\xa2\x83\x58\x83\x5e\x81\x5b", rIter);
+    MR::tryRegisterDemoCast(this, "\x83\x60\x83\x52\x83\x4b\x83\x43\x83\x68\x83\x66\x83\x82", rIter);
+    MR::tryRegisterDemoCast(this, "\x83\x47\x83\x73\x83\x8d\x81\x5b\x83\x4f\x83\x66\x83\x82", rIter);
     AstroDemoFunction::tryRegisterSimpleCastIfAstroGalaxy(this);
 
     mTurnJointCtrl = new TurnJointCtrl(this);
@@ -82,15 +82,15 @@ void Rosetta::init(const JMapInfoIter& rIter) {
     mTurnJointCtrl->addWaist("Spine2", 0.4f, TurnJointCtrl::Z, TurnJointCtrl::X, TurnJointCtrl::Y);
     makeActorAppeared();
 
-    if (MR::isDemoCast(this, "チコガイドデモ")) {
+    if (MR::isDemoCast(this, "\x83\x60\x83\x52\x83\x4b\x83\x43\x83\x68\x83\x66\x83\x82")) {
         mDemoExecutor = new RosettaDemoHeavensDoor1(this, rIter);
-    } else if (MR::isDemoCast(this, "赤いスター")) {
+    } else if (MR::isDemoCast(this, "\x90\xd4\x82\xa2\x83\x58\x83\x5e\x81\x5b")) {
         mDemoExecutor = new RosettaDemoHeavensDoor2(this, rIter);
-    } else if (MR::isDemoCast(this, "ロゼッタ状況説明デモ")) {
+    } else if (MR::isDemoCast(this, "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x8f\xf3\x8b\xb5\x90\xe0\x96\xbe\x83\x66\x83\x82")) {
         mDemoExecutor = new RosettaDemoAstroDomeExplain(this, rIter);
-    } else if (MR::isDemoCast(this, "エピローグデモ")) {
+    } else if (MR::isDemoCast(this, "\x83\x47\x83\x73\x83\x8d\x81\x5b\x83\x4f\x83\x66\x83\x82")) {
         mDemoExecutor = new RosettaDemoEpilogue(this, rIter);
-    } else if (MR::isDemoCast(this, "ロゼッタ最終決戦デモ")) {
+    } else if (MR::isDemoCast(this, "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x8d\xc5\x8f\x49\x8c\x88\x90\xed\x83\x66\x83\x82")) {
         mDemoExecutor = new RosettaDemoAstroDomeFinalBattle(this, rIter);
     }
 
@@ -147,7 +147,7 @@ void Rosetta::control() {
     mTurnJointCtrl->update();
 
     if (mMsgCtrl != nullptr && MR::isTalkStart(mMsgCtrl)) {
-        switch (MR::getRandom(0l, 3l)) {
+        switch (MR::getRandom(0, 3)) {
         case 0:
             mParam._1C = "TalkA";
             break;
@@ -161,7 +161,7 @@ void Rosetta::control() {
     }
 
     if (MR::isIntervalStep(this, ::sWaitActionInterval)) {
-        switch (MR::getRandom(0l, 2l)) {
+        switch (MR::getRandom(0, 2)) {
         case 0:
             mParam._14 = "WaitA";
             break;

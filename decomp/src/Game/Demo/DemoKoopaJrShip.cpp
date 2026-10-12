@@ -25,7 +25,7 @@ namespace {
     };
 
     static const Vec sKoopaJrPos = {135.0f, 188.0f, 0.0f};
-    static const char* sPartName = "クッパＪｒ．デモ";
+    static const char* sPartName = "\x83\x4e\x83\x62\x83\x70\x82\x69\x82\x92\x81\x44\x83\x66\x83\x82";
     static const char* sJointNameKoopaJrPos = "obj";
     static const s32 sBgmStartStep = 309;
     static const Anim sAnim[] = {
@@ -155,7 +155,7 @@ void DemoKoopaJrShip::initAnimID(const JMapInfoIter& rIter) {
 }
 
 void DemoKoopaJrShip::createKoopaJrObj(const JMapInfoIter& rIter) {
-    mKoopaJrObj = new KoopaJr("クッパJr");
+    mKoopaJrObj = new KoopaJr("\x83\x4e\x83\x62\x83\x70Jr");
     mKoopaJrObj->init(rIter);
     mKoopaJrObj->makeActorDead();
 }

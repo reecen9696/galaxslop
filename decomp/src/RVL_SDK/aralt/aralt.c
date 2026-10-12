@@ -1,5 +1,5 @@
 #include "revolution/os/OSInterrupt.h"
-#include <cstring>
+#include <string.h>
 #include "revolution/aralt.h"
 #include "revolution/os.h"
 

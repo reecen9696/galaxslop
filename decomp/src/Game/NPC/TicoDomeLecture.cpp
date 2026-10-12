@@ -57,7 +57,7 @@ void TicoDomeLecture::exeWait() {
 }
 
 void TicoDomeLecture::exeMove() {
-    const char* demoName = "チコ移動";
+    const char* demoName = "\x83\x60\x83\x52\x88\xda\x93\xae";
     if (MR::isFirstStep(this)) {
         MR::startBck(this, "Fly");
     }

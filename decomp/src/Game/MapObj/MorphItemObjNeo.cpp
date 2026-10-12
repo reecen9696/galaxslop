@@ -195,15 +195,15 @@ void MorphItemObjNeo::init(const JMapInfoIter& rIter) {
     }
 
     if (mContainerType == 2) {
-        mContainerModel = new ModelObj("クリスタルボックス", "CrystalBox", mBaseMtx, MR::DrawBufferType_CrystalBox, -2, -2, false);
+        mContainerModel = new ModelObj("\x83\x4e\x83\x8a\x83\x58\x83\x5e\x83\x8b\x83\x7b\x83\x62\x83\x4e\x83\x58", "CrystalBox", mBaseMtx, MR::DrawBufferType_CrystalBox, -2, -2, false);
         mContainerModel->initWithoutIter();
         mContainerModel->appear();
         MR::startBck(mContainerModel, "CrystalBox");
 
-        mContainerBreakModel = new ModelObj("クリスタル破壊", "CrystalBoxBreak", mBaseMtx, MR::DrawBufferType_CrystalBox, -2, -2, false);
+        mContainerBreakModel = new ModelObj("\x83\x4e\x83\x8a\x83\x58\x83\x5e\x83\x8b\x94\x6a\x89\xf3", "CrystalBoxBreak", mBaseMtx, MR::DrawBufferType_CrystalBox, -2, -2, false);
         mContainerBreakModel->makeActorDead();
     } else if (mContainerType == 1) {
-        mContainerModel = new ModelObj("アイテム泡", "ItemBubble", nullptr, -2, -2, -2, false);
+        mContainerModel = new ModelObj("\x83\x41\x83\x43\x83\x65\x83\x80\x96\x41", "ItemBubble", nullptr, -2, -2, -2, false);
         mContainerModel->initWithoutIter();
         mContainerModel->mPosition = mPosition;
         mContainerModel->mRotation = mRotation;
@@ -274,16 +274,16 @@ void MorphItemObjNeo::init(const JMapInfoIter& rIter) {
 
     if (arg5 > 0) {
         if (arg5 == 1) {
-            MR::initMultiActorCamera(this, rIter, &mActorCameraInfo, "出現1");
+            MR::initMultiActorCamera(this, rIter, &mActorCameraInfo, "\x8f\x6f\x8c\xbb""1");
             mCameraMode = 1;
         } else {
-            MR::initMultiActorCamera(this, rIter, &mActorCameraInfo, "出現1");
-            MR::initMultiActorCamera(this, rIter, &mActorCameraInfo, "出現2");
+            MR::initMultiActorCamera(this, rIter, &mActorCameraInfo, "\x8f\x6f\x8c\xbb""1");
+            MR::initMultiActorCamera(this, rIter, &mActorCameraInfo, "\x8f\x6f\x8c\xbb""2");
 
             mCameraMode = 2;
         }
 
-        mCameraTargetMtx = new CameraTargetMtx("カメラターゲットダミー");
+        mCameraTargetMtx = new CameraTargetMtx("\x83\x4a\x83\x81\x83\x89\x83\x5e\x81\x5b\x83\x51\x83\x62\x83\x67\x83\x5f\x83\x7e\x81\x5b");
     }
 
     mRotateMode = arg6;
@@ -396,13 +396,13 @@ void MorphItemObjNeo::control() {
         return;
     }
 
-    if (_92 && MR::tryStartDemoWithoutCinemaFrame(this, "出現")) {
+    if (_92 && MR::tryStartDemoWithoutCinemaFrame(this, "\x8f\x6f\x8c\xbb")) {
         _92 = false;
 
         TPos3f* pMtx = &mCameraTargetMtx->mMatrix;
         pMtx->set(getBaseMtx());
-        MR::startMultiActorCameraTargetSelf(this, mActorCameraInfo, "出現1", -1);
-        mAppearFrames = MR::getMultiActorCameraFrames(this, mActorCameraInfo, "出現1");
+        MR::startMultiActorCameraTargetSelf(this, mActorCameraInfo, "\x8f\x6f\x8c\xbb""1", -1);
+        mAppearFrames = MR::getMultiActorCameraFrames(this, mActorCameraInfo, "\x8f\x6f\x8c\xbb""1");
 
         if (mAppearFrames != 0) {
             mAppearFrames--;
@@ -833,21 +833,21 @@ void MorphItemObjNeo::exeSwitchAppear() {
     }
 
     if (mCameraMode != 0 && mAppearFrames != 0 && --mAppearFrames == 0) {
-        MR::endMultiActorCamera(this, mActorCameraInfo, "出現1", false, -1);
-        MR::endMultiActorCamera(this, mActorCameraInfo, "出現2", false, -1);
+        MR::endMultiActorCamera(this, mActorCameraInfo, "\x8f\x6f\x8c\xbb""1", false, -1);
+        MR::endMultiActorCamera(this, mActorCameraInfo, "\x8f\x6f\x8c\xbb""2", false, -1);
 
         mCameraMode--;
 
         if (mCameraMode == 0) {
-            MR::endDemo(this, "出現");
+            MR::endDemo(this, "\x8f\x6f\x8c\xbb");
             MR::validateClipping(this);
         } else {
             TPos3f* pMtx = &mCameraTargetMtx->mMatrix;
             pMtx->set(getBaseMtx());
 
-            MR::startMultiActorCameraTargetOther(this, mActorCameraInfo, "出現2", CameraTargetArg(nullptr, mCameraTargetMtx, nullptr, nullptr), -1);
+            MR::startMultiActorCameraTargetOther(this, mActorCameraInfo, "\x8f\x6f\x8c\xbb""2", CameraTargetArg(nullptr, mCameraTargetMtx, nullptr, nullptr), -1);
 
-            mAppearFrames = MR::getMultiActorCameraFrames(this, mActorCameraInfo, "出現2");
+            mAppearFrames = MR::getMultiActorCameraFrames(this, mActorCameraInfo, "\x8f\x6f\x8c\xbb""2");
         }
     }
 

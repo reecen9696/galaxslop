@@ -73,11 +73,19 @@ public:
 
     union MixConfig {
         u16 whole;
+#if defined(__MWERKS__) || defined(__BIG_ENDIAN__)
         struct {
             u8 upper : 8;
             u8 lower0 : 4;
             u8 lower1 : 4;
         };
+#else
+        struct {
+            u8 lower1 : 4;
+            u8 lower0 : 4;
+            u8 upper : 8;
+        };
+#endif
     };
 
     JASChannel(Callback, void*);

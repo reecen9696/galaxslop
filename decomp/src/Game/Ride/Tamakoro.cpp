@@ -147,7 +147,7 @@ void Tamakoro::init(const JMapInfoIter& rIter) {
 
     if (mHasTutorial) {
         setNerve(GET_NERVE(Tamakoro, TamakoroNrvStandByTutorial));
-        mTutorial = new TamakoroTutorial("タマコロチュートリアル");
+        mTutorial = new TamakoroTutorial("\x83\x5e\x83\x7d\x83\x52\x83\x8d\x83\x60\x83\x85\x81\x5b\x83\x67\x83\x8a\x83\x41\x83\x8b");
         mTutorial->mHost = this;
         MR::initChildObj(mTutorial, rIter, 0);
     }
@@ -615,7 +615,7 @@ void Tamakoro::exeBindStartLand() {
 
 void Tamakoro::exeTutorial() {
     if (MR::isFirstStep(this)) {
-        MR::startBckPlayerJ("タマコロ移動");
+        MR::startBckPlayerJ("\x83\x5e\x83\x7d\x83\x52\x83\x8d\x88\xda\x93\xae");
         MR::zeroVelocity(this);
         mAccelDir.zero();
         mAccelRate = 0.0f;
@@ -639,7 +639,7 @@ void Tamakoro::exeTutorial() {
 
 void Tamakoro::exeWait() {
     if (MR::isFirstStep(this)) {
-        MR::startBckPlayerJ("タマコロ移動");
+        MR::startBckPlayerJ("\x83\x5e\x83\x7d\x83\x52\x83\x8d\x88\xda\x93\xae");
     }
     reactionCollision();
     addVelocityOperate();
@@ -735,7 +735,7 @@ void Tamakoro::exeJumpHole() {
     if (MR::isFirstStep(this)) {
         MR::tryRumblePadWeak(this, WPAD_CHAN0);
         MR::offBind(this);
-        MR::startBckPlayerJ("タマコロしゃがみ");
+        MR::startBckPlayerJ("\x83\x5e\x83\x7d\x83\x52\x83\x8d\x82\xb5\x82\xe1\x82\xaa\x82\xdd");
         mAccelDir.zero();
         mAccelRate = 0.0f;
         mMarioOffsetVelocity = 0.0f;
@@ -816,7 +816,7 @@ void Tamakoro::exeDashRailEnd() {
 
 void Tamakoro::exeRideRail() {
     if (MR::isFirstStep(this)) {
-        MR::startBckPlayerJ("タマコロ移動");
+        MR::startBckPlayerJ("\x83\x5e\x83\x7d\x83\x52\x83\x8d\x88\xda\x93\xae");
         MR::tryRumblePadMiddle(this, WPAD_CHAN0);
     }
 

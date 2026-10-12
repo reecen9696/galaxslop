@@ -299,3 +299,13 @@ public:
     /* 0x16C */ TTrackInfo mTrackInfo;
     /* 0x180 */ JGadget::TLinkListNode mNode;
 };
+
+#ifndef __MWERKS__
+// The list typedef uses the Wii offset; resolve the real one once AudMeTrack is complete.
+template <>
+struct JGadget::TLinkListOffset< AudMeTrack, -384 > {
+    static int value() {
+        return -static_cast< int >(offsetof(AudMeTrack, mNode));
+    }
+};
+#endif

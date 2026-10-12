@@ -27,6 +27,13 @@ void GameSystemFontHolder::createFontFromEmbeddedData() {
     char embeddedFontPath[256];
     const char* languagePrefix = MR::getCurrentLanguagePrefix();
     snprintf(embeddedFontPath, sizeof(embeddedFontPath), "/%s/LayoutData/EmbeddedFont.arc", languagePrefix);
+#ifdef TARGET_PC
+    // The archive comes from the player's main.dol: the Korean one (this
+    // code's) has a font for each language, the others one for all.
+    if (pArchive->getResource(embeddedFontPath) == nullptr) {
+        snprintf(embeddedFontPath, sizeof(embeddedFontPath), "/LayoutData/EmbeddedFont.arc");
+    }
+#endif
 
     _0 = static_cast< u8* >(MR::decompressFileFromArchive(pArchive, embeddedFontPath, pHeap, -32));
     _4 = new (pHeap, 0) JKRMemArchive();

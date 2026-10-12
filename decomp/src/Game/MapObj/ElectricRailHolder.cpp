@@ -177,7 +177,7 @@ void ElectricRailHolder::init(const JMapInfoIter& rIter) {
 
     MR::registerDemoSimpleCastAll(this);
 
-    MR::createAdaptorAndConnectToDrawBloomModel("電撃レールブルーム描画", MR::Functor(this, &ElectricRailHolder::draw));
+    MR::createAdaptorAndConnectToDrawBloomModel("\x93\x64\x8c\x82\x83\x8c\x81\x5b\x83\x8b\x83\x75\x83\x8b\x81\x5b\x83\x80\x95\x60\x89\xe6", MR::Functor(this, &ElectricRailHolder::draw));
 
     makeActorAppeared();
 }
@@ -207,7 +207,7 @@ ModelObj* ElectricRailHolder::createModel(ElectricRailType railType) const {
     switch (railType) {
     case ElectricRail_Red:
         pModelName = "ElectricRail";
-        pName = "電撃レールモデル(黄)";
+        pName = "\x93\x64\x8c\x82\x83\x8c\x81\x5b\x83\x8b\x83\x82\x83\x66\x83\x8b(\x89\xa9)";
         pModel = new ModelObj(pName, pModelName, nullptr, MR::DrawBufferType_None, MR::MovementType_None, MR::CalcAnimType_None, false);
         pModel->initWithoutIter();
 
@@ -218,7 +218,7 @@ ModelObj* ElectricRailHolder::createModel(ElectricRailType railType) const {
         break;
     case ElectricRail_Yellow:
         pModelName = "ElectricRail";
-        pName = "電撃レールモデル(赤)";
+        pName = "\x93\x64\x8c\x82\x83\x8c\x81\x5b\x83\x8b\x83\x82\x83\x66\x83\x8b(\x90\xd4)";
         pModel = new ModelObj(pName, pModelName, nullptr, MR::DrawBufferType_None, MR::MovementType_None, MR::CalcAnimType_None, false);
         pModel->initWithoutIter();
 
@@ -229,7 +229,7 @@ ModelObj* ElectricRailHolder::createModel(ElectricRailType railType) const {
         break;
     case ElectricRail_YellowMoving:
         pModelName = "ElectricRailMoving";
-        pName = "移動電撃レールモデル(黄)";
+        pName = "\x88\xda\x93\xae\x93\x64\x8c\x82\x83\x8c\x81\x5b\x83\x8b\x83\x82\x83\x66\x83\x8b(\x89\xa9)";
         pModel = new ModelObj(pName, pModelName, nullptr, MR::DrawBufferType_None, MR::MovementType_None, MR::CalcAnimType_None, false);
         pModel->initWithoutIter();
 
@@ -240,7 +240,7 @@ ModelObj* ElectricRailHolder::createModel(ElectricRailType railType) const {
         break;
     case ElectricRail_RedMoving:;
         pModelName = "ElectricRailMoving";
-        pName = "移動電撃レールモデル(赤)";
+        pName = "\x88\xda\x93\xae\x93\x64\x8c\x82\x83\x8c\x81\x5b\x83\x8b\x83\x82\x83\x66\x83\x8b(\x90\xd4)";
         pModel = new ModelObj(pName, pModelName, nullptr, MR::DrawBufferType_None, MR::MovementType_None, MR::CalcAnimType_None, false);
         pModel->initWithoutIter();
 

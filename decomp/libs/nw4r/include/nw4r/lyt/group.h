@@ -14,11 +14,7 @@ namespace nw4r {
             };
         };
 
-        #ifdef __MWERKS__
         typedef ut::LinkList<detail::PaneLink, offsetof(detail::PaneLink, mLink)> PaneLinkList;
-        #else
-        typedef ut::LinkList<detail::PaneLink, 0>   PaneLinkList;
-        #endif
 
         class Group {
         public:
@@ -49,11 +45,7 @@ namespace nw4r {
             u8 mPadding[2];
         };
 
-        #ifdef __MWERKS__
         typedef ut::LinkList<Group, offsetof(Group, mLink)> GroupList;
-        #else
-        typedef ut::LinkList<Group, 0> GroupList;
-        #endif
 
         class GroupContainer {
         public:

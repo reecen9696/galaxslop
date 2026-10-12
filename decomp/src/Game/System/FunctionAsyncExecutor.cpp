@@ -75,8 +75,13 @@ FunctionAsyncExecutor::FunctionAsyncExecutor() : mMainThreadExec(nullptr), mHold
     }
 
     mMainThreadExec = new FunctionAsyncExecutorOnMainThread(OSGetCurrentThread());
+#ifdef TARGET_PC
+    // Units hold FunctionAsyncExecInfo (0x34 bytes on the Wii): same unit count, 64-bit unit size.
+    _410 = JKRUnitHeap::create(sizeof(FunctionAsyncExecInfo), (0x34A8 / 0x34) * sizeof(FunctionAsyncExecInfo) + 0x200, 4, MR::getCurrentHeap(), false);
+#else
     _410 = JKRUnitHeap::create(0x34, 0x34A8, 4, MR::getCurrentHeap(), false);
-    _414 = JKRExpHeap::create(0x2800, MR::getCurrentHeap(), false);
+#endif
+    _414 = JKRExpHeap::create(0x2800 * (sizeof(void*) / 4), MR::getCurrentHeap(), false);  // room for 64-bit objects
 }
 
 void FunctionAsyncExecutor::update() {
@@ -145,6 +150,14 @@ bool FunctionAsyncExecutor::isEnd(const char* pName) const {
         cur++;
     }
 
+#ifdef TARGET_PC
+    if (cur == lst) {
+        port_log("async: isEnd('%s') not found among %d entries", pName, mHolders.size());
+        for (FunctionAsyncExecInfo* const* p = mHolders.begin(); p != lst; p++) {
+            port_log("async:   %p '%s'", (void*)*p, *p ? (*p)->mName : "(null)");
+        }
+    }
+#endif
     FunctionAsyncExecInfo* info = *cur;
     OSUnlockMutex(&MR::MutexHolder< 2 >::sMutex);
     return info->mIsEnd;

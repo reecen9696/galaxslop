@@ -255,7 +255,7 @@ namespace MR {
     PartsModel* createNPCGoods(LiveActor* pActor, const char* pModelName, const char* pJointName) {
         PartsModel* pGoods = nullptr;
         if (!isNullOrEmptyString(pModelName) && isNPCItemFileExist(pModelName) && isExistJoint(pActor, pJointName)) {
-            pGoods = createPartsModelNpcAndFix(pActor, "グッズ", pModelName, pJointName);
+            pGoods = createPartsModelNpcAndFix(pActor, "\x83\x4f\x83\x62\x83\x59", pModelName, pJointName);
             pGoods->appear();
             if (getLightNumMax(pGoods) > 0) {
                 initLightCtrl(pGoods);
@@ -268,7 +268,7 @@ namespace MR {
     PartsModel* createIndirectNPCGoods(LiveActor* pActor, const char* pModelName, const char* pJointName) {
         PartsModel* pGoods = nullptr;
         if (!isNullOrEmptyString(pModelName) && isNPCItemFileExist(pModelName) && isExistJoint(pActor, pJointName)) {
-            pGoods = createPartsModelIndirectNpc(pActor, "グッズ", pModelName, getJointMtx(pActor, pJointName));
+            pGoods = createPartsModelIndirectNpc(pActor, "\x83\x4f\x83\x62\x83\x59", pModelName, getJointMtx(pActor, pJointName));
             pGoods->appear();
             if (getLightNumMax(pGoods) > 0) {
                 initLightCtrl(pGoods);
@@ -570,7 +570,7 @@ namespace MR {
             return false;
         }
 
-        switch (getRandom(0L, 3L)) {
+        switch (getRandom(0, 3)) {
         case 0:
             if (pAction0) {
                 pActor->mParam._1C = pAction0;
@@ -624,8 +624,8 @@ namespace MR {
 }  // namespace MR
 
 TakeOutStar::TakeOutStar(NPCActor* pActor, const char* pActionName, const char* pAnimName, const Nerve* pNerve)
-    : NerveExecutor("パワースター取り出しデモ実行者"), mActor(pActor), mNerve(pNerve), mActionName(pActionName), mAnimName(pAnimName) {
-    mStarModel = MR::createPowerStarDemoModel(mActor, "パワースターデモモデル", pActor->getBaseMtx());
+    : NerveExecutor("\x83\x70\x83\x8f\x81\x5b\x83\x58\x83\x5e\x81\x5b\x8e\xe6\x82\xe8\x8f\x6f\x82\xb5\x83\x66\x83\x82\x8e\xc0\x8d\x73\x8e\xd2"), mActor(pActor), mNerve(pNerve), mActionName(pActionName), mAnimName(pAnimName) {
+    mStarModel = MR::createPowerStarDemoModel(mActor, "\x83\x70\x83\x8f\x81\x5b\x83\x58\x83\x5e\x81\x5b\x83\x66\x83\x82\x83\x82\x83\x66\x83\x8b", pActor->getBaseMtx());
     mStarModel->makeActorDead();
 
     initNerve(GET_NERVE(TakeOutStar, TakeOutStarNrvAnim));
@@ -707,7 +707,7 @@ void TakeOutStar::exeDemo() {
 void TakeOutStar::exeTerm() {
 }
 
-FadeStarter::FadeStarter(NPCActor* pActor, s32 a2) : NerveExecutor("フェード開始制御"), mActor(pActor), _C(), _10(a2) {
+FadeStarter::FadeStarter(NPCActor* pActor, s32 a2) : NerveExecutor("\x83\x74\x83\x46\x81\x5b\x83\x68\x8a\x4a\x8e\x6e\x90\xa7\x8c\xe4"), mActor(pActor), _C(), _10(a2) {
     initNerve(GET_NERVE(FadeStarter, FadeStarterNrvFade));
 }
 
@@ -749,7 +749,7 @@ void FadeStarter::exeFade() {
 void FadeStarter::exeTerm() {
 }
 
-DemoStarter::DemoStarter(NPCActor* pActor) : NerveExecutor("デモ開始制御"), mActor(pActor) {
+DemoStarter::DemoStarter(NPCActor* pActor) : NerveExecutor("\x83\x66\x83\x82\x8a\x4a\x8e\x6e\x90\xa7\x8c\xe4"), mActor(pActor) {
     initNerve(GET_NERVE(DemoStarter, DemoStarterNrvInit));
 }
 

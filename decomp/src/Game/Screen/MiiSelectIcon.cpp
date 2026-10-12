@@ -242,7 +242,7 @@ void MiiSelectIcon::createFaceImageObj() {
     nw4r::lyt::TexMap* pTexMap;
 
     mIcon =
-        new MiiFaceIcon(128, 128, MiiFaceRecipe(RFLDataSource_Official, 0, RFLResolution_256, RFLExpFlag_Normal | RFLExpFlag_Blink), "Miiアイコン");
+        new MiiFaceIcon(128, 128, MiiFaceRecipe(RFLDataSource_Official, 0, RFLResolution_256, RFLExpFlag_Normal | RFLExpFlag_Blink), "Mii\x83\x41\x83\x43\x83\x52\x83\x93");
     mIcon->initWithoutIter();
 
     GXTexObj texObj;

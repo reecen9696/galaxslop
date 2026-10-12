@@ -2,10 +2,12 @@
 #include <ctype.h>
 #include <locale.h>
 
+#ifdef __MWERKS__
 /* this is here because it won't be inlined otherwise */
 inline int tolower(int c) {
     return ((c < 0) || (c >= 0x100)) ? c : (int) (_current_locale.ctype_cmpt_ptr->lower_map_ptr[c]);
 }
+#endif
 
 typedef struct FSTEntry FSTEntry;
 

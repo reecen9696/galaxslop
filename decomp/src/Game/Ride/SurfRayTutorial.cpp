@@ -38,7 +38,7 @@ namespace NrvSurfRayTutorial {
 };  // namespace NrvSurfRayTutorial
 
 SurfRayTutorial::SurfRayTutorial(LiveActor* pHost, TalkMessageCtrl* pTalkCtrl, const JMapInfoIter& rIter)
-    : NerveExecutor("チュートリアル演出"), mHost(pHost), mIsTutorialPass(), mPadAccel(0.0f, 0.0f, 0.0f), mTalkCtrl(pTalkCtrl), mChangeStep(), _28() {
+    : NerveExecutor("\x83\x60\x83\x85\x81\x5b\x83\x67\x83\x8a\x83\x41\x83\x8b\x89\x89\x8f\x6f"), mHost(pHost), mIsTutorialPass(), mPadAccel(0.0f, 0.0f, 0.0f), mTalkCtrl(pTalkCtrl), mChangeStep(), _28() {
     initNerve(GET_NERVE(SurfRayTutorial, SurfRayTutorialNrvTutorialAllStart));
 
     mSurfingGuidance = new SurfingGuidance();
@@ -46,6 +46,9 @@ SurfRayTutorial::SurfRayTutorial(LiveActor* pHost, TalkMessageCtrl* pTalkCtrl, c
 }
 
 bool SurfRayTutorial::update() {
+#ifdef TARGET_PC
+    port_input_use_tilt(0.0f);  // as SurfRay
+#endif
     MR::getCorePadAcceleration(&mPadAccel, WPAD_CHAN0);
     updateNerve();
 

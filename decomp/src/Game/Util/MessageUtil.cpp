@@ -160,7 +160,12 @@ namespace MR {
                 } else if (tag.getGroup() == 11) {
                     count += 2;
                 } else if (tag.getGroup() == 7) {
+#ifdef __MWERKS__
                     count += countMessageChar(*reinterpret_cast< const wchar_t* const* >(tag.getParamPtr(0)));
+#else
+                    count += countMessageChar(
+                        reinterpret_cast< const wchar_t* >(static_cast< uintptr_t >(*reinterpret_cast< const u32* >(tag.getParamPtr(0)))));
+#endif
                 } else if (tag.isGroupTagId(1, 1)) {
                     break;
                 }

@@ -22,7 +22,7 @@ namespace NrvPoltaActionSequencer {
 };  // namespace NrvPoltaActionSequencer
 
 PoltaActionSequencer::PoltaActionSequencer(Polta* pPolta, const JMapInfoIter& rIter)
-    : NerveExecutor("ポルタアクション管理"), mPoltaPtr(pPolta), mActionDemo(nullptr), mCurrentAction(nullptr), mActionWaitStart(nullptr),
+    : NerveExecutor("\x83\x7c\x83\x8b\x83\x5e\x83\x41\x83\x4e\x83\x56\x83\x87\x83\x93\x8a\xc7\x97\x9d"), mPoltaPtr(pPolta), mActionDemo(nullptr), mCurrentAction(nullptr), mActionWaitStart(nullptr),
       mActionPoltaBattleLv1(nullptr), mActionPoltaBattleLv2(nullptr) {
     initNerve(GET_NERVE(PoltaActionSequencer, PoltaActionSequencerNrvWaitStart));
     mActionDemo = new PoltaDemo(pPolta);

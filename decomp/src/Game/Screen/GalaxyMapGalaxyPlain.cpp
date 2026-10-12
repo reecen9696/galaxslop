@@ -17,7 +17,7 @@ extern int swprintf(wchar_t*, size_t, const wchar_t*, ...);
 #endif
 
 GalaxyMapGalaxyPlain::GalaxyMapGalaxyPlain(const LayoutActor* pHost)
-    : LayoutActor("Galaxy情報簡易表示", true), mHost(pHost), mPaneName(), mNamePlate(), mGalaxyName(), mIsShow() {
+    : LayoutActor("Galaxy\x8f\xee\x95\xf1\x8a\xc8\x88\xd5\x95\x5c\x8e\xa6", true), mHost(pHost), mPaneName(), mNamePlate(), mGalaxyName(), mIsShow() {
 }
 
 void GalaxyMapGalaxyPlain::show(const char* pGalaxyName, const char* pPaneName) {

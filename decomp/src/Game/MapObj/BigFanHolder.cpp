@@ -16,7 +16,7 @@ namespace {
     }
 };  // namespace
 
-BigFanHolder::BigFanHolder() : DeriveActorGroup("大型扇風機管理", ::sMaxBigFan) {
+BigFanHolder::BigFanHolder() : DeriveActorGroup("\x91\xe5\x8c\x5e\x90\xee\x95\x97\x8b\x40\x8a\xc7\x97\x9d", ::sMaxBigFan) {
 }
 
 void BigFanHolder::calcWindInfo(TVec3f* pWindInfo, const TVec3f& rPos, f32* pWindSpeed) {

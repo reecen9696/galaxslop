@@ -8,10 +8,10 @@ extern "C" {
 #endif
 
 #define SWAP32(val)                                                                                                                                  \
-    ((u32)((((u32)(val) & (u32)0x000000ffUL) << 24) | (((u32)(val) & (u32)0x0000ff00UL) << 8) | (((u32)(val) & (u32)0x00ff0000UL) >> 8) |            \
-           (((u32)(val) & (u32)0xff000000UL) >> 24)))
+    ((u32)((((u32)(val) & (u32)0x000000ffU) << 24) | (((u32)(val) & (u32)0x0000ff00U) << 8) | (((u32)(val) & (u32)0x00ff0000U) >> 8) |            \
+           (((u32)(val) & (u32)0xff000000U) >> 24)))
 
-#define SWAP16(val) ((u16)((((u16)(val) & (u16)0x00ffUL) << 8) | (((u16)(val) & (u16)0xff00) >> 8)))
+#define SWAP16(val) ((u16)((((u16)(val) & (u16)0x00ffU) << 8) | (((u16)(val) & (u16)0xff00) >> 8)))
 
 typedef struct {
     u8 bLength;

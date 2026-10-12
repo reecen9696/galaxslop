@@ -151,17 +151,17 @@ bool SceneObjHolder::isExist(int id) const {
 NameObj* SceneObjHolder::newEachObj(int id) {
     switch (id) {
     case SceneObj_SensorHitChecker:
-        return new SensorHitChecker("センサー当たり");
+        return new SensorHitChecker("\x83\x5a\x83\x93\x83\x54\x81\x5b\x93\x96\x82\xbd\x82\xe8");
     case SceneObj_CollisionDirector:
         return new CollisionDirector();
     case SceneObj_ClippingDirector:
         return new ClippingDirector();
     case SceneObj_DemoDirector:
-        return new DemoDirector("デモ指揮");
+        return new DemoDirector("\x83\x66\x83\x82\x8e\x77\x8a\xf6");
     case SceneObj_EventDirector:
         return new EventDirector();
     case SceneObj_EffectSystem:
-        return new EffectSystem("エフェクトシステム", true);
+        return new EffectSystem("\x83\x47\x83\x74\x83\x46\x83\x4e\x83\x67\x83\x56\x83\x58\x83\x65\x83\x80", true);
     case SceneObj_LightDirector:
         return new LightDirector();
     case SceneObj_SceneDataInitializer:
@@ -169,7 +169,7 @@ NameObj* SceneObjHolder::newEachObj(int id) {
     case SceneObj_StageDataHolder:
         return new StageDataHolder(MR::getCurrentStageName(), 0, true);
     case SceneObj_MessageSensorHolder:
-        return new MessageSensorHolder("システム汎用センサー");
+        return new MessageSensorHolder("\x83\x56\x83\x58\x83\x65\x83\x80\x94\xc4\x97\x70\x83\x5a\x83\x93\x83\x54\x81\x5b");
     case SceneObj_StageSwitchContainer:
         return new StageSwitchContainer();
     case SceneObj_SwitchWatcherHolder:
@@ -177,11 +177,11 @@ NameObj* SceneObjHolder::newEachObj(int id) {
     case SceneObj_SleepControllerHolder:
         return new SleepControllerHolder();
     case SceneObj_AreaObjContainer:
-        return new AreaObjContainer("エリアオブジェクトコンテナ管理");
+        return new AreaObjContainer("\x83\x47\x83\x8a\x83\x41\x83\x49\x83\x75\x83\x57\x83\x46\x83\x4e\x83\x67\x83\x52\x83\x93\x83\x65\x83\x69\x8a\xc7\x97\x9d");
     case SceneObj_LiveActorGroupArray:
-        return new LiveActorGroupArray("オブジェクトグループ");
+        return new LiveActorGroupArray("\x83\x49\x83\x75\x83\x57\x83\x46\x83\x4e\x83\x67\x83\x4f\x83\x8b\x81\x5b\x83\x76");
     case SceneObj_MovementOnOffGroupHolder:
-        return new MovementOnOffGroupHolder("Movementグループ管理");
+        return new MovementOnOffGroupHolder("Movement\x83\x4f\x83\x8b\x81\x5b\x83\x76\x8a\xc7\x97\x9d");
     case SceneObj_CaptureScreenActor:
         return new CaptureScreenActor(MR::DrawType_CaptureScreenIndirect, "Indirect");
     case SceneObj_AudCameraWatcher:
@@ -193,13 +193,13 @@ NameObj* SceneObjHolder::newEachObj(int id) {
     case SceneObj_MarioHolder:
         return new MarioHolder();
     case SceneObj_MirrorCamera:
-        return new MirrorCamera("鏡用カメラ");
+        return new MirrorCamera("\x8b\xbe\x97\x70\x83\x4a\x83\x81\x83\x89");
     case SceneObj_CameraContext:
         return new CameraContext();
     case SceneObj_NameObjGroup:
         return new NameObjGroup("IgnorePauseNameObj", 16);
     case SceneObj_TalkDirector:
-        return new TalkDirector("会話ディレクター");
+        return new TalkDirector("\x89\xef\x98\x62\x83\x66\x83\x42\x83\x8c\x83\x4e\x83\x5e\x81\x5b");
     case SceneObj_EventSequencer:
         return new EventSequencer();
     case SceneObj_StopSceneController:
@@ -209,13 +209,13 @@ NameObj* SceneObjHolder::newEachObj(int id) {
     case SceneObj_ImageEffectSystemHolder:
         return new ImageEffectSystemHolder();
     case SceneObj_BloomEffect:
-        return new BloomEffect("ブルーム");
+        return new BloomEffect("\x83\x75\x83\x8b\x81\x5b\x83\x80");
     case SceneObj_BloomEffectSimple:
         return new BloomEffectSimple();
     case SceneObj_ScreenBlurEffect:
-        return new ScreenBlurEffect("画面ブラー");
+        return new ScreenBlurEffect("\x89\xe6\x96\xca\x83\x75\x83\x89\x81\x5b");
     case SceneObj_DepthOfFieldBlur:
-        return new DepthOfFieldBlur("被写界深度ブラー");
+        return new DepthOfFieldBlur("\x94\xed\x8e\xca\x8a\x45\x90\x5b\x93\x78\x83\x75\x83\x89\x81\x5b");
     case SceneObj_SceneWipeHolder:
         return new SceneWipeHolder();
     case SceneObj_PlayerActionGuidance:
@@ -227,7 +227,7 @@ NameObj* SceneObjHolder::newEachObj(int id) {
     case SceneObj_FurDrawManager:
         return new FurDrawManager(64);
     case SceneObj_PlacementStateChecker:
-        return new PlacementStateChecker("オブジェクト配置状態の監視");
+        return new PlacementStateChecker("\x83\x49\x83\x75\x83\x57\x83\x46\x83\x4e\x83\x67\x94\x7a\x92\x75\x8f\xf3\x91\xd4\x82\xcc\x8a\xc4\x8e\x8b");
     case SceneObj_NamePosHolder:
         return new NamePosHolder();
     case SceneObj_NPCDirector:
@@ -243,19 +243,19 @@ NameObj* SceneObjHolder::newEachObj(int id) {
     case SceneObj_OdhConverter:
         return new OdhConverter();
     case SceneObj_CometRetryButton:
-        return new CometRetryButton("コメットリトライボタン");
+        return new CometRetryButton("\x83\x52\x83\x81\x83\x62\x83\x67\x83\x8a\x83\x67\x83\x89\x83\x43\x83\x7b\x83\x5e\x83\x93");
     case SceneObj_AllLiveActorGroup:
         return new AllLiveActorGroup();
     case SceneObj_CameraDirector:
-        return new CameraDirector("カメラ管理");
+        return new CameraDirector("\x83\x4a\x83\x81\x83\x89\x8a\xc7\x97\x9d");
     case SceneObj_PlanetGravityManager:
-        return new PlanetGravityManager("重力");
+        return new PlanetGravityManager("\x8f\x64\x97\xcd");
     case SceneObj_BaseMatrixFollowTargetHolder:
-        return new BaseMatrixFollowTargetHolder("行列追随先リスト", 256, 256);
+        return new BaseMatrixFollowTargetHolder("\x8d\x73\x97\xf1\x92\xc7\x90\x8f\x90\xe6\x83\x8a\x83\x58\x83\x67", 256, 256);
     case SceneObj_GameSceneLayoutHolder:
         return new GameSceneLayoutHolder();
     case SceneObj_TripodBossAccesser:
-        return new TripodBossAccesser("三脚ボスアクセサ");
+        return new TripodBossAccesser("\x8e\x4f\x8b\x72\x83\x7b\x83\x58\x83\x41\x83\x4e\x83\x5a\x83\x54");
     case SceneObj_KameckBeamHolder:
         return new KameckBeamHolder();
     case SceneObj_KameckFireBallHolder:
@@ -267,35 +267,35 @@ NameObj* SceneObjHolder::newEachObj(int id) {
     case SceneObj_TakoHeiInkHolder:
         return new TakoHeiInkHolder();
     case SceneObj_SwingRopeGroup:
-        return new SwingRopeGroup("スイングロープ描画");
+        return new SwingRopeGroup("\x83\x58\x83\x43\x83\x93\x83\x4f\x83\x8d\x81\x5b\x83\x76\x95\x60\x89\xe6");
     case SceneObj_CoinHolder:
-        return new CoinHolder("コイン管理");
+        return new CoinHolder("\x83\x52\x83\x43\x83\x93\x8a\xc7\x97\x9d");
     case SceneObj_PurpleCoinHolder:
         return new PurpleCoinHolder();
     case SceneObj_CoinRotater:
-        return new CoinRotater("コイン回転管理");
+        return new CoinRotater("\x83\x52\x83\x43\x83\x93\x89\xf1\x93\x5d\x8a\xc7\x97\x9d");
     case SceneObj_AirBubbleHolder:
-        return new AirBubbleHolder("空気アワ管理");
+        return new AirBubbleHolder("\x8b\xf3\x8b\x43\x83\x41\x83\x8f\x8a\xc7\x97\x9d");
     case SceneObj_StarPieceDirector:
-        return new StarPieceDirector("スターピース指揮");
+        return new StarPieceDirector("\x83\x58\x83\x5e\x81\x5b\x83\x73\x81\x5b\x83\x58\x8e\x77\x8a\xf6");
     case SceneObj_BegomanAttackPermitter:
-        return new BegomanAttackPermitter("ベーゴマン攻撃許可者");
+        return new BegomanAttackPermitter("\x83\x78\x81\x5b\x83\x53\x83\x7d\x83\x93\x8d\x55\x8c\x82\x8b\x96\x89\xc2\x8e\xd2");
     case SceneObj_BigFanHolder:
         return new BigFanHolder();
     case SceneObj_KarikariDirector:
-        return new KarikariDirector("カリカリディレクター");
+        return new KarikariDirector("\x83\x4a\x83\x8a\x83\x4a\x83\x8a\x83\x66\x83\x42\x83\x8c\x83\x4e\x83\x5e\x81\x5b");
     case SceneObj_ShadowControllerHolder:
         return new ShadowControllerHolder();
     case SceneObj_ShadowVolumeDrawInit:
         return new ShadowVolumeDrawInit();
     case SceneObj_ShadowSurfaceDrawInit:
-        return new ShadowSurfaceDrawInit("水面影描画初期化");
+        return new ShadowSurfaceDrawInit("\x90\x85\x96\xca\x89\x65\x95\x60\x89\xe6\x8f\x89\x8a\xfa\x89\xbb");
     case SceneObj_PlantStalkDrawInit:
-        return new PlantStalkDrawInit("植物の茎描画初期化");
+        return new PlantStalkDrawInit("\x90\x41\x95\xa8\x82\xcc\x8c\x73\x95\x60\x89\xe6\x8f\x89\x8a\xfa\x89\xbb");
     case SceneObj_PlantLeafDrawInit:
-        return new PlantLeafDrawInit("描画初期化[植物の葉]");
+        return new PlantLeafDrawInit("\x95\x60\x89\xe6\x8f\x89\x8a\xfa\x89\xbb[\x90\x41\x95\xa8\x82\xcc\x97\x74]");
     case SceneObj_TrapezeRopeDrawInit:
-        return new TrapezeRopeDrawInit("空中ブランコロープ描画");
+        return new TrapezeRopeDrawInit("\x8b\xf3\x92\x86\x83\x75\x83\x89\x83\x93\x83\x52\x83\x8d\x81\x5b\x83\x76\x95\x60\x89\xe6");
     case SceneObj_VolumeModelDrawInit:
         return new VolumeModelDrawInit();
     case SceneObj_SpinDriverPathDrawInit:
@@ -303,37 +303,37 @@ NameObj* SceneObjHolder::newEachObj(int id) {
     case SceneObj_NoteGroup:
         return new NoteGroup();
     case SceneObj_ClipAreaHolder:
-        return new ClipAreaHolder("クリップエリアホルダー");
+        return new ClipAreaHolder("\x83\x4e\x83\x8a\x83\x62\x83\x76\x83\x47\x83\x8a\x83\x41\x83\x7a\x83\x8b\x83\x5f\x81\x5b");
     case SceneObj_ArrowSwitchMultiHolder:
         return new ArrowSwitchMultiHolder();
     case SceneObj_ClipAreaDropHolder:
         return new ClipAreaDropHolder();
     case SceneObj_FallOutFieldDraw:
-        return new FallOutFieldDraw("クリップエリア描画[抜き]");
+        return new FallOutFieldDraw("\x83\x4e\x83\x8a\x83\x62\x83\x76\x83\x47\x83\x8a\x83\x41\x95\x60\x89\xe6[\x94\xb2\x82\xab]");
     case SceneObj_ClipFieldFillDraw:
-        return new ClipFieldFillDraw("クリップエリア描画[塗りつぶし]");
+        return new ClipFieldFillDraw("\x83\x4e\x83\x8a\x83\x62\x83\x76\x83\x47\x83\x8a\x83\x41\x95\x60\x89\xe6[\x93\x68\x82\xe8\x82\xc2\x82\xd4\x82\xb5]");
     case SceneObj_ScreenAlphaCapture:
-        return new ScreenAlphaCapture("アルファテクスチャ取り込み");
+        return new ScreenAlphaCapture("\x83\x41\x83\x8b\x83\x74\x83\x40\x83\x65\x83\x4e\x83\x58\x83\x60\x83\x83\x8e\xe6\x82\xe8\x8d\x9e\x82\xdd");
     case SceneObj_MapPartsRailGuideHolder:
         return new MapPartsRailGuideHolder();
     case SceneObj_GCapture:
-        return new GCapture("Gキャプチャー");
+        return new GCapture("G\x83\x4c\x83\x83\x83\x76\x83\x60\x83\x83\x81\x5b");
     case SceneObj_NameObjExecuteHolder:
         return new NameObjExecuteHolder(4096);
     case SceneObj_ElectricRailHolder:
-        return new ElectricRailHolder("電撃レール保持");
+        return new ElectricRailHolder("\x93\x64\x8c\x82\x83\x8c\x81\x5b\x83\x8b\x95\xdb\x8e\x9d");
     case SceneObj_SpiderThread:
-        return new SpiderThread("クモの巣");
+        return new SpiderThread("\x83\x4e\x83\x82\x82\xcc\x91\x83");
     case SceneObj_QuakeEffectGenerator:
         return new QuakeEffectGenerator();
     case SceneObj_HeatHazeDirector:
-        return new HeatHazeDirector("陽炎制御");
+        return new HeatHazeDirector("\x97\x7a\x89\x8a\x90\xa7\x8c\xe4");
     case SceneObj_BlueChipHolder:
-        return new ChipHolder("ブルーチップホルダー", 0);
+        return new ChipHolder("\x83\x75\x83\x8b\x81\x5b\x83\x60\x83\x62\x83\x76\x83\x7a\x83\x8b\x83\x5f\x81\x5b", 0);
     case SceneObj_YellowChipHolder:
-        return new ChipHolder("イエローーチップホルダー", 1);
+        return new ChipHolder("\x83\x43\x83\x47\x83\x8d\x81\x5b\x81\x5b\x83\x60\x83\x62\x83\x76\x83\x7a\x83\x8b\x83\x5f\x81\x5b", 1);
     case SceneObj_BigBubbleHolder:
-        return new BigBubbleHolder("オオアワホルダー");
+        return new BigBubbleHolder("\x83\x49\x83\x49\x83\x41\x83\x8f\x83\x7a\x83\x8b\x83\x5f\x81\x5b");
     case SceneObj_EarthenPipeMediator:
         return new EarthenPipeMediator();
     case SceneObj_WaterAreaHolder:
@@ -345,21 +345,21 @@ NameObj* SceneObjHolder::newEachObj(int id) {
     case SceneObj_RaceManager:
         return new RaceManager();
     case SceneObj_GroupCheckManager:
-        return new GroupCheckManager("属性グループマネージャー");
+        return new GroupCheckManager("\x91\xae\x90\xab\x83\x4f\x83\x8b\x81\x5b\x83\x76\x83\x7d\x83\x6c\x81\x5b\x83\x57\x83\x83\x81\x5b");
     case SceneObj_SkeletalFishBabyRailHolder:
-        return new SkeletalFishBabyRailHolder("スカルシャークベビーレール管理");
+        return new SkeletalFishBabyRailHolder("\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x83\x78\x83\x72\x81\x5b\x83\x8c\x81\x5b\x83\x8b\x8a\xc7\x97\x9d");
     case SceneObj_SkeletalFishBossRailHolder:
-        return new SkeletalFishBossRailHolder("スカルシャークボスレール管理");
+        return new SkeletalFishBossRailHolder("\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x83\x7b\x83\x58\x83\x8c\x81\x5b\x83\x8b\x8a\xc7\x97\x9d");
     case SceneObj_WaterPressureBulletHolder:
-        return new WaterPressureBulletHolder("ウォータープレッシャー玉ホルダ−");
+        return new WaterPressureBulletHolder("\x83\x45\x83\x48\x81\x5b\x83\x5e\x81\x5b\x83\x76\x83\x8c\x83\x62\x83\x56\x83\x83\x81\x5b\x8b\xca\x83\x7a\x83\x8b\x83\x5f\x81\x7c");
     case SceneObj_FirePressureBulletHolder:
-        return new FirePressureBulletHolder("ファイアプレッシャー玉ホルダ−");
+        return new FirePressureBulletHolder("\x83\x74\x83\x40\x83\x43\x83\x41\x83\x76\x83\x8c\x83\x62\x83\x56\x83\x83\x81\x5b\x8b\xca\x83\x7a\x83\x8b\x83\x5f\x81\x7c");
     case SceneObj_SunshadeMapHolder:
         return new SunshadeMapHolder();
     case SceneObj_MiiFacePartsHolder:
         return new MiiFacePartsHolder(128);
     case SceneObj_MiiFaceIconHolder:
-        return new MiiFaceIconHolder(16, "Miiアイコン保持管理");
+        return new MiiFaceIconHolder(16, "Mii\x83\x41\x83\x43\x83\x52\x83\x93\x95\xdb\x8e\x9d\x8a\xc7\x97\x9d");
     case SceneObj_FluffWindHolder:
         return new FluffWindHolder();
     case SceneObj_SphereSelector:
@@ -373,19 +373,19 @@ NameObj* SceneObjHolder::newEachObj(int id) {
     case SceneObj_MiniatureGalaxyHolder:
         return new MiniatureGalaxyHolder();
     case SceneObj_PlanetMapCreator:
-        return new PlanetMapCreator("惑星クリエイタ");
+        return new PlanetMapCreator("\x98\x66\x90\xaf\x83\x4e\x83\x8a\x83\x47\x83\x43\x83\x5e");
     case SceneObj_WarpPodMgr:
-        return new WarpPodMgr("ワープポッド管理局");
+        return new WarpPodMgr("\x83\x8f\x81\x5b\x83\x76\x83\x7c\x83\x62\x83\x68\x8a\xc7\x97\x9d\x8b\xc7");
     case SceneObj_PriorDrawAirHolder:
         return new PriorDrawAirHolder();
     case SceneObj_GalaxyMapController:
         return new GalaxyMapController();
     case SceneObj_MoviePlayingSequenceHolder:
-        return new MoviePlayingSequenceHolder("ムービー管理保持");
+        return new MoviePlayingSequenceHolder("\x83\x80\x81\x5b\x83\x72\x81\x5b\x8a\xc7\x97\x9d\x95\xdb\x8e\x9d");
     case SceneObj_PrologueHolder:
-        return new PrologueHolder("プロローグ保持");
+        return new PrologueHolder("\x83\x76\x83\x8d\x83\x8d\x81\x5b\x83\x4f\x95\xdb\x8e\x9d");
     case SceneObj_StaffRoll:
-        return new StaffRoll("スタッフロール");
+        return new StaffRoll("\x83\x58\x83\x5e\x83\x62\x83\x74\x83\x8d\x81\x5b\x83\x8b");
     default:
         return nullptr;
     }

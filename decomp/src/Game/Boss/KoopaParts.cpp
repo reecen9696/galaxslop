@@ -163,14 +163,14 @@ void KoopaParts::createPlanetShadow() {
 void KoopaParts::initVs1() {
     createFireStairs(false);
 
-    mPlanetLv1 = ::createKoopaBattleMapPlanet("クッパ惑星", "KoopaBattleMapPlanet", "惑星中心", false, false, false);
+    mPlanetLv1 = ::createKoopaBattleMapPlanet("\x83\x4e\x83\x62\x83\x70\x98\x66\x90\xaf", "KoopaBattleMapPlanet", "\x98\x66\x90\xaf\x92\x86\x90\x53", false, false, false);
 
     createPlanetShadow();
     createCommonParts();
 }
 
 void KoopaParts::initVs2() {
-    mPlanetLv1 = ::createKoopaBattleMapPlanet("クッパ惑星", "KoopaBattleMapPlanetVs2", "惑星中心", true, false, false);
+    mPlanetLv1 = ::createKoopaBattleMapPlanet("\x83\x4e\x83\x62\x83\x70\x98\x66\x90\xaf", "KoopaBattleMapPlanetVs2", "\x98\x66\x90\xaf\x92\x86\x90\x53", true, false, false);
 
     createCommonParts();
 }
@@ -179,7 +179,7 @@ namespace {
     ModelObjNpc* createDemoNpc(const char* pName, const char* pModelArcName) {
         ModelObjNpc* pModelObjNpc = new ModelObjNpc(pName, pModelArcName, nullptr);
         pModelObjNpc->initWithoutIter();
-        MR::resetPosition(pModelObjNpc, "デモ中心");
+        MR::resetPosition(pModelObjNpc, "\x83\x66\x83\x82\x92\x86\x90\x53");
 
         pModelObjNpc->mLodCtrl->invalidateClipping();
         pModelObjNpc->mLodCtrl->invalidate();
@@ -196,7 +196,7 @@ namespace {
     ModelObj* createDemoEnemy(const char* pName1, const char* pName2) {
         ModelObj* pModelObj = MR::createModelObjEnemy(pName1, pName2, nullptr);
         pModelObj->initWithoutIter();
-        MR::resetPosition(pModelObj, "デモ中心");
+        MR::resetPosition(pModelObj, "\x83\x66\x83\x82\x92\x86\x90\x53");
         pModelObj->kill();
         return pModelObj;
     };
@@ -205,26 +205,26 @@ namespace {
 void KoopaParts::initVs3() {
     createFireStairs(true);
 
-    mPlanetLv1 = ::createKoopaBattleMapPlanet("クッパ惑星Ｌｖ１", "KoopaBattleMapPlanetVs3Lv1", "惑星中心", false, false, true);
-    mPlanetLv2 = ::createKoopaBattleMapPlanet("クッパ惑星Ｌｖ２", "KoopaBattleMapPlanetVs3Lv2", "惑星Ｌｖ２", false, false, true);
-    mPlanetLv3 = ::createKoopaBattleMapPlanet("クッパ惑星Ｌｖ３", "KoopaBattleMapPlanetVs3Lv3", "惑星Ｌｖ３", false, true, false);
+    mPlanetLv1 = ::createKoopaBattleMapPlanet("\x83\x4e\x83\x62\x83\x70\x98\x66\x90\xaf\x82\x6b\x82\x96\x82\x50", "KoopaBattleMapPlanetVs3Lv1", "\x98\x66\x90\xaf\x92\x86\x90\x53", false, false, true);
+    mPlanetLv2 = ::createKoopaBattleMapPlanet("\x83\x4e\x83\x62\x83\x70\x98\x66\x90\xaf\x82\x6b\x82\x96\x82\x51", "KoopaBattleMapPlanetVs3Lv2", "\x98\x66\x90\xaf\x82\x6b\x82\x96\x82\x51", false, false, true);
+    mPlanetLv3 = ::createKoopaBattleMapPlanet("\x83\x4e\x83\x62\x83\x70\x98\x66\x90\xaf\x82\x6b\x82\x96\x82\x52", "KoopaBattleMapPlanetVs3Lv3", "\x98\x66\x90\xaf\x82\x6b\x82\x96\x82\x52", false, true, false);
 
     MR::startBrk(mPlanetLv1, "Wait");
     MR::startBrk(mPlanetLv2, "Wait");
 
     createPlanetShadow();
 
-    mHoleSunPlanetOutside = MR::createModelObjMapObj("穴あき太陽（外側）", "KoopaVS3HoleSunPlanet", nullptr);
+    mHoleSunPlanetOutside = MR::createModelObjMapObj("\x8c\x8a\x82\xa0\x82\xab\x91\xbe\x97\x7a\x81\x69\x8a\x4f\x91\xa4\x81\x6a", "KoopaVS3HoleSunPlanet", nullptr);
     MR::setClippingTypeSphere(mHoleSunPlanetOutside, 40000.0f);
     MR::setClippingFarMax(mHoleSunPlanetOutside);
-    MR::resetPosition(mHoleSunPlanetOutside, "惑星Ｌｖ３");
+    MR::resetPosition(mHoleSunPlanetOutside, "\x98\x66\x90\xaf\x82\x6b\x82\x96\x82\x52");
     MR::tryStartAllAnim(mHoleSunPlanetOutside, "KoopaVS3HoleSunPlanet");
 
     mHoleSunPlanetOutsideBloom = MR::createBloomModel(mHoleSunPlanetOutside, nullptr);
 
-    mHoleSunPlanetInside = MR::createModelObjMapObj("穴あき太陽（内側）", "KoopaVS3HoleSunInsidePlanet", nullptr);
+    mHoleSunPlanetInside = MR::createModelObjMapObj("\x8c\x8a\x82\xa0\x82\xab\x91\xbe\x97\x7a\x81\x69\x93\xe0\x91\xa4\x81\x6a", "KoopaVS3HoleSunInsidePlanet", nullptr);
     MR::invalidateClipping(mHoleSunPlanetInside);
-    MR::resetPosition(mHoleSunPlanetInside, "惑星Ｌｖ３");
+    MR::resetPosition(mHoleSunPlanetInside, "\x98\x66\x90\xaf\x82\x6b\x82\x96\x82\x52");
     MR::tryStartAllAnim(mHoleSunPlanetInside, "KoopaVS3HoleSunInsidePlanet");
 
     mHoleSunPlanetInsideBloom = MR::createBloomModel(mHoleSunPlanetInside, nullptr);
@@ -235,13 +235,13 @@ void KoopaParts::initVs3() {
     MR::registerDemoSimpleCastAll(mHoleSunPlanetInside);
     MR::registerDemoSimpleCastAll(mHoleSunPlanetInsideBloom);
 
-    mPeach = ::createDemoNpc("ピーチ", "Peach");
-    mKoopaJr = ::createDemoNpc("クッパＪｒ", "KoopaJr");
-    mKoopaJrShip = ::createDemoNpc("クッパＪｒ戦艦", "KoopaJrShip");
+    mPeach = ::createDemoNpc("\x83\x73\x81\x5b\x83\x60", "Peach");
+    mKoopaJr = ::createDemoNpc("\x83\x4e\x83\x62\x83\x70\x82\x69\x82\x92", "KoopaJr");
+    mKoopaJrShip = ::createDemoNpc("\x83\x4e\x83\x62\x83\x70\x82\x69\x82\x92\x90\xed\x8a\xcd", "KoopaJrShip");
 
-    mMeteor1 = ::createDemoEnemy("デモ砲弾１", "MeteorStrike");
-    mMeteor2 = ::createDemoEnemy("デモ砲弾２", "MeteorStrike");
-    mMeteor3 = ::createDemoEnemy("デモ砲弾３", "MeteorStrike");
+    mMeteor1 = ::createDemoEnemy("\x83\x66\x83\x82\x96\x43\x92\x65\x82\x50", "MeteorStrike");
+    mMeteor2 = ::createDemoEnemy("\x83\x66\x83\x82\x96\x43\x92\x65\x82\x51", "MeteorStrike");
+    mMeteor3 = ::createDemoEnemy("\x83\x66\x83\x82\x96\x43\x92\x65\x82\x52", "MeteorStrike");
 
     createCommonParts();
 }
@@ -251,7 +251,7 @@ void KoopaParts::createRock() {
         return;
     }
 
-    mRock = ::createKoopaBodyParts(mKoopa, "クッパ岩", "KoopaRock", "RockFixPos");
+    mRock = ::createKoopaBodyParts(mKoopa, "\x83\x4e\x83\x62\x83\x70\x8a\xe2", "KoopaRock", "RockFixPos");
     mRock->kill();
 
     mRockBreak = new KoopaRockBreak(mKoopa);
@@ -263,20 +263,20 @@ void KoopaParts::createRollBall() {
         return;
     }
 
-    mRollBall = ::createKoopaBodyParts(mKoopa, "回転攻撃ボール", "KoopaRollBall", "RollBallFixPos");
+    mRollBall = ::createKoopaBodyParts(mKoopa, "\x89\xf1\x93\x5d\x8d\x55\x8c\x82\x83\x7b\x81\x5b\x83\x8b", "KoopaRollBall", "RollBallFixPos");
     mRollBall->kill();
 }
 
 void KoopaParts::createCommonParts() {
-    mThornBig = ::createKoopaBodyParts(mKoopa, "尻尾のトゲ（大）", "KoopaThorn", "TailThornBigFixPos");
-    mThornSmall = ::createKoopaBodyParts(mKoopa, "尻尾のトゲ（小）", "KoopaThorn", "TailThornSmallFixPos");
-    mArmorBreak = ::createKoopaBodyParts(mKoopa, "壊れ甲羅", "KoopaArmorBreak", "ArmorBreakFixPos");
+    mThornBig = ::createKoopaBodyParts(mKoopa, "\x90\x4b\x94\xf6\x82\xcc\x83\x67\x83\x51\x81\x69\x91\xe5\x81\x6a", "KoopaThorn", "TailThornBigFixPos");
+    mThornSmall = ::createKoopaBodyParts(mKoopa, "\x90\x4b\x94\xf6\x82\xcc\x83\x67\x83\x51\x81\x69\x8f\xac\x81\x6a", "KoopaThorn", "TailThornSmallFixPos");
+    mArmorBreak = ::createKoopaBodyParts(mKoopa, "\x89\xf3\x82\xea\x8d\x62\x97\x85", "KoopaArmorBreak", "ArmorBreakFixPos");
     mArmorBreak->kill();
 
-    mThornBreak = ::createKoopaBodyParts(mKoopa, "トゲ破片", "KoopaThornBreak", "ThornBreakFixPos");
+    mThornBreak = ::createKoopaBodyParts(mKoopa, "\x83\x67\x83\x51\x94\x6a\x95\xd0", "KoopaThornBreak", "ThornBreakFixPos");
     mThornBreak->kill();
 
-    mFireShort = new LiveActorGroup("ショート炎", ::sFireShortNum);
+    mFireShort = new LiveActorGroup("\x83\x56\x83\x87\x81\x5b\x83\x67\x89\x8a", ::sFireShortNum);
     mFireShort->initWithoutIter();
 
     for (int idx = 0; idx < ::sFireShortNum; idx++) {
@@ -285,7 +285,7 @@ void KoopaParts::createCommonParts() {
         mFireShort->registerActor(pFireShort);
     }
 
-    mShockWave = new LiveActorGroup("衝撃波（球状）", ::sShockWaveNum);
+    mShockWave = new LiveActorGroup("\x8f\xd5\x8c\x82\x94\x67\x81\x69\x8b\x85\x8f\xf3\x81\x6a", ::sShockWaveNum);
     mShockWave->initWithoutIter();
 
     for (int idx = 0; idx < ::sShockWaveNum; idx++) {
@@ -296,11 +296,11 @@ void KoopaParts::createCommonParts() {
 }
 
 void KoopaParts::createFireStairs(bool a1) {
-    mFireStairs = new LiveActorGroup("炎（階段用）保持", ::sFireStairsNum);
+    mFireStairs = new LiveActorGroup("\x89\x8a\x81\x69\x8a\x4b\x92\x69\x97\x70\x81\x6a\x95\xdb\x8e\x9d", ::sFireStairsNum);
     mFireStairs->initWithoutIter();
 
     for (int idx = 0; idx < ::sFireStairsNum; idx++) {
-        KoopaFireStairs* pFireStairs = new KoopaFireStairs("炎（階段用）", a1);
+        KoopaFireStairs* pFireStairs = new KoopaFireStairs("\x89\x8a\x81\x69\x8a\x4b\x92\x69\x97\x70\x81\x6a", a1);
         pFireStairs->initWithoutIter();
         mFireStairs->registerActor(pFireStairs);
     }

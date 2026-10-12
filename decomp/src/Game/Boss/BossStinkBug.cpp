@@ -58,7 +58,7 @@ BossStinkBug::BossStinkBug(const char* pName)
     _90 = new GroundChecker*[6];
 
     for (int i = 0; i < 6; i++) {
-        _90[i] = new GroundChecker("地面チェック", 30.0f, 0.0f);
+        _90[i] = new GroundChecker("\x92\x6e\x96\xca\x83\x60\x83\x46\x83\x62\x83\x4e", 30.0f, 0.0f);
         _90[i]->makeActorDead();
         MR::setBinderExceptActor(_90[i], this);
     }
@@ -104,9 +104,9 @@ void BossStinkBug::init(const JMapInfoIter& rIter) {
     MR::invalidateClipping(this);
     mActionSequencer = new BossStinkBugActionSequencer(this, rIter);
     _94 = new BossStinkBugBombHolder(this);
-    _D4 = MR::createPartsModelMapObj(this, "羽モデル", "BossStinkBugWing", nullptr);
+    _D4 = MR::createPartsModelMapObj(this, "\x89\x48\x83\x82\x83\x66\x83\x8b", "BossStinkBugWing", nullptr);
     _D4->initFixedPosition("Switch");
-    mBombLauncher = MR::createPartsModelMapObj(this, "ボム発射口", "BossStinkBugBombLauncher", nullptr);
+    mBombLauncher = MR::createPartsModelMapObj(this, "\x83\x7b\x83\x80\x94\xad\x8e\xcb\x8c\xfb", "BossStinkBugBombLauncher", nullptr);
     mBombLauncher->initFixedPosition("Body");
     MR::declarePowerStar(this);
     initSound(12, false);

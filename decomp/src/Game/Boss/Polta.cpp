@@ -34,11 +34,11 @@ namespace {
     static const f32 sTurnMaxSpeed = 1.1f;
 };  // namespace
 
-BombTeresaHolder::BombTeresaHolder() : DeriveActorGroup< BombTeresa >("ボムテレサ管理", ::sBombTeresaBufferSize) {
+BombTeresaHolder::BombTeresaHolder() : DeriveActorGroup< BombTeresa >("\x83\x7b\x83\x80\x83\x65\x83\x8c\x83\x54\x8a\xc7\x97\x9d", ::sBombTeresaBufferSize) {
     BombTeresa* bombTeresa;
 
     for (int i = 0; i < ::sBombTeresaBufferSize; i++) {
-        bombTeresa = new BombTeresa("ポルタ用ボムテレサ");
+        bombTeresa = new BombTeresa("\x83\x7c\x83\x8b\x83\x5e\x97\x70\x83\x7b\x83\x80\x83\x65\x83\x8c\x83\x54");
         bombTeresa->initWithoutIter();
         bombTeresa->makeActorDead();
         bombTeresa->_EF = true;
@@ -81,19 +81,19 @@ void Polta::init(const JMapInfoIter& rIter) {
 
 void Polta::initArm() {
     calcAnim();
-    mLeftArm = new PoltaArm("左腕", "PoltaLeftArm", getBaseMtx());
-    mRightArm = new PoltaArm("右腕", "PoltaRightArm", getBaseMtx());
+    mLeftArm = new PoltaArm("\x8d\xb6\x98\x72", "PoltaLeftArm", getBaseMtx());
+    mRightArm = new PoltaArm("\x89\x45\x98\x72", "PoltaRightArm", getBaseMtx());
     mLeftArm->initWithoutIter();
     mRightArm->initWithoutIter();
 }
 
 void Polta::initPartsModel() {
-    mBreakModel = MR::createModelObjEnemy("壊れモデル", "PoltaBodyBreak", getBaseMtx());
+    mBreakModel = MR::createModelObjEnemy("\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "PoltaBodyBreak", getBaseMtx());
     mBreakModel->initWithoutIter();
     MR::initLightCtrl(mBreakModel);
     MR::invalidateClipping(mBreakModel);
     mBreakModel->makeActorDead();
-    mFormationModel = MR::createModelObjEnemy("合体演出岩モデル", "PoltaFormationRock", getBaseMtx());
+    mFormationModel = MR::createModelObjEnemy("\x8d\x87\x91\xcc\x89\x89\x8f\x6f\x8a\xe2\x83\x82\x83\x66\x83\x8b", "PoltaFormationRock", getBaseMtx());
     mFormationModel->initWithoutIter();
     MR::initLightCtrl(mFormationModel);
     MR::invalidateClipping(mFormationModel);

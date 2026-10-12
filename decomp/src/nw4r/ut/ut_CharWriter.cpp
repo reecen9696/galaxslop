@@ -67,7 +67,7 @@ namespace nw4r {
         void CharWriter::SetupGX() {
             ResetTextureCache();
 
-            if ((mColorMapping.min != 0x00000000UL) || (mColorMapping.max != 0xFFFFFFFFUL)) {
+            if ((mColorMapping.min != 0x00000000U) || (mColorMapping.max != 0xFFFFFFFFU)) {
                 SetupGXWithColorMapping(mColorMapping.min, mColorMapping.max);
             } else {
                 if (mFont) {

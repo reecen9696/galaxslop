@@ -8,10 +8,10 @@
             (u32)__rlwimi((int)(regOrg), (int)(newFlag), (regName##_SHIFT), (32 - (regName##_SHIFT) - (regName##_SIZE)), (31 - (regName##_SHIFT)));  \
     } while (0)
 #else
-#define FAST_GPFLAGSET(regOrg, newFlag, regName)
+#define FAST_GPFLAGSET(regOrg, newFlag, regName)                                                                                                         do {                                                                                                                                                     (regOrg) =                                                                                                                                               (u32)__rlwimi((u32)(regOrg), (u32)(newFlag), (regName##_SHIFT), (32 - (regName##_SHIFT) - (regName##_SIZE)), (31 - (regName##_SHIFT)));      } while (0)
 #endif
 
-#define CP_VCD_REG_HI_TEXALL_MASK ((1UL << CP_VCD_REG_HI_TOTAL_SIZE) - 1)
+#define CP_VCD_REG_HI_TEXALL_MASK ((1U << CP_VCD_REG_HI_TOTAL_SIZE) - 1)
 #define CP_VCD_REG_HI_TEXALL_SHIFT CP_VCD_REG_HI_TEX0_SHIFT
 #define CP_VCD_REG_LO_COLALL_MASK (CP_VCD_REG_LO_COL0_MASK | CP_VCD_REG_LO_COL1_MASK)
 #define CP_VCD_REG_LO_COLALL_SHIFT CP_VCD_REG_LO_COL0_SHIFT
@@ -60,32 +60,32 @@
 #define XF_AMBIENT0_F_RGBA_SHIFT XF_AMBIENT0_F_ALPHA_SHIFT
 #define XF_AMBIENT0_F_RGBA_MASK ((XF_AMBIENT0_F_ALPHA_MASK) | (XF_AMBIENT0_F_BLUE_MASK) | (XF_AMBIENT0_F_GREEN_MASK) | (XF_AMBIENT0_F_RED_MASK))
 #define SC_XF_AMBIENT0_F_SET_RGBA(xf_ambient0_f, rgba)                                                                                               \
-    { xf_ambient0_f = (((unsigned long)(xf_ambient0_f)) & ~XF_AMBIENT0_F_RGBA_MASK) | (((unsigned long)(rgba)) << XF_AMBIENT0_F_RGBA_SHIFT); }
+    { xf_ambient0_f = (((unsigned int)(xf_ambient0_f)) & ~XF_AMBIENT0_F_RGBA_MASK) | (((unsigned int)(rgba)) << XF_AMBIENT0_F_RGBA_SHIFT); }
 
 #define XF_AMBIENT0_F_ALPHA_SIZE 8
 #define XF_AMBIENT0_F_ALPHA_SHIFT 0
 #define XF_AMBIENT0_F_ALPHA_MASK 0x000000ff
-#define XF_AMBIENT0_F_GET_ALPHA(xf_ambient0_f) ((((unsigned long)(xf_ambient0_f)) & XF_AMBIENT0_F_ALPHA_MASK) >> XF_AMBIENT0_F_ALPHA_SHIFT)
+#define XF_AMBIENT0_F_GET_ALPHA(xf_ambient0_f) ((((unsigned int)(xf_ambient0_f)) & XF_AMBIENT0_F_ALPHA_MASK) >> XF_AMBIENT0_F_ALPHA_SHIFT)
 #define XF_AMBIENT0_F_SET_ALPHA(xf_ambient0_f, alpha)                                                                                                \
-    { xf_ambient0_f = (((unsigned long)(xf_ambient0_f)) & ~XF_AMBIENT0_F_ALPHA_MASK) | (((unsigned long)(alpha)) << XF_AMBIENT0_F_ALPHA_SHIFT); }
+    { xf_ambient0_f = (((unsigned int)(xf_ambient0_f)) & ~XF_AMBIENT0_F_ALPHA_MASK) | (((unsigned int)(alpha)) << XF_AMBIENT0_F_ALPHA_SHIFT); }
 #define XF_AMBIENT0_F_BLUE_SIZE 8
 #define XF_AMBIENT0_F_BLUE_SHIFT 8
 #define XF_AMBIENT0_F_BLUE_MASK 0x0000ff00
-#define XF_AMBIENT0_F_GET_BLUE(xf_ambient0_f) ((((unsigned long)(xf_ambient0_f)) & XF_AMBIENT0_F_BLUE_MASK) >> XF_AMBIENT0_F_BLUE_SHIFT)
+#define XF_AMBIENT0_F_GET_BLUE(xf_ambient0_f) ((((unsigned int)(xf_ambient0_f)) & XF_AMBIENT0_F_BLUE_MASK) >> XF_AMBIENT0_F_BLUE_SHIFT)
 #define XF_AMBIENT0_F_SET_BLUE(xf_ambient0_f, blue)                                                                                                  \
-    { xf_ambient0_f = (((unsigned long)(xf_ambient0_f)) & ~XF_AMBIENT0_F_BLUE_MASK) | (((unsigned long)(blue)) << XF_AMBIENT0_F_BLUE_SHIFT); }
+    { xf_ambient0_f = (((unsigned int)(xf_ambient0_f)) & ~XF_AMBIENT0_F_BLUE_MASK) | (((unsigned int)(blue)) << XF_AMBIENT0_F_BLUE_SHIFT); }
 #define XF_AMBIENT0_F_GREEN_SIZE 8
 #define XF_AMBIENT0_F_GREEN_SHIFT 16
 #define XF_AMBIENT0_F_GREEN_MASK 0x00ff0000
-#define XF_AMBIENT0_F_GET_GREEN(xf_ambient0_f) ((((unsigned long)(xf_ambient0_f)) & XF_AMBIENT0_F_GREEN_MASK) >> XF_AMBIENT0_F_GREEN_SHIFT)
+#define XF_AMBIENT0_F_GET_GREEN(xf_ambient0_f) ((((unsigned int)(xf_ambient0_f)) & XF_AMBIENT0_F_GREEN_MASK) >> XF_AMBIENT0_F_GREEN_SHIFT)
 #define XF_AMBIENT0_F_SET_GREEN(xf_ambient0_f, green)                                                                                                \
-    { xf_ambient0_f = (((unsigned long)(xf_ambient0_f)) & ~XF_AMBIENT0_F_GREEN_MASK) | (((unsigned long)(green)) << XF_AMBIENT0_F_GREEN_SHIFT); }
+    { xf_ambient0_f = (((unsigned int)(xf_ambient0_f)) & ~XF_AMBIENT0_F_GREEN_MASK) | (((unsigned int)(green)) << XF_AMBIENT0_F_GREEN_SHIFT); }
 #define XF_AMBIENT0_F_RED_SIZE 8
 #define XF_AMBIENT0_F_RED_SHIFT 24
 #define XF_AMBIENT0_F_RED_MASK 0xff000000
-#define XF_AMBIENT0_F_GET_RED(xf_ambient0_f) ((((unsigned long)(xf_ambient0_f)) & XF_AMBIENT0_F_RED_MASK) >> XF_AMBIENT0_F_RED_SHIFT)
+#define XF_AMBIENT0_F_GET_RED(xf_ambient0_f) ((((unsigned int)(xf_ambient0_f)) & XF_AMBIENT0_F_RED_MASK) >> XF_AMBIENT0_F_RED_SHIFT)
 #define XF_AMBIENT0_F_SET_RED(xf_ambient0_f, red)                                                                                                    \
-    { xf_ambient0_f = (((unsigned long)(xf_ambient0_f)) & ~XF_AMBIENT0_F_RED_MASK) | (((unsigned long)(red)) << XF_AMBIENT0_F_RED_SHIFT); }
+    { xf_ambient0_f = (((unsigned int)(xf_ambient0_f)) & ~XF_AMBIENT0_F_RED_MASK) | (((unsigned int)(red)) << XF_AMBIENT0_F_RED_SHIFT); }
 
 #define XF_AMBIENT0_F_RGB_SIZE ((XF_AMBIENT0_F_BLUE_SIZE) + (XF_AMBIENT0_F_GREEN_SIZE) + (XF_AMBIENT0_F_RED_SIZE))
 #define XF_AMBIENT0_F_RGB_SHIFT XF_AMBIENT0_F_BLUE_SHIFT
@@ -97,32 +97,32 @@
 #define XF_AMBIENT1_F_RGBA_SHIFT XF_AMBIENT1_F_ALPHA_SHIFT
 #define XF_AMBIENT1_F_RGBA_MASK ((XF_AMBIENT1_F_ALPHA_MASK) | (XF_AMBIENT1_F_BLUE_MASK) | (XF_AMBIENT1_F_GREEN_MASK) | (XF_AMBIENT1_F_RED_MASK))
 #define SC_XF_AMBIENT1_F_SET_RGBA(xf_ambient1_f, rgba)                                                                                               \
-    { xf_ambient1_f = (((unsigned long)(xf_ambient1_f)) & ~XF_AMBIENT1_F_RGBA_MASK) | (((unsigned long)(rgba)) << XF_AMBIENT1_F_RGBA_SHIFT); }
+    { xf_ambient1_f = (((unsigned int)(xf_ambient1_f)) & ~XF_AMBIENT1_F_RGBA_MASK) | (((unsigned int)(rgba)) << XF_AMBIENT1_F_RGBA_SHIFT); }
 
 #define XF_AMBIENT1_F_ALPHA_SIZE 8
 #define XF_AMBIENT1_F_ALPHA_SHIFT 0
 #define XF_AMBIENT1_F_ALPHA_MASK 0x000000ff
-#define XF_AMBIENT1_F_GET_ALPHA(xf_ambient1_f) ((((unsigned long)(xf_ambient1_f)) & XF_AMBIENT1_F_ALPHA_MASK) >> XF_AMBIENT1_F_ALPHA_SHIFT)
+#define XF_AMBIENT1_F_GET_ALPHA(xf_ambient1_f) ((((unsigned int)(xf_ambient1_f)) & XF_AMBIENT1_F_ALPHA_MASK) >> XF_AMBIENT1_F_ALPHA_SHIFT)
 #define XF_AMBIENT1_F_SET_ALPHA(xf_ambient1_f, alpha)                                                                                                \
-    { xf_ambient1_f = (((unsigned long)(xf_ambient1_f)) & ~XF_AMBIENT1_F_ALPHA_MASK) | (((unsigned long)(alpha)) << XF_AMBIENT1_F_ALPHA_SHIFT); }
+    { xf_ambient1_f = (((unsigned int)(xf_ambient1_f)) & ~XF_AMBIENT1_F_ALPHA_MASK) | (((unsigned int)(alpha)) << XF_AMBIENT1_F_ALPHA_SHIFT); }
 #define XF_AMBIENT1_F_BLUE_SIZE 8
 #define XF_AMBIENT1_F_BLUE_SHIFT 8
 #define XF_AMBIENT1_F_BLUE_MASK 0x0000ff00
-#define XF_AMBIENT1_F_GET_BLUE(xf_ambient1_f) ((((unsigned long)(xf_ambient1_f)) & XF_AMBIENT1_F_BLUE_MASK) >> XF_AMBIENT1_F_BLUE_SHIFT)
+#define XF_AMBIENT1_F_GET_BLUE(xf_ambient1_f) ((((unsigned int)(xf_ambient1_f)) & XF_AMBIENT1_F_BLUE_MASK) >> XF_AMBIENT1_F_BLUE_SHIFT)
 #define XF_AMBIENT1_F_SET_BLUE(xf_ambient1_f, blue)                                                                                                  \
-    { xf_ambient1_f = (((unsigned long)(xf_ambient1_f)) & ~XF_AMBIENT1_F_BLUE_MASK) | (((unsigned long)(blue)) << XF_AMBIENT1_F_BLUE_SHIFT); }
+    { xf_ambient1_f = (((unsigned int)(xf_ambient1_f)) & ~XF_AMBIENT1_F_BLUE_MASK) | (((unsigned int)(blue)) << XF_AMBIENT1_F_BLUE_SHIFT); }
 #define XF_AMBIENT1_F_GREEN_SIZE 8
 #define XF_AMBIENT1_F_GREEN_SHIFT 16
 #define XF_AMBIENT1_F_GREEN_MASK 0x00ff0000
-#define XF_AMBIENT1_F_GET_GREEN(xf_ambient1_f) ((((unsigned long)(xf_ambient1_f)) & XF_AMBIENT1_F_GREEN_MASK) >> XF_AMBIENT1_F_GREEN_SHIFT)
+#define XF_AMBIENT1_F_GET_GREEN(xf_ambient1_f) ((((unsigned int)(xf_ambient1_f)) & XF_AMBIENT1_F_GREEN_MASK) >> XF_AMBIENT1_F_GREEN_SHIFT)
 #define XF_AMBIENT1_F_SET_GREEN(xf_ambient1_f, green)                                                                                                \
-    { xf_ambient1_f = (((unsigned long)(xf_ambient1_f)) & ~XF_AMBIENT1_F_GREEN_MASK) | (((unsigned long)(green)) << XF_AMBIENT1_F_GREEN_SHIFT); }
+    { xf_ambient1_f = (((unsigned int)(xf_ambient1_f)) & ~XF_AMBIENT1_F_GREEN_MASK) | (((unsigned int)(green)) << XF_AMBIENT1_F_GREEN_SHIFT); }
 #define XF_AMBIENT1_F_RED_SIZE 8
 #define XF_AMBIENT1_F_RED_SHIFT 24
 #define XF_AMBIENT1_F_RED_MASK 0xff000000
-#define XF_AMBIENT1_F_GET_RED(xf_ambient1_f) ((((unsigned long)(xf_ambient1_f)) & XF_AMBIENT1_F_RED_MASK) >> XF_AMBIENT1_F_RED_SHIFT)
+#define XF_AMBIENT1_F_GET_RED(xf_ambient1_f) ((((unsigned int)(xf_ambient1_f)) & XF_AMBIENT1_F_RED_MASK) >> XF_AMBIENT1_F_RED_SHIFT)
 #define XF_AMBIENT1_F_SET_RED(xf_ambient1_f, red)                                                                                                    \
-    { xf_ambient1_f = (((unsigned long)(xf_ambient1_f)) & ~XF_AMBIENT1_F_RED_MASK) | (((unsigned long)(red)) << XF_AMBIENT1_F_RED_SHIFT); }
+    { xf_ambient1_f = (((unsigned int)(xf_ambient1_f)) & ~XF_AMBIENT1_F_RED_MASK) | (((unsigned int)(red)) << XF_AMBIENT1_F_RED_SHIFT); }
 
 #define XF_AMBIENT1_F_RGB_SIZE ((XF_AMBIENT1_F_BLUE_SIZE) + (XF_AMBIENT1_F_GREEN_SIZE) + (XF_AMBIENT1_F_RED_SIZE))
 #define XF_AMBIENT1_F_RGB_SHIFT XF_AMBIENT1_F_BLUE_SHIFT
@@ -133,7 +133,7 @@
 #define XF_MATERIAL0_F_RGBA_SHIFT XF_MATERIAL0_F_ALPHA_SHIFT
 #define XF_MATERIAL0_F_RGBA_MASK ((XF_MATERIAL0_F_ALPHA_MASK) | (XF_MATERIAL0_F_BLUE_MASK) | (XF_MATERIAL0_F_GREEN_MASK) | (XF_MATERIAL0_F_RED_MASK))
 #define SC_XF_MATERIAL0_F_SET_RGBA(xf_material0_f, rgba)                                                                                             \
-    { xf_material0_f = (((unsigned long)(xf_material0_f)) & ~XF_MATERIAL0_F_RGBA_MASK) | (((unsigned long)(rgba)) << XF_MATERIAL0_F_RGBA_SHIFT); }
+    { xf_material0_f = (((unsigned int)(xf_material0_f)) & ~XF_MATERIAL0_F_RGBA_MASK) | (((unsigned int)(rgba)) << XF_MATERIAL0_F_RGBA_SHIFT); }
 
 #define XF_MATERIAL0_F_RGBA_SIZE ((XF_MATERIAL0_F_ALPHA_SIZE) + (XF_MATERIAL0_F_BLUE_SIZE) + (XF_MATERIAL0_F_GREEN_SIZE) + (XF_MATERIAL0_F_RED_SIZE))
 #define XF_MATERIAL0_F_RGBA_SHIFT XF_MATERIAL0_F_ALPHA_SHIFT
@@ -153,7 +153,7 @@
 #define XF_MATERIAL1_F_RGBA_SHIFT XF_MATERIAL1_F_ALPHA_SHIFT
 #define XF_MATERIAL1_F_RGBA_MASK ((XF_MATERIAL1_F_ALPHA_MASK) | (XF_MATERIAL1_F_BLUE_MASK) | (XF_MATERIAL1_F_GREEN_MASK) | (XF_MATERIAL1_F_RED_MASK))
 #define SC_XF_MATERIAL1_F_SET_RGBA(xf_material1_f, rgba)                                                                                             \
-    { xf_material1_f = (((unsigned long)(xf_material1_f)) & ~XF_MATERIAL1_F_RGBA_MASK) | (((unsigned long)(rgba)) << XF_MATERIAL1_F_RGBA_SHIFT); }
+    { xf_material1_f = (((unsigned int)(xf_material1_f)) & ~XF_MATERIAL1_F_RGBA_MASK) | (((unsigned int)(rgba)) << XF_MATERIAL1_F_RGBA_SHIFT); }
 
 #define XF_MATERIAL1_F_RGB_SIZE ((XF_MATERIAL1_F_BLUE_SIZE) + (XF_MATERIAL1_F_GREEN_SIZE) + (XF_MATERIAL1_F_RED_SIZE))
 #define XF_MATERIAL1_F_RGB_SHIFT XF_MATERIAL1_F_BLUE_SHIFT

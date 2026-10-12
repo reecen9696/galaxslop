@@ -34,7 +34,7 @@ namespace NrvBossStinkBugActionFlyHigh {
 };  // namespace NrvBossStinkBugActionFlyHigh
 
 BossStinkBugActionFlyHigh::BossStinkBugActionFlyHigh(BossStinkBug* pStinkBug)
-    : BossStinkBugActionBase("ボスカメムシ高空戦", pStinkBug), _68(0), _6C(false), _70(0) {
+    : BossStinkBugActionBase("\x83\x7b\x83\x58\x83\x4a\x83\x81\x83\x80\x83\x56\x8d\x82\x8b\xf3\x90\xed", pStinkBug), _68(0), _6C(false), _70(0) {
     _38 = 20.0f;
     _3C = 1000.0f;
     _44 = -400.0f;

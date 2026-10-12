@@ -144,7 +144,7 @@ void EarthenPipe::init(const JMapInfoIter& rIter) {
     MR::setEffectHostMtx(this, "LavaAppear", _BC.mMtx);
     MR::setEffectHostMtx(this, "LavaVanish", _BC.mMtx);
     initSound(4, false);
-    MR::initMultiActorCamera(this, rIter, &mCameraInfo, "出現");
+    MR::initMultiActorCamera(this, rIter, &mCameraInfo, "\x8f\x6f\x8c\xbb");
     initNerve(GET_NERVE(EarthenPipe, EarthenPipeNrvWait));
 
     if ((mPipeMode - 1) <= 1u) {
@@ -156,7 +156,7 @@ void EarthenPipe::init(const JMapInfoIter& rIter) {
     }
 
     if (isWaterPipe) {
-        mPipeStreamModel = MR::createPartsModelMapObj(this, "土管水流", "EarthenPipeStream", nullptr);
+        mPipeStreamModel = MR::createPartsModelMapObj(this, "\x93\x79\x8a\xc7\x90\x85\x97\xac", "EarthenPipeStream", nullptr);
         MR::setClippingTypeSphere(mPipeStreamModel, 500.0f);
         MR::tryStartAllAnim(mPipeStreamModel, "EarthenPipeStream");
         mPipeStreamModel->appear();
@@ -188,7 +188,7 @@ void EarthenPipe::makeActorAppeared() {
 
 bool EarthenPipe::tryShowUp() {
     MR::invalidateClipping(this);
-    MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "出現", -1);
+    MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "\x8f\x6f\x8c\xbb", -1);
     if (mPipeMode != 1 && mPipeMode != 2) {
         return false;
     }
@@ -199,7 +199,7 @@ bool EarthenPipe::tryShowUp() {
 
 bool EarthenPipe::tryHideDown() {
     MR::validateClipping(this);
-    MR::endMultiActorCamera(this, mCameraInfo, "出現", true, -1);
+    MR::endMultiActorCamera(this, mCameraInfo, "\x8f\x6f\x8c\xbb", true, -1);
 
     if (!mPipeMode || (mPipeMode - 3) <= 1u) {
         setNerve(GET_NERVE(EarthenPipe, EarthenPipeNrvInvalid));
@@ -253,6 +253,9 @@ void EarthenPipe::exeWait() {
 void EarthenPipe::exeReady() {
     if (MR::isFirstStep(this)) {
         MR::startBckPlayer("EarthenPipeReady");
+#ifdef TARGET_PC
+        port_vr_transit_begin(this);
+#endif
     }
 
     MR::blendMtx(_120.mMtx, _150.mMtx, MR::calcNerveRate(this, MR::getBckFrameMaxPlayer()), _F0.mMtx);
@@ -313,7 +316,10 @@ void EarthenPipe::exePlayerOut() {
 
         MR::startSound(mHostActor, "SE_PM_JUMP_M");
         MR::startSound(mHostActor, "SE_PV_JUMP_JOY");
-        MR::startBckPlayer("EarthenPipeJump", 0L);
+        MR::startBckPlayer("EarthenPipeJump", 0);
+#ifdef TARGET_PC
+        port_vr_transit_end(this);
+#endif
         MR::endBindAndPlayerForceWeakGravityJumpInputOff(this, v4);
         mHostActor = nullptr;
         _B0->tryHideDown();
@@ -445,6 +451,9 @@ bool EarthenPipe::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pRecei
         return true;
     }
     if (MR::isMsgRushCancel(msg)) {
+#ifdef TARGET_PC
+        port_vr_transit_end(this);
+#endif
         mHostActor = nullptr;
         _B0->tryHideDown();
         setNerve(GET_NERVE(EarthenPipe, EarthenPipeNrvWait));
@@ -517,7 +526,7 @@ void EarthenPipe::processBgmPlayerOut() {
     }
 }
 
-EarthenPipeMediator::EarthenPipeMediator() : NameObj("土管仲介者") {
+EarthenPipeMediator::EarthenPipeMediator() : NameObj("\x93\x79\x8a\xc7\x92\x87\x89\xee\x8e\xd2") {
     mNumEntries = 0;
     mPipeEntries = nullptr;
     mPipeEntries = new Entry[0x20];

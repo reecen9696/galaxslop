@@ -107,16 +107,26 @@ void CameraInfo::exeNormal() {
         MR::hidePane(this, "LineU");
     }
 
+#ifdef TARGET_PC
+    // With the camera's turns swapped (invert_camera), each arrow stands for
+    // the turn the D-pad's other side makes.
+    const bool inverted = port_input_camera_inverted() != 0;
+    const char* lineLeft = inverted ? "LineR" : "LineL";
+    const char* lineRight = inverted ? "LineL" : "LineR";
+#else
+    const char* lineLeft = "LineL";
+    const char* lineRight = "LineR";
+#endif
     if (MR::isCameraPossibleToRoundLeft()) {
-        MR::showPane(this, "LineL");
+        MR::showPane(this, lineLeft);
     } else {
-        MR::hidePane(this, "LineL");
+        MR::hidePane(this, lineLeft);
     }
 
     if (MR::isCameraPossibleToRoundRight()) {
-        MR::showPane(this, "LineR");
+        MR::showPane(this, lineRight);
     } else {
-        MR::hidePane(this, "LineR");
+        MR::hidePane(this, lineRight);
     }
 
     updateCameraNG();

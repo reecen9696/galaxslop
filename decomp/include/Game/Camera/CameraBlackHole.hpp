@@ -4,7 +4,7 @@
 
 class CameraBlackHole : public Camera {
 public:
-    CameraBlackHole(const char* pName = "ブラックホールカメラ");
+    CameraBlackHole(const char* pName = "\x83\x75\x83\x89\x83\x62\x83\x4e\x83\x7a\x81\x5b\x83\x8b\x83\x4a\x83\x81\x83\x89");
 
     virtual void reset();
     virtual CameraTargetObj* calc();

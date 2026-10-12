@@ -548,6 +548,30 @@ inline f32 J3DHermiteInterpolation(__REGISTER f32 pp1, __REGISTER s16 const* pp2
     }
 
     return value;
+#else
+    // Same sequence as the paired-single code; GQR5 loads s16 with no scaling.
+    f32 value = pp1;
+    f32 time = (f32)*pp2;
+    f32 end = (f32)*pp5;
+    f32 start = (f32)*pp3;
+    f32 duration = end - time;
+    end = (f32)*pp6;
+    f32 t = value - time;
+    value = (f32)*pp7;
+    f32 delta = end - start;
+    t = t / duration;
+    time = (f32)*pp4;
+    value = value * duration + start;
+    delta = delta - duration * time;
+    f32 squared = t * t;
+    value = value - end;
+    value = value - delta;
+    end = squared * value;
+    value = duration * time + end;
+    value = value * t + start;
+    value = delta * squared + value;
+    value = value - end;
+    return value;
 #endif
 }
 

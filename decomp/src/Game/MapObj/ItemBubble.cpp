@@ -67,7 +67,7 @@ void ItemBubble::init(const JMapInfoIter& rIter) {
     for (u32 i = 0; i < itemCount; i++) {
         switch (itemType) {
         case 0:
-            _90[i] = new RotPartsModel(this, "ダミーコイン", "Coin", nullptr, 15, false);
+            _90[i] = new RotPartsModel(this, "\x83\x5f\x83\x7e\x81\x5b\x83\x52\x83\x43\x83\x93", "Coin", nullptr, 15, false);
             _90[i]->initWithoutIter();
 
             switch (itemCount) {
@@ -105,9 +105,9 @@ void ItemBubble::init(const JMapInfoIter& rIter) {
 
             break;
         case 1:
-            _94[i] = new StarPiece("アイテムバブルピース");
+            _94[i] = new StarPiece("\x83\x41\x83\x43\x83\x65\x83\x80\x83\x6f\x83\x75\x83\x8b\x83\x73\x81\x5b\x83\x58");
             _94[i]->initWithoutIter();
-            _90[i] = new RotPartsModel(this, "スターピース", "StarPiece", nullptr, 13, true);
+            _90[i] = new RotPartsModel(this, "\x83\x58\x83\x5e\x81\x5b\x83\x73\x81\x5b\x83\x58", "StarPiece", nullptr, 13, true);
             MR::initDLMakerMatColor0(_90[i], "StarPiece1_v", &_94[i]->mColor);
             MR::newDifferedDLBuffer(_90[i]);
             _90[i]->initWithoutIter();

@@ -45,8 +45,8 @@ void CameraUtil_DUMMY() {
 }
 
 namespace {
-    static const char* sLauncherCameraName = "大砲";
-    static const char* sLauncherFlightCameraName = "大砲飛行";
+    static const char* sLauncherCameraName = "\x91\xe5\x96\x43";
+    static const char* sLauncherFlightCameraName = "\x91\xe5\x96\x43\x94\xf2\x8d\x73";
 
     CameraContext* getCameraContext() {
         return MR::getSceneObj< CameraContext >(SceneObj_CameraContext);
@@ -142,7 +142,7 @@ namespace MR {
     }
 
     void loadProjectionMtx() {
-        GXSetProjection(::getCameraContext()->mProjection, (GXProjectionType) nullptr);
+        GXSetProjection(::getCameraContext()->mProjection, (GXProjectionType) 0);
     }
 
     void loadViewMtx() {

@@ -53,7 +53,7 @@ void JumpBeamer::control() {
 
 void JumpBeamer::init(const JMapInfoIter& rIter) {
     initModelManagerWithAnm("JumpBeamerBody", nullptr, false);
-    mHeadModel = MR::createPartsModelMapObjStrongLight(this, "ジャンプビーマー頭", "JumpBeamerHead", _90);
+    mHeadModel = MR::createPartsModelMapObjStrongLight(this, "\x83\x57\x83\x83\x83\x93\x83\x76\x83\x72\x81\x5b\x83\x7d\x81\x5b\x93\xaa", "JumpBeamerHead", _90);
     MR::initLightCtrl(mHeadModel);
     MR::initDefaultPos(this, rIter);
     MR::connectToSceneEnemy(this);
@@ -94,7 +94,7 @@ void JumpBeamer::init(const JMapInfoIter& rIter) {
     }
 
     for (s32 i = 0; i < 3; i++) {
-        mBeams[i] = new RingBeam("リングビーム", this, false, false);
+        mBeams[i] = new RingBeam("\x83\x8a\x83\x93\x83\x4f\x83\x72\x81\x5b\x83\x80", this, false, false);
         mBeams[i]->init(rIter);
         mBeams[i]->setSpeed(arg1);
         mBeams[i]->setLife(arg0);

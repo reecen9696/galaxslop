@@ -2,7 +2,7 @@
 #include "Game/MapObj/MapPartsRailGuideDrawer.hpp"
 #include "Game/Util/JMapInfo.hpp"
 
-MapPartsRailGuideHolder::MapPartsRailGuideHolder() : NameObj("レールガイド保持"), mNumRailGuides() {
+MapPartsRailGuideHolder::MapPartsRailGuideHolder() : NameObj("\x83\x8c\x81\x5b\x83\x8b\x83\x4b\x83\x43\x83\x68\x95\xdb\x8e\x9d"), mNumRailGuides() {
 }
 
 MapPartsRailGuideDrawer* MapPartsRailGuideHolder::createRailGuide(LiveActor* pHost, const char* pModelName, const JMapInfoIter& rIter) {

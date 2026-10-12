@@ -20,7 +20,7 @@ void SeesawMoveNut::init(const JMapInfoIter& rIter) {
     MapObjActor::init(rIter);
     MapObjActorInitInfo initInfo;
 
-    initInfo.setupHioNode("地形オブジェ");
+    initInfo.setupHioNode("\x92\x6e\x8c\x60\x83\x49\x83\x75\x83\x57\x83\x46");
     initInfo.setupDefaultPos();
     initInfo.setupConnectToScene();
     initInfo.setupSeesaw1AxisRotator(nullptr, 0.0f);

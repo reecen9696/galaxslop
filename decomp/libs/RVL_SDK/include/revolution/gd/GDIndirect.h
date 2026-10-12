@@ -15,10 +15,10 @@
 #define IND_CMD_PAD0_SHIFT 21
 #define IND_CMD_RID_SHIFT 24
 #define IND_CMD(bt, fmt, bias, bs, m, sw, tw, lb, fb, rid)                                                                                           \
-    ((((unsigned long)(bt)) << IND_CMD_BT_SHIFT) | (((unsigned long)(fmt)) << IND_CMD_FMT_SHIFT) | (((unsigned long)(bias)) << IND_CMD_BIAS_SHIFT) | \
-     (((unsigned long)(bs)) << IND_CMD_BS_SHIFT) | (((unsigned long)(m)) << IND_CMD_M_SHIFT) | (((unsigned long)(sw)) << IND_CMD_SW_SHIFT) |         \
-     (((unsigned long)(tw)) << IND_CMD_TW_SHIFT) | (((unsigned long)(lb)) << IND_CMD_LB_SHIFT) | (((unsigned long)(fb)) << IND_CMD_FB_SHIFT) |       \
-     (((unsigned long)(rid)) << IND_CMD_RID_SHIFT))
+    ((((unsigned int)(bt)) << IND_CMD_BT_SHIFT) | (((unsigned int)(fmt)) << IND_CMD_FMT_SHIFT) | (((unsigned int)(bias)) << IND_CMD_BIAS_SHIFT) | \
+     (((unsigned int)(bs)) << IND_CMD_BS_SHIFT) | (((unsigned int)(m)) << IND_CMD_M_SHIFT) | (((unsigned int)(sw)) << IND_CMD_SW_SHIFT) |         \
+     (((unsigned int)(tw)) << IND_CMD_TW_SHIFT) | (((unsigned int)(lb)) << IND_CMD_LB_SHIFT) | (((unsigned int)(fb)) << IND_CMD_FB_SHIFT) |       \
+     (((unsigned int)(rid)) << IND_CMD_RID_SHIFT))
 
 #define BP_IND_MTX(m0, m1, scale_exp, id) ((u32)(m0) << 0 | (u32)(m1) << 11 | (u32)(scale_exp) << 22 | (u32)(id) << 24)
 

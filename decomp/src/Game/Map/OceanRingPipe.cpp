@@ -15,7 +15,7 @@ OceanRingPipe::~OceanRingPipe() {
 }
 
 OceanRingPipe::OceanRingPipe(const OceanRing* pRing, f32 a, f32 b)
-    : LiveActor("オーシャンリングの側面"), mOceanRing(pRing), _90(), _94(), _98(), _9C(8), _A0(), _A4(), _A8(a), _AC(b), mPipeInside(),
+    : LiveActor("\x83\x49\x81\x5b\x83\x56\x83\x83\x83\x93\x83\x8a\x83\x93\x83\x4f\x82\xcc\x91\xa4\x96\xca"), mOceanRing(pRing), _90(), _94(), _98(), _9C(8), _A0(), _A4(), _A8(a), _AC(b), mPipeInside(),
       mPipeOutside() {
 }
 
@@ -29,7 +29,7 @@ void OceanRingPipe::init(const JMapInfoIter& rIter) {
     mPipeOutside = new OceanRingPipeOutside(this);
     mPipeOutside->initWithoutIter();
 
-    if (MR::isName(mOceanRing, "オーシャンリング（旗）")) {
+    if (MR::isName(mOceanRing, "\x83\x49\x81\x5b\x83\x56\x83\x83\x83\x93\x83\x8a\x83\x93\x83\x4f\x81\x69\x8a\xf8\x81\x6a")) {
         f32 f30 = 300.0f;
         f32 f29 = 200.0f;
         f32 f28 = 500.0f;
@@ -42,9 +42,9 @@ void OceanRingPipe::init(const JMapInfoIter& rIter) {
             }
 
             if (i & 1) {
-                MR::setClippingFarMax(MR::createMapFlag("旗", "FlagSurfing", &_A0[calcPointIndex(i, 0)], vec, f28, f30, f29, 2, 3, -1.0f));
+                MR::setClippingFarMax(MR::createMapFlag("\x8a\xf8", "FlagSurfing", &_A0[calcPointIndex(i, 0)], vec, f28, f30, f29, 2, 3, -1.0f));
             } else {
-                MR::setClippingFarMax(MR::createMapFlag("旗", "FlagSurfing", &_A0[calcPointIndex(i, _9C - 1)], vec, f28, f30, f29, 2, 3, -1.0f));
+                MR::setClippingFarMax(MR::createMapFlag("\x8a\xf8", "FlagSurfing", &_A0[calcPointIndex(i, _9C - 1)], vec, f28, f30, f29, 2, 3, -1.0f));
             }
         }
     }

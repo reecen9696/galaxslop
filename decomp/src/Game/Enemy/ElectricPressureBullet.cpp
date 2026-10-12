@@ -82,7 +82,7 @@ void ElectricPressureBullet::exeFly() {
 }
 
 void ElectricPressureBullet::control() {
-    if (MR::isStarPointerPointing2POnTriggerButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnTriggerButton(this, "\x8e\xe3", true, false)) {
         kill();
     }
 }

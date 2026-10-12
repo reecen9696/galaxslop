@@ -13,10 +13,10 @@ namespace {
     static const s32 sStepForWhiteFadeIn = 60;
     static const s32 sStepToBreakFaceEffect = 120;
     static const s32 sStepToExplosionEffect = 300;
-    static const char* const sDemoPartNameBreak = "壊れ開始";
-    static const char* const sDemoPartNameFadeOut = "フェードアウト";
-    static const char* const sDemoPartNameWhite = "白画面";
-    static const char* const sDemoPartNameFadeIn = "フェードイン";
+    static const char* const sDemoPartNameBreak = "\x89\xf3\x82\xea\x8a\x4a\x8e\x6e";
+    static const char* const sDemoPartNameFadeOut = "\x83\x74\x83\x46\x81\x5b\x83\x68\x83\x41\x83\x45\x83\x67";
+    static const char* const sDemoPartNameWhite = "\x94\x92\x89\xe6\x96\xca";
+    static const char* const sDemoPartNameFadeIn = "\x83\x74\x83\x46\x81\x5b\x83\x68\x83\x43\x83\x93";
 };  // namespace
 
 namespace NrvMechaKoopaPartsHead {
@@ -34,7 +34,7 @@ MechaKoopaPartsHead::MechaKoopaPartsHead(const char* pName) : MapObjActor(pName)
 void MechaKoopaPartsHead::init(const JMapInfoIter& rIter) {
     MapObjActor::init(rIter);
     MapObjActorInitInfo initInfo;
-    initInfo.setupHioNode("地形オブジェ");
+    initInfo.setupHioNode("\x92\x6e\x8c\x60\x83\x49\x83\x75\x83\x57\x83\x46");
     initInfo.setupDefaultPos();
     initInfo.setupConnectToScene();
     initInfo.setupEffect(nullptr);
@@ -101,7 +101,7 @@ void MechaKoopaPartsHead::exeDemoWhiteWait() {
             MR::offSwitchA(this);
         }
 
-        MR::setPlayerPos("爆破デモ後マリオ");
+        MR::setPlayerPos("\x94\x9a\x94\x6a\x83\x66\x83\x82\x8c\xe3\x83\x7d\x83\x8a\x83\x49");
         MR::setPlayerStateWait();
     }
 }

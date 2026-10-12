@@ -1,7 +1,7 @@
 #include "revolution/types.h"
 
-static inline void NETMemSet_BufSize32Aligned(register void* buf, register unsigned long fill, unsigned long size) {
-    register unsigned long loopSize = size >> 5;
+static inline void NETMemSet_BufSize32Aligned(register void* buf, register unsigned int fill, unsigned int size) {
+    register unsigned int loopSize = size >> 5;
 
     if (fill == 0) {
         asm {
@@ -30,10 +30,10 @@ static inline void NETMemSet_BufSize32Aligned(register void* buf, register unsig
     }
 }
 
-static inline void NETMemSet_Simple(register void* buf, register unsigned long fill, unsigned long size) {
+static inline void NETMemSet_Simple(register void* buf, register unsigned int fill, unsigned int size) {
     register unsigned char* buf_u8 = (unsigned char*)buf;
-    register unsigned long numWords = size >> 2;
-    register unsigned long remainBytes = size & 3;
+    register unsigned int numWords = size >> 2;
+    register unsigned int remainBytes = size & 3;
 
     if (numWords != 0) {
         asm {
@@ -55,10 +55,10 @@ static inline void NETMemSet_Simple(register void* buf, register unsigned long f
     }
 }
 
-void* NETMemSet(void* buf, int ch, unsigned long size) {
-    unsigned long headSize;
-    unsigned long accBlkSize;
-    register unsigned long fill = ch;
+void* NETMemSet(void* buf, int ch, unsigned int size) {
+    unsigned int headSize;
+    unsigned int accBlkSize;
+    register unsigned int fill = ch;
 
     if (size == 0) {
         return buf;
@@ -70,7 +70,7 @@ void* NETMemSet(void* buf, int ch, unsigned long size) {
     }
 
     if (size >= 0x40) {
-        headSize = (unsigned long)buf & 0x1F;
+        headSize = (unsigned int)buf & 0x1F;
         if (headSize != 0) {
             headSize = 0x20 - headSize;
             NETMemSet_Simple(buf, fill, headSize);

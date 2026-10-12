@@ -43,7 +43,7 @@ const GXColor lightColor[] = {
 };
 
 namespace {
-    const char* const cAppearDemoName = "パワースター出現";
+    const char* const cAppearDemoName = "\x83\x70\x83\x8f\x81\x5b\x83\x58\x83\x5e\x81\x5b\x8f\x6f\x8c\xbb";
     const char* const cStageClearAnimNameKoopaVs3 = "GrandStarGetKoopaVs3";
 
     void setupColor(LiveActor* pActor, bool useFrame, int frame) {
@@ -137,8 +137,8 @@ void PowerStar::init(const JMapInfoIter& rIter) {
     }
 
     if (MR::tryRegisterDemoCast(this, rIter)) {
-        MR::registerDemoActionNerve(this, GET_NERVE(PowerStar, PowerStarNrvWeakNoRotate), "ミニ太陽消失");
-        MR::registerDemoActionNerve(this, GET_NERVE(PowerStar, PowerStarNrvWeakToWait), "グランドスター復活");
+        MR::registerDemoActionNerve(this, GET_NERVE(PowerStar, PowerStarNrvWeakNoRotate), "\x83\x7e\x83\x6a\x91\xbe\x97\x7a\x8f\xc1\x8e\xb8");
+        MR::registerDemoActionNerve(this, GET_NERVE(PowerStar, PowerStarNrvWeakToWait), "\x83\x4f\x83\x89\x83\x93\x83\x68\x83\x58\x83\x5e\x81\x5b\x95\x9c\x8a\x88");
         MR::registerDemoSimpleCastAll(this);
     }
 
@@ -291,7 +291,7 @@ bool PowerStar::isCurrentStageKoopaVs3() {
 void PowerStar::initShadowPowerStar(LiveActor* pActor, bool a2) {
     MR::initShadowFromCSV(pActor, "Shadow");
     MR::invalidateShadowAll(pActor);
-    MR::validateShadowGroup(pActor, a2 ? "円柱" : "通常");
+    MR::validateShadowGroup(pActor, a2 ? "\x89\x7e\x92\x8c" : "\x92\xca\x8f\xed");
 }
 
 void PowerStar::makeArchiveList(NameObjArchiveListCollector* pCollector, const JMapInfoIter& rIter) {
@@ -367,7 +367,7 @@ void PowerStar::initMapToolInfo(const JMapInfoIter& rIter) {
     mAppearPosition.set(mPosition);
     mInitRotation.set(mRotation);
     MR::registerPowerStar(this, mPowerStarId);
-    MR::joinToGroupArray(this, rIter, "パワースター出現ポイントグループ", 0x10);
+    MR::joinToGroupArray(this, rIter, "\x83\x70\x83\x8f\x81\x5b\x83\x58\x83\x5e\x81\x5b\x8f\x6f\x8c\xbb\x83\x7c\x83\x43\x83\x93\x83\x67\x83\x4f\x83\x8b\x81\x5b\x83\x76", 0x10);
 
     if (mPowerStarId > 0) {
         if (!MR::hasPowerStarInCurrentStage(mPowerStarId)) {
@@ -397,14 +397,14 @@ void PowerStar::initModel() {
 
     if (mIsGrandStar) {
         MtxPtr pMtx = (MtxPtr)&mBaseMtx;
-        const char* pName = "グランドスターデモモデル";
+        const char* pName = "\x83\x4f\x83\x89\x83\x93\x83\x68\x83\x58\x83\x5e\x81\x5b\x83\x66\x83\x82\x83\x82\x83\x66\x83\x8b";
 
         mPowerStarModelObj = MR::createModelObjIndirectMapObj(pName, mIsGrandStar ? "GrandStar" : "PowerStar", pMtx);
 
         ::setupColorGrandStar(mPowerStarModelObj, mColorFrame_v == 4);
     } else {
         MtxPtr pMtx = (MtxPtr)&mBaseMtx;
-        const char* pName = "パワースターデモモデル";
+        const char* pName = "\x83\x70\x83\x8f\x81\x5b\x83\x58\x83\x5e\x81\x5b\x83\x66\x83\x82\x83\x82\x83\x66\x83\x8b";
 
         mPowerStarModelObj = MR::createModelObjNoSilhouettedMapObj(pName, mIsGrandStar ? "GrandStar" : "PowerStar", pMtx);
 
@@ -415,7 +415,7 @@ void PowerStar::initModel() {
     mPowerStarModelObj->makeActorDead();
 
     if (MR::isPowerStarGetDemoWithLuigiCurrentGalaxy()) {
-        mLuigiNPC = MR::createModelObjNpc("ルイージデモモデル", "LuigiNPC", (MtxPtr)&mBaseMtx);
+        mLuigiNPC = MR::createModelObjNpc("\x83\x8b\x83\x43\x81\x5b\x83\x57\x83\x66\x83\x82\x83\x82\x83\x66\x83\x8b", "LuigiNPC", (MtxPtr)&mBaseMtx);
 
         MR::initLightCtrl(mLuigiNPC);
         MR::invalidateClipping(mLuigiNPC);
@@ -454,7 +454,7 @@ void PowerStar::initShadow(const JMapInfoIter& rIter) {
         bool thing = arg3;
         MR::initShadowFromCSV(this, "Shadow");
         MR::invalidateShadowAll(this);
-        MR::validateShadowGroup(this, thing ? "円柱" : "通常");
+        MR::validateShadowGroup(this, thing ? "\x89\x7e\x92\x8c" : "\x92\xca\x8f\xed");
     } else {
         MR::initShadowFromCSV(this, "Shadow");
     }
@@ -711,7 +711,7 @@ void PowerStar::exeAppearDemoKoopa() {
     }
 
     if (MR::isStep(this, 1)) {
-        MR::startBckPlayer(MR::isStageKoopaVs3() ? "DemoKoopaGrandStarVs3" : "DemoKoopaGrandStar", 0L);
+        MR::startBckPlayer(MR::isStageKoopaVs3() ? "DemoKoopaGrandStarVs3" : "DemoKoopaGrandStar", 0);
     }
 
     if (MR::isStageKoopaVs3()) {
@@ -825,7 +825,7 @@ void PowerStar::exeStageClearDemo() {
 
         MR::hideModelIfShown(this);
 
-        MR::startBckPlayer(mIsGrandStar ? "GrandStarGet" : "PowerStarGet", 0L);
+        MR::startBckPlayer(mIsGrandStar ? "GrandStarGet" : "PowerStarGet", 0);
 
         mBaseMtx.setTrans(mPosition);
 

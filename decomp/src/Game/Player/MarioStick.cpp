@@ -91,10 +91,10 @@ bool MarioStick::setStickSensor(const HitSensor* pSensor) {
 
 bool MarioStick::start() {
     _4C = 0;
-    changeAnimation("ハチ壁くっつき", "ハチ壁くっつき中");
-    startPadVib(0ul);
-    playEffectTrans("ハチ花くっつき", _38);
-    playSound("ハチ壁くっつき");
+    changeAnimation("\x83\x6e\x83\x60\x95\xc7\x82\xad\x82\xc1\x82\xc2\x82\xab", "\x83\x6e\x83\x60\x95\xc7\x82\xad\x82\xc1\x82\xc2\x82\xab\x92\x86");
+    startPadVib(0u);
+    playEffectTrans("\x83\x6e\x83\x60\x89\xd4\x82\xad\x82\xc1\x82\xc2\x82\xab", _38);
+    playSound("\x83\x6e\x83\x60\x95\xc7\x82\xad\x82\xc1\x82\xc2\x82\xab");
     mActor->_F44 = 0;
     getPlayer()->setFrontVecKeepSide(-_20);
     _6C = -_20;
@@ -108,7 +108,7 @@ bool MarioStick::update() {
     getPlayer()->setTrans(_14, nullptr);
 
     if (checkTrgA()) {
-        if (!isAnimationRun("ハチ壁くっつき")) {
+        if (!isAnimationRun("\x83\x6e\x83\x60\x95\xc7\x82\xad\x82\xc1\x82\xc2\x82\xab")) {
             if (startJump()) {
                 return false;
             }
@@ -138,9 +138,9 @@ bool MarioStick::update() {
     PSMTXMultVec(secondRotMtx, &stack_2C, &stack_2C);
 
     if (getStickP() > 0.0f) {
-        changeAnimation("ハチ花移動");
+        changeAnimation("\x83\x6e\x83\x60\x89\xd4\x88\xda\x93\xae");
     } else {
-        stopAnimation("ハチ花移動");
+        stopAnimation("\x83\x6e\x83\x60\x89\xd4\x88\xda\x93\xae");
     }
 
     if (MR::diffAngleAbs(stack_2C, _2C) < 1.308997f) {
@@ -166,15 +166,15 @@ bool MarioStick::update() {
 }
 
 bool MarioStick::close() {
-    stopAnimation("ハチ壁くっつき", "落下");
+    stopAnimation("\x83\x6e\x83\x60\x95\xc7\x82\xad\x82\xc1\x82\xc2\x82\xab", "\x97\x8e\x89\xba");
 
     if (getPlayer()->mMovementStates._1) {
-        changeAnimation(nullptr, "基本");
+        changeAnimation(nullptr, "\x8a\xee\x96\x7b");
     }
 
     getPlayer()->mMovementStates._38 = 0;
     mActor->_F44 = 1;
-    playEffectTrans("ハチ花くっつき", _38);
+    playEffectTrans("\x83\x6e\x83\x60\x89\xd4\x82\xad\x82\xc1\x82\xc2\x82\xab", _38);
     return true;
 }
 

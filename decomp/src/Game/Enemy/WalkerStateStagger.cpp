@@ -32,7 +32,7 @@ WalkerStateStaggerParam::WalkerStateStaggerParam()
 }
 
 WalkerStateStagger::WalkerStateStagger(LiveActor* pHost, TVec3f* pDirection, WalkerStateParam* pStateParam, WalkerStateStaggerParam* pStaggerParam)
-    : ActorStateBase< LiveActor >("歩行型よろめき状態", pHost), mStateParam(pStateParam), mStaggerParam(pStaggerParam), mVelH(0.0f, 0.0f, 1.0f),
+    : ActorStateBase< LiveActor >("\x95\xe0\x8d\x73\x8c\x5e\x82\xe6\x82\xeb\x82\xdf\x82\xab\x8f\xf3\x91\xd4", pHost), mStateParam(pStateParam), mStaggerParam(pStaggerParam), mVelH(0.0f, 0.0f, 1.0f),
       mDirection(pDirection) {
     if (mStaggerParam == nullptr) {
         mStaggerParam = &::sDefaultStaggerParam;

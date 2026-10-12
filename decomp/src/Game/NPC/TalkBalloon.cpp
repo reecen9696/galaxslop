@@ -82,11 +82,11 @@ void TalkBalloon::close() {
     MR::startAnim(this, "End", 0);
 }
 
-inline f32 fmin(f32 a, f32 b) {
+inline f32 tbFmin(f32 a, f32 b) {
     return b >= a ? a : b;
 }
 
-inline f32 fmax(f32 a, f32 b) {
+inline f32 tbFmax(f32 a, f32 b) {
     return b >= a ? b : a;
 }
 
@@ -109,10 +109,10 @@ void TalkBalloon::updateBalloon() {
         if (v2.x * v3.y - v2.y * v3.x > 0.0f) {
             f32 halfMax = paneAnimFrameMax;
             halfMax *= 0.5f;
-            paneAnimFrameMax = fmin(paneAnimFrameMax, halfMax + cosine);
+            paneAnimFrameMax = tbFmin(paneAnimFrameMax, halfMax + cosine);
         } else {
             f32 half = 0.5f;
-            paneAnimFrameMax = fmax(0.0f, paneAnimFrameMax * half - cosine);
+            paneAnimFrameMax = tbFmax(0.0f, paneAnimFrameMax * half - cosine);
         }
 
         if (!_29) {
@@ -420,22 +420,22 @@ TalkBalloonHolder::TalkBalloonHolder() : _14() {
     mBalloonShortArray = new TalkBalloonShort*[4];
 
     for (u32 i = 0; i < 4; i++) {
-        TalkBalloonShort* temp = new TalkBalloonShort("会話吹き出し[簡易会話]");
+        TalkBalloonShort* temp = new TalkBalloonShort("\x89\xef\x98\x62\x90\x81\x82\xab\x8f\x6f\x82\xb5[\x8a\xc8\x88\xd5\x89\xef\x98\x62]");
         mBalloonShortArray[i] = temp;
         mBalloonShortArray[i]->initWithoutIter();
         mBalloonShortArray[i]->kill();
     }
 
-    mBalloonEvent = new TalkBalloonEvent("会話吹き出し[イベント]");
+    mBalloonEvent = new TalkBalloonEvent("\x89\xef\x98\x62\x90\x81\x82\xab\x8f\x6f\x82\xb5[\x83\x43\x83\x78\x83\x93\x83\x67]");
     mBalloonEvent->initWithoutIter();
     mBalloonEvent->kill();
-    mBalloonInfo = new TalkBalloonInfo("会話吹き出し[インフォメーション]");
+    mBalloonInfo = new TalkBalloonInfo("\x89\xef\x98\x62\x90\x81\x82\xab\x8f\x6f\x82\xb5[\x83\x43\x83\x93\x83\x74\x83\x48\x83\x81\x81\x5b\x83\x56\x83\x87\x83\x93]");
     mBalloonInfo->initWithoutIter();
     mBalloonInfo->kill();
-    mBalloonSign = new TalkBalloonSign("会話吹き出し[看板]");
+    mBalloonSign = new TalkBalloonSign("\x89\xef\x98\x62\x90\x81\x82\xab\x8f\x6f\x82\xb5[\x8a\xc5\x94\xc2]");
     mBalloonSign->initWithoutIter();
     mBalloonSign->kill();
-    mBalloonIcon = new TalkBalloonIcon("会話吹き出し[アイコン]");
+    mBalloonIcon = new TalkBalloonIcon("\x89\xef\x98\x62\x90\x81\x82\xab\x8f\x6f\x82\xb5[\x83\x41\x83\x43\x83\x52\x83\x93]");
     mBalloonIcon->initWithoutIter();
     mBalloonIcon->kill();
 

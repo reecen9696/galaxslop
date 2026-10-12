@@ -28,7 +28,7 @@ namespace NrvKoopaShockWave {
 };  // namespace NrvKoopaShockWave
 
 KoopaShockWave::KoopaShockWave(Koopa* pKoopa)
-    : LiveActor("球状衝撃波"), mKoopa(pKoopa), mAngle(), mUp(0.0f, 1.0f, 0.0f), mFront(0.0f, 0.0f, 1.0f), mPartsModel(), mShadow() {
+    : LiveActor("\x8b\x85\x8f\xf3\x8f\xd5\x8c\x82\x94\x67"), mKoopa(pKoopa), mAngle(), mUp(0.0f, 1.0f, 0.0f), mFront(0.0f, 0.0f, 1.0f), mPartsModel(), mShadow() {
     _94.identity();
     mBaseMtx.identity();
     mMtx.identity();
@@ -59,7 +59,7 @@ void KoopaShockWave::init(const JMapInfoIter& rIter) {
     mPartsModel->kill();
     MR::invalidateClipping(mPartsModel);
 
-    ModelObj* pModelObj = MR::createModelObjNoSilhouettedMapObj("衝撃波の影", "KoopaShockWaveShadow", mMtx);
+    ModelObj* pModelObj = MR::createModelObjNoSilhouettedMapObj("\x8f\xd5\x8c\x82\x94\x67\x82\xcc\x89\x65", "KoopaShockWaveShadow", mMtx);
     mShadow = pModelObj;
     MR::startAction(pModelObj, "Spread");
     MR::setBckFrameAndStop(pModelObj, 0.0f);

@@ -6,7 +6,15 @@ void AutoEffectInfo_FORCE_MATCH_SDATA2() {
     (void)1.0f;
 }
 
+#ifdef __MWERKS__
+#ifdef __MWERKS__
 extern "C" u32 strtoul(const char*, char**, int);
+#else
+#include <stdlib.h>
+#endif
+#else
+#include <stdlib.h>
+#endif
 
 namespace {
     u32 str2Color(const char* pStr) NO_INLINE {

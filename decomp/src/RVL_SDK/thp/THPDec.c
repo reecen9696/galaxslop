@@ -24,7 +24,7 @@ static THPCoeff* __THPMCUBuffer[6];
 static THPFileInfo* __THPInfo;
 static BOOL __THPInitFlag = FALSE; 
 
-#define ROUNDUP(a, b) ((((s32)(a)) + ((s32)(b) - 1L)) / ((s32)(b)))
+#define ROUNDUP(a, b) ((((s32)(a)) + ((s32)(b) - 1)) / ((s32)(b)))
 
 void __THPInverseDCTY8(register THPCoeff *, register u32);
 
@@ -370,7 +370,7 @@ static void __THPHuffGenerateDecoderTables(u8 tabIndex) {
         }
     }
 
-    h->maxCode[17] = 0xfffffL;
+    h->maxCode[17] = 0xfffff;
 }
 
 static void __THPRestartDefinition(void) {

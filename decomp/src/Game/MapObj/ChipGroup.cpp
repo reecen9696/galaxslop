@@ -137,7 +137,7 @@ void ChipGroup::init(const JMapInfoIter& rIter) {
 
     if (arg3 == 1) {
         mIsDeactivated = 0;
-        mAlreadyDoneFlag = MR::setupAlreadyDoneFlag("チップ集め済み", rIter, &mIsDeactivated);
+        mAlreadyDoneFlag = MR::setupAlreadyDoneFlag("\x83\x60\x83\x62\x83\x76\x8f\x57\x82\xdf\x8d\xcf\x82\xdd", rIter, &mIsDeactivated);
     } else {
         mIsDeactivated = 0;
         mAlreadyDoneFlag = -1;

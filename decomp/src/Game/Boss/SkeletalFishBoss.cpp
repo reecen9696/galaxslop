@@ -219,8 +219,8 @@ void SkeletalFishBoss::kill() {
 void SkeletalFishBoss::control() {
     ActorCameraInfo info = ActorCameraInfo();
 
-    if (MR::isEventCameraActive(&info, "デモ終了後カメラ") && MR::isGreaterEqualStep(this, 60)) {
-        MR::endGlobalEventCamera("デモ終了後カメラ", -1, true);
+    if (MR::isEventCameraActive(&info, "\x83\x66\x83\x82\x8f\x49\x97\xb9\x8c\xe3\x83\x4a\x83\x81\x83\x89") && MR::isGreaterEqualStep(this, 60)) {
+        MR::endGlobalEventCamera("\x83\x66\x83\x82\x8f\x49\x97\xb9\x8c\xe3\x83\x4a\x83\x81\x83\x89", -1, true);
     }
 
     if (!isNerve(GET_NERVE_ANON(SkeletalFishBossNrvDead)) && !isNerve(GET_NERVE_ANON(SkeletalFishBossNrvAppearWait))) {
@@ -293,7 +293,7 @@ void SkeletalFishBoss::damage(const HitSensor* pSensor, const TVec3f& rStarPiece
         if (_114 <= 0) {
             if (_110 + 1 == _1A0) {
                 setNerve(GET_NERVE_ANON(SkeletalFishBossNrvDeadDamage));
-            } else if (MR::isDemoExist("スカルシャークデモ")) {
+            } else if (MR::isDemoExist("\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x83\x66\x83\x82")) {
                 setNerve(GET_NERVE_ANON(SkeletalFishBossNrvDown));
             }
         } else {
@@ -427,7 +427,7 @@ void SkeletalFishBoss::exeDown() {
     MR::startLevelSound(mBossHead, "SE_BM_LV_SKL_BOSS_SWIM_NEAR");
 
     if (MR::isStep(this, 120)) {
-        stopScene("スカルシャークパワーアップ", GET_NERVE_ANON(SkeletalFishBossNrvPowerUpDemo), &SkeletalFishBoss::startPowerUpDemo);
+        stopScene("\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76", GET_NERVE_ANON(SkeletalFishBossNrvPowerUpDemo), &SkeletalFishBoss::startPowerUpDemo);
     }
 }
 
@@ -446,7 +446,7 @@ void SkeletalFishBoss::exeDeadDamage() {
 
     if (MR::isStep(this, 120)) {
         MR::stopStageBGM(30);
-        stopScene("スカルシャーク死亡", GET_NERVE_ANON(SkeletalFishBossNrvDeadDemo), &SkeletalFishBoss::startDeadDemo);
+        stopScene("\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x8e\x80\x96\x53", GET_NERVE_ANON(SkeletalFishBossNrvDeadDemo), &SkeletalFishBoss::startDeadDemo);
     }
 }
 
@@ -454,14 +454,14 @@ void SkeletalFishBoss::exeDead() {
     if (MR::isFirstStep(this)) {
         Mtx pos;
 
-        if (MR::tryFindNamePos("マリオ再セット位置2", pos)) {
+        if (MR::tryFindNamePos("\x83\x7d\x83\x8a\x83\x49\x8d\xc4\x83\x5a\x83\x62\x83\x67\x88\xca\x92\x75""2", pos)) {
             MR::setPlayerBaseMtx(pos);
         }
 
         resetCamera();
     } else {
         ActorCameraInfo info = ActorCameraInfo();
-        bool isCameraActive = MR::isEventCameraActive(&info, "デモ終了後カメラ") == false;
+        bool isCameraActive = MR::isEventCameraActive(&info, "\x83\x66\x83\x82\x8f\x49\x97\xb9\x8c\xe3\x83\x4a\x83\x81\x83\x89") == false;
 
         if (isCameraActive) {
             kill();
@@ -471,7 +471,7 @@ void SkeletalFishBoss::exeDead() {
 
 void SkeletalFishBoss::exeAppearWait() {
     if (!MR::isPlayerInBind() && !MR::isEventCameraActive()) {
-        stopScene("スカルシャーク出現", GET_NERVE_ANON(SkeletalFishBossNrvAppearDemo), &SkeletalFishBoss::startAppearDemo);
+        stopScene("\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x8f\x6f\x8c\xbb", GET_NERVE_ANON(SkeletalFishBossNrvAppearDemo), &SkeletalFishBoss::startAppearDemo);
     }
 }
 
@@ -663,7 +663,7 @@ void SkeletalFishBoss::calcAndSetBaseMtx() {
 }
 
 void SkeletalFishBoss::initLevelStatus() {
-    mBossInfo = new SkeletalFishBossInfo(this, _1A0, _1A4, "ボス戦パラメータ");
+    mBossInfo = new SkeletalFishBossInfo(this, _1A0, _1A4, "\x83\x7b\x83\x58\x90\xed\x83\x70\x83\x89\x83\x81\x81\x5b\x83\x5e");
 }
 
 void SkeletalFishBoss::initJoint() {
@@ -703,7 +703,7 @@ void SkeletalFishBoss::initScarFlash() {
 }
 
 void SkeletalFishBoss::initBreakModel() {
-    mBreakModel = new ModelObj("壊れモデル", "SkeletalFishBossBreak", _150.mMtx, MR::DrawBufferType_Enemy, -2, -2, false);
+    mBreakModel = new ModelObj("\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "SkeletalFishBossBreak", _150.mMtx, MR::DrawBufferType_Enemy, -2, -2, false);
     mBreakModel->initWithoutIter();
     MR::initLightCtrl(mBreakModel);
     mBreakModel->makeActorDead();
@@ -719,7 +719,7 @@ void SkeletalFishBoss::initSwitch(const JMapInfoIter& rIter) {
 }
 
 void SkeletalFishBoss::createGuards() {
-    mGuardHolder = new SkeletalFishGuardHolder(this, _1A4, "スカルシャークガード管理");
+    mGuardHolder = new SkeletalFishGuardHolder(this, _1A4, "\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x83\x4b\x81\x5b\x83\x68\x8a\xc7\x97\x9d");
 }
 
 void SkeletalFishBoss::initShadow() {
@@ -739,15 +739,15 @@ void SkeletalFishBoss::initShadow() {
 void SkeletalFishBoss::initCamera() {
     ActorCameraInfo cameraInfo = ActorCameraInfo();
     const char* fileName = "SkeletalFishBossBattleStart.canm";
-    MR::declareEventCameraAnim(&cameraInfo, "スカルシャーク出現", MR::getResourceHolder(this)->mFileInfoTable->getRes(fileName));
+    MR::declareEventCameraAnim(&cameraInfo, "\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x8f\x6f\x8c\xbb", MR::getResourceHolder(this)->mFileInfoTable->getRes(fileName));
     fileName = "SkeletalFishBossPowerUp1.canm";
-    MR::declareEventCameraAnim(&cameraInfo, "スカルシャークパワーアップ", MR::getResourceHolder(this)->mFileInfoTable->getRes(fileName));
+    MR::declareEventCameraAnim(&cameraInfo, "\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76", MR::getResourceHolder(this)->mFileInfoTable->getRes(fileName));
     fileName = "SkeletalFishBossPowerUp2.canm";
-    MR::declareEventCameraAnim(&cameraInfo, "スカルシャークパワーアップ２", MR::getResourceHolder(this)->mFileInfoTable->getRes(fileName));
+    MR::declareEventCameraAnim(&cameraInfo, "\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76\x82\x51", MR::getResourceHolder(this)->mFileInfoTable->getRes(fileName));
     fileName = "SkeletalFishBossDown.canm";
-    MR::declareEventCameraAnim(&cameraInfo, "スカルシャーク死亡", MR::getResourceHolder(this)->mFileInfoTable->getRes(fileName));
-    MR::declareEventCameraProgrammable("デモ終了後カメラ");
-    mCameraTargetMtx = new CameraTargetMtx("カメラターゲットダミー");
+    MR::declareEventCameraAnim(&cameraInfo, "\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x8e\x80\x96\x53", MR::getResourceHolder(this)->mFileInfoTable->getRes(fileName));
+    MR::declareEventCameraProgrammable("\x83\x66\x83\x82\x8f\x49\x97\xb9\x8c\xe3\x83\x4a\x83\x81\x83\x89");
+    mCameraTargetMtx = new CameraTargetMtx("\x83\x4a\x83\x81\x83\x89\x83\x5e\x81\x5b\x83\x51\x83\x62\x83\x67\x83\x5f\x83\x7e\x81\x5b");
     mCameraTargetMtx->mMatrix.setInline(_150);
 }
 
@@ -888,7 +888,7 @@ void SkeletalFishBoss::startCamera(const char* pCameraName) {
 }
 
 void SkeletalFishBoss::resetCamera() {
-    MR::startGlobalEventCameraTargetPlayer("デモ終了後カメラ", 0);
+    MR::startGlobalEventCameraTargetPlayer("\x83\x66\x83\x82\x8f\x49\x97\xb9\x8c\xe3\x83\x4a\x83\x81\x83\x89", 0);
     TPos3f playerMtx(MR::getPlayerBaseMtx());
     TVec3f position;
     playerMtx.getTrans(position);
@@ -898,7 +898,7 @@ void SkeletalFishBoss::resetCamera() {
     TVec3f cameraTarget = position + targetPosition * 1200.0f;
     targetPosition = cameraTarget;
     playerMtx.getZDir(frontDirection);
-    MR::setProgrammableCameraParam("デモ終了後カメラ", position, targetPosition, frontDirection, true);
+    MR::setProgrammableCameraParam("\x83\x66\x83\x82\x8f\x49\x97\xb9\x8c\xe3\x83\x4a\x83\x81\x83\x89", position, targetPosition, frontDirection, true);
 }
 
 void SkeletalFishBoss::playDamageBrk() {
@@ -913,12 +913,12 @@ void SkeletalFishBoss::startAppearDemo() {
     MR::requestMovementOn(MR::getSceneObj< SensorHitChecker >(SceneObj_SensorHitChecker));
     Mtx namePosMtx;
 
-    if (MR::tryFindNamePos("マリオ再セット位置1", namePosMtx)) {
+    if (MR::tryFindNamePos("\x83\x7d\x83\x8a\x83\x49\x8d\xc4\x83\x5a\x83\x62\x83\x67\x88\xca\x92\x75""1", namePosMtx)) {
         MR::setPlayerBaseMtx(namePosMtx);
     }
 
     MR::hidePlayer();
-    startCamera("スカルシャーク出現");
+    startCamera("\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x8f\x6f\x8c\xbb");
 
     if (!MR::isNormalBloomOn()) {
         MR::turnOnNormalBloom();
@@ -932,12 +932,12 @@ void SkeletalFishBoss::startAppearDemo() {
 void SkeletalFishBoss::endAppearDemo() {
     Mtx namePosMtx;
 
-    if (MR::tryFindNamePos("マリオ再セット位置1", namePosMtx)) {
+    if (MR::tryFindNamePos("\x83\x7d\x83\x8a\x83\x49\x8d\xc4\x83\x5a\x83\x62\x83\x67\x88\xca\x92\x75""1", namePosMtx)) {
         MR::setPlayerBaseMtx(namePosMtx);
     }
 
     MR::showPlayer();
-    const char* cameraName = "スカルシャーク出現";
+    const char* cameraName = "\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x8f\x6f\x8c\xbb";
     ActorCameraInfo cameraInfo = ActorCameraInfo();
     MR::endEventCamera(&cameraInfo, cameraName, false, 0);
     resetCamera();
@@ -958,16 +958,16 @@ void SkeletalFishBoss::startPowerUpDemo() {
     MR::hidePlayer();
 
     if (!_110) {
-        startCamera("スカルシャークパワーアップ");
+        startCamera("\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76");
     } else {
-        startCamera("スカルシャークパワーアップ２");
+        startCamera("\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76\x82\x51");
     }
 }
 
 void SkeletalFishBoss::endPowerUpDemo() {
     Mtx namePosMtx;
 
-    if (MR::tryFindNamePos("マリオ再セット位置2", namePosMtx)) {
+    if (MR::tryFindNamePos("\x83\x7d\x83\x8a\x83\x49\x8d\xc4\x83\x5a\x83\x62\x83\x67\x88\xca\x92\x75""2", namePosMtx)) {
         MR::setPlayerBaseMtx(namePosMtx);
     }
 
@@ -976,21 +976,21 @@ void SkeletalFishBoss::endPowerUpDemo() {
     const char* eventCameraName;
 
     if (_110 == 1) {
-        eventCameraName = "スカルシャークパワーアップ";
+        eventCameraName = "\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76";
         ActorCameraInfo cameraInfo = ActorCameraInfo();
         MR::endEventCamera(&cameraInfo, eventCameraName, false, 0);
         resetCamera();
         mBossDirector->endPowerUpDemo1();
     } else {
-        eventCameraName = "スカルシャークパワーアップ２";
+        eventCameraName = "\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76\x82\x51";
         ActorCameraInfo cameraInfo = ActorCameraInfo();
         MR::endEventCamera(&cameraInfo, eventCameraName, false, 0);
         resetCamera();
         mBossDirector->endPowerUpDemo2();
     }
 
-    if ("スカルシャークパワーアップ" != nullptr) {
-        MR::endDemo(this, "スカルシャークパワーアップ");
+    if ("\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76" != nullptr) {
+        MR::endDemo(this, "\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76");
     }
 
     resetRail();
@@ -1003,11 +1003,11 @@ void SkeletalFishBoss::endPowerUpDemo() {
 void SkeletalFishBoss::startDeadDemo() {
     MR::overlayWithPreviousScreen(2);
     MR::hidePlayer();
-    startCamera("スカルシャーク死亡");
+    startCamera("\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x8e\x80\x96\x53");
 }
 
 void SkeletalFishBoss::endBreakDemo() {
-    const char* cameraName = "スカルシャーク死亡";
+    const char* cameraName = "\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x8e\x80\x96\x53";
     ActorCameraInfo info = ActorCameraInfo();
     MR::endEventCamera(&info, cameraName, false, 0);
     resetCamera();
@@ -1032,7 +1032,7 @@ bool SkeletalFishBoss::isEnableToBeDamaged() const {
 }
 
 SkeletalFishBossHead::SkeletalFishBossHead(LiveActor* pActor)
-    : PartsModel(pActor, "スカルシャーク頭", "SkeletalFishBossHeadA", nullptr, MR::DrawBufferType_Enemy, false) {
+    : PartsModel(pActor, "\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x93\xaa", "SkeletalFishBossHeadA", nullptr, MR::DrawBufferType_Enemy, false) {
     initFixedPosition("Head");
     initHitSensor(17);
     MR::addHitSensorAtJointEnemy(this, "body", "Head", 8, 400.0f, TVec3f(0.0f, -120.0f, 320.0f));
@@ -1144,11 +1144,11 @@ void SkeletalFishBossHead::createSubModel() {
     const char* coneMdls[2] = {"LightConeLeft", "LightConeRight"};
 
     for (s32 i = 0; i < 2; i++) {
-        mLightModels[i] = new ModelObj("眼光", "SkeletalFishBossLight", MR::getJointMtx(this, coneMdls[i]), MR::DrawBufferType_Enemy, -1, -1, false);
+        mLightModels[i] = new ModelObj("\x8a\xe1\x8c\xf5", "SkeletalFishBossLight", MR::getJointMtx(this, coneMdls[i]), MR::DrawBufferType_Enemy, -1, -1, false);
         mLightModels[i]->initWithoutIter();
         MR::invalidateClipping(mLightModels[i]);
 
-        mBloomModels[i] = new ModelObj("眼光ブルーム", "SkeletalFishBossLightBloom", MR::getJointMtx(this, coneMdls[i]),
+        mBloomModels[i] = new ModelObj("\x8a\xe1\x8c\xf5\x83\x75\x83\x8b\x81\x5b\x83\x80", "SkeletalFishBossLightBloom", MR::getJointMtx(this, coneMdls[i]),
                                        MR::DrawBufferType_BloomModel, -1, -1, false);
         mBloomModels[i]->initWithoutIter();
         MR::invalidateClipping(mBloomModels[i]);
@@ -1156,7 +1156,7 @@ void SkeletalFishBossHead::createSubModel() {
 }
 
 SkeletalFishBossScarFlash::SkeletalFishBossScarFlash(LiveActor* pActor)
-    : PartsModel(pActor, "スカルシャーク傷跡エフェクトモデル", "SkeletalFishBossScarFlash", nullptr, MR::DrawBufferType_Enemy, false) {
+    : PartsModel(pActor, "\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x8f\x9d\x90\xd5\x83\x47\x83\x74\x83\x46\x83\x4e\x83\x67\x83\x82\x83\x66\x83\x8b", "SkeletalFishBossScarFlash", nullptr, MR::DrawBufferType_Enemy, false) {
     initFixedPosition("Head");
 }
 

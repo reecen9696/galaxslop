@@ -20,16 +20,16 @@ void SpkTable::setResource(void* pRes) {
 
     mResourceCount = resourceCount;
 
-    SpkParameters* entryOffset = (SpkParameters*)((s32)pRes + entryOff);
+    SpkParameters* entryOffset = (SpkParameters*)((u8*)pRes + entryOff);
     mParameters = entryOffset;
-    const char** names = (const char**)((s32)pRes + dataOffsetsStartOff);
+    u32* names = (u32*)((u8*)pRes + dataOffsetsStartOff);  // 4-byte name slots in the file
     if (!isDataOffsetsInitialized) {
         for (s32 i = 0; i < mResourceCount; i++) {
-            names[i] += (s32)pRes;
+            names[i] += (u32)(uintptr_t)pRes;
         }
     }
 
-    mNames = names;
+    mNames = (PTR32(const char)*)names;
     *pIsDataOffsetsInitialized = TRUE;
     mInitialized = true;
 }

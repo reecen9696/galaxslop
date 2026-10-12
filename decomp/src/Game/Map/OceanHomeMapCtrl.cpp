@@ -17,7 +17,7 @@ namespace {
     }
 };  // namespace
 
-OceanHomeMapCtrl::OceanHomeMapCtrl() : NameObj("オーシャンホーム地形制御") {
+OceanHomeMapCtrl::OceanHomeMapCtrl() : NameObj("\x83\x49\x81\x5b\x83\x56\x83\x83\x83\x93\x83\x7a\x81\x5b\x83\x80\x92\x6e\x8c\x60\x90\xa7\x8c\xe4") {
     mOceanHomePlanet = nullptr;
     mOceanRingPlanet = nullptr;
     _14 = 0;
@@ -28,7 +28,7 @@ OceanHomeMapCtrl::OceanHomeMapCtrl() : NameObj("オーシャンホーム地形�
 
 void OceanHomeMapCtrl::entryMapRing(PlanetMap* pPlanet) {
     mOceanRingPlanet = pPlanet;
-    mOceanRingPlanetLowInWater = MR::createModelObjPlanetLow("オーシャンリング（水中用Low）", "OceanRingPlanetLowInWater", nullptr);
+    mOceanRingPlanetLowInWater = MR::createModelObjPlanetLow("\x83\x49\x81\x5b\x83\x56\x83\x83\x83\x93\x83\x8a\x83\x93\x83\x4f\x81\x69\x90\x85\x92\x86\x97\x70Low\x81\x6a", "OceanRingPlanetLowInWater", nullptr);
 
     MR::copyTransRotateScale(mOceanRingPlanet, mOceanRingPlanetLowInWater);
     MR::invalidateClipping(mOceanRingPlanetLowInWater);
@@ -37,9 +37,9 @@ void OceanHomeMapCtrl::entryMapRing(PlanetMap* pPlanet) {
 }
 
 void OceanHomeMapFunction::tryEntryOceanHomeMap(PlanetMap* pPlanet) {
-    if (strcmp(pPlanet->mName, "海洋ホーム惑星") == 0) {
+    if (strcmp(pPlanet->mName, "\x8a\x43\x97\x6d\x83\x7a\x81\x5b\x83\x80\x98\x66\x90\xaf") == 0) {
         ::getOceanHomeMapCtrl()->mOceanHomePlanet = pPlanet;
-    } else if (strcmp(pPlanet->mName, "オーシャンリング惑星") == 0) {
+    } else if (strcmp(pPlanet->mName, "\x83\x49\x81\x5b\x83\x56\x83\x83\x83\x93\x83\x8a\x83\x93\x83\x4f\x98\x66\x90\xaf") == 0) {
         ::getOceanHomeMapCtrl()->entryMapRing(pPlanet);
     }
 }

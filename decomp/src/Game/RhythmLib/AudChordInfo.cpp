@@ -3,8 +3,8 @@
 #include <JSystem/JKernel/JKRArchive.hpp>
 
 void AudScaleData::initScaleData(u32 base) {
-    up += base;
-    down += base;
+    up = reinterpret_cast< u8* >(static_cast< uintptr_t >(static_cast< u32 >(up) + base));
+    down = reinterpret_cast< u8* >(static_cast< uintptr_t >(static_cast< u32 >(down) + base));
 }
 
 AudChordTable::AudChordTable() : mLoaded(false), mChordCount(0), mScaleCount(0), mChordPtr(nullptr), mScalePtr(nullptr) {
@@ -43,19 +43,19 @@ bool AudChordTable::setChordTableResource(void* pRes) {
     u8* base = (u8*)cursor;
     mChordCount = *(u16*)(base + 0);
     mScaleCount = *(u16*)(base + 2);
-    mChordPtr = (AudChordData**)(base + 4);
-    mScalePtr = (AudScaleData**)(base + 4 + mChordCount * 4);
+    mChordPtr = (PTR32(AudChordData)*)(base + 4);
+    mScalePtr = (PTR32(AudScaleData)*)(base + 4 + mChordCount * 4);
 
     if (!alreadyRelocated) {
         // Relocate chord pointers
         for (s32 i = 0; i < mChordCount; i++) {
-            mChordPtr[i] = (AudChordData*)((u32)pRes + (u32)mChordPtr[i]);
+            mChordPtr[i] = (AudChordData*)(uintptr_t)((u32)(uintptr_t)pRes + (u32)mChordPtr[i]);
         }
 
         // Relocate scale pointers and init scale data
         for (s32 i = 0; i < mScaleCount; i++) {
-            mScalePtr[i] = (AudScaleData*)((u32)pRes + (u32)mScalePtr[i]);
-            mScalePtr[i]->initScaleData((u32)pRes);
+            mScalePtr[i] = (AudScaleData*)(uintptr_t)((u32)(uintptr_t)pRes + (u32)mScalePtr[i]);
+            mScalePtr[i]->initScaleData((u32)(uintptr_t)pRes);
         }
 
         *initialized = true;

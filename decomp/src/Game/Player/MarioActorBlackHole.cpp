@@ -45,14 +45,14 @@ void MarioActor::exeGameOverBlackHole2() {
         MR::clearBgmQueue();
 
         if (!(mBlackHole->tryStartDemoCamera()) && !mMario->getMovementStates()._37) {
-            MR::startBlackHoleCamera("ブラックホール", mBlackHolePosition, mPosition);
+            MR::startBlackHoleCamera("\x83\x75\x83\x89\x83\x62\x83\x4e\x83\x7a\x81\x5b\x83\x8b", mBlackHolePosition, mPosition);
         }
 
         _F44 = false;
 
-        changeAnimationNonStop("ブラックホール落下");
-        playEffect("共通ブラックホール");
-        playSound("ブラックホール吸い込まれ", -1);
+        changeAnimationNonStop("\x83\x75\x83\x89\x83\x62\x83\x4e\x83\x7a\x81\x5b\x83\x8b\x97\x8e\x89\xba");
+        playEffect("\x8b\xa4\x92\xca\x83\x75\x83\x89\x83\x62\x83\x4e\x83\x7a\x81\x5b\x83\x8b");
+        playSound("\x83\x75\x83\x89\x83\x62\x83\x4e\x83\x7a\x81\x5b\x83\x8b\x8b\x7a\x82\xa2\x8d\x9e\x82\xdc\x82\xea", -1);
         playEffect(changeMorphString("DieBlackHole"));
         initBlackHoleOut();
 
@@ -64,9 +64,9 @@ void MarioActor::exeGameOverBlackHole2() {
 
     if (getNerveStep() == 60) {
         if (!MR::getPlayerLeft()) {
-            MR::startPlayerEvent("ゲームオーバー");
+            MR::startPlayerEvent("\x83\x51\x81\x5b\x83\x80\x83\x49\x81\x5b\x83\x6f\x81\x5b");
         } else {
-            MR::startPlayerEvent("マリオ奈落");
+            MR::startPlayerEvent("\x83\x7d\x83\x8a\x83\x49\x93\xde\x97\x8e");
         }
     }
 
@@ -74,7 +74,7 @@ void MarioActor::exeGameOverBlackHole2() {
         _482 = true;
 
         MR::hidePlayer();
-        MR::emitEffect(this, "ブラックホール消滅");
+        MR::emitEffect(this, "\x83\x75\x83\x89\x83\x62\x83\x4e\x83\x7a\x81\x5b\x83\x8b\x8f\xc1\x96\xc5");
     }
 
     f32 nervestepfloat = getNerveStep();

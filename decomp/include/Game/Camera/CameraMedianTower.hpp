@@ -4,7 +4,7 @@
 
 class CameraMedianTower : public Camera {
 public:
-    CameraMedianTower(const char* pName = "中点塔カメラ");
+    CameraMedianTower(const char* pName = "\x92\x86\x93\x5f\x93\x83\x83\x4a\x83\x81\x83\x89");
 
     virtual void reset();
     virtual CameraTargetObj* calc();

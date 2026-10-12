@@ -129,7 +129,7 @@ void LensFlareModel::notifyInArea() {
     }
 }
 
-LensFlareRing::LensFlareRing() : LensFlareModel("レンズフレアリング", "LensFlare"), _A0() {
+LensFlareRing::LensFlareRing() : LensFlareModel("\x83\x8c\x83\x93\x83\x59\x83\x74\x83\x8c\x83\x41\x83\x8a\x83\x93\x83\x4f", "LensFlare"), _A0() {
     mScale.x = 0.135f;
     mScale.y = 0.135f;
     mScale.z = 0.135f;
@@ -153,7 +153,7 @@ void LensFlareRing::controlAnim() {
     MR::setBckFrameAndStop(this, frame);
 }
 
-LensFlareGlow::LensFlareGlow() : LensFlareModel("グレア（円形）", "GlareGlow") {
+LensFlareGlow::LensFlareGlow() : LensFlareModel("\x83\x4f\x83\x8c\x83\x41\x81\x69\x89\x7e\x8c\x60\x81\x6a", "GlareGlow") {
     _94 = 0.05f;
 }
 
@@ -167,7 +167,7 @@ void LensFlareGlow::controlAnim() {
     MR::setBrkFrame(this, (1.0f - _8C * _90) * MR::getBrkCtrl(this)->getEnd());
 }
 
-LensFlareLine::LensFlareLine() : LensFlareModel("グレア（ライン）", "GlareLine") {
+LensFlareLine::LensFlareLine() : LensFlareModel("\x83\x4f\x83\x8c\x83\x41\x81\x69\x83\x89\x83\x43\x83\x93\x81\x6a", "GlareLine") {
     _94 = 0.05f;
 }
 
@@ -181,7 +181,7 @@ void LensFlareLine::controlAnim() {
 }
 
 LensFlareDirector::LensFlareDirector()
-    : NameObj("レンズフレア管理"), mRing(), mGlow(), mLine(), mBrightObjCount(), _60(0.0f, 0.0f), _68(), _6C(0.0f, 0.0f), _74(0.0f, 0.0f), _7C(),
+    : NameObj("\x83\x8c\x83\x93\x83\x59\x83\x74\x83\x8c\x83\x41\x8a\xc7\x97\x9d"), mRing(), mGlow(), mLine(), mBrightObjCount(), _60(0.0f, 0.0f), _68(), _6C(0.0f, 0.0f), _74(0.0f, 0.0f), _7C(),
       mDrawSyncTokenIndex(), mBrightCamInfo() {
     _7C = DrawSyncManager::sInstance->setCallback(3, 2, this);
 }

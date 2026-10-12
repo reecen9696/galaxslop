@@ -945,7 +945,7 @@ bool BigBubble::addAccelPointing(s32 padChannel) {
         return false;
     }
 
-    if (MR::isStarPointerPointing(this, padChannel, true, "弱")) {
+    if (MR::isStarPointerPointing(this, padChannel, true, "\x8e\xe3")) {
         return false;
     }
 

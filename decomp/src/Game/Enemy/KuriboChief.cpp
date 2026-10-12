@@ -194,7 +194,7 @@ void KuriboChief::initState() {
 
 void KuriboChief::initKeySwitch(const JMapInfoIter& rIter) {
     if (MR::useStageSwitchWriteA(this, rIter)) {
-        mKeySwitch = new KeySwitch("鍵スイッチ");
+        mKeySwitch = new KeySwitch("\x8c\xae\x83\x58\x83\x43\x83\x62\x83\x60");
         mKeySwitch->initKeySwitchByOwner(rIter);
     }
 }

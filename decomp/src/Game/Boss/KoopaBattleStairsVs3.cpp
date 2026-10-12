@@ -21,7 +21,7 @@ namespace NrvKoopaBattleStairsVs3 {
 
 KoopaBattleStairsVs3::KoopaBattleStairsVs3(Koopa* pKoopa) : KoopaBattleStairsBase(pKoopa), mNamePos(0.0f, 0.0f, 0.0f) {
     initNerve(GET_NERVE(KoopaBattleStairsVs3, KoopaBattleStairsVs3NrvWaitDemo));
-    MR::findNamePos("クッパ階段戦の砲弾出現", &mNamePos, nullptr);
+    MR::findNamePos("\x83\x4e\x83\x62\x83\x70\x8a\x4b\x92\x69\x90\xed\x82\xcc\x96\x43\x92\x65\x8f\x6f\x8c\xbb", &mNamePos, nullptr);
     KoopaFunction::initKoopaAnimCamera(mKoopa, "DemoKoopaBattleStairsVs3Start");
 }
 
@@ -32,7 +32,7 @@ s32 KoopaBattleStairsVs3::registerStair(KoopaBattleMapStair* pBattleMapStair) {
 }
 
 void KoopaBattleStairsVs3::exeWaitDemo() {
-    if (!KoopaFunction::tryStartKoopaCameraDemo(mKoopa, "階段の戦い開始デモ", "DemoKoopaBattleStairsVs3Start", "デモ中心")) {
+    if (!KoopaFunction::tryStartKoopaCameraDemo(mKoopa, "\x8a\x4b\x92\x69\x82\xcc\x90\xed\x82\xa2\x8a\x4a\x8e\x6e\x83\x66\x83\x82", "DemoKoopaBattleStairsVs3Start", "\x83\x66\x83\x82\x92\x86\x90\x53")) {
         return;
     }
 
@@ -60,7 +60,7 @@ void KoopaBattleStairsVs3::exeWaitDemo() {
 }
 
 void KoopaBattleStairsVs3::exeDemo() {
-    if (!KoopaFunction::tryEndKoopaCameraDemo(mKoopa, "階段の戦い開始デモ", "DemoKoopaBattleStairsVs3Start")) {
+    if (!KoopaFunction::tryEndKoopaCameraDemo(mKoopa, "\x8a\x4b\x92\x69\x82\xcc\x90\xed\x82\xa2\x8a\x4a\x8e\x6e\x83\x66\x83\x82", "DemoKoopaBattleStairsVs3Start")) {
         return;
     }
 

@@ -17,7 +17,7 @@ namespace {
     NEW_NERVE(GamePauseSequenceSceneInformation, GamePauseSequence, SceneInformation);
 };  // namespace
 
-GamePauseSequence::GamePauseSequence() : LayoutActor("ポーズ画面管理", true), mMenuType(ActivePause), mPauseMenu(nullptr), mWindowMenuFunc(nullptr) {
+GamePauseSequence::GamePauseSequence() : LayoutActor("\x83\x7c\x81\x5b\x83\x59\x89\xe6\x96\xca\x8a\xc7\x97\x9d", true), mMenuType(ActivePause), mPauseMenu(nullptr), mWindowMenuFunc(nullptr) {
 }
 
 void GamePauseSequence::init(const JMapInfoIter& rIter) {

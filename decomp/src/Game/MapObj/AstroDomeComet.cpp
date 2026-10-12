@@ -35,7 +35,7 @@ void AstroDomeComet::init(const JMapInfoIter& rIter) {
     mPointingActors = new LiveActor*[::cPointingActorNum];
 
     for (s32 i = 0; i < ::cPointingActorNum; i++) {
-        mPointingActors[i] = new LiveActor("ポインティング用アクター");
+        mPointingActors[i] = new LiveActor("\x83\x7c\x83\x43\x83\x93\x83\x65\x83\x42\x83\x93\x83\x4f\x97\x70\x83\x41\x83\x4e\x83\x5e\x81\x5b");
         mPointingActors[i]->initWithoutIter();
         MR::invalidateClipping(mPointingActors[i]);
         MR::initStarPointerTargetAtMtx(mPointingActors[i], ::cPointingRadius, MR::getJointMtx(this, "CometIcon"),

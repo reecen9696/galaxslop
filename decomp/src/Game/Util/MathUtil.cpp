@@ -1174,6 +1174,16 @@ f32 PSVECKillElement(__REGISTER const Vec* pSrc, __REGISTER const Vec* pKill, __
         psq_st     f2, 4(pDst),  0, 0
     }  // clang-format on
     return dot;
+#else
+    f32 dot = (pSrc->x * pKill->x + pSrc->y * pKill->y) + pSrc->z * pKill->z;
+    f32 x = pSrc->x - dot * pKill->x;
+    f32 y = pSrc->y - dot * pKill->y;
+    f32 z = pSrc->z - dot * pKill->z;
+    Vec* pOut = const_cast< Vec* >(pDst);
+    pOut->x = x;
+    pOut->y = y;
+    pOut->z = z;
+    return dot;
 #endif
 }
 
@@ -1201,6 +1211,11 @@ namespace MR {
             psq_st f2, 8(pA1), 1, 0
         }
 
+#else
+        TVec3f* pOut = const_cast< TVec3f* >(pA1);
+        pOut->x = pA2->x * a3 + pA1->x;
+        pOut->y = pA2->y * a3 + pA1->y;
+        pOut->z = pA2->z * a3 + pA1->z;
 #endif
     }
 
@@ -1219,6 +1234,13 @@ namespace MR {
             psq_st    f3, 8(pA3), 1, 0
         }
 
+#else
+        f32 x = pA2->x * a5 + pA1->x * a4;
+        f32 y = pA2->y * a5 + pA1->y * a4;
+        f32 z = pA2->z * a5 + pA1->z * a4;
+        pA3->x = x;
+        pA3->y = y;
+        pA3->z = z;
 #endif
     }
 
@@ -1628,6 +1650,7 @@ f32 JMASqrt(__REGISTER f32 value) {
         return value;
     }
 
+#ifdef __MWERKS__
     __REGISTER f32 inverse;
     __asm { frsqrte inverse, value }
     f32 estimate = inverse * value;
@@ -1635,4 +1658,7 @@ f32 JMASqrt(__REGISTER f32 value) {
     inverse *= estimate;
     inverse *= 0.5f;
     return inverse;
+#else
+    return __builtin_sqrtf(value);
+#endif
 }

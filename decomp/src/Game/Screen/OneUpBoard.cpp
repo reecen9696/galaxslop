@@ -16,7 +16,7 @@ namespace NrvOneUpBoard {
     NEW_NERVE(HostTypeAppear, OneUpBoard, Appear);
 };  // namespace NrvOneUpBoard
 
-OneUpBoard::OneUpBoard() : LayoutActor("1UPボード", true) {
+OneUpBoard::OneUpBoard() : LayoutActor("1UP\x83\x7b\x81\x5b\x83\x68", true) {
 }
 
 void OneUpBoard::init(const JMapInfoIter& rIter) {

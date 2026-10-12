@@ -8,6 +8,10 @@ public:
 
     virtual void init(const JMapInfoIter& rIter);
     virtual void appear();
+#ifdef TARGET_PC
+    virtual void draw() const;
+    f32 getBlackRate() const;
+#endif
 
     void tryScreenToFrame();
     void tryFrameToBlank();

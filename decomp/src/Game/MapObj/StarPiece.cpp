@@ -52,6 +52,9 @@ StarPiece::StarPiece(const char* pName)
     : LiveActor(pName), _8C(0, 0, 1), _98(0.02f), _9C(), _A0(), _A4(), _A8(0, 0, 0), _B4(0, 0, 0), mDelegator(nullptr), mTargetSensor(), _C8(-1),
       mGettableDelayCounter(-1), mFallKillTimer(), mColor((GXColor){0, 0, 0, 255}), mGroupType(groupType_noGroup), mHostInfo(nullptr),
       mReceiverInfo(0), mNumGift(1) {
+#ifdef TARGET_PC
+    mThrownFromVr = false;
+#endif
     MR::incNumStarPieceNewed();
 
     mFlags.isGoToPlayer = false;
@@ -693,6 +696,15 @@ void StarPiece::exeThrow() {
 
     TVec3f camZDir(MR::getCamZdir());
     TVec3f camPos(MR::getCamPos());
+#ifdef TARGET_PC
+    if (mThrownFromVr) {
+        // Shot from the VR controller: collisions start once the star bit is
+        // past the player along its own flight, as they do past the camera.
+        camPos.set(_A8);
+        camZDir.set(_B4 - _A8);
+        MR::normalizeOrZero(&camZDir);
+    }
+#endif
     TVec3f vec10(mPosition);
     TVec3f playerCenterPos(*MR::getPlayerCenterPos());
 
@@ -700,7 +712,11 @@ void StarPiece::exeThrow() {
     playerCenterPos -= camPos;
 
     if (MR::isNoBind(this)) {
+#ifdef TARGET_PC
+        if (1500.0f < camPos.distance(mPosition) || camZDir.dot(playerCenterPos) < camZDir.dot(vec10) || MR::isGreaterStep(this, 28)) {
+#else
         if (1500.0f < MR::getCamPos().distance(mPosition) || camZDir.dot(playerCenterPos) < camZDir.dot(vec10) || MR::isGreaterStep(this, 28)) {
+#endif
             MR::onBind(this);
         }
     }
@@ -835,6 +851,9 @@ bool StarPiece::throwToTarget(HitSensor* pSensor, const TVec3f& rVec1, const TVe
 }
 
 bool StarPiece::throwToTargetCore(const TVec3f& rVec1, const TVec3f& rVec2, const TVec3f& rVec3, f32 f1, bool a1) {
+#ifdef TARGET_PC
+    mThrownFromVr = false;  // StarPieceShooter::shoot sets it afterwards
+#endif
     mGravity.set(rVec3);
     _B4.set(rVec1);
     _A8.set(rVec2);
@@ -1075,7 +1094,7 @@ void StarPiece::tryGotJudge() {
     }
 
     if (mGettableDelayCounter < 0) {
-        bool isPointing = MR::isStarPointerPointing1Por2P(this, "弱", false, false);
+        bool isPointing = MR::isStarPointerPointing1Por2P(this, "\x8e\xe3", false, false);
         MR::getStarPointerLastPointedPort(this);
 
         if (isPointing == true) {

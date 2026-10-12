@@ -86,13 +86,13 @@ void Rock::init(const JMapInfoIter& rIter) {
     if (mRockType != NormalRock) {
         switch (mRockType) {
         case WanwanRolling:
-            setName("ワンワン");
+            setName("\x83\x8f\x83\x93\x83\x8f\x83\x93");
             break;
         case WanwanRollingMini:
-            setName("ミニワンワン");
+            setName("\x83\x7e\x83\x6a\x83\x8f\x83\x93\x83\x8f\x83\x93");
             break;
         case WanwanRollingGold:
-            setName("ゴールドワンワン");
+            setName("\x83\x53\x81\x5b\x83\x8b\x83\x68\x83\x8f\x83\x93\x83\x8f\x83\x93");
             MR::declarePowerStar(this);
             break;
         }
@@ -413,14 +413,14 @@ void Rock::initModel() {
     switch (mRockType) {
     case NormalRock:
         initModelManagerWithAnm("Rock", nullptr, false);
-        mBreakModel = MR::createModelObjMapObjStrongLight("ゴロゴロ岩壊れモデル", "RockBreak", nullptr);
+        mBreakModel = MR::createModelObjMapObjStrongLight("\x83\x53\x83\x8d\x83\x53\x83\x8d\x8a\xe2\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "RockBreak", nullptr);
         mBreakModel->initWithoutIter();
         mBreakModel->mScale.set(mScale);
         mBreakModel->makeActorDead();
         break;
     case WanwanRolling:
         initModelManagerWithAnm("WanwanRolling", nullptr, false);
-        mBreakModel = MR::createModelObjMapObjStrongLight("ワンワン壊れモデル", "WanwanRollingBreak", nullptr);
+        mBreakModel = MR::createModelObjMapObjStrongLight("\x83\x8f\x83\x93\x83\x8f\x83\x93\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "WanwanRollingBreak", nullptr);
         mBreakModel->initWithoutIter();
         mBreakModel->mScale.set(mScale);
         mBreakModel->makeActorDead();
@@ -430,7 +430,7 @@ void Rock::initModel() {
         break;
     case WanwanRollingGold:
         initModelManagerWithAnm("WanwanRollingGold", nullptr, false);
-        mBreakModel = MR::createModelObjMapObjStrongLight("ゴールドワンワン壊れモデル", "WanwanRollingGoldBreak", nullptr);
+        mBreakModel = MR::createModelObjMapObjStrongLight("\x83\x53\x81\x5b\x83\x8b\x83\x68\x83\x8f\x83\x93\x83\x8f\x83\x93\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "WanwanRollingGoldBreak", nullptr);
         mBreakModel->initWithoutIter();
         mBreakModel->mScale.set(mScale);
         mBreakModel->makeActorDead();
@@ -581,7 +581,7 @@ void Rock::startRollLevelSound(bool resetTimer) {
 }
 
 bool Rock::tryFreeze(const Nerve* pNerve) {
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         mFreezeTime = 0;
         mFreezePos.set(mPosition);
         mUnfreezeNerve = pNerve;
@@ -617,7 +617,7 @@ void Rock::setBtkForEnvironmentMap(LiveActor* pActor, const char* pBtkName) {
 }
 
 void Rock::rumblePadAndCamera() {
-    MR::startRumbleWithShakeCameraWeak(this, "強", "中", ::cRumbleDistance, ::cRumbleDistance * 2);
+    MR::startRumbleWithShakeCameraWeak(this, "\x8b\xad", "\x92\x86", ::cRumbleDistance, ::cRumbleDistance * 2);
 
     f32 dist = MR::calcDistanceToPlayer(this);
 
@@ -965,7 +965,7 @@ void Rock::exeFreeze() {
     v1 *= rumbleOffset;
     mPosition.add(mFreezePos, v1);
 
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         setNerve(GET_NERVE(Rock, RockNrvFreeze));
         return;
     }

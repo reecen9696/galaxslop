@@ -86,7 +86,7 @@ void Kiraira::init(const JMapInfoIter& rIter) {
     initNerve(GET_NERVE(Kiraira, KirairaNrvWait));
     MR::useStageSwitchWriteB(this, rIter);
     MR::setGroupClipping(this, rIter, 16);
-    mSharedGroup = MR::joinToGroupArray(this, rIter, "キライラ軍団", 16);
+    mSharedGroup = MR::joinToGroupArray(this, rIter, "\x83\x4c\x83\x89\x83\x43\x83\x89\x8c\x52\x92\x63", 16);
     MR::addToAttributeGroupSearchTurtle(this);
     if (!mIsRail) {
         mChain = new KirairaChain(this);
@@ -359,7 +359,7 @@ void Kiraira::driftOnRail() {
 
 void Kiraira::explode() {
     closeEyes();
-    MR::startRumbleWithShakeCameraStrong(this, "強", "中", ::sCameraShakeDistance, ::sNoCameraShakeDistance);
+    MR::startRumbleWithShakeCameraStrong(this, "\x8b\xad", "\x92\x86", ::sCameraShakeDistance, ::sNoCameraShakeDistance);
     if (mIsForceDetonated) {
         MR::sendMsgExplosionToNearActor(getSensor("eye"), -1.0f);
     }

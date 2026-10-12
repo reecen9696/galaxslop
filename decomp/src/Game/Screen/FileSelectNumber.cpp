@@ -99,7 +99,7 @@ namespace FileSelectNumberSub {
     NEW_NERVE(SelectAnimControllerNrvSelectOutStart, SelectAnimController, SelectOutStart);
     NEW_NERVE(SelectAnimControllerNrvSelectOut, SelectAnimController, SelectOut);
 
-    SelectAnimController::SelectAnimController(LayoutActor* pHost) : NerveExecutor("セレクトアニメ制御"), mHost(pHost) {
+    SelectAnimController::SelectAnimController(LayoutActor* pHost) : NerveExecutor("\x83\x5a\x83\x8c\x83\x4e\x83\x67\x83\x41\x83\x6a\x83\x81\x90\xa7\x8c\xe4"), mHost(pHost) {
         initNerve(GET_NERVE_GLOBAL(SelectAnimControllerNrvSelectOut));
     }
 

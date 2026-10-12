@@ -144,7 +144,7 @@ void Mario::checkHang() {
 
         if (!MR::isExistMapCollision(_4A4 - mFrontVec * 50.0f - getAirGravityVec() * 5.0f, mFrontVec * 60.0f)) {
             u8 started = 1;
-            if (isAnimationRun("落下")) {
+            if (isAnimationRun("\x97\x8e\x89\xba")) {
                 started = 0;
             }
 
@@ -553,7 +553,7 @@ MarioHang::MarioHang(MarioActor* pActor) : MarioState(pActor, MarioStatus_Hang) 
 bool MarioHang::start() {
     getPlayer()->cancelSquatMode();
     stopAnimationUpper(nullptr);
-    changeAnimation("崖つかまり開始", "崖つかまり中");
+    changeAnimation("\x8a\x52\x82\xc2\x82\xa9\x82\xdc\x82\xe8\x8a\x4a\x8e\x6e", "\x8a\x52\x82\xc2\x82\xa9\x82\xdc\x82\xe8\x92\x86");
     mActor->setBlendMtxTimer(mActor->getConst().getTable()->mHangBlendTime);
     _12 = 0;
     _14 = 0;
@@ -597,7 +597,7 @@ bool MarioHang::update() {
         if (getPlayer()->_8D4 != nullptr) {
             addTrans(getPlayer()->mFrontVec * -100.0f, "Module");
             mActor->setBlendMtxTimer(16);
-            stopAnimation("崖つかまり中", "基本");
+            stopAnimation("\x8a\x52\x82\xc2\x82\xa9\x82\xdc\x82\xe8\x92\x86", "\x8a\xee\x96\x7b");
             return false;
         }
     } else {
@@ -609,7 +609,7 @@ bool MarioHang::update() {
         }
 
         Mario* pPlayer = getPlayer();
-        if (pPlayer->_184.dot(getFrontVec()) > 0.707f && getPlayer()->_4E4 < 45.0f && !isAnimationRun("崖つかまり開始")) {
+        if (pPlayer->_184.dot(getFrontVec()) > 0.707f && getPlayer()->_4E4 < 45.0f && !isAnimationRun("\x8a\x52\x82\xc2\x82\xa9\x82\xdc\x82\xe8\x8a\x4a\x8e\x6e")) {
             _1C = 1;
         }
     }
@@ -619,7 +619,7 @@ bool MarioHang::update() {
         if (mWallSensor != pPlayer->_8D4) {
             addTrans(getPlayer()->mFrontVec * -100.0f, "Module");
             mActor->setBlendMtxTimer(16);
-            stopAnimation("崖つかまり中", "基本");
+            stopAnimation("\x8a\x52\x82\xc2\x82\xa9\x82\xdc\x82\xe8\x92\x86", "\x8a\xee\x96\x7b");
             return false;
         }
     }
@@ -627,7 +627,7 @@ bool MarioHang::update() {
     if (_1C) {
         addTrans(getPlayer()->mFrontVec * -100.0f, "Module");
         mActor->setBlendMtxTimer(16);
-        stopAnimation("崖つかまり中", "基本");
+        stopAnimation("\x8a\x52\x82\xc2\x82\xa9\x82\xdc\x82\xe8\x92\x86", "\x8a\xee\x96\x7b");
         return false;
     }
 
@@ -637,7 +637,7 @@ bool MarioHang::update() {
             if (getPlayer()->getShadowNorm().dot(getGravityVec()) < -0.707f) {
                 addTrans(getPlayer()->mFrontVec * -100.0f, "Module");
                 mActor->setBlendMtxTimer(16);
-                stopAnimation("崖つかまり中", "基本");
+                stopAnimation("\x8a\x52\x82\xc2\x82\xa9\x82\xdc\x82\xe8\x92\x86", "\x8a\xee\x96\x7b");
                 return false;
             }
         }
@@ -653,13 +653,13 @@ bool MarioHang::update() {
         break;
     case 1:
         if (calcAngleD(getPlayer()->_368) > 5.0f) {
-            changeAnimationNonStop("崖つかまり終了坂");
-            changeAnimation(nullptr, "基本");
+            changeAnimationNonStop("\x8a\x52\x82\xc2\x82\xa9\x82\xdc\x82\xe8\x8f\x49\x97\xb9\x8d\xe2");
+            changeAnimation(nullptr, "\x8a\xee\x96\x7b");
         } else {
-            changeAnimation("崖つかまり終了", "基本");
+            changeAnimation("\x8a\x52\x82\xc2\x82\xa9\x82\xdc\x82\xe8\x8f\x49\x97\xb9", "\x8a\xee\x96\x7b");
         }
 
-        playSound("声崖つかまり終了");
+        playSound("\x90\xba\x8a\x52\x82\xc2\x82\xa9\x82\xdc\x82\xe8\x8f\x49\x97\xb9");
         _12++;
         return true;
     case 2:
@@ -678,7 +678,7 @@ bool MarioHang::update() {
     if (_1C) {
         addTrans(getPlayer()->mFrontVec * -100.0f, "Module");
         mActor->setBlendMtxTimer(16);
-        stopAnimation("崖つかまり中", "基本");
+        stopAnimation("\x8a\x52\x82\xc2\x82\xa9\x82\xdc\x82\xe8\x92\x86", "\x8a\xee\x96\x7b");
         return false;
     }
 
@@ -710,7 +710,7 @@ bool MarioHang::update() {
 
         break;
     case 2:
-        if (isAnimationRun("崖つかまり開始") && getAnimator()->getFrame() < 20.0f) {
+        if (isAnimationRun("\x8a\x52\x82\xc2\x82\xa9\x82\xdc\x82\xe8\x8a\x4a\x8e\x6e") && getAnimator()->getFrame() < 20.0f) {
             _1D = 1;
         } else {
             addTrans(getPlayer()->mFrontVec * -100.0f, "Module");
@@ -734,21 +734,21 @@ bool MarioHang::update() {
     }
 
     if (!_12 && _14 == 2) {
-        playSound("声崖つかまり");
+        playSound("\x90\xba\x8a\x52\x82\xc2\x82\xa9\x82\xdc\x82\xe8");
     }
 
     return true;
 }
 
 bool MarioHang::close() {
-    stopAnimation("崖つかまり開始");
-    stopAnimation("崖つかまり中");
-    stopAnimation("崖つかまり終了");
-    stopAnimation("崖つかまり終了坂");
+    stopAnimation("\x8a\x52\x82\xc2\x82\xa9\x82\xdc\x82\xe8\x8a\x4a\x8e\x6e");
+    stopAnimation("\x8a\x52\x82\xc2\x82\xa9\x82\xdc\x82\xe8\x92\x86");
+    stopAnimation("\x8a\x52\x82\xc2\x82\xa9\x82\xdc\x82\xe8\x8f\x49\x97\xb9");
+    stopAnimation("\x8a\x52\x82\xc2\x82\xa9\x82\xdc\x82\xe8\x8f\x49\x97\xb9\x8d\xe2");
     if (getPlayer()->mMovementStates._1) {
-        changeAnimation(nullptr, "基本");
+        changeAnimation(nullptr, "\x8a\xee\x96\x7b");
     } else {
-        changeAnimation(nullptr, "落下");
+        changeAnimation(nullptr, "\x97\x8e\x89\xba");
     }
 
     getPlayer()->setWallCancel();
@@ -767,7 +767,7 @@ bool MarioHang::notice() {
     if (getNoticedStatus() == MarioStatus_Faint) {
         addTrans(getPlayer()->mFrontVec * -150.0f, "Module");
         mActor->setBlendMtxTimer(16);
-        stopAnimation("崖つかまり中", "基本");
+        stopAnimation("\x8a\x52\x82\xc2\x82\xa9\x82\xdc\x82\xe8\x92\x86", "\x8a\xee\x96\x7b");
     }
 
     return false;
@@ -815,10 +815,10 @@ void MarioHang::tryClimb(bool jump) {
         return;
     }
 
-    if (isAnimationRun("崖つかまり開始")) {
+    if (isAnimationRun("\x8a\x52\x82\xc2\x82\xa9\x82\xdc\x82\xe8\x8a\x4a\x8e\x6e")) {
         if (_1E && jump && getAnimationFrame() < 30.0f) {
             _16 = 5;
-            changeAnimationNonStop("つかまりスリップアップ準備");
+            changeAnimationNonStop("\x82\xc2\x82\xa9\x82\xdc\x82\xe8\x83\x58\x83\x8a\x83\x62\x83\x76\x83\x41\x83\x62\x83\x76\x8f\x80\x94\xf5");
         }
 
         _1B = 1;

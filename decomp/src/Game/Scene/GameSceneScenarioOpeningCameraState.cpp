@@ -19,7 +19,7 @@ namespace {
     NEW_NERVE(GameSceneScenarioOpeningCameraStatePlay, GameSceneScenarioOpeningCameraState, Play);
 };  // namespace
 
-GameSceneScenarioOpeningCameraState::GameSceneScenarioOpeningCameraState() : NerveExecutor("シナリオ開始カメラ再生") {
+GameSceneScenarioOpeningCameraState::GameSceneScenarioOpeningCameraState() : NerveExecutor("\x83\x56\x83\x69\x83\x8a\x83\x49\x8a\x4a\x8e\x6e\x83\x4a\x83\x81\x83\x89\x8d\xc4\x90\xb6") {
     mBaseMtx.identity();
     initNerve(GET_NERVE_ANON(GameSceneScenarioOpeningCameraStatePlay));
     mScenarioTitle = new ScenarioTitle();
@@ -47,8 +47,8 @@ void GameSceneScenarioOpeningCameraState::start() {
 
     TVec3f namePos;
 
-    if (MR::tryFindNamePos("スタートカメラマリオ座標", &namePos, nullptr)) {
-        MR::setPlayerPos("スタートカメラマリオ座標");
+    if (MR::tryFindNamePos("\x83\x58\x83\x5e\x81\x5b\x83\x67\x83\x4a\x83\x81\x83\x89\x83\x7d\x83\x8a\x83\x49\x8d\xc0\x95\x57", &namePos, nullptr)) {
+        MR::setPlayerPos("\x83\x58\x83\x5e\x81\x5b\x83\x67\x83\x4a\x83\x81\x83\x89\x83\x7d\x83\x8a\x83\x49\x8d\xc0\x95\x57");
     }
 }
 
@@ -97,6 +97,13 @@ bool GameSceneScenarioOpeningCameraState::trySkipTrigger() const {
     if (MR::isFirstStep(this)) {
         return false;
     }
+
+#ifdef TARGET_PC
+    // Also on the first visit, once A has been held (port_skip_context).
+    if (port_skip_take(PORT_SKIP_OPENING)) {
+        return true;
+    }
+#endif
 
     return !MR::isAlreadyVisitedCurrentStageAndScenario() ? false : MR::testSystemPadTriggerDecide();
 }

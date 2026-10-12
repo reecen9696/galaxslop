@@ -65,11 +65,15 @@ namespace nw4r {
         }
 
         __declspec(weak) void VPanic(const char* file, int line, const char* fmt, va_list vlist, bool halt) {
+#ifdef __MWERKS__
             register u32 stackPointer;
             asm {
         mr  stackPointer, r1
             }
             stackPointer = *((u32*)stackPointer);
+#else
+            uintptr_t stackPointer = 0;
+#endif
             (void)OSDisableInterrupts();
             (void)OSDisableScheduler();
 

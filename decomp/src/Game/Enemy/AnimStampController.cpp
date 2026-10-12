@@ -17,7 +17,7 @@ namespace NrvAnimStampController {
     NEW_NERVE(HostNrvAnimEnd, AnimStampController, AnimEnd);
 };  // namespace NrvAnimStampController
 
-AnimStampController::AnimStampController() : NerveExecutor("つぶれアニメコントローラ"), _8(0, 0, 1) {
+AnimStampController::AnimStampController() : NerveExecutor("\x82\xc2\x82\xd4\x82\xea\x83\x41\x83\x6a\x83\x81\x83\x52\x83\x93\x83\x67\x83\x8d\x81\x5b\x83\x89"), _8(0, 0, 1) {
     init(8, 0.2f, 1.5f, 0.125f, 4.0f, 0.12, 4.0f);
 }
 

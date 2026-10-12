@@ -14,8 +14,8 @@ namespace {
 };  // namespace
 
 MiniatureGalaxyHolder::MiniatureGalaxyHolder()
-    : LiveActor("ミニチュアギャラクシー保持"), mMiniatureGalaxyGroup(), _90(), mCometGalaxy(), mCometID(-1), _9C() {
-    mMiniatureGalaxyGroup = new LiveActorGroup("ミニチュアギャラクシーグループ", 16);
+    : LiveActor("\x83\x7e\x83\x6a\x83\x60\x83\x85\x83\x41\x83\x4d\x83\x83\x83\x89\x83\x4e\x83\x56\x81\x5b\x95\xdb\x8e\x9d"), mMiniatureGalaxyGroup(), _90(), mCometGalaxy(), mCometID(-1), _9C() {
+    mMiniatureGalaxyGroup = new LiveActorGroup("\x83\x7e\x83\x6a\x83\x60\x83\x85\x83\x41\x83\x4d\x83\x83\x83\x89\x83\x4e\x83\x56\x81\x5b\x83\x4f\x83\x8b\x81\x5b\x83\x76", 16);
 }
 
 void MiniatureGalaxyHolder::registerActor(LiveActor* pActor, const JMapInfoIter& rIter) {
@@ -26,7 +26,7 @@ void MiniatureGalaxyHolder::registerActor(LiveActor* pActor, const JMapInfoIter&
     }
 
     MR::tryRegisterDemoCast(this, rIter);
-    MR::registerDemoActionFunctor(this, MR::Functor(this, &MiniatureGalaxyHolder::killAllMiniatureGalaxy), "飛び出す");
+    MR::registerDemoActionFunctor(this, MR::Functor(this, &MiniatureGalaxyHolder::killAllMiniatureGalaxy), "\x94\xf2\x82\xd1\x8f\x6f\x82\xb7");
 
     _90 = true;
 }

@@ -40,7 +40,7 @@ namespace {
     const s32 cOpenDisappearStep = 75;
     const s32 cOpenMiniatureAppearStep = 45;
     const s32 cOpenTotalFrame = 150;
-    const char* const cDemoNameDomeLecture2 = "ドームレクチャー２";
+    const char* const cDemoNameDomeLecture2 = "\x83\x68\x81\x5b\x83\x80\x83\x8c\x83\x4e\x83\x60\x83\x83\x81\x5b\x82\x51";
 
     const char* getGalayNameFromObjectName(const char* pObjName) {
         return pObjName + strlen("Mini");
@@ -360,22 +360,22 @@ void MiniatureGalaxy::initPartsModel() {
         pModelName = "MiniatureGalaxyUnknownKoopa";
     }
 
-    mUnknownModel = ::createGalaxyPart("Unknownモデル", pModelName, getBaseMtx(), false);
+    mUnknownModel = ::createGalaxyPart("Unknown\x83\x82\x83\x66\x83\x8b", pModelName, getBaseMtx(), false);
     ::initGalaxyPart(mUnknownModel);
 
-    mShadowModel = ::createGalaxyPart("影モデル", "MiniatureGalaxyShadow", mShadowBaseMtx, true);
+    mShadowModel = ::createGalaxyPart("\x89\x65\x83\x82\x83\x66\x83\x8b", "MiniatureGalaxyShadow", mShadowBaseMtx, true);
     mProjmapEffectMtxSetter = MR::initDLMakerProjmapEffectMtxSetter(mShadowModel);
     MR::newDifferedDLBuffer(mShadowModel);
     ::initGalaxyPart(mShadowModel);
 
-    mSelectModel = ::createGalaxyPart("選択時モデル", "MiniatureGalaxySelect", mPosMtx, false);
+    mSelectModel = ::createGalaxyPart("\x91\x49\x91\xf0\x8e\x9e\x83\x82\x83\x66\x83\x8b", "MiniatureGalaxySelect", mPosMtx, false);
     ::initGalaxyPart(mSelectModel);
 
     if (mType == MiniatureGalaxyType_Hatena) {
         return;
     }
 
-    mStarPlateModel = ::createGalaxyPart("スター数モデル", "MiniatureGalaxyStarNumber", mPosMtx, true);
+    mStarPlateModel = ::createGalaxyPart("\x83\x58\x83\x5e\x81\x5b\x90\x94\x83\x82\x83\x66\x83\x8b", "MiniatureGalaxyStarNumber", mPosMtx, true);
 
     s32 powerStarNum = MR::getPowerStarNumToOpenGalaxy(mGalaxyName);
 
@@ -578,7 +578,7 @@ bool MiniatureGalaxy::isUseKoopaFaceModel() const {
 }
 
 void MiniatureGalaxy::playPointedME() {
-    switch (MR::getRandom(0l, 5l)) {
+    switch (MR::getRandom(0, 5)) {
     case 0:
         MR::startSystemME("ME_ASTRO_DOME_HIT_GALAXY1");
 
@@ -603,7 +603,7 @@ void MiniatureGalaxy::playPointedME() {
 }
 
 void MiniatureGalaxy::playNeedStarME() {
-    switch (MR::getRandom(0l, 5l)) {
+    switch (MR::getRandom(0, 5)) {
     case 0:
         MR::startSystemME("ME_ASTRO_DOME_HIT_GALAXY_N1");
 

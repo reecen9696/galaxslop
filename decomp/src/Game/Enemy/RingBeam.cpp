@@ -27,7 +27,7 @@ namespace NrvRingBeam {
     NEW_NERVE(RingBeamNrvSpread, RingBeam, Spread);
 };  // namespace NrvRingBeam
 
-RingBeamShadowDrawer::RingBeamShadowDrawer(const LiveActor* unk0) : ShadowVolumeDrawer("影描画[リングビーム]") {
+RingBeamShadowDrawer::RingBeamShadowDrawer(const LiveActor* unk0) : ShadowVolumeDrawer("\x89\x65\x95\x60\x89\xe6[\x83\x8a\x83\x93\x83\x4f\x83\x72\x81\x5b\x83\x80]") {
     _1c = unk0;
     _20 = 0.0f;
 }
@@ -190,7 +190,7 @@ void RingBeam::init(const JMapInfoIter& rIter) {
     mtx.getTrans(_c0);
     mtx.getTrans(_cc);
     if (_9d) {
-        _a4 = new ModelObj("影モデル", "JumpBeamerBeamShadow", nullptr, MR::DrawBufferType_IndirectEnemy, MR::MovementType_Enemy,
+        _a4 = new ModelObj("\x89\x65\x83\x82\x83\x66\x83\x8b", "JumpBeamerBeamShadow", nullptr, MR::DrawBufferType_IndirectEnemy, MR::MovementType_Enemy,
                            MR::CalcAnimType_Enemy, false);
         _a4->initWithoutIter();
         _a4->mPosition.set(this->mPosition);
@@ -199,7 +199,7 @@ void RingBeam::init(const JMapInfoIter& rIter) {
     } else {
         _a0 = new RingBeamShadowDrawer(this);
     }
-    mBloomModel = MR::createModelObjBloomModel("リングビームブルーム", "JumpBeamerBeamBloom", getBaseMtx());
+    mBloomModel = MR::createModelObjBloomModel("\x83\x8a\x83\x93\x83\x4f\x83\x72\x81\x5b\x83\x80\x83\x75\x83\x8b\x81\x5b\x83\x80", "JumpBeamerBeamBloom", getBaseMtx());
     MR::invalidateClipping(mBloomModel);
     makeActorDead();
 }

@@ -7,7 +7,7 @@ JKRDecomp* JKRDecomp::sDecompObject;
 OSMessage JKRDecomp::sMessageBuffer[8];
 OSMessageQueue JKRDecomp::sMessageQueue;
 
-JKRDecomp* JKRDecomp::create(long a1) {
+JKRDecomp* JKRDecomp::create(int a1) {
     if (sDecompObject == nullptr) {
         sDecompObject = new (JKRHeap::sSystemHeap, 0) JKRDecomp(a1);
     }
@@ -15,7 +15,7 @@ JKRDecomp* JKRDecomp::create(long a1) {
     return sDecompObject;
 }
 
-JKRDecomp::JKRDecomp(long a1) : JKRThread(0x4000, 0x10, a1) {
+JKRDecomp::JKRDecomp(int a1) : JKRThread(0x4000, 0x10, a1) {
     OSResumeThread(mThread);
 }
 
@@ -55,8 +55,8 @@ void* JKRDecomp::run() {
     }
 }
 
-JKRDecompCommand* JKRDecomp::prepareCommand(unsigned char* pSrc, unsigned char* pDst, unsigned long compressedSize, unsigned long decompressedSize,
-                                            void (*a5)(unsigned long)) {
+JKRDecompCommand* JKRDecomp::prepareCommand(unsigned char* pSrc, unsigned char* pDst, unsigned int compressedSize, unsigned int decompressedSize,
+                                            void (*a5)(unsigned int)) {
     JKRDecompCommand* command = new (JKRHeap::sSystemHeap, -4) JKRDecompCommand();
 
     command->mSrc = pSrc;
@@ -83,7 +83,7 @@ bool JKRDecomp::sync(JKRDecompCommand* pCommand, int noBlock) {
     }
 }
 
-bool JKRDecomp::orderSync(unsigned char* pSrc, unsigned char* pDst, unsigned long compressedSize, unsigned long decompressedSize) {
+bool JKRDecomp::orderSync(unsigned char* pSrc, unsigned char* pDst, unsigned int compressedSize, unsigned int decompressedSize) {
     JKRDecompCommand* command = prepareCommand(pSrc, pDst, compressedSize, decompressedSize, nullptr);
 
     OSSendMessage(&sMessageQueue, command, OS_MESSAGE_NOBLOCK);
@@ -96,7 +96,7 @@ bool JKRDecomp::orderSync(unsigned char* pSrc, unsigned char* pDst, unsigned lon
     return received;
 }
 
-void JKRDecomp::decode(unsigned char* pSrc, unsigned char* pDst, unsigned long compressedSize, unsigned long decompressedSize) {
+void JKRDecomp::decode(unsigned char* pSrc, unsigned char* pDst, unsigned int compressedSize, unsigned int decompressedSize) {
     EJKRCompression compression = checkCompressed(pSrc);
 
     if (compression == JKR_COMPRESSION_SZP) {
@@ -193,7 +193,7 @@ void JKRDecomp::decodeSZP(u8* src, u8* dst, u32 srcLength, u32 dstLength) {
 }
 
 void JKRDecomp::decodeSZS(u8* pSrc, u8* pDst, u32 compressedSize, u32 a4) {
-    u32 decompSize = ((s32)pDst + *(u32*)(pSrc + 4)) - a4;
+    u32 decompSize = ((s32)(uintptr_t)pDst + JKRDecompExpandSize(pSrc)) - a4;
     u8* copySrc;
     s32 validBitCount = 0;
     u32 curBlock;

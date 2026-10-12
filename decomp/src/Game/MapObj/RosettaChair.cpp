@@ -19,8 +19,8 @@ void RosettaChair::init(const JMapInfoIter& rIter) {
 
     MR::setClippingTypeSphere(this, 500.0f);
     MR::tryRegisterDemoCast(this, rIter);
-    MR::registerDemoActionFunctor(this, MR::Functor(this, &RosettaChair::startDemo), "朗読開始");
-    MR::registerDemoActionFunctor(this, MR::Functor(this, &RosettaChair::setDefaultPose), "キャスト入れ換え");
+    MR::registerDemoActionFunctor(this, MR::Functor(this, &RosettaChair::startDemo), "\x98\x4e\x93\xc7\x8a\x4a\x8e\x6e");
+    MR::registerDemoActionFunctor(this, MR::Functor(this, &RosettaChair::setDefaultPose), "\x83\x4c\x83\x83\x83\x58\x83\x67\x93\xfc\x82\xea\x8a\xb7\x82\xa6");
     mDefaultPosition.set(mPosition);
     mDefaultRotation.set(mRotation);
     MR::startBck(this, "RosettaChair");

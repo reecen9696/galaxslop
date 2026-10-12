@@ -17,7 +17,7 @@ ShadowSurfaceOval::~ShadowSurfaceOval() {
 }
 
 ShadowSurfaceOval::ShadowSurfaceOval()
-    : ShadowSurfaceDrawer("影描画[水面ボックス]"), mModelData(), mSize(100.0f, 100.0f, 200.0f), mColor(0, 0, 0, 64) {
+    : ShadowSurfaceDrawer("\x89\x65\x95\x60\x89\xe6[\x90\x85\x96\xca\x83\x7b\x83\x62\x83\x4e\x83\x58]"), mModelData(), mSize(100.0f, 100.0f, 200.0f), mColor(0, 0, 0, 64) {
     mModelData = MR::getJ3DModelData("ShadowVolumeSphere");
 }
 

@@ -65,7 +65,7 @@ void WoodBox::init(const JMapInfoIter& rIter) {
     if (arg7_PowerStar != 0) {
         mHasPowerStar = true;
         MR::declarePowerStar(this);
-        mStarDemoModel = MR::createPowerStarDemoModel(this, "パワースターデモモデル", mBaseMtx);
+        mStarDemoModel = MR::createPowerStarDemoModel(this, "\x83\x70\x83\x8f\x81\x5b\x83\x58\x83\x5e\x81\x5b\x83\x66\x83\x82\x83\x82\x83\x66\x83\x8b", mBaseMtx);
         mStarDemoModel->makeActorDead();
     }
 
@@ -85,7 +85,7 @@ void WoodBox::init(const JMapInfoIter& rIter) {
         mPlaySolveSE = true;
     }
 
-    mBreakModel = new ModelObj("壊れモデル", "WoodBoxBreak", getBaseMtx(), MR::DrawBufferType_NoSilhouettedMapObjStrongLight, -2, -2, false);
+    mBreakModel = new ModelObj("\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "WoodBoxBreak", getBaseMtx(), MR::DrawBufferType_NoSilhouettedMapObjStrongLight, -2, -2, false);
     mBreakModel->mScale = mScale;
     MR::initLightCtrl(mBreakModel);
     mBreakModel->kill();

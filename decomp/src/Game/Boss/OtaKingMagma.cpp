@@ -21,7 +21,7 @@ namespace {
 }
 
 OtaKingMagma::OtaKingMagma(LiveActor* pHost, s32 drawBufferType)
-    : PartsModel(pHost, "オタキングマグマ", "OtaKingMagma", nullptr, drawBufferType, true), mBloomModel(), _A0(), _A4() {
+    : PartsModel(pHost, "\x83\x49\x83\x5e\x83\x4c\x83\x93\x83\x4f\x83\x7d\x83\x4f\x83\x7d", "OtaKingMagma", nullptr, drawBufferType, true), mBloomModel(), _A0(), _A4() {
     _A0 = MR::initDLMakerProjmapEffectMtxSetter(this);
     MR::newDifferedDLBuffer(this);
 }
@@ -35,7 +35,7 @@ void OtaKingMagma::init(const JMapInfoIter& rIter) {
     PartsModel::init(rIter);
     mSoundObject->setTrans(&mHost->mPosition);
 
-    mBloomModel = new PartsModel(mHost, "オタキングマグマブルーム", "OtaKingMagmaBloom", nullptr, MR::DrawBufferType_BloomModel, true);
+    mBloomModel = new PartsModel(mHost, "\x83\x49\x83\x5e\x83\x4c\x83\x93\x83\x4f\x83\x7d\x83\x4f\x83\x7d\x83\x75\x83\x8b\x81\x5b\x83\x80", "OtaKingMagmaBloom", nullptr, MR::DrawBufferType_BloomModel, true);
     _A4 = MR::initDLMakerProjmapEffectMtxSetter(mBloomModel);
     MR::newDifferedDLBuffer(mBloomModel);
     mBloomModel->mPosition.set(mPosition);

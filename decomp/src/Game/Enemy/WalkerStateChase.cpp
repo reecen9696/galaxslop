@@ -20,7 +20,7 @@ WalkerStateChaseParam::WalkerStateChaseParam() : mChaseTime(130), mForceChaseEnd
 }
 
 WalkerStateChase::WalkerStateChase(LiveActor* pHost, TVec3f* pDirection, WalkerStateParam* pStateParam, WalkerStateChaseParam* pChaseParam)
-    : ActorStateBase< LiveActor >("クリボー追いかけ状態", pHost), mStateParam(pStateParam), mChaseParam(pChaseParam), mDirection(pDirection) {
+    : ActorStateBase< LiveActor >("\x83\x4e\x83\x8a\x83\x7b\x81\x5b\x92\xc7\x82\xa2\x82\xa9\x82\xaf\x8f\xf3\x91\xd4", pHost), mStateParam(pStateParam), mChaseParam(pChaseParam), mDirection(pDirection) {
     if (mChaseParam == nullptr) {
         mChaseParam = &::sDefaultParam;
     }

@@ -12,7 +12,7 @@ namespace {
     const s32 sDefaultItemNumCoin = 1;
     const s32 sDefaultItemNumStarPiece = 5;
     const char* const cBckNameBreak = "Break";
-    const char* const cDemoName = "注目カメラ";
+    const char* const cDemoName = "\x92\x8d\x96\xda\x83\x4a\x83\x81\x83\x89";
 }  // namespace
 
 namespace NrvSimpleBreakableObj {
@@ -184,7 +184,7 @@ void SimpleBreakableObj::setStateBreak() {
         return;
     }
 
-    MR::startRumbleWithShakeCameraWeak(this, "中", "中", 1000.0f, FLOAT_MAX);
+    MR::startRumbleWithShakeCameraWeak(this, "\x92\x86", "\x92\x86", 1000.0f, FLOAT_MAX);
     MR::invalidateCollisionParts(this);
     MR::stopScene(5);
     startBreak();
@@ -259,7 +259,7 @@ void SimpleBreakableObj::appearItem() {
 void SimpleBreakableObj::exeTryStartDemo() {
     if (MR::tryStartDemoWithoutCinemaFrame(this, ::cDemoName)) {
         MR::startActorCameraTargetSelf(this, mCameraInfo, -1);
-        MR::startRumbleWithShakeCameraWeak(this, "中", "中", 1000.0f, FLOAT_MAX);
+        MR::startRumbleWithShakeCameraWeak(this, "\x92\x86", "\x92\x86", 1000.0f, FLOAT_MAX);
         MR::invalidateCollisionParts(this);
         setNerve(GET_NERVE(SimpleBreakableObj, HostTypeDemo));
     }

@@ -87,8 +87,10 @@ public:
     JAIAudience* getAudience() {
         return data;
     }
-    void JAISeMgr_appendSe_(JAISe* se) {
-        mSeList.append(se);
+    // Template so the JAISe -> JSULink<JAISe> conversion is checked where JAISe is complete.
+    template < typename TSe >
+    void JAISeMgr_appendSe_(TSe* se) {
+        mSeList.append(static_cast< JSULink< TSe >* >(se));
     }
 
     /* 0x08 */ JAISoundParamsMove mParams;

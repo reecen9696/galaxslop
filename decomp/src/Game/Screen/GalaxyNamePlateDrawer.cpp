@@ -16,7 +16,7 @@ namespace {
     };
 };  // namespace
 
-GalaxyNamePlateDrawer::GalaxyNamePlateDrawer() : NameObj("ギャラクシー名プレート描画") {
+GalaxyNamePlateDrawer::GalaxyNamePlateDrawer() : NameObj("\x83\x4d\x83\x83\x83\x89\x83\x4e\x83\x56\x81\x5b\x96\xbc\x83\x76\x83\x8c\x81\x5b\x83\x67\x95\x60\x89\xe6") {
     MR::zeroMemory(&mPlateArray, sizeof(mPlateArray.mArray));
 }
 

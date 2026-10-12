@@ -47,11 +47,11 @@ MarioParalyze::MarioParalyze(MarioActor* pActor) : MarioState(pActor, MarioStatu
 }
 
 bool MarioParalyze::start() {
-    changeAnimationNonStop("電気ダメージ");
-    playSound("ダメージ");
-    playSound("電気ダメージ");
-    playSound("声電気ダメージ");
-    playEffect("ビリビリ");
+    changeAnimationNonStop("\x93\x64\x8b\x43\x83\x5f\x83\x81\x81\x5b\x83\x57");
+    playSound("\x83\x5f\x83\x81\x81\x5b\x83\x57");
+    playSound("\x93\x64\x8b\x43\x83\x5f\x83\x81\x81\x5b\x83\x57");
+    playSound("\x90\xba\x93\x64\x8b\x43\x83\x5f\x83\x81\x81\x5b\x83\x57");
+    playEffect("\x83\x72\x83\x8a\x83\x72\x83\x8a");
 
     startPadVib(3);
 
@@ -88,8 +88,8 @@ bool MarioParalyze::update() {
         }
 
         if (getPlayer()->getMovementStates()._1) {
-            changeAnimation("電気ダメージ終了");
-            playSound("声電気ダメージ終了");
+            changeAnimation("\x93\x64\x8b\x43\x83\x5f\x83\x81\x81\x5b\x83\x57\x8f\x49\x97\xb9");
+            playSound("\x90\xba\x93\x64\x8b\x43\x83\x5f\x83\x81\x81\x5b\x83\x57\x8f\x49\x97\xb9");
         }
 
         if (mActor->mHealth == 0) {
@@ -117,8 +117,8 @@ bool MarioParalyze::close() {
         mActor->changeGameOverAnimation();
     }
 
-    stopAnimation("電気ダメージ");
-    stopEffect("ビリビリ");
+    stopAnimation("\x93\x64\x8b\x43\x83\x5f\x83\x81\x81\x5b\x83\x57");
+    stopEffect("\x83\x72\x83\x8a\x83\x72\x83\x8a");
 
     _16 = 120;
 

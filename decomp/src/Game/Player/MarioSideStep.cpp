@@ -91,19 +91,19 @@ bool Mario::doSideStep() {
 }
 
 bool MarioSideStep::start() {
-    if (!isAnimationRun("壁押し")) {
-        playSound("声壁押し");
+    if (!isAnimationRun("\x95\xc7\x89\x9f\x82\xb5")) {
+        playSound("\x90\xba\x95\xc7\x89\x9f\x82\xb5");
     }
-    changeAnimation("壁押し", 0UL);
+    changeAnimation("\x95\xc7\x89\x9f\x82\xb5", 0U);
     mActor->setBlendMtxTimer(10);
     return true;
 }
 
 bool MarioSideStep::close() {
-    stopAnimation("壁ウエイト");
-    stopAnimation("壁右歩き");
-    stopAnimation("壁左歩き");
-    stopAnimation("壁押し");
+    stopAnimation("\x95\xc7\x83\x45\x83\x47\x83\x43\x83\x67");
+    stopAnimation("\x95\xc7\x89\x45\x95\xe0\x82\xab");
+    stopAnimation("\x95\xc7\x8d\xb6\x95\xe0\x82\xab");
+    stopAnimation("\x95\xc7\x89\x9f\x82\xb5");
     getPlayer()->startBas(nullptr, false, 0.0f, 0.0f);
     return true;
 }
@@ -130,7 +130,7 @@ bool MarioSideStep::update() {
         return false;
     }
     if (getStickP() < 0.1f) {
-        changeAnimation("壁ウエイト");
+        changeAnimation("\x95\xc7\x83\x45\x83\x47\x83\x43\x83\x67");
     } else {
         TVec3f direction(getWorldPadDir());
         MR::vecKillElement(direction, getPlayer()->getAirGravityVec(), &direction);
@@ -138,10 +138,10 @@ bool MarioSideStep::update() {
         TVec3f side;
         f32 forward = MR::vecKillElement(direction, getPlayer()->getWallNorm(), &side);
         if (forward < -0.866f) {
-            if (!isAnimationRun("壁押し")) {
-                playSound("声壁押し");
+            if (!isAnimationRun("\x95\xc7\x89\x9f\x82\xb5")) {
+                playSound("\x90\xba\x95\xc7\x89\x9f\x82\xb5");
             }
-            changeAnimation("壁押し", 0UL);
+            changeAnimation("\x95\xc7\x89\x9f\x82\xb5", 0U);
         } else if (forward > 0.0f) {
             if (forward > 0.707f) {
                 getPlayer()->setFrontVecKeepUp(getPlayer()->getWallNorm());
@@ -151,11 +151,11 @@ bool MarioSideStep::update() {
         } else {
             side *= (1.0f + 0.25f * forward) * getStickP();
             if (side.dot(getPlayer()->mSideVec) < 0.0f) {
-                if (!isAnimationRun("壁右歩き")) {
-                    changeAnimation("壁右歩き");
+                if (!isAnimationRun("\x95\xc7\x89\x45\x95\xe0\x82\xab")) {
+                    changeAnimation("\x95\xc7\x89\x45\x95\xe0\x82\xab");
                 }
-            } else if (!isAnimationRun("壁左歩き")) {
-                changeAnimation("壁左歩き");
+            } else if (!isAnimationRun("\x95\xc7\x8d\xb6\x95\xe0\x82\xab")) {
+                changeAnimation("\x95\xc7\x8d\xb6\x95\xe0\x82\xab");
             }
             addVelocity(side * 6.0f - getPlayer()->getWallNorm() * 6.0f);
         }

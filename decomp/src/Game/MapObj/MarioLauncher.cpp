@@ -89,7 +89,7 @@ namespace NrvMarioLauncher {
 };  // namespace NrvMarioLauncher
 
 MarioLauncher::MarioLauncher(const char* pName)
-    : LiveActor(pName), mLayout(), mShell(), mHost(), mIsInAttractor(), mCameraTargetMtx("カメラターゲットダミー") {
+    : LiveActor(pName), mLayout(), mShell(), mHost(), mIsInAttractor(), mCameraTargetMtx("\x83\x4a\x83\x81\x83\x89\x83\x5e\x81\x5b\x83\x51\x83\x62\x83\x67\x83\x5f\x83\x7e\x81\x5b") {
     mEffectMtxSmoke.identity();
     mEffectMtxGravity.identity();
     mPlayerBaseMtx.identity();
@@ -102,7 +102,7 @@ void MarioLauncher::init(const JMapInfoIter& rIter) {
     initModelManagerWithAnm("MarioLauncher", nullptr, false);
     initNerve(GET_NERVE(MarioLauncher, MarioLauncherNrvWait));
 
-    mShell = new MarioLauncherShell("移動用弾丸");
+    mShell = new MarioLauncherShell("\x88\xda\x93\xae\x97\x70\x92\x65\x8a\xdb");
     mShell->init(rIter);
     mLayout = new MarioLauncherLayout();
     mLayout->init(rIter);

@@ -27,7 +27,7 @@ namespace NrvSunakazeKunTrap {
 };  // namespace NrvSunakazeKunTrap
 
 SunakazeKunTrap::SunakazeKunTrap(LiveActor* pHost, const TVec3f& rParam2)
-    : ModelObj("スナカゼ用トラップ", "SunakazeKunTrap", nullptr, -2, -2, -2, false), mHost(pHost), _94(rParam2) {
+    : ModelObj("\x83\x58\x83\x69\x83\x4a\x83\x5b\x97\x70\x83\x67\x83\x89\x83\x62\x83\x76", "SunakazeKunTrap", nullptr, -2, -2, -2, false), mHost(pHost), _94(rParam2) {
 }
 
 void SunakazeKunTrap::init(const JMapInfoIter& rIter) {
@@ -229,7 +229,7 @@ void Sandstorm::exeStormEnd() {
 
         // BUG: Invokes `__ptmf_test` instead of calling the function.
 
-        if (isSunakazeKun) {
+        if (true /* original tests the member function address */) {
             MR::startSound(this, "SE_OJ_SANDSTORM_S_BIND_END");
         } else {
             MR::startSound(this, "SE_OJ_SANDSTORM_BIND_END");

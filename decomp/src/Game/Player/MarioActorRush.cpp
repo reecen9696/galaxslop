@@ -110,12 +110,12 @@ void MarioActor::resetCondition() {
 
     if (mMario->isStatusActive(MarioStatus_Swim) && inWater) {
         if (_468) {
-            mMario->changeAnimation("水泳ジェット", "水泳ジェット");
+            mMario->changeAnimation("\x90\x85\x89\x6a\x83\x57\x83\x46\x83\x62\x83\x67", "\x90\x85\x89\x6a\x83\x57\x83\x46\x83\x62\x83\x67");
         } else {
-            mMario->changeAnimation(nullptr, "水泳基本");
+            mMario->changeAnimation(nullptr, "\x90\x85\x89\x6a\x8a\xee\x96\x7b");
         }
     } else {
-        mMario->changeAnimation(nullptr, "基本");
+        mMario->changeAnimation(nullptr, "\x8a\xee\x96\x7b");
 
         if (_468) {
             mMarioAnim->waterToGround();
@@ -135,11 +135,11 @@ void MarioActor::resetCondition() {
     mMario->_154.zero();
     mMario->mVerticalSpeed = 0.0f;
     mMario->_474->mIdx = -1;
-    stopEffect("いい汗");
-    stopEffect("ホッパー尻落ルイージ");
-    stopEffect("ホッパー尻落");
-    stopEffect("尻落ルイージ");
-    stopEffect("尻落");
+    stopEffect("\x82\xa2\x82\xa2\x8a\xbe");
+    stopEffect("\x83\x7a\x83\x62\x83\x70\x81\x5b\x90\x4b\x97\x8e\x83\x8b\x83\x43\x81\x5b\x83\x57");
+    stopEffect("\x83\x7a\x83\x62\x83\x70\x81\x5b\x90\x4b\x97\x8e");
+    stopEffect("\x90\x4b\x97\x8e\x83\x8b\x83\x43\x81\x5b\x83\x57");
+    stopEffect("\x90\x4b\x97\x8e");
 
     _9C4->kill();
     MR::offCalcAnim(_9C4);
@@ -158,8 +158,8 @@ void MarioActor::beginRush() {
     _924 = _7E4[0];
     mMarioAnim->clearAllJointTransform();
     MR::invalidateHitSensors(this);
-    stopEffect("共通壁手擦り");
-    stopEffect("スピンライト");
+    stopEffect("\x8b\xa4\x92\xca\x95\xc7\x8e\xe8\x8e\x43\x82\xe8");
+    stopEffect("\x83\x58\x83\x73\x83\x93\x83\x89\x83\x43\x83\x67");
     bool spinCatch = selectSpinCatchInRush(_924->mHost->mName);
     if (mPlayerMode == PlayerMode_Bee && selectHideFlyMeter(_924)) {
         MR::getGameSceneLayoutHolder()->changeLifeMeterModeGround();
@@ -179,7 +179,7 @@ void MarioActor::beginRush() {
     }
 
     if (selectLandEffect(_924)) {
-        playEffect("特殊着地");
+        playEffect("\x93\xc1\x8e\xea\x92\x85\x92\x6e");
     }
 
     switch (_924->mType) {
@@ -381,7 +381,7 @@ void MarioActor::endRush(const RushEndInfo* pInfo) {
                 mMario->mMovementStates.jumping = true;
                 mMario->mMovementStates._1 = false;
             } else {
-                changeAnimation("基本");
+                changeAnimation("\x8a\xee\x96\x7b");
             }
 
             updateGravityVec(true, true);
@@ -430,7 +430,7 @@ bool MarioActor::takeSensor(HitSensor* pSensor) {
         return false;
     }
 
-    changeAnimation("カブ抜き");
+    changeAnimation("\x83\x4a\x83\x75\x94\xb2\x82\xab");
     changeNullAnimation("PullOut", -1);
     _424 = pSensor;
     memorizeSensorThrow(pSensor);

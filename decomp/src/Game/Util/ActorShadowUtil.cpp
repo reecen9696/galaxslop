@@ -34,33 +34,33 @@ namespace MR {
 
     void initShadowSurfaceCircle(LiveActor* pActor, f32 radius) {
         pActor->initShadowControllerList(1);
-        addShadowSurfaceCircle(pActor, "水面丸影", radius);
+        addShadowSurfaceCircle(pActor, "\x90\x85\x96\xca\x8a\xdb\x89\x65", radius);
     }
 
     void initShadowVolumeSphere(LiveActor* pActor, f32 radius) {
         pActor->initShadowControllerList(1);
-        addShadowVolumeSphere(pActor, "ボリューム影(球)", radius);
+        addShadowVolumeSphere(pActor, "\x83\x7b\x83\x8a\x83\x85\x81\x5b\x83\x80\x89\x65(\x8b\x85)", radius);
     }
 
     void initShadowVolumeOval(LiveActor* pActor, const TVec3f& rSize) {
         pActor->initShadowControllerList(1);
-        const char* pName = "ボリューム影(楕球)";
+        const char* pName = "\x83\x7b\x83\x8a\x83\x85\x81\x5b\x83\x80\x89\x65(\x91\xc8\x8b\x85)";
         addShadowVolumeOval(pActor, pName, rSize, pActor->getBaseMtx());
     }
 
     void initShadowVolumeCylinder(LiveActor* pActor, f32 radius) {
         pActor->initShadowControllerList(1);
-        addShadowVolumeCylinder(pActor, "ボリューム影(円柱)", radius);
+        addShadowVolumeCylinder(pActor, "\x83\x7b\x83\x8a\x83\x85\x81\x5b\x83\x80\x89\x65(\x89\x7e\x92\x8c)", radius);
     }
 
     void initShadowVolumeBox(LiveActor* pActor, const TVec3f& rSize) {
         pActor->initShadowControllerList(1);
-        addShadowVolumeBox(pActor, "ボリューム影(ボックス)", rSize);
+        addShadowVolumeBox(pActor, "\x83\x7b\x83\x8a\x83\x85\x81\x5b\x83\x80\x89\x65(\x83\x7b\x83\x62\x83\x4e\x83\x58)", rSize);
     }
 
     void initShadowVolumeFlatModel(LiveActor* pActor, const char* pModelName) {
         pActor->initShadowControllerList(1);
-        addShadowVolumeFlatModel(pActor, "ボリューム影(板モデル)", pModelName);
+        addShadowVolumeFlatModel(pActor, "\x83\x7b\x83\x8a\x83\x85\x81\x5b\x83\x80\x89\x65(\x94\xc2\x83\x82\x83\x66\x83\x8b)", pModelName);
     }
 
     void initShadowController(LiveActor* pActor, u32 numShadows) {
@@ -135,12 +135,12 @@ namespace MR {
 
     void initShadowVolumeBox(LiveActor* pActor, const TVec3f& rSize, MtxPtr pMtx) {
         pActor->initShadowControllerList(1);
-        addShadowVolumeBox(pActor, "ボリューム影(ボックス)", rSize, pMtx);
+        addShadowVolumeBox(pActor, "\x83\x7b\x83\x8a\x83\x85\x81\x5b\x83\x80\x89\x65(\x83\x7b\x83\x62\x83\x4e\x83\x58)", rSize, pMtx);
     }
 
     void initShadowVolumeFlatModel(LiveActor* pActor, const char* pModelName, MtxPtr pMtx) {
         pActor->initShadowControllerList(1);
-        addShadowVolumeFlatModel(pActor, "ボリューム影(板モデル)", pModelName, pMtx);
+        addShadowVolumeFlatModel(pActor, "\x83\x7b\x83\x8a\x83\x85\x81\x5b\x83\x80\x89\x65(\x94\xc2\x83\x82\x83\x66\x83\x8b)", pModelName, pMtx);
     }
 
     void setShadowDropPositionPtr(LiveActor* pActor, const char* pName, const TVec3f* pPos) {

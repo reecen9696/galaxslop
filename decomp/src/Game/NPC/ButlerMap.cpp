@@ -23,7 +23,7 @@ void ButlerMap_FORCE_MATCH_SDATA2() {
 }
 
 namespace {
-    const char* cDemoNameMapLecture = "バトラーマップレクチャー";
+    const char* cDemoNameMapLecture = "\x83\x6f\x83\x67\x83\x89\x81\x5b\x83\x7d\x83\x62\x83\x76\x83\x8c\x83\x4e\x83\x60\x83\x83\x81\x5b";
 };  // namespace
 
 namespace NrvButlerMap {
@@ -62,7 +62,7 @@ void ButlerMap::init(const JMapInfoIter& rIter) {
     mParam._20 = talk;
     MR::createSceneObj(SceneObj_GalaxyMapController);
     MR::tryRegisterDemoCast(this, rIter);
-    MR::tryRegisterDemoCast(this, "バトラー報告", rIter);
+    MR::tryRegisterDemoCast(this, "\x83\x6f\x83\x67\x83\x89\x81\x5b\x95\xf1\x8d\x90", rIter);
     TVec3f vec;
     const char* demoNameMapLecture = ::cDemoNameMapLecture;
     vec.setPSZeroVec();
@@ -71,12 +71,12 @@ void ButlerMap::init(const JMapInfoIter& rIter) {
             MR::createTalkCtrlDirectOnRootNodeAutomatic(this, rIter, "AstroGalaxy_ButlerMap001", vec, MR::getJointMtx(this, "Body")))) {
         const char* demoNameMapLecture = ::cDemoNameMapLecture;
         const MR::FunctorBase& func = MR::Functor(this, &ButlerMap::startLectureDemo);
-        MR::registerDemoActionFunctorDirect(this, func, demoNameMapLecture, "開始");
-        MR::registerDemoActionFunctorDirect(this, MR::Functor(this, &ButlerMap::resetStatus), demoNameMapLecture, "バトラーリセット");
+        MR::registerDemoActionFunctorDirect(this, func, demoNameMapLecture, "\x8a\x4a\x8e\x6e");
+        MR::registerDemoActionFunctorDirect(this, MR::Functor(this, &ButlerMap::resetStatus), demoNameMapLecture, "\x83\x6f\x83\x67\x83\x89\x81\x5b\x83\x8a\x83\x5a\x83\x62\x83\x67");
     }
 
     AstroDemoFunction::tryRegisterGrandStarReturnAndSimpleCast(this, rIter);
-    AstroDemoFunction::tryRegisterDemo(this, "バトラーグリーンドライバ説明", rIter);
+    AstroDemoFunction::tryRegisterDemo(this, "\x83\x6f\x83\x67\x83\x89\x81\x5b\x83\x4f\x83\x8a\x81\x5b\x83\x93\x83\x68\x83\x89\x83\x43\x83\x6f\x90\xe0\x96\xbe", rIter);
 
     if (mObjArg0) {
         SphereSelectorFunction::registerTarget(this);
@@ -217,7 +217,7 @@ void ButlerMap::exeTalk() {
 }
 
 void ButlerMap::exeLectureDemoShowMapBefore() {
-    if (MR::isDemoPartLastStep("マップ表示開始")) {
+    if (MR::isDemoPartLastStep("\x83\x7d\x83\x62\x83\x76\x95\x5c\x8e\xa6\x8a\x4a\x8e\x6e")) {
         MR::pauseTimeKeepDemo(this);
         setNerve(GET_NERVE(ButlerMap, ButlerMapNrvLectureDemoShowMap));
     }

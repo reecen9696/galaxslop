@@ -6,14 +6,14 @@
 #include "Game/Util/SoundUtil.hpp"
 
 EventFireDown::EventFireDown() : EventSequence(16) {
-    addEventOnTime("初期化", static_cast< EventFunc1 >(&EventFireDown::init), 0);
-    addEventOnTime("通常レイアウト消去", static_cast< EventFunc1 >(&EventFireDown::closeDefaultLayout), 100);
-    addEventOnTime("サウンドA", static_cast< EventFunc1 >(&EventFireDown::sound), 30);
-    addEventOnTime("サウンドB", static_cast< EventFunc1 >(&EventFireDown::sound2), 50);
-    addEventInStatus("ワイプ開始", static_cast< EventFunc1 >(&EventFireDown::doCloseWipe),
+    addEventOnTime("\x8f\x89\x8a\xfa\x89\xbb", static_cast< EventFunc1 >(&EventFireDown::init), 0);
+    addEventOnTime("\x92\xca\x8f\xed\x83\x8c\x83\x43\x83\x41\x83\x45\x83\x67\x8f\xc1\x8b\x8e", static_cast< EventFunc1 >(&EventFireDown::closeDefaultLayout), 100);
+    addEventOnTime("\x83\x54\x83\x45\x83\x93\x83\x68""A", static_cast< EventFunc1 >(&EventFireDown::sound), 30);
+    addEventOnTime("\x83\x54\x83\x45\x83\x93\x83\x68""B", static_cast< EventFunc1 >(&EventFireDown::sound2), 50);
+    addEventInStatus("\x83\x8f\x83\x43\x83\x76\x8a\x4a\x8e\x6e", static_cast< EventFunc1 >(&EventFireDown::doCloseWipe),
                      static_cast< EventFunc2 >(&EventSequence::isMissLayoutClosed));
-    addEventOnTime("残機を引く", static_cast< EventFunc1 >(&EventFireDown::decLeft), 120);
-    addEventInPhase("ワイプ終了後", static_cast< EventFunc1 >(&EventFireDown::doWaitAfterWipe), 2);
+    addEventOnTime("\x8e\x63\x8b\x40\x82\xf0\x88\xf8\x82\xad", static_cast< EventFunc1 >(&EventFireDown::decLeft), 120);
+    addEventInPhase("\x83\x8f\x83\x43\x83\x76\x8f\x49\x97\xb9\x8c\xe3", static_cast< EventFunc1 >(&EventFireDown::doWaitAfterWipe), 2);
 }
 
 void EventFireDown::init(u16 eventFrame, u16 sequenceFrame) {
@@ -22,8 +22,8 @@ void EventFireDown::init(u16 eventFrame, u16 sequenceFrame) {
     MR::stopStageBGM(10);
     MR::stopSubBGM(10);
     MarioAccess::getPlayerActor()->changeGameOverAnimation();
-    playSound("声最終ダメージ");
-    playSound("最後の一撃");
+    playSound("\x90\xba\x8d\xc5\x8f\x49\x83\x5f\x83\x81\x81\x5b\x83\x57");
+    playSound("\x8d\xc5\x8c\xe3\x82\xcc\x88\xea\x8c\x82");
     _28 = 20.0f;
     MR::startPlayerDownWipe();
     MR::startMissLayout();

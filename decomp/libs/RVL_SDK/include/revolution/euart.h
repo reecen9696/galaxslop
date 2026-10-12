@@ -22,7 +22,7 @@ typedef enum {
 
 
 UARTError InitializeUART(UARTBaudRate);
-UARTError WriteUARTN(const void *, unsigned long);
+UARTError WriteUARTN(const void *, unsigned int);
 
 #ifdef __cplusplus
 }

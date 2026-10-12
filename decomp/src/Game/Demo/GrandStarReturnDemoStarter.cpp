@@ -25,8 +25,8 @@ void GrandStarReturnDemoStarter_FORCE_MATCH_SDATA2() {
 }
 
 namespace {
-    const char* const cDemoMovePartName = "移動";
-    const char* const cDemoWaitPartName = "ウェイト→コア突入";
+    const char* const cDemoMovePartName = "\x88\xda\x93\xae";
+    const char* const cDemoWaitPartName = "\x83\x45\x83\x46\x83\x43\x83\x67\x81\xa8\x83\x52\x83\x41\x93\xcb\x93\xfc";
 };  // namespace
 
 GrandStarReturnDemoStarter::GrandStarReturnDemoStarter(const char* pName)
@@ -54,7 +54,7 @@ void GrandStarReturnDemoStarter::init(const JMapInfoIter& rIter) {
     mStageResultInformer = new StageResultInformer();
     mStageResultInformer->initWithoutIter();
 
-    mPowerStar = reinterpret_cast< PowerStar* >(MR::createModelObjNoSilhouettedMapObjStrongLight("スターデモモデル", "GrandStar", mTransform));
+    mPowerStar = reinterpret_cast< PowerStar* >(MR::createModelObjNoSilhouettedMapObjStrongLight("\x83\x58\x83\x5e\x81\x5b\x83\x66\x83\x82\x83\x82\x83\x66\x83\x8b", "GrandStar", mTransform));
     MR::invalidateClipping(mPowerStar);
     mPowerStar->kill();
 
@@ -73,9 +73,9 @@ void GrandStarReturnDemoStarter::init(const JMapInfoIter& rIter) {
         };
     }
 
-    MR::initMultiActorCamera(this, rIter, &mActorCameraInfo, "移動");
-    MR::initMultiActorCamera(this, rIter, &mActorCameraInfo, "ウェイト");
-    MR::initMultiActorCamera(this, rIter, &mActorCameraInfo, "リザルト");
+    MR::initMultiActorCamera(this, rIter, &mActorCameraInfo, "\x88\xda\x93\xae");
+    MR::initMultiActorCamera(this, rIter, &mActorCameraInfo, "\x83\x45\x83\x46\x83\x43\x83\x67");
+    MR::initMultiActorCamera(this, rIter, &mActorCameraInfo, "\x83\x8a\x83\x55\x83\x8b\x83\x67");
 
     for (int i = 0; i < 6; i++) {
         char buffer[32];
@@ -118,7 +118,7 @@ void GrandStarReturnDemoStarter::calcOffsetStarToCore(TVec3f* pOffset) const {
     TVec3f namePos;
     TVec3f jointPos;
 
-    MR::findNamePos("コア中心", &namePos, nullptr);
+    MR::findNamePos("\x83\x52\x83\x41\x92\x86\x90\x53", &namePos, nullptr);
     MR::copyJointPos(mPowerStar, "PowerStar", &jointPos);
 
     pOffset->sub(namePos, jointPos);
@@ -177,11 +177,11 @@ void GrandStarReturnDemoStarter::exeMove() {
 
     if (!isActiveGrandStarReturnDemoIndex(0)) {
         if (MR::isFirstStep(this)) {
-            MR::startMultiActorCameraTargetPlayer(this, mActorCameraInfo, "移動", -1);
+            MR::startMultiActorCameraTargetPlayer(this, mActorCameraInfo, "\x88\xda\x93\xae", -1);
         }
 
         if (MR::isDemoPartStep(::cDemoMovePartName, 300)) {
-            MR::startMultiActorCameraTargetPlayer(this, mActorCameraInfo, "ウェイト", -1);
+            MR::startMultiActorCameraTargetPlayer(this, mActorCameraInfo, "\x83\x45\x83\x46\x83\x43\x83\x67", -1);
         }
     }
 
@@ -266,16 +266,16 @@ void GrandStarReturnDemoStarter::exeRevival() {
         mPowerStar->kill();
     }
 
-    if (MR::isDemoPartLastStep("ドーム復活")) {
+    if (MR::isDemoPartLastStep("\x83\x68\x81\x5b\x83\x80\x95\x9c\x8a\x88")) {
         MR::endAnimCamera(this, mActorCameraInfo, buffer, 0, true);
         MR::overlayWithPreviousScreen(2);
     }
 
-    if (MR::isDemoPartFirstStep("リザルト画面")) {
-        MR::startMultiActorCameraTargetPlayer(this, mActorCameraInfo, "リザルト", -1);
+    if (MR::isDemoPartFirstStep("\x83\x8a\x83\x55\x83\x8b\x83\x67\x89\xe6\x96\xca")) {
+        MR::startMultiActorCameraTargetPlayer(this, mActorCameraInfo, "\x83\x8a\x83\x55\x83\x8b\x83\x67", -1);
     }
 
-    tryStartStageResult("リザルト画面");
+    tryStartStageResult("\x83\x8a\x83\x55\x83\x8b\x83\x67\x89\xe6\x96\xca");
 }
 
 void GrandStarReturnDemoStarter::exeStageResult() {
@@ -290,7 +290,7 @@ void GrandStarReturnDemoStarter::exeFadeOut() {
     }
 
     if (!MR::isWipeActive()) {
-        MR::endMultiActorCamera(this, mActorCameraInfo, "リザルト", false, -1);
+        MR::endMultiActorCamera(this, mActorCameraInfo, "\x83\x8a\x83\x55\x83\x8b\x83\x67", false, -1);
         setNerve(GET_NERVE(GrandStarReturnDemoStarter, GrandStarReturnDemoStarterNrvWaitDemoEnd));
     }
 }

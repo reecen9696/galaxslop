@@ -4,7 +4,7 @@
 
 class CameraSlide : public Camera {
 public:
-    CameraSlide(const char* pName = "スライドカメラ");
+    CameraSlide(const char* pName = "\x83\x58\x83\x89\x83\x43\x83\x68\x83\x4a\x83\x81\x83\x89");
 
     virtual void reset();
     virtual CameraTargetObj* calc();

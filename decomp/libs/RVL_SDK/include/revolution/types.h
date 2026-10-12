@@ -3,11 +3,19 @@
 
 typedef signed char s8;
 typedef signed short s16;
-typedef signed long s32;
+#ifdef __MWERKS__
+typedef signed int s32;
+#else
+typedef signed int s32;
+#endif
 typedef signed long long s64;
 typedef unsigned char u8;
 typedef unsigned short u16;
-typedef unsigned long u32;
+#ifdef __MWERKS__
+typedef unsigned int u32;
+#else
+typedef unsigned int u32;
+#endif
 typedef unsigned long long u64;
 
 typedef volatile u8 vu8;
@@ -34,6 +42,7 @@ typedef int BOOL;
 #endif
 #endif
 
+#ifdef __MWERKS__
 #ifndef nullptr
 #ifdef __cplusplus
 #define nullptr 0
@@ -43,6 +52,7 @@ typedef int BOOL;
 #ifndef override
 #ifdef __cplusplus
 #define override
+#endif
 #endif
 #endif
 
@@ -73,19 +83,19 @@ typedef int BOOL;
 #define NO_INLINE
 #endif
 
-#if __MWERKS__
+#if __MWERKS__ || defined(__clang__)
 #define ATTRIBUTE_ALIGN(num) __attribute__((aligned(num)))
 #else
 #define ATTRIBUTE_ALIGN(num)
 #endif
 
-#if __MWERKS__
+#if __MWERKS__ || defined(__clang__)
 #define ATTRIBUTE_PACKED __attribute__((packed))
 #else
 #define ATTRIBUTE_PACKED
 #endif
 
-#if __MWERKS__
+#if __MWERKS__ || defined(__clang__)
 #define ATTRIBUTE_WEAK __attribute__((weak))
 #else
 #define ATTRIBUTE_WEAK
@@ -100,7 +110,7 @@ typedef int BOOL;
 #endif
 
 #define ROUND_UP(x, align) (((x) + (align) - 1) & (-(align)))
-#define ROUND_UP_PTR(x, align) ((void*)((((u32)(x)) + (align) - 1) & (~((align) - 1))))
+#define ROUND_UP_PTR(x, align) ((void*)((((__UINTPTR_TYPE__)(x)) + (align) - 1) & (~((__UINTPTR_TYPE__)(align) - 1))))
 
 #define ALIGN_PREV(X, N) ((X) & ~((N) - 1))
 #define ALIGN_NEXT(X, N) ALIGN_PREV(((X) + (N) - 1), N)
@@ -113,7 +123,7 @@ typedef int BOOL;
 
 #define FOURCC(c0, c1, c2, c3) (u32)((c0 & 0xFF) << 24 | (c1 & 0xFF) << 16 | (c2 & 0xFF) << 8 | (c3 & 0xFF))
 
-#define IS_ALIGNED(x, align) (((unsigned long)(x) & ((align) - 1)) == 0)
+#define IS_ALIGNED(x, align) (((__UINTPTR_TYPE__)(x) & ((align) - 1)) == 0)
 #define IS_NOT_ALIGNED(X, N) (((X) & ((N) - 1)) != 0)
 
 // Comparing a non-volatile reference type to NULL is tautological
@@ -130,12 +140,9 @@ typedef int BOOL;
 /* just some common intrinsics */
 
 #ifndef __MWERKS__
-f32 __frsqrte(f32);
-u32 __cntlzw(u32);
-s32 __abs(s32);
-f32 __fabsf(f32);
-f64 __fabs(f64);
-void* __memcpy(void*, const void*, int);
+/* PowerPC intrinsics are provided by the port compat header (force-included). */
+#include "port/ppc_intrinsics.h"
+#include "port/ptr32.h"
 #endif
 
 #endif  // TYPES_H

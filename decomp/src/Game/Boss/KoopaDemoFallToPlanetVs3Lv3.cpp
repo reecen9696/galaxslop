@@ -31,11 +31,11 @@ namespace NrvKoopaDemoFallToPlanetVs3Lv3 {
     NEW_NERVE(KoopaDemoFallToPlanetVs3Lv3NrvWaitPlayer, KoopaDemoFallToPlanetVs3Lv3, WaitPlayer);
 };  // namespace NrvKoopaDemoFallToPlanetVs3Lv3
 
-KoopaDemoFallToPlanetVs3Lv3::KoopaDemoFallToPlanetVs3Lv3(Koopa* pKoopa) : ActorStateBase< Koopa >("Demo[Ｌｖ３惑星まで落下]", pKoopa) {
+KoopaDemoFallToPlanetVs3Lv3::KoopaDemoFallToPlanetVs3Lv3(Koopa* pKoopa) : ActorStateBase< Koopa >("Demo[\x82\x6b\x82\x96\x82\x52\x98\x66\x90\xaf\x82\xdc\x82\xc5\x97\x8e\x89\xba]", pKoopa) {
 }
 
 void KoopaDemoFallToPlanetVs3Lv3::init() {
-    KoopaFunction::initKoopaCamera(mHost, "惑星Ｌｖ３内側を落下");
+    KoopaFunction::initKoopaCamera(mHost, "\x98\x66\x90\xaf\x82\x6b\x82\x96\x82\x52\x93\xe0\x91\xa4\x82\xf0\x97\x8e\x89\xba");
     KoopaFunction::initKoopaAnimCamera(mHost, "DemoKoopaFallSun");
     initNerve(GET_NERVE(KoopaDemoFallToPlanetVs3Lv3, KoopaDemoFallToPlanetVs3Lv3NrvWaitFallDemo));
 }
@@ -50,11 +50,11 @@ void KoopaDemoFallToPlanetVs3Lv3::appear() {
 void KoopaDemoFallToPlanetVs3Lv3::kill() {
     mIsDead = true;
 
-    KoopaFunction::endKoopaCamera(mHost, "惑星Ｌｖ３内側を落下", false, -1);
+    KoopaFunction::endKoopaCamera(mHost, "\x98\x66\x90\xaf\x82\x6b\x82\x96\x82\x52\x93\xe0\x91\xa4\x82\xf0\x97\x8e\x89\xba", false, -1);
 }
 
 void KoopaDemoFallToPlanetVs3Lv3::exeWaitFallDemo() {
-    if (KoopaFunction::tryStartKoopaAndMarioCameraDemo(mHost, "クッパＶｓ３惑星移動（Ｌｖ２からＬｖ３）", "DemoKoopaFallSun", "デモ中心")) {
+    if (KoopaFunction::tryStartKoopaAndMarioCameraDemo(mHost, "\x83\x4e\x83\x62\x83\x70\x82\x75\x82\x93\x82\x52\x98\x66\x90\xaf\x88\xda\x93\xae\x81\x69\x82\x6b\x82\x96\x82\x51\x82\xa9\x82\xe7\x82\x6b\x82\x96\x82\x52\x81\x6a", "DemoKoopaFallSun", "\x83\x66\x83\x82\x92\x86\x90\x53")) {
         setNerve(GET_NERVE(KoopaDemoFallToPlanetVs3Lv3, KoopaDemoFallToPlanetVs3Lv3NrvFallOutside));
     }
 }
@@ -97,11 +97,11 @@ void KoopaDemoFallToPlanetVs3Lv3::exeFallOutside() {
         MR::startAtmosphereSE("SE_BM_KOOPA_FALL_SUN_3_WIND");
     }
 
-    if (KoopaFunction::tryEndKoopaCameraDemo(mHost, "クッパＶｓ３惑星移動（Ｌｖ２からＬｖ３）", "DemoKoopaFallSun")) {
-        KoopaFunction::setKoopaPos(mHost, "Ｌｖ３内側（クッパ）");
-        MR::setPlayerPosAndWait("Ｌｖ３内側（マリオ）");
+    if (KoopaFunction::tryEndKoopaCameraDemo(mHost, "\x83\x4e\x83\x62\x83\x70\x82\x75\x82\x93\x82\x52\x98\x66\x90\xaf\x88\xda\x93\xae\x81\x69\x82\x6b\x82\x96\x82\x51\x82\xa9\x82\xe7\x82\x6b\x82\x96\x82\x52\x81\x6a", "DemoKoopaFallSun")) {
+        KoopaFunction::setKoopaPos(mHost, "\x82\x6b\x82\x96\x82\x52\x93\xe0\x91\xa4\x81\x69\x83\x4e\x83\x62\x83\x70\x81\x6a");
+        MR::setPlayerPosAndWait("\x82\x6b\x82\x96\x82\x52\x93\xe0\x91\xa4\x81\x69\x83\x7d\x83\x8a\x83\x49\x81\x6a");
 
-        KoopaFunction::startKoopaCamera(mHost, "惑星Ｌｖ３内側を落下");
+        KoopaFunction::startKoopaCamera(mHost, "\x98\x66\x90\xaf\x82\x6b\x82\x96\x82\x52\x93\xe0\x91\xa4\x82\xf0\x97\x8e\x89\xba");
         MR::startAction(mHost, "JumpSoon");
 
         KoopaFunction::getKoopaPlanetShadow(mHost)->appear();

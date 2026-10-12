@@ -68,8 +68,8 @@ void PenguinSkater::init(const JMapInfoIter& rIter) {
     caps.mObjectName = "Penguin";
     if (MR::isConnectedWithRail(rIter)) {
         caps.mRailRider = true;
-        MR::initMultiActorCamera(this, rIter, &mCameraInfo, "開始");
-        MR::initMultiActorCamera(this, rIter, &mCameraInfo, "終了");
+        MR::initMultiActorCamera(this, rIter, &mCameraInfo, "\x8a\x4a\x8e\x6e");
+        MR::initMultiActorCamera(this, rIter, &mCameraInfo, "\x8f\x49\x97\xb9");
         MR::joinToGroupArray(this, rIter, nullptr, 32);
     } else {
         caps.mWaitNerve = GET_NERVE(PenguinSkater, PenguinSkaterNrvTalk);
@@ -276,8 +276,8 @@ void PenguinSkater::exeWait() {
         pushNerve(GET_NERVE(PenguinSkater, PenguinSkaterNrvReaction));
     } else if (MR::tryTalkNearPlayerAtEndAndStartTalkAction(this)) {
         MR::invalidateClipping(this);
-        MR::tryStartDemo(this, "ペンギンスケート開始");
-        MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "開始", -1);
+        MR::tryStartDemo(this, "\x83\x79\x83\x93\x83\x4d\x83\x93\x83\x58\x83\x50\x81\x5b\x83\x67\x8a\x4a\x8e\x6e");
+        MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "\x8a\x4a\x8e\x6e", -1);
         MR::forwardNode(mMsgCtrl);
         TVec3f pos;
         MR::calcRailStartPointDirection(&pos, mRail);
@@ -305,8 +305,8 @@ void PenguinSkater::exeDemo() {
     }
     moveRail(::sDemoSpeed, ::sBlendRatio);
     if (inProvokeRangeIn(calcLead())) {
-        MR::endMultiActorCamera(this, mCameraInfo, "開始", false, -1);
-        MR::endDemo(this, "ペンギンスケート開始");
+        MR::endMultiActorCamera(this, mCameraInfo, "\x8a\x4a\x8e\x6e", false, -1);
+        MR::endDemo(this, "\x83\x79\x83\x93\x83\x4d\x83\x93\x83\x58\x83\x50\x81\x5b\x83\x67\x8a\x4a\x8e\x6e");
         setNerve(GET_NERVE(PenguinSkater, PenguinSkaterNrvAway));
     }
 }
@@ -374,8 +374,8 @@ void PenguinSkater::exeProvoke() {
 
 void PenguinSkater::exeCaught() {
     if (MR::isFirstStep(this)) {
-        MR::tryStartDemoMarioPuppetable(this, "捕まり");
-        MR::startMultiActorCameraTargetPlayer(this, mCameraInfo, "終了", -1);
+        MR::tryStartDemoMarioPuppetable(this, "\x95\xdf\x82\xdc\x82\xe8");
+        MR::startMultiActorCameraTargetPlayer(this, mCameraInfo, "\x8f\x49\x97\xb9", -1);
         MR::startAction(this, "Caught");
         MR::startBckPlayer("TossStart");
         MR::startSound(this, "SE_SM_PENGUIN_CAUGHT");
@@ -409,11 +409,11 @@ void PenguinSkater::exeFadeOut() {
 void PenguinSkater::exeFadeIn() {
     if (MR::isFirstStep(this)) {
         TPos3f pos;
-        MR::findNamePos("マリオ移動後", pos);
-        MR::setNPCActorPos(this, "ペンギン移動後");
-        MR::setPlayerPosOnGroundAndWait("マリオ移動後");
-        MR::endMultiActorCamera(this, mCameraInfo, "終了", false, -1);
-        MR::endDemo(this, "捕まり");
+        MR::findNamePos("\x83\x7d\x83\x8a\x83\x49\x88\xda\x93\xae\x8c\xe3", pos);
+        MR::setNPCActorPos(this, "\x83\x79\x83\x93\x83\x4d\x83\x93\x88\xda\x93\xae\x8c\xe3");
+        MR::setPlayerPosOnGroundAndWait("\x83\x7d\x83\x8a\x83\x49\x88\xda\x93\xae\x8c\xe3");
+        MR::endMultiActorCamera(this, mCameraInfo, "\x8f\x49\x97\xb9", false, -1);
+        MR::endDemo(this, "\x95\xdf\x82\xdc\x82\xe8");
         MR::startTalkingSequence(this);
         MR::startNPCTalkCamera(getMsgCtrl(), getBaseMtx(), pos, 1.0f, 0);
         MR::forwardNode(getMsgCtrl());

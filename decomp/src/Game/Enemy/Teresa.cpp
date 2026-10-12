@@ -165,7 +165,7 @@ void Teresa::initDummyModel(const JMapInfoIter& rIter) {
         mDisplayModel->kill();
 
         if (MR::getDummyDisplayModelId(rIter, -1) == 6) {
-            mKeySwitch = new KeySwitch("鍵スイッチ");
+            mKeySwitch = new KeySwitch("\x8c\xae\x83\x58\x83\x43\x83\x62\x83\x60");
             mKeySwitch->initKeySwitchByOwner(rIter);
             _FC = 0;
         }
@@ -490,7 +490,7 @@ bool Teresa::tryCheseEnd() {
 }
 
 bool Teresa::tryShay() {
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         setNerve(GET_NERVE(Teresa, TeresaNrvShay));
         return true;
     }

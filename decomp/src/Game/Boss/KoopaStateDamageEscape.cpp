@@ -77,7 +77,7 @@ namespace NrvKoopaStateDamageEscape {
 };  // namespace NrvKoopaStateDamageEscape
 
 KoopaStateDamageEscape::KoopaStateDamageEscape(Koopa* pKoopa)
-    : ActorStateBase< Koopa >("State[逃走]", pKoopa), mEscapeTime(-1), mMaxEscapeTime(-1), _18(-1), mIsTurnClockwise(), mIsLastHit(),
+    : ActorStateBase< Koopa >("State[\x93\xa6\x91\x96]", pKoopa), mEscapeTime(-1), mMaxEscapeTime(-1), _18(-1), mIsTurnClockwise(), mIsLastHit(),
       mEscapeRunParam(&::sEscapeRunParamLv1), mDamageTailRunParam(&::sDamageTailRunParam), mMaxRunFrames(::sDamageTailStep),
       mRotateVelocity(::sDamageTailRunStartSpeed), mJumpAwayVelocity(::sDownFlyUpSpeed) {
 }
@@ -85,10 +85,10 @@ KoopaStateDamageEscape::KoopaStateDamageEscape(Koopa* pKoopa)
 void KoopaStateDamageEscape::init() {
     initNerve(GET_NERVE(KoopaStateDamageEscape, KoopaStateDamageEscapeNrvEscapeStart));
 
-    KoopaFunction::initKoopaCamera(mHost, "逃走開始");
-    KoopaFunction::initKoopaCamera(mHost, "逃走");
-    KoopaFunction::initKoopaCamera(mHost, "逃走（尻尾ダメージ）");
-    KoopaFunction::initKoopaCamera(mHost, "逃走ダウン");
+    KoopaFunction::initKoopaCamera(mHost, "\x93\xa6\x91\x96\x8a\x4a\x8e\x6e");
+    KoopaFunction::initKoopaCamera(mHost, "\x93\xa6\x91\x96");
+    KoopaFunction::initKoopaCamera(mHost, "\x93\xa6\x91\x96\x81\x69\x90\x4b\x94\xf6\x83\x5f\x83\x81\x81\x5b\x83\x57\x81\x6a");
+    KoopaFunction::initKoopaCamera(mHost, "\x93\xa6\x91\x96\x83\x5f\x83\x45\x83\x93");
 
     kill();
 }
@@ -96,7 +96,7 @@ void KoopaStateDamageEscape::init() {
 void KoopaStateDamageEscape::appear() {
     mIsDead = false;
 
-    KoopaFunction::endKoopaCamera(mHost, "逃走開始", false, -1);
+    KoopaFunction::endKoopaCamera(mHost, "\x93\xa6\x91\x96\x8a\x4a\x8e\x6e", false, -1);
     MR::validateHitSensor(mHost, "ReceiverTail");
     MR::validateHitSensor(mHost, "ReceiverTailTop");
 
@@ -154,9 +154,9 @@ void KoopaStateDamageEscape::kill() {
 
     mIsDead = true;
 
-    KoopaFunction::endKoopaCamera(mHost, "逃走", false, -1);
-    KoopaFunction::endKoopaCamera(mHost, "逃走（尻尾ダメージ）", false, -1);
-    KoopaFunction::endKoopaCamera(mHost, "逃走ダウン", false, -1);
+    KoopaFunction::endKoopaCamera(mHost, "\x93\xa6\x91\x96", false, -1);
+    KoopaFunction::endKoopaCamera(mHost, "\x93\xa6\x91\x96\x81\x69\x90\x4b\x94\xf6\x83\x5f\x83\x81\x81\x5b\x83\x57\x81\x6a", false, -1);
+    KoopaFunction::endKoopaCamera(mHost, "\x93\xa6\x91\x96\x83\x5f\x83\x45\x83\x93", false, -1);
 
     MR::invalidateHitSensor(mHost, "ReceiverTail");
     MR::invalidateHitSensor(mHost, "ReceiverTailTop");
@@ -285,7 +285,7 @@ void KoopaStateDamageEscape::exeEscapeStart() {
         MR::startAction(mHost, "EscapeRunStart");
         MR::setVelocityJump(mHost, ::sEscapeStartJumpSpeed);
 
-        KoopaFunction::startKoopaCamera(mHost, "逃走開始");
+        KoopaFunction::startKoopaCamera(mHost, "\x93\xa6\x91\x96\x8a\x4a\x8e\x6e");
         KoopaFunction::startBreakKoopaTailThorn(mHost);
 
         MR::startSound(mHost, "SE_BM_KOOPA_BURN");
@@ -327,7 +327,7 @@ void KoopaStateDamageEscape::exeEscapeStartLand() {
 void KoopaStateDamageEscape::exeEscapeRun() {
     if (MR::isFirstStep(this)) {
         MR::startAction(mHost, "EscapeRun");
-        KoopaFunction::startKoopaCamera(mHost, "逃走");
+        KoopaFunction::startKoopaCamera(mHost, "\x93\xa6\x91\x96");
     }
 
     KoopaFunction::escapeKoopaFromPlayer(mHost, *mEscapeRunParam);
@@ -397,7 +397,7 @@ void KoopaStateDamageEscape::exeDamageTailRunStart() {
 
         MR::setVelocity(pKoopa, KoopaFunction::getKoopaFront(pKoopa) * mRotateVelocity);
 
-        KoopaFunction::startKoopaCamera(mHost, "逃走（尻尾ダメージ）");
+        KoopaFunction::startKoopaCamera(mHost, "\x93\xa6\x91\x96\x81\x69\x90\x4b\x94\xf6\x83\x5f\x83\x81\x81\x5b\x83\x57\x81\x6a");
 
         MR::invalidateHitSensor(mHost, "ReceiverTail");
         MR::invalidateHitSensor(mHost, "ReceiverTailTop");
@@ -494,7 +494,7 @@ void KoopaStateDamageEscape::exeDown() {
     if (MR::isFirstStep(this)) {
         MR::startAction(mHost, "Down");
         MR::setVelocityJumpAwayFromPlayer(mHost, 35.0f, mJumpAwayVelocity);
-        KoopaFunction::startKoopaCamera(mHost, "逃走ダウン");
+        KoopaFunction::startKoopaCamera(mHost, "\x93\xa6\x91\x96\x83\x5f\x83\x45\x83\x93");
         MR::emitEffect(mHost, "DownSmoke");
     }
 

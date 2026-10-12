@@ -80,9 +80,9 @@ void Mario::forceStopTornado() {
 void Mario::doSpinWallEffect() {
     if ((!mMovementStates._8 || !mFrontWallTriangle->mSensor->isType(0x55)) && (!mMovementStates._19 || !mBackWallTriangle->mSensor->isType(0x55)) &&
         (!mMovementStates._1A || !mSideWallTriangle->mSensor->isType(0x55))) {
-        playSound("壁反射");
-        playSound("声スピンキャンセル");
-        playEffect("壁スパーク");
+        playSound("\x95\xc7\x94\xbd\x8e\xcb");
+        playSound("\x90\xba\x83\x58\x83\x73\x83\x93\x83\x4c\x83\x83\x83\x93\x83\x5a\x83\x8b");
+        playEffect("\x95\xc7\x83\x58\x83\x70\x81\x5b\x83\x4e");
     }
 }
 
@@ -92,7 +92,7 @@ void Mario::startRotationTask(u32 flags) {
 
 bool Mario::taskOnRotation(u32 flags) {
     if (flags & 4) {
-        if (!isAnimationRun("ヘリコプタージャンプ")) {
+        if (!isAnimationRun("\x83\x77\x83\x8a\x83\x52\x83\x76\x83\x5e\x81\x5b\x83\x57\x83\x83\x83\x93\x83\x76")) {
             mYAngleOffset = 0.0f;
             return false;
         }

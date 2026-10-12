@@ -6,7 +6,7 @@ class RailRider;
 
 class CameraRailWatch : public Camera {
 public:
-    CameraRailWatch(const char* pName = "レール注目カメラ");
+    CameraRailWatch(const char* pName = "\x83\x8c\x81\x5b\x83\x8b\x92\x8d\x96\xda\x83\x4a\x83\x81\x83\x89");
 
     virtual void reset();
     virtual CameraTargetObj* calc();

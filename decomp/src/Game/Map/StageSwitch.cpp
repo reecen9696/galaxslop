@@ -221,7 +221,7 @@ namespace MR {
 StageSwitchContainer::~StageSwitchContainer() {
 }
 
-StageSwitchContainer::StageSwitchContainer() : NameObj("ステージスイッチ"), mSwitches(), mGlobalSwitches() {
+StageSwitchContainer::StageSwitchContainer() : NameObj("\x83\x58\x83\x65\x81\x5b\x83\x57\x83\x58\x83\x43\x83\x62\x83\x60"), mSwitches(), mGlobalSwitches() {
     mGlobalSwitches = new ZoneSwitch();
 }
 

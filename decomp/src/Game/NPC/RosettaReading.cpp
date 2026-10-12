@@ -77,19 +77,19 @@ void RosettaReading::makeArchiveList(NameObjArchiveListCollector* pCollector, co
 }
 
 void RosettaReading::exePictureBookBefore() {
-    if (MR::isDemoPartActive("朗読開始") || MR::isDemoPartActive("ロゼッタ会話[開始]") || MR::isDemoPartLessEqualStep("絵本デモ開始", 60)) {
+    if (MR::isDemoPartActive("\x98\x4e\x93\xc7\x8a\x4a\x8e\x6e") || MR::isDemoPartActive("\x83\x8d\x83\x5b\x83\x62\x83\x5e\x89\xef\x98\x62[\x8a\x4a\x8e\x6e]") || MR::isDemoPartLessEqualStep("\x8a\x47\x96\x7b\x83\x66\x83\x82\x8a\x4a\x8e\x6e", 60)) {
         MR::startSystemLevelSE("SE_SM_LV_TICO_WAIT_LIBRARY");
     }
 
-    if (MR::isDemoPartStep("絵本デモ開始", 100)) {
+    if (MR::isDemoPartStep("\x8a\x47\x96\x7b\x83\x66\x83\x82\x8a\x4a\x8e\x6e", 100)) {
         MR::startSound(this, "SE_SM_ROSETTA_BOOK_OPEN");
     }
 
-    if (MR::isDemoPartFirstStep("絵本デモ開始")) {
+    if (MR::isDemoPartFirstStep("\x8a\x47\x96\x7b\x83\x66\x83\x82\x8a\x4a\x8e\x6e")) {
         MR::stopStageBGM(120);
     }
 
-    if (MR::isDemoPartLastStep("絵本デモ開始")) {
+    if (MR::isDemoPartLastStep("\x8a\x47\x96\x7b\x83\x66\x83\x82\x8a\x4a\x8e\x6e")) {
         MR::pauseTimeKeepDemo(this);
         setNerve(GET_NERVE(RosettaReading, RosettaReadingNrvPictureBook));
     }
@@ -113,11 +113,11 @@ void RosettaReading::exePictureBook() {
 }
 
 void RosettaReading::exePictureBookAfter() {
-    if (MR::isDemoPartGreaterStep("絵本デモ終了", 30) || MR::isDemoPartActive("ロゼッタ会話[終了]")) {
+    if (MR::isDemoPartGreaterStep("\x8a\x47\x96\x7b\x83\x66\x83\x82\x8f\x49\x97\xb9", 30) || MR::isDemoPartActive("\x83\x8d\x83\x5b\x83\x62\x83\x5e\x89\xef\x98\x62[\x8f\x49\x97\xb9]")) {
         MR::startSystemLevelSE("SE_SM_LV_TICO_WAIT_LIBRARY");
     }
 
-    if (MR::isDemoPartStep("絵本デモ終了", ::cOverlayStartStep)) {
+    if (MR::isDemoPartStep("\x8a\x47\x96\x7b\x83\x66\x83\x82\x8f\x49\x97\xb9", ::cOverlayStartStep)) {
         MR::overlayWithPreviousScreen(::cOverlayFrame);
     }
 

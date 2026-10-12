@@ -1,6 +1,16 @@
 #include "JSystem/JAudio2/JAISe.hpp"
 #include "JSystem/JAudio2/JAIAudience.hpp"
 #include "JSystem/JAudio2/JAISeMgr.hpp"
+#ifdef TARGET_PC
+#include <stdlib.h>
+
+// PETARI_SELOG: logs each sound effect's start and end, and the ones whose
+// track keeps running long after they were stopped.
+static bool portSeLog() {
+    static const bool sOn = getenv("PETARI_SELOG") != nullptr;
+    return sOn;
+}
+#endif
 
 JAISe::JAISe(JAISeMgr* SeMgr, JAISoundStrategyMgr< JAISe >* soundStrategyMgr, u32 priority) : JSULink< JAISe >(this) {
     inner_.mSoundStrategyMgr = soundStrategyMgr;
@@ -116,6 +126,16 @@ void JAISe::JAISeCategoryMgr_calc_() {
 }
 
 bool JAISe::JAISound_tryDie_() {
+#ifdef TARGET_PC
+    if (portSeLog()) {
+        s32 frames = ++inner_.mPortStoppingFrames;
+        if (inner_.track.getStatus() != JASTrack::STATUS_RUN) {
+            port_log("se: end %08x after %d stopping frames", (u32)getID(), (int)frames);
+        } else if (frames == 60 || frames == 600) {
+            port_log("se: %08x still running %d frames after its stop", (u32)getID(), (int)frames);
+        }
+    }
+#endif
     switch (inner_.track.getStatus()) {
     case JASTrack::STATUS_FREE:
     case JASTrack::STATUS_STOPPED:
@@ -134,6 +154,12 @@ bool JAISe::JAISound_tryDie_() {
 void JAISe::JAISeMgr_startID_(JAISoundID id, const TVec3f* posPtr, JAIAudience* audience) {
     start_JAISound_(id, posPtr, audience);
     inner_._26C = false;
+#ifdef TARGET_PC
+    inner_.mPortStoppingFrames = 0;
+    if (portSeLog()) {
+        port_log("se: start %08x%s", (u32)id, posPtr != nullptr ? " (positional)" : "");
+    }
+#endif
     if (inner_.mSoundStrategyMgr != nullptr) {
         inner_.mSoundStrategy = inner_.mSoundStrategyMgr->newStrategy(id);
     } else {

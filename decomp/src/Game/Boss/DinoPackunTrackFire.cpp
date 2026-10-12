@@ -19,11 +19,11 @@ void DinoPackunTrackFire_FORCE_MATCH_SDATA2() {
     (void) 2.0f;
 }
 
-DinoPackunTrackFireHolder::DinoPackunTrackFireHolder(s32 max) : DeriveActorGroup< DinoPackunTrackFire >("シッポ跡炎管理", max) {
+DinoPackunTrackFireHolder::DinoPackunTrackFireHolder(s32 max) : DeriveActorGroup< DinoPackunTrackFire >("\x83\x56\x83\x62\x83\x7c\x90\xd5\x89\x8a\x8a\xc7\x97\x9d", max) {
     DinoPackunTrackFire* pTrackFire;
 
     for (s32 i = 0; i < max; i++) {
-        pTrackFire = new DinoPackunTrackFire("シッポ跡炎");
+        pTrackFire = new DinoPackunTrackFire("\x83\x56\x83\x62\x83\x7c\x90\xd5\x89\x8a");
         pTrackFire->initWithoutIter();
         registerActor(pTrackFire);
     }
@@ -59,7 +59,7 @@ void DinoPackunTrackFire::init(const JMapInfoIter& rIter) {
 void DinoPackunTrackFire::control() {
     MR::makeMtxUpNoSupportPos(&_8C, -mGravity, mPosition);
 
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         kill();
     }
 }

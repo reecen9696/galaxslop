@@ -4,6 +4,15 @@
 #include <revolution/gx/GXDispList.h>
 #include <stdint.h>
 
+#if defined(__MWERKS__) || defined(__BIG_ENDIAN__)
+#define DL_READ_U16(p) (*reinterpret_cast< u16* >(p))
+#define DL_WRITE_U16(p, v) (*reinterpret_cast< u16* >(p) = (v))
+#else
+// Display lists keep the GPU's big-endian byte order.
+#define DL_READ_U16(p) ((u16)(((p)[0] << 8) | (p)[1]))
+#define DL_WRITE_U16(p, v) ((p)[0] = (u8)((v) >> 8), (p)[1] = (u8)(v))
+#endif
+
 u32 J3DShapeDraw::countVertex(u32 stride) {
     u32 count = 0;
     u8* dlStart = static_cast< u8* >(getDisplayList());
@@ -13,7 +22,7 @@ u32 J3DShapeDraw::countVertex(u32 stride) {
         dl++;
         if (cmd != GX_TRIANGLEFAN && cmd != GX_TRIANGLESTRIP)
             break;
-        int vtxNum = *reinterpret_cast< u16* >(dl);
+        int vtxNum = DL_READ_U16(dl);
         dl += 2;
         count += vtxNum;
         dl = static_cast< u8* >(dl) + stride * vtxNum;
@@ -39,9 +48,9 @@ void J3DShapeDraw::addTexMtxIndexInDL(u32 stride, u32 attrOffs, u32 valueBase) {
             break;
 
         // Copy count
-        int vtxNum = *reinterpret_cast< u16* >(oldDL);
+        int vtxNum = DL_READ_U16(oldDL);
         oldDL += 2;
-        *reinterpret_cast< u16* >(newDL) = vtxNum;
+        DL_WRITE_U16(newDL, vtxNum);
         newDL += 2;
 
         for (int i = 0; i < vtxNum; i++) {

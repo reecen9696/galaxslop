@@ -71,6 +71,14 @@ namespace MR {
 
     void waitEndChangeArchivePlayer() {
         while (!GameSystemFunction::isEndChangeArchivePlayer()) {
+#ifdef TARGET_PC
+            // The change is made by the main thread, which on the console
+            // preempts this one at the next retrace interrupt.  The port only
+            // takes interrupts at safe points: without one here, starting a
+            // file as Luigi (the player archives change) hung for good.
+            port_host_sleep_ns(200000);
+            port_irq_poll();
+#endif
         }
     }
 

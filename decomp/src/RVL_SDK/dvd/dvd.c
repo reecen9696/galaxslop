@@ -1495,7 +1495,7 @@ static void cbForStateBusy(u32 intType) {
                 u32 coverReg;
 
                 coverReg = DVDLowGetCoverRegister();
-                if (((((unsigned long)(coverReg)) & 0x00000004) >> 2) || (coverReg & 1)) {
+                if (((((unsigned int)(coverReg)) & 0x00000004) >> 2) || (coverReg & 1)) {
                     retVal = FALSE;
                 } else {
                     if (ResumeFromHere != 0) {

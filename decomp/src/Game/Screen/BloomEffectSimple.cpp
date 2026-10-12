@@ -30,7 +30,7 @@ namespace {
 };  // namespace
 
 BloomEffectSimple::BloomEffectSimple()
-    : ImageEffectBase("簡易ブルーム"), _14(), _18(), _1C(), _20(), _24(), _28(), _2C(), mMaskFilter(), mThreshold(205), mIntensity(0.3f) {
+    : ImageEffectBase("\x8a\xc8\x88\xd5\x83\x75\x83\x8b\x81\x5b\x83\x80"), _14(), _18(), _1C(), _20(), _24(), _28(), _2C(), mMaskFilter(), mThreshold(205), mIntensity(0.3f) {
     MR::connectToSceneImageEffect(this);
     MR::createImageEffectSystemHolder();
     MR::getImageEffectResource()->createBloomTexture();

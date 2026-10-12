@@ -4,6 +4,7 @@
 #include <JSystem/JKernel/JKRExpHeap.hpp>
 #include <revolution/rso.h>
 
+#ifndef TARGET_PC
 void (*HBMCreateRSO)(const HBMDataInfo*);
 void (*HBMInitRSO)(void);
 void (*HBMCalcRSO)(const HBMControllerData*);
@@ -87,6 +88,36 @@ void RSO::HBMSetAdjustFlag(int flag) {
 void RSO::HBMStartBlackOut() {
     (*HBMStartBlackOutRSO)();
 }
+
+#else
+// The HOME Menu ships as a PowerPC module (HomeButtonMenuWrapperRSO.rso).
+// On Quest the system menu takes its place, so the menu closes as soon as
+// it opens.
+void RSO::setupRsoHomeButtonMenu() {
+}
+
+void RSO::HBMCreate(const HBMDataInfo* pHBInfo) {
+}
+
+void RSO::HBMInit() {
+}
+
+void RSO::HBMCalc(const HBMControllerData* pController) {
+}
+
+void RSO::HBMDraw() {
+}
+
+HBMSelectBtnNum RSO::HBMGetSelectBtnNum() {
+    return HBM_SELECT_HOMEBTN;
+}
+
+void RSO::HBMSetAdjustFlag(int flag) {
+}
+
+void RSO::HBMStartBlackOut() {
+}
+#endif
 
 void _unresolved(void) {
 }

@@ -38,7 +38,7 @@ void HeatHazeEffect::init(const JMapInfoIter& rIter) {
 }
 
 void HeatHazeDirector::init(const JMapInfoIter& rIter) {
-    mEffect = new HeatHazeEffect("陽炎");
+    mEffect = new HeatHazeEffect("\x97\x7a\x89\x8a");
     mEffect->initWithoutIter();
 
     MR::connectToSceneMapObjMovement(this);

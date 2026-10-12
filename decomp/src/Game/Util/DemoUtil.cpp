@@ -573,12 +573,12 @@ namespace MR {
     }
 
     void startTalkingSequenceWithoutCinemaFrame(NameObj* pObj) {
-        DemoStartRequestUtil::startDemoSystem(pObj, "会話", 3, DemoStartInfo::DemoType(0), DemoStartInfo::CinemaFrameType(1),
+        DemoStartRequestUtil::startDemoSystem(pObj, "\x89\xef\x98\x62", 3, DemoStartInfo::DemoType(0), DemoStartInfo::CinemaFrameType(1),
                                               DemoStartInfo::StarPointerType(0), DemoStartInfo::DeleteEffectType(0), nullptr);
     }
 
     void endTalkingSequence(NameObj* pObj) {
-        endDemo(pObj, "会話");
+        endDemo(pObj, "\x89\xef\x98\x62");
     }
 
     bool isSystemTalking() {
@@ -599,7 +599,7 @@ namespace MR {
 
     LiveActor* getTalkingActor() {
         if (isExistSceneObj(SceneObj_TalkDirector) == false) {
-            return false;
+            return nullptr;
         }
 
         return ::getTalkDirector()->getTalkingActor();
@@ -610,7 +610,7 @@ namespace MR {
     }
 
     void startTalkingSequence(NameObj* pObj) {
-        DemoStartRequestUtil::startDemoSystem(pObj, "会話", 3, DemoStartInfo::DemoType(0), DemoStartInfo::CinemaFrameType(0),
+        DemoStartRequestUtil::startDemoSystem(pObj, "\x89\xef\x98\x62", 3, DemoStartInfo::DemoType(0), DemoStartInfo::CinemaFrameType(0),
                                               DemoStartInfo::StarPointerType(0), DemoStartInfo::DeleteEffectType(0), nullptr);
     }
 };  // namespace MR

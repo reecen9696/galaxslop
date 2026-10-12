@@ -8,7 +8,7 @@ public:
         EaseType_Linear = 0,
         EaseType_InOut = 1,
     };
-    CameraSpiral(const char* pName = "螺旋カメラ（デモ用）");
+    CameraSpiral(const char* pName = "\x97\x86\x90\xf9\x83\x4a\x83\x81\x83\x89\x81\x69\x83\x66\x83\x82\x97\x70\x81\x6a");
 
     virtual void reset();
     virtual CameraTargetObj* calc();

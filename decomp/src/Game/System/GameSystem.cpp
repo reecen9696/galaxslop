@@ -35,7 +35,7 @@
 
 #define GX_FIFO_SIZE 0x80000
 
-#define INIT_AUDIO_KEY "オーディオ初期化"  // "Audio Initialization"
+#define INIT_AUDIO_KEY "\x83\x49\x81\x5b\x83\x66\x83\x42\x83\x49\x8f\x89\x8a\xfa\x89\xbb"  // "Audio Initialization"
 
 namespace NrvGameSystem {
     NEW_NERVE(GameSystemInitializeAudio, GameSystem, InitializeAudio);
@@ -45,7 +45,15 @@ namespace NrvGameSystem {
     NEW_NERVE(GameSystemNormal, GameSystem, Normal);
 };  // namespace NrvGameSystem
 
+#ifdef TARGET_PC
+void port_game_main(void) {
+#else
+#ifdef TARGET_PC
+void port_game_main(void) {
+#else
 void main(void) {
+#endif
+#endif
     OSInitFastCast();
     DVDInit();
     VIInit();
@@ -191,6 +199,32 @@ bool GameSystem::isPreparedReset() const {
 }
 
 void GameSystem::frameLoop() {
+#ifdef TARGET_PC
+    port_perf_frame_begin();
+    if (port_skip_fast_forwarding()) {
+        // A cutscene being skipped: nothing is drawn (the headset view is
+        // dimmed), and the game logic runs as often as fits in a frame.  The
+        // retrace wait still gives the other threads (audio, loading) their
+        // turn.
+        int64_t start = port_host_time_ns();
+        do {
+            update();
+            calcAnim();
+            if (mSceneController->isChangingScene()) {
+                // The skipped cutscene ends in another stage (Mario jumping
+                // out of a dome into the star select): the scene change runs
+                // at the normal pace, drawn, with its loading threads timed
+                // as when nothing is skipped.  Fast-forwarded through, the
+                // game stopped for good there.
+                port_skip_scene_change();
+                break;
+            }
+        } while (port_skip_fast_forwarding() && port_host_time_ns() - start < 12000000);
+        port_perf_frame_work_done();
+        MainLoopFramework::sManager->waitForRetrace();
+        return;
+    }
+#endif
     MainLoopFramework::sManager->beginRender();
     draw();
     MainLoopFramework::sManager->endRender();
@@ -198,13 +232,29 @@ void GameSystem::frameLoop() {
     calcAnim();
     mObjHolder->captureIfAllowForScreenPreserver();
     MainLoopFramework::sManager->endFrame();
+#ifdef TARGET_PC
+    port_perf_frame_work_done();
+#endif
     MainLoopFramework::sManager->waitForRetrace();
 }
 
 void GameSystem::draw() {
     mSceneController->drawScene();
+#ifdef TARGET_PC
+    // Everything drawn over the scene is 2D too: the save and error windows,
+    // the pointer's cursor, the system wipe.  In VR it goes on the HUD panel
+    // with the scene's own 2D, where the pointer aims (drawn into the eyes'
+    // images instead, it covered the whole view, out of the pointer's reach).
+    port_gx_marker(PORT_GX_MARK_HUD_BEGIN);
+#endif
     mSequenceDirector->draw();
+#ifdef TARGET_PC
+    port_gx_marker(PORT_GX_MARK_POINTER_BEGIN);
+#endif
     mObjHolder->drawStarPointer();
+#ifdef TARGET_PC
+    port_gx_marker(PORT_GX_MARK_POINTER_END);
+#endif
     mObjHolder->drawBeforeEndRender();
 
     if (mSystemWipeHolder != nullptr) {
@@ -214,6 +264,9 @@ void GameSystem::draw() {
     mErrorWatcher->draw();
     mHomeButtonLayout->draw();
     SingletonHolder< GameSystemResetAndPowerProcess >::get()->draw();
+#ifdef TARGET_PC
+    port_gx_marker(PORT_GX_MARK_HUD_END);
+#endif
 }
 
 void GameSystem::update() {

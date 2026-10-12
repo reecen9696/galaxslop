@@ -126,7 +126,7 @@ void WarpCube::init(const JMapInfoIter& rIter) {
     MR::getJMapInfoArg0WithInit(rIter, &arg0);
 
     char eventName[0x100];
-    sprintf(eventName, "ワープカメラ %d-%c", groupID, arg0 + 65);
+    sprintf(eventName, "\x83\x8f\x81\x5b\x83\x76\x83\x4a\x83\x81\x83\x89 %d-%c", groupID, arg0 + 65);
 
     MR::declareEventCamera(mCameraInfo, eventName);
 

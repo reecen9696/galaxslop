@@ -43,10 +43,10 @@ struct RSOObjectLink {
 };
 
 struct RSOExportTable {
-    unsigned long strOffset;
-    unsigned long value;
-    unsigned long section;
-    unsigned long hash;
+    unsigned int strOffset;
+    unsigned int value;
+    unsigned int section;
+    unsigned int hash;
 };
 
 struct RSOObjectInfo {

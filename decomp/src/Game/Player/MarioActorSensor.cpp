@@ -128,63 +128,63 @@ void MarioActor::updateHitSensor(HitSensor* pSensor) {
                 _3E5 = true;
             }
 
-            if (isAnimationRun("地上ひねり")) {
+            if (isAnimationRun("\x92\x6e\x8f\xe3\x82\xd0\x82\xcb\x82\xe8")) {
                 _3E5 = true;
             }
 
-            if (isAnimationRun("サマーソルト")) {
+            if (isAnimationRun("\x83\x54\x83\x7d\x81\x5b\x83\x5c\x83\x8b\x83\x67")) {
                 _3E5 = true;
             }
 
-            if (isAnimationRun("水泳スピン")) {
+            if (isAnimationRun("\x90\x85\x89\x6a\x83\x58\x83\x73\x83\x93")) {
                 _3E5 = true;
             }
 
-            if (isAnimationRun("水上スピン")) {
+            if (isAnimationRun("\x90\x85\x8f\xe3\x83\x58\x83\x73\x83\x93")) {
                 _3E5 = true;
             }
 
-            if (isAnimationRun("しゃがみスピン")) {
+            if (isAnimationRun("\x82\xb5\x82\xe1\x82\xaa\x82\xdd\x83\x58\x83\x73\x83\x93")) {
                 _3E5 = true;
             }
 
-            if (isAnimationRun("フーファイタースピン")) {
+            if (isAnimationRun("\x83\x74\x81\x5b\x83\x74\x83\x40\x83\x43\x83\x5e\x81\x5b\x83\x58\x83\x73\x83\x93")) {
                 _3E5 = true;
             }
 
-            if (isAnimationRun("ハチスピン")) {
+            if (isAnimationRun("\x83\x6e\x83\x60\x83\x58\x83\x73\x83\x93")) {
                 _3E5 = true;
             }
 
-            if (isAnimationRun("ハチスピン空中")) {
+            if (isAnimationRun("\x83\x6e\x83\x60\x83\x58\x83\x73\x83\x93\x8b\xf3\x92\x86")) {
                 _3E5 = true;
             }
 
-            if (isAnimationRun("アイスひねり空中")) {
+            if (isAnimationRun("\x83\x41\x83\x43\x83\x58\x82\xd0\x82\xcb\x82\xe8\x8b\xf3\x92\x86")) {
                 _3E5 = true;
             }
 
-            if (isAnimationRun("ファイアスピン空中")) {
+            if (isAnimationRun("\x83\x74\x83\x40\x83\x43\x83\x41\x83\x58\x83\x73\x83\x93\x8b\xf3\x92\x86")) {
                 _3E5 = true;
             }
 
-            if (isAnimationRun("ファイアスピン")) {
+            if (isAnimationRun("\x83\x74\x83\x40\x83\x43\x83\x41\x83\x58\x83\x73\x83\x93")) {
                 _3E5 = true;
             }
 
-            if (isAnimationRun("アイスひねり")) {
+            if (isAnimationRun("\x83\x41\x83\x43\x83\x58\x82\xd0\x82\xcb\x82\xe8")) {
                 _3E5 = true;
             }
 
-            if (isAnimationRun("アイスひねり移動")) {
+            if (isAnimationRun("\x83\x41\x83\x43\x83\x58\x82\xd0\x82\xcb\x82\xe8\x88\xda\x93\xae")) {
                 _3E5 = true;
             }
 
-            if (isAnimationRun("アイスひねり静止")) {
+            if (isAnimationRun("\x83\x41\x83\x43\x83\x58\x82\xd0\x82\xcb\x82\xe8\x90\xc3\x8e\x7e")) {
                 _3E5 = true;
             }
 
-            if (isAnimationRun("ハンマー投げリリース")) {
+            if (isAnimationRun("\x83\x6e\x83\x93\x83\x7d\x81\x5b\x93\x8a\x82\xb0\x83\x8a\x83\x8a\x81\x5b\x83\x58")) {
                 _3E5 = true;
             }
 
@@ -228,14 +228,14 @@ void MarioActor::doTrampleJump(HitSensor* pSensor) {
     case 0x1F:
         _988 = 0;
         trampleJump(getConst().getTable()->mTrampleBegoma, getConst().getTable()->mTrampleLong);
-        changeAnimationNonStop("ヘリコプタージャンプ");
-        mMario->startPadVib(2UL);
-        playSound("ヘリコプタージャンプ", -1);
+        changeAnimationNonStop("\x83\x77\x83\x8a\x83\x52\x83\x76\x83\x5e\x81\x5b\x83\x57\x83\x83\x83\x93\x83\x76");
+        mMario->startPadVib(2U);
+        playSound("\x83\x77\x83\x8a\x83\x52\x83\x76\x83\x5e\x81\x5b\x83\x57\x83\x83\x83\x93\x83\x76", -1);
         mMario->startRotationTask(4);
         mMario->_430 = 11;
         break;
     default:
-        if (strcmp(pSensor->mHost->mName, "砲弾") == 0) {
+        if (strcmp(pSensor->mHost->mName, "\x96\x43\x92\x65") == 0) {
             mMario->playSoundTrampleCombo(_989);
             _989++;
             if (_989 > 1 && _989 < 5) {
@@ -250,7 +250,7 @@ void MarioActor::doTrampleJump(HitSensor* pSensor) {
             }
         }
 
-        if (strcmp(pSensor->mHost->mName, "全滅用クリボー") == 0) {
+        if (strcmp(pSensor->mHost->mName, "\x91\x53\x96\xc5\x97\x70\x83\x4e\x83\x8a\x83\x7b\x81\x5b") == 0) {
             mMario->playSoundTrampleCombo(_989);
             _989++;
             if (_989 > 1 && _989 < 8) {
@@ -298,11 +298,11 @@ void MarioActor::trampleJump(f32 normal, f32 extra) {
         if (!mMario->mMovementStates._A) {
             _988++;
             if (_988 == 1) {
-                changeAnimation("ジャンプふみ1");
+                changeAnimation("\x83\x57\x83\x83\x83\x93\x83\x76\x82\xd3\x82\xdd""1");
             } else if (_988 == 2) {
-                changeAnimation("ジャンプふみ2");
+                changeAnimation("\x83\x57\x83\x83\x83\x93\x83\x76\x82\xd3\x82\xdd""2");
             } else if (_988 >= 3) {
-                changeAnimation("ジャンプふみ3");
+                changeAnimation("\x83\x57\x83\x83\x83\x93\x83\x76\x82\xd3\x82\xdd""3");
                 _988 = 0;
             }
         }
@@ -310,17 +310,17 @@ void MarioActor::trampleJump(f32 normal, f32 extra) {
         stopAnimation(nullptr);
         switch (mMario->mRabbit->_68) {
         case 0:
-            changeAnimation("ホッパーふみジャンプA");
+            changeAnimation("\x83\x7a\x83\x62\x83\x70\x81\x5b\x82\xd3\x82\xdd\x83\x57\x83\x83\x83\x93\x83\x76""A");
             break;
         case 1:
-            changeAnimation("ホッパーふみジャンプB");
+            changeAnimation("\x83\x7a\x83\x62\x83\x70\x81\x5b\x82\xd3\x82\xdd\x83\x57\x83\x83\x83\x93\x83\x76""B");
             break;
         }
     }
 
-    playSound("声踏み", -1);
-    playEffect("ふみつぶし");
-    mMario->startPadVib(0UL);
+    playSound("\x90\xba\x93\xa5\x82\xdd", -1);
+    playEffect("\x82\xd3\x82\xdd\x82\xc2\x82\xd4\x82\xb5");
+    mMario->startPadVib(0U);
     mMario->mMovementStates._2F = false;
     mMario->mMovementStates._22 = false;
     mMario->mMovementStates._3E = 0;

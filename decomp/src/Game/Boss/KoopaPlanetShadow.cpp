@@ -10,7 +10,7 @@
 KoopaPlanetShadow::~KoopaPlanetShadow() {
 }
 
-KoopaPlanetShadow::KoopaPlanetShadow(const Koopa* pKoopa) : LiveActor("惑星用の影"), mKoopa(pKoopa), mHipMtx() {
+KoopaPlanetShadow::KoopaPlanetShadow(const Koopa* pKoopa) : LiveActor("\x98\x66\x90\xaf\x97\x70\x82\xcc\x89\x65"), mKoopa(pKoopa), mHipMtx() {
 }
 
 void KoopaPlanetShadow::init(const JMapInfoIter& rIter) {

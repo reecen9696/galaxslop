@@ -101,10 +101,10 @@ void MarioRabbit::impact() {
     if (_28) {
         switch (_68) {
         case 0:
-            changeAnimationNonStop("ホッパーハイジャンプA");
+            changeAnimationNonStop("\x83\x7a\x83\x62\x83\x70\x81\x5b\x83\x6e\x83\x43\x83\x57\x83\x83\x83\x93\x83\x76""A");
             break;
         case 1:
-            changeAnimationNonStop("ホッパーハイジャンプB");
+            changeAnimationNonStop("\x83\x7a\x83\x62\x83\x70\x81\x5b\x83\x6e\x83\x43\x83\x57\x83\x83\x83\x93\x83\x76""B");
             break;
         }
 
@@ -112,10 +112,10 @@ void MarioRabbit::impact() {
     } else if (!MR::isNearZero(getStickP())) {
         switch (_68) {
         case 0:
-            changeAnimationNonStop("ホッパー移動A");
+            changeAnimationNonStop("\x83\x7a\x83\x62\x83\x70\x81\x5b\x88\xda\x93\xae""A");
             break;
         case 1:
-            changeAnimationNonStop("ホッパー移動B");
+            changeAnimationNonStop("\x83\x7a\x83\x62\x83\x70\x81\x5b\x88\xda\x93\xae""B");
             break;
         }
 
@@ -123,10 +123,10 @@ void MarioRabbit::impact() {
     } else {
         switch (_68) {
         case 0:
-            changeAnimationNonStop("ホッパージャンプA");
+            changeAnimationNonStop("\x83\x7a\x83\x62\x83\x70\x81\x5b\x83\x57\x83\x83\x83\x93\x83\x76""A");
             break;
         case 1:
-            changeAnimationNonStop("ホッパージャンプB");
+            changeAnimationNonStop("\x83\x7a\x83\x62\x83\x70\x81\x5b\x83\x57\x83\x83\x83\x93\x83\x76""B");
             break;
         }
     }
@@ -151,18 +151,18 @@ bool MarioRabbit::update() {
 
     if (getPlayer()->mMovementStates._1) {
         if (_6A) {
-            playSound("ホッパー跳ね返り");
+            playSound("\x83\x7a\x83\x62\x83\x70\x81\x5b\x92\xb5\x82\xcb\x95\xd4\x82\xe8");
             _6A = 0;
         }
 
-        if (_27 || isAnimationRun("ホッパー壁ジャンプ") || isAnimationRun("ホッパーヒップドロップ")) {
+        if (_27 || isAnimationRun("\x83\x7a\x83\x62\x83\x70\x81\x5b\x95\xc7\x83\x57\x83\x83\x83\x93\x83\x76") || isAnimationRun("\x83\x7a\x83\x62\x83\x70\x81\x5b\x83\x71\x83\x62\x83\x76\x83\x68\x83\x8d\x83\x62\x83\x76")) {
             stopAnimation(nullptr);
             switch (_68) {
             case 0:
-                changeAnimation("ホッパージャンプA");
+                changeAnimation("\x83\x7a\x83\x62\x83\x70\x81\x5b\x83\x57\x83\x83\x83\x93\x83\x76""A");
                 break;
             case 1:
-                changeAnimation("ホッパージャンプB");
+                changeAnimation("\x83\x7a\x83\x62\x83\x70\x81\x5b\x83\x57\x83\x83\x83\x93\x83\x76""B");
                 break;
             }
 
@@ -172,24 +172,24 @@ bool MarioRabbit::update() {
                 getPlayer()->mMovementStates.jumping = false;
             }
 
-            startPadVib(1UL);
-            playEffect("共通着地普通");
+            startPadVib(1U);
+            playEffect("\x8b\xa4\x92\xca\x92\x85\x92\x6e\x95\x81\x92\xca");
             if (!_28) {
-                playSound("ホッパー跳ね返り");
+                playSound("\x83\x7a\x83\x62\x83\x70\x81\x5b\x92\xb5\x82\xcb\x95\xd4\x82\xe8");
             }
         }
 
         if (getPlayer()->_3CE < mActor->getConst().getTable()->mHopperLandingTime) {
             if (mActor->isRequestJump() || _69) {
                 _28 = 1;
-                playEffect("共通ハイジャンプ");
-                startPadVib("マリオ[ホッパーため]");
+                playEffect("\x8b\xa4\x92\xca\x83\x6e\x83\x43\x83\x57\x83\x83\x83\x93\x83\x76");
+                startPadVib("\x83\x7d\x83\x8a\x83\x49[\x83\x7a\x83\x62\x83\x70\x81\x5b\x82\xbd\x82\xdf]");
                 switch (_68) {
                 case 0:
-                    changeAnimationNonStop("ホッパーハイジャンプA");
+                    changeAnimationNonStop("\x83\x7a\x83\x62\x83\x70\x81\x5b\x83\x6e\x83\x43\x83\x57\x83\x83\x83\x93\x83\x76""A");
                     break;
                 case 1:
-                    changeAnimationNonStop("ホッパーハイジャンプB");
+                    changeAnimationNonStop("\x83\x7a\x83\x62\x83\x70\x81\x5b\x83\x6e\x83\x43\x83\x57\x83\x83\x83\x93\x83\x76""B");
                     break;
                 }
             }
@@ -199,13 +199,13 @@ bool MarioRabbit::update() {
 
         if (_28) {
             if (getPlayer()->_3CE < mActor->getConst().getTable()->mRabbitChargeTime2) {
-                playSound("ホッパージャンプ溜め");
+                playSound("\x83\x7a\x83\x62\x83\x70\x81\x5b\x83\x57\x83\x83\x83\x93\x83\x76\x97\xad\x82\xdf");
                 return true;
             }
 
             _14 = -mActor->getConst().getTable()->mRabbitFirstJump2;
-            playSound("声物ジャンプ");
-            playSound("ホッパージャンプ");
+            playSound("\x90\xba\x95\xa8\x83\x57\x83\x83\x83\x93\x83\x76");
+            playSound("\x83\x7a\x83\x62\x83\x70\x81\x5b\x83\x57\x83\x83\x83\x93\x83\x76");
         } else {
             _14 = -mActor->getConst().getTable()->mRabbitFirstJump;
         }
@@ -303,9 +303,9 @@ bool MarioRabbit::update() {
 bool MarioRabbit::close() {
     stopAnimation(nullptr);
     if (getPlayer()->mMovementStates.jumping) {
-        stopAnimation(nullptr, "落下");
+        stopAnimation(nullptr, "\x97\x8e\x89\xba");
     } else {
-        stopAnimation(nullptr, "基本");
+        stopAnimation(nullptr, "\x8a\xee\x96\x7b");
     }
 
     setJointGlobalMtx(static_cast< u8 >(MR::getJointIndex(mActor, "Hip")), nullptr);

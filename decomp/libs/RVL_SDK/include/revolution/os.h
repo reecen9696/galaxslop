@@ -1,7 +1,11 @@
 #ifndef OS_H
 #define OS_H
 
+#ifdef __cplusplus
 #include <cstdarg>
+#else
+#include <stdarg.h>
+#endif
 #include "revolution/types.h"
 
 #ifdef __cplusplus
@@ -14,8 +18,9 @@ extern "C" {
 u32 __OSBusClock : (0x8000 << 16 | 0x00F8);
 u32 __MEM2End : (0x8000 << 16 | 0x3128);
 #else
-u32 __OSBusClock = 0x800000F8;
-u32 __MEM2End = 0x80003128;
+/* OS globals live at fixed addresses in low MEM1, which the port maps at 0x80000000. */
+#define __OSBusClock (*(volatile u32*)0x800000F8)
+#define __MEM2End (*(volatile u32*)0x80003128)
 #endif
 
 #define OS_BUS_CLOCK __OSBusClock
@@ -129,6 +134,7 @@ void* OSAllocFromArenaHi(u32 size, u32 align);
 #define ASSERTMSG(exp, msg) ((void)0)
 #endif
 
+#ifdef __MWERKS__
 inline s16 __OSf32tos16(__REGISTER f32 inF) {
     __REGISTER s16 out;
     u32 tmp;
@@ -172,6 +178,7 @@ inline void OSf32tou8(f32* f, u8* out) {
     *out = __OSf32tou8(*f);
 }
 #endif
+#endif /* __MWERKS__: portable versions live in OSFastCast.h */
 
 #include "revolution/base/PPCArch.h"
 #include "revolution/gx.h"

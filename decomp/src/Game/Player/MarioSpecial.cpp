@@ -9,7 +9,7 @@
 #include <revolution/types.h>
 
 void Mario::checkOnimasu(const HitSensor* pSensor) {
-    if (strstr(pSensor->mHost->mName, "オニマス") == nullptr) {
+    if (strstr(pSensor->mHost->mName, "\x83\x49\x83\x6a\x83\x7d\x83\x58") == nullptr) {
         return;
     }
 
@@ -27,7 +27,7 @@ bool Mario::isDossun(const Triangle* pTriangle) const {
         return false;
     }
 
-    if (strstr(pTriangle->mSensor->mHost->getName(), "ドッスン") != nullptr) {
+    if (strstr(pTriangle->mSensor->mHost->getName(), "\x83\x68\x83\x62\x83\x58\x83\x93") != nullptr) {
         return true;
     }
 
@@ -355,7 +355,7 @@ bool Mario::isHeadPushEnableArea() const {
 bool Mario::isOnimasuBinderPressSkip() const {
     if (isStatusActive(MarioStatus_SideStep)) {
         if (mFrontWallTriangle->mSensor != nullptr) {
-            if (strstr(mFrontWallTriangle->mSensor->mHost->mName, "オニマス")) {
+            if (strstr(mFrontWallTriangle->mSensor->mHost->mName, "\x83\x49\x83\x6a\x83\x7d\x83\x58")) {
                 return true;
             }
         }

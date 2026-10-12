@@ -234,6 +234,18 @@ void* operator new(u32, JKRHeap*, int);
 void* operator new[](u32, int);
 
 void* operator new[](u32, JKRHeap*, int);
+#else
+#include <stddef.h>
+void* operator new(size_t, int);
+void* operator new(size_t, JKRHeap*);
+void* operator new(size_t, JKRHeap*, int);
+void* operator new[](size_t, int);
+void* operator new[](size_t, JKRHeap*, int);
+// Matching placement deletes (only called if a constructor throws; we build without exceptions).
+void operator delete(void*, int) noexcept;
+void operator delete(void*, JKRHeap*, int) noexcept;
+void operator delete[](void*, int) noexcept;
+void operator delete[](void*, JKRHeap*, int) noexcept;
 #endif
 
 inline void* JKRAllocFromHeap(JKRHeap* pHeap, u32 size, int alignment) {

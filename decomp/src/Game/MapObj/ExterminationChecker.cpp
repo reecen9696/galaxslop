@@ -48,7 +48,7 @@ ExterminationChecker::ExterminationChecker(const char* pName) : LiveActor(pName)
 void ExterminationChecker::init(const JMapInfoIter& rIter) {
     MR::connectToSceneMapObjMovement(this);
     s32 objNum = MR::getChildObjNum(rIter);
-    mGroup = new LiveActorGroup("アクター管理", objNum);
+    mGroup = new LiveActorGroup("\x83\x41\x83\x4e\x83\x5e\x81\x5b\x8a\xc7\x97\x9d", objNum);
 
     for (s32 i = 0; i < objNum; i++) {
         const char* objName = nullptr;
@@ -62,7 +62,7 @@ void ExterminationChecker::init(const JMapInfoIter& rIter) {
     MR::useStageSwitchSleep(this, rIter);
 
     if (_A1) {
-        mKeySwitch = new KeySwitch("全滅用キースイッチ");
+        mKeySwitch = new KeySwitch("\x91\x53\x96\xc5\x97\x70\x83\x4c\x81\x5b\x83\x58\x83\x43\x83\x62\x83\x60");
         mKeySwitch->initKeySwitchByOwner(rIter);
     }
 
@@ -108,7 +108,7 @@ void ExterminationChecker::exeTryStartDemoAppear() {
     }
 
     if (MR::isGreaterStep(this, 5)) {
-        if (MR::tryStartDemo(this, "全滅スター出現")) {
+        if (MR::tryStartDemo(this, "\x91\x53\x96\xc5\x83\x58\x83\x5e\x81\x5b\x8f\x6f\x8c\xbb")) {
             setNerve(GET_NERVE(ExterminationChecker, ExterminationCheckerNrvAppearStar));
         }
     }
@@ -120,7 +120,7 @@ void ExterminationChecker::exeAppearStar() {
     }
 
     if (MR::isStep(this, 120)) {
-        MR::endDemo(this, "全滅スター出現");
+        MR::endDemo(this, "\x91\x53\x96\xc5\x83\x58\x83\x5e\x81\x5b\x8f\x6f\x8c\xbb");
         MR::startAfterBossBGM();
         MR::requestAppearPowerStar(this);
         kill();

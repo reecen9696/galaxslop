@@ -37,17 +37,17 @@ namespace NrvKoopaStateChaseRoll {
 };  // namespace NrvKoopaStateChaseRoll
 
 KoopaStateChaseRoll::KoopaStateChaseRoll(Koopa* pKoopa)
-    : ActorStateBase< Koopa >("State[転がり追跡攻撃]", pKoopa), mFigureBall(), mRollDelay(::sWaitToStartStep) {
+    : ActorStateBase< Koopa >("State[\x93\x5d\x82\xaa\x82\xe8\x92\xc7\x90\xd5\x8d\x55\x8c\x82]", pKoopa), mFigureBall(), mRollDelay(::sWaitToStartStep) {
 }
 
 void KoopaStateChaseRoll::init() {
     initNerve(GET_NERVE(KoopaStateChaseRoll, KoopaStateChaseRollNrvStart));
 
-    KoopaFunction::initKoopaCamera(mHost, "ロール追跡開始");
+    KoopaFunction::initKoopaCamera(mHost, "\x83\x8d\x81\x5b\x83\x8b\x92\xc7\x90\xd5\x8a\x4a\x8e\x6e");
 
     KoopaFunction::createKoopaRock(mHost);
 
-    mFigureBall = new KoopaFigureBall("追跡ボール", mHost, 260.0f, &::sChaseRollParam);
+    mFigureBall = new KoopaFigureBall("\x92\xc7\x90\xd5\x83\x7b\x81\x5b\x83\x8b", mHost, 260.0f, &::sChaseRollParam);
     mFigureBall->initWithoutIter();
 
     kill();
@@ -87,7 +87,7 @@ void KoopaStateChaseRoll::kill() {
     MR::tryDeleteEffect(KoopaFunction::getKoopaRock(mHost), "RollingSmoke");
     KoopaFunction::getKoopaRock(mHost)->kill();
 
-    KoopaFunction::endKoopaCamera(mHost, "ロール追跡開始", false, -1);
+    KoopaFunction::endKoopaCamera(mHost, "\x83\x8d\x81\x5b\x83\x8b\x92\xc7\x90\xd5\x8a\x4a\x8e\x6e", false, -1);
 
     KoopaFunction::startFaceCtrl(mHost);
 }
@@ -171,7 +171,7 @@ void KoopaStateChaseRoll::exeStart() {
         MR::startAction(KoopaFunction::getKoopaRock(mHost), "AttackRollStart");
         MR::startAction(KoopaFunction::getKoopaRockBreak(mHost), "AttackRollStart");
 
-        KoopaFunction::startKoopaCamera(mHost, "ロール追跡開始");
+        KoopaFunction::startKoopaCamera(mHost, "\x83\x8d\x81\x5b\x83\x8b\x92\xc7\x90\xd5\x8a\x4a\x8e\x6e");
         KoopaFunction::endFaceCtrl(mHost, -1);
     }
 
@@ -213,7 +213,7 @@ void KoopaStateChaseRoll::exeRollAir() {
 
 void KoopaStateChaseRoll::exeRollGround() {
     if (MR::isFirstStep(this)) {
-        KoopaFunction::endKoopaCamera(mHost, "ロール追跡開始", false, -1);
+        KoopaFunction::endKoopaCamera(mHost, "\x83\x8d\x81\x5b\x83\x8b\x92\xc7\x90\xd5\x8a\x4a\x8e\x6e", false, -1);
         MR::emitEffect(KoopaFunction::getKoopaRock(mHost), "RollingSmoke");
     }
 

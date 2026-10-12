@@ -540,12 +540,12 @@ void Mario::pushedByWind() {
     MR::normalizeOrZero(&windDir);
 
     if (MR::isNearZero(windDir)) {
-        if (isAnimationRun("向かい風ふんばり")) {
-            stopAnimation("向かい風ふんばり");
+        if (isAnimationRun("\x8c\xfc\x82\xa9\x82\xa2\x95\x97\x82\xd3\x82\xf1\x82\xce\x82\xe8")) {
+            stopAnimation("\x8c\xfc\x82\xa9\x82\xa2\x95\x97\x82\xd3\x82\xf1\x82\xce\x82\xe8");
         }
 
-        if (isAnimationRun("向かい風走り")) {
-            stopAnimation("向かい風走り");
+        if (isAnimationRun("\x8c\xfc\x82\xa9\x82\xa2\x95\x97\x91\x96\x82\xe8")) {
+            stopAnimation("\x8c\xfc\x82\xa9\x82\xa2\x95\x97\x91\x96\x82\xe8");
         }
 
         if (_10.debugMode) {
@@ -569,7 +569,7 @@ void Mario::pushedByWind() {
             windMag *= table->mWindSlideFriction;
             _350 += windDir * windMag;
             _1C._15 = 1;
-            changeAnimation("向かい風ふんばり");
+            changeAnimation("\x8c\xfc\x82\xa9\x82\xa2\x95\x97\x82\xd3\x82\xf1\x82\xce\x82\xe8");
         }
         return;
     }
@@ -580,8 +580,8 @@ void Mario::pushedByWind() {
         const MarioConstTable* table = mActor->getConst().getTable();
         _350 += scaled * table->mWindForwardFriction;
         _1C._15 = 1;
-        stopAnimation("向かい風ふんばり");
-        stopAnimation("向かい風走り");
+        stopAnimation("\x8c\xfc\x82\xa9\x82\xa2\x95\x97\x82\xd3\x82\xf1\x82\xce\x82\xe8");
+        stopAnimation("\x8c\xfc\x82\xa9\x82\xa2\x95\x97\x91\x96\x82\xe8");
         return;
     }
 
@@ -600,7 +600,7 @@ void Mario::pushedByWind() {
 
     scaled = killed + windDir * element;
 
-    changeAnimation("向かい風走り");
+    changeAnimation("\x8c\xfc\x82\xa9\x82\xa2\x95\x97\x91\x96\x82\xe8");
     _350 += scaled;
     _1C._15 = 1;
 }

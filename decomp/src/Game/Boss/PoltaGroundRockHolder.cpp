@@ -5,11 +5,11 @@ namespace {
     static const s32 sMaxPoltaGroundRock = 16;
 };  // namespace
 
-PoltaGroundRockHolder::PoltaGroundRockHolder() : DeriveActorGroup< PoltaGroundRock >("ポルタ地面岩管理", ::sMaxPoltaGroundRock) {
+PoltaGroundRockHolder::PoltaGroundRockHolder() : DeriveActorGroup< PoltaGroundRock >("\x83\x7c\x83\x8b\x83\x5e\x92\x6e\x96\xca\x8a\xe2\x8a\xc7\x97\x9d", ::sMaxPoltaGroundRock) {
     PoltaGroundRock* pGroundRock;
 
     for (int i = 0; i < ::sMaxPoltaGroundRock; i++) {
-        pGroundRock = new PoltaGroundRock("ポルタ地面岩");
+        pGroundRock = new PoltaGroundRock("\x83\x7c\x83\x8b\x83\x5e\x92\x6e\x96\xca\x8a\xe2");
         pGroundRock->initWithoutIter();
         registerActor(pGroundRock);
     }

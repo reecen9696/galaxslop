@@ -3,6 +3,7 @@
 #include <math_types.hpp>
 #include <revolution/types.h>
 
+#ifdef __MWERKS__
 namespace std {
     template < typename A1, typename B1 >
     struct pair {
@@ -14,6 +15,21 @@ namespace std {
         }
     };
 }  // namespace std
+#define JMATH_PAIR std::pair
+#else
+namespace JMath {
+    template < typename A1, typename B1 >
+    struct TPair {
+        A1 a1;
+        B1 b1;
+        TPair() {
+            a1 = A1();
+            b1 = B1();
+        }
+    };
+}  // namespace JMath
+#define JMATH_PAIR JMath::TPair
+#endif
 
 namespace JMath {
 
@@ -45,7 +61,7 @@ namespace JMath {
         TSinCosTable();
 
         static const u32 LEN = 1 << Bits;
-        std::pair< T, T > table[LEN];
+        JMATH_PAIR< T, T > table[LEN];
 
         T sinShort(s16 v) const {
             return table[static_cast< u16 >(v) >> (16U - Bits)].a1;
@@ -123,6 +139,16 @@ namespace JMath {
         T mTable[Len];
         T _1000;
     };
+
+#ifndef __MWERKS__
+    template <>
+    f32 TAtanTable< 1024, f32 >::atan2_(f32 y, f32 x) const;
+#endif
+
+#ifndef __MWERKS__
+    template <>
+    f32 TAtanTable< 1024, f32 >::atan2_(f32 y, f32 x) const;
+#endif
 
     template < s32 Len, typename T >
     class TAsinAcosTable {

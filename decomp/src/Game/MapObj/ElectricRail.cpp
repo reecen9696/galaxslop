@@ -87,7 +87,7 @@ void ElectricRailSeparator::setup(const TVec3f& rVec1, const TVec3f& rVec2, cons
 }
 
 ElectricRailShadowDrawer::ElectricRailShadowDrawer(const LiveActor* pActor, ElectricRailSeparator* pSeparator, s32 count)
-    : ShadowVolumeDrawer("影描画[電撃レールボリューム]"), mHost(pActor), mDisplayListBuffer(), mDisplayListBufferSize() {
+    : ShadowVolumeDrawer("\x89\x65\x95\x60\x89\xe6[\x93\x64\x8c\x82\x83\x8c\x81\x5b\x83\x8b\x83\x7b\x83\x8a\x83\x85\x81\x5b\x83\x80]"), mHost(pActor), mDisplayListBuffer(), mDisplayListBufferSize() {
     MR::ProhibitSchedulerAndInterrupts pScheduler = MR::ProhibitSchedulerAndInterrupts(false);
     mDisplayListBufferSize = 0;
 

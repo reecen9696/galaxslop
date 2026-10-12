@@ -449,7 +449,7 @@ AreaPolygon::~AreaPolygon() {
 CollisionArea::~CollisionArea() {
 }
 
-AreaPolygon::AreaPolygon() : DynamicCollisionObj("エリアポリゴン") {
+AreaPolygon::AreaPolygon() : DynamicCollisionObj("\x83\x47\x83\x8a\x83\x41\x83\x7c\x83\x8a\x83\x53\x83\x93") {
     mForm = nullptr;
     _128 = nullptr;
     _12C.zero();

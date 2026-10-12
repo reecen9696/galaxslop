@@ -22,7 +22,12 @@ namespace JGeometry {
     }
 
 #else
-    inline void negateInternal(const f32* rSrc, f32* rDest);
+    inline void negateInternal(const f32* rSrc, f32* rDest) {
+        f32 x = -rSrc[0], y = -rSrc[1], z = -rSrc[2];
+        rDest[0] = x;
+        rDest[1] = y;
+        rDest[2] = z;
+    }
 #endif
 
 #ifdef __MWERKS__
@@ -41,7 +46,12 @@ namespace JGeometry {
     }
 
 #else
-    static void subInternal(const f32* vec1, const f32* vec2, f32* dst);
+    inline static void subInternal(const f32* vec1, const f32* vec2, f32* dst) {
+        f32 x = vec1[0] - vec2[0], y = vec1[1] - vec2[1], z = vec1[2] - vec2[2];
+        dst[0] = x;
+        dst[1] = y;
+        dst[2] = z;
+    }
 #endif
 
 #ifdef __MWERKS__
@@ -58,7 +68,12 @@ namespace JGeometry {
     }
 
 #else
-    void mulInternal(const f32* vec1, const f32* vec2, f32* dst);
+    inline void mulInternal(const f32* vec1, const f32* vec2, f32* dst) {
+        f32 x = vec1[0] * vec2[0], y = vec1[1] * vec2[1], z = vec1[2] * vec2[2];
+        dst[0] = x;
+        dst[1] = y;
+        dst[2] = z;
+    }
 #endif
 
     template < typename T >
@@ -168,7 +183,13 @@ namespace JGeometry {
             return dot(*this);
         };
 
+#ifdef __MWERKS__
         T squared(const TVec2< T >& rOther) const;  //{ return (x - rOther.x) * (x - rOther.x) + (y - rOther.y) * (y - rOther.y); };
+#else
+        T squared(const TVec2< T >& rOther) const {
+            return (x - rOther.x) * (x - rOther.x) + (y - rOther.y) * (y - rOther.y);
+        }
+#endif
 
         T dot(const TVec2< T >& rOther) const {
             return x * rOther.x + y * rOther.y;
@@ -257,7 +278,7 @@ namespace JGeometry {
     };
 
     template <>
-    TVec2< f32 >::TVec2() {
+    inline TVec2< f32 >::TVec2() {
     }
 
     template < typename T >
@@ -275,7 +296,9 @@ namespace JGeometry {
             z = _z;
         }
 
+#ifdef __MWERKS__
         TVec3< T >(int x, int y, int Z);
+#endif
 
         inline TVec3(T val) {
             x = val;
@@ -344,7 +367,11 @@ namespace JGeometry {
         }
 
 #else
-        TVec3(const Vec& vec);
+        TVec3(const Vec& vec) {
+            x = vec.x;
+            y = vec.y;
+            z = vec.z;
+        }
 #endif
 #ifdef __MWERKS__
         // Used inlined and non-inlined?
@@ -365,7 +392,11 @@ namespace JGeometry {
         }
 
 #else
-        TVec3(const TVec3< f32 >& vec);
+        TVec3(const TVec3< f32 >& vec) : Vec() {
+            x = vec.x;
+            y = vec.y;
+            z = vec.z;
+        }
 #endif
 
         template < typename T >
@@ -422,6 +453,11 @@ namespace JGeometry {
             stfs b_x, 8(v_b)
             }
             ;
+#else
+            f32 nx = vec.x, ny = vec.y, nz = vec.z;
+            x = nx;
+            y = ny;
+            z = nz;
 #endif
         }
 
@@ -640,7 +676,11 @@ namespace JGeometry {
         }
 
 #else
-        void setPSZeroVec();
+        void setPSZeroVec() {
+            x = gZeroVec.x;
+            y = gZeroVec.y;
+            z = gZeroVec.z;
+        }
 #endif
         f32 dot(const TVec3& rOther) const NO_INLINE {
             // TODO: this is *never* uninlined except in the specific
@@ -666,6 +706,8 @@ namespace JGeometry {
             }
 
             return _fp1;
+#else
+            return (x * rOther.x + y * rOther.y) + z * rOther.z;
 #endif
         }
 
@@ -808,7 +850,10 @@ namespace JGeometry {
             return sqdist;
         };
 #else
-        f32 squared(const TVec3& rB) const;
+        f32 squared(const TVec3& rB) const {
+            f32 dx = x - rB.x, dy = y - rB.y, dz = z - rB.z;
+            return (dx * dx + dy * dy) + dz * dz;
+        }
 #endif
 
         bool isZero() const {
@@ -1127,7 +1172,7 @@ namespace JGeometry {
             f32 crossPart = dir.length();
 
             if (crossPart <= JGeometry::TUtil< f32 >::epsilon()) {
-                set< f32 >(0.0f, 0.0f, 0.0f, 1.0f);
+                this->template set< f32 >(0.0f, 0.0f, 0.0f, 1.0f);
             } else {
                 f32 dotPart = rA.dot(rB);
                 f32 halfAngle = ratio * (JMAATan2(crossPart, dotPart) * 0.5f);

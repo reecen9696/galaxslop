@@ -295,6 +295,91 @@ JKRErrorHandler JKRHeap::setErrorHandler(JKRErrorHandler errorHandler) {
     return prev;
 }
 
+#ifdef TARGET_PC
+// The original game routes every `new` into the current JKRHeap.  On the port the
+// same process also hosts the renderer, audio device and libc++, which must not
+// allocate from (or race on) the game heaps.  Only emulated game threads outside a
+// host-allocation scope use JKRHeap; everything else goes to malloc.
+#include "port/heap_routing.h"
+
+static inline void* gameAlloc(size_t size, int align, JKRHeap* pHeap) {
+    if (!port_use_game_heap() || (pHeap == nullptr && JKRHeap::getCurrentHeap() == nullptr)) {
+        return port_host_alloc(size, align < 0 ? -align : align);
+    }
+    return JKRHeap::alloc(size, align, pHeap);
+}
+
+static inline void gameFree(void* pData) {
+    if (pData == nullptr) {
+        return;
+    }
+    if (!port_is_game_heap_ptr(pData)) {
+        port_host_free(pData);
+        return;
+    }
+    JKRHeap::free(pData, nullptr);
+}
+
+void* operator new(size_t size) {
+    return gameAlloc(size, 4, nullptr);
+}
+
+void* operator new(size_t size, int align) {
+    return gameAlloc(size, align, nullptr);
+}
+
+void* operator new(size_t size, JKRHeap* pHeap) {
+    return gameAlloc(size, 4, pHeap);
+}
+
+void* operator new(size_t size, JKRHeap* pHeap, int align) {
+    return gameAlloc(size, align, pHeap);
+}
+
+void* operator new[](size_t size) {
+    return gameAlloc(size, 4, nullptr);
+}
+
+void* operator new[](size_t size, int align) {
+    return gameAlloc(size, align, nullptr);
+}
+
+void* operator new[](size_t size, JKRHeap* pHeap, int align) {
+    return gameAlloc(size, align, pHeap);
+}
+
+void operator delete(void* pData) noexcept {
+    gameFree(pData);
+}
+
+void operator delete[](void* pData) noexcept {
+    gameFree(pData);
+}
+
+void operator delete(void* pData, size_t) noexcept {
+    gameFree(pData);
+}
+
+void operator delete[](void* pData, size_t) noexcept {
+    gameFree(pData);
+}
+
+void operator delete(void* pData, int) noexcept {
+    gameFree(pData);
+}
+
+void operator delete(void* pData, JKRHeap*, int) noexcept {
+    gameFree(pData);
+}
+
+void operator delete[](void* pData, int) noexcept {
+    gameFree(pData);
+}
+
+void operator delete[](void* pData, JKRHeap*, int) noexcept {
+    gameFree(pData);
+}
+#else
 void* operator new(u32 size) {
     return JKRHeap::alloc(size, 4, nullptr);
 }
@@ -326,6 +411,8 @@ void operator delete(void* pData) {
 void operator delete[](void* pData) {
     JKRHeap::free(pData, nullptr);
 }
+
+#endif
 
 void JKRHeap::state_register(TState*, u32) const {
     return;

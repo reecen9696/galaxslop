@@ -4,6 +4,36 @@
 #include "Game/Util/StringUtil.hpp"
 #include <revolution/types.h>
 
+template <>
+MR::FixedRingBuffer< const DemoStartInfo*, 16 >::iterator::iterator(const DemoStartInfo** pHead, const DemoStartInfo** pTail) {
+    mHead = pHead;
+    mTail = pTail;
+    mEnd = pTail + 16;
+}
+
+template <>
+void MR::FixedRingBuffer< const DemoStartInfo*, 16 >::iterator::operator++() {
+    const DemoStartInfo** pEnd = mEnd;
+    mHead++;
+
+    if (pEnd <= mHead) {
+        mHead = mTail;
+    }
+}
+
+template <>
+void MR::FixedRingBuffer< const DemoStartInfo*, 16 >::push_back(const DemoStartInfo* const& rValue) {
+    if ((u32)mCount >= 16) {
+        return;
+    }
+
+    *mEnd.mHead = rValue;
+    ++mEnd;
+    mCount++;
+}
+
+
+
 DemoStartInfo::DemoStartInfo() {
     _0 = nullptr;
     _4 = nullptr;
@@ -173,7 +203,7 @@ DemoStartInfo* DemoStartRequestHolder::findEmpty() const {
 }
 
 DemoStartRequestHolder::DemoStartRequestHolder() : mNumInfos(), mRequestBuffer(mRequestBuffer.mBuffer, mRequestBuffer.mBuffer) {
-    mProxyObj = new NameObj("代理人");
+    mProxyObj = new NameObj("\x91\xe3\x97\x9d\x90\x6c");
     for (u32 i = 0; i < ARRAY_SIZE(mStartInfos); i++) {
         DemoStartInfo* pInfo = new DemoStartInfo();
         s32 idx = mNumInfos;
@@ -182,30 +212,3 @@ DemoStartRequestHolder::DemoStartRequestHolder() : mNumInfos(), mRequestBuffer(m
     }
 }
 
-template <>
-MR::FixedRingBuffer< const DemoStartInfo*, 16 >::iterator::iterator(const DemoStartInfo** pHead, const DemoStartInfo** pTail) {
-    mHead = pHead;
-    mTail = pTail;
-    mEnd = pTail + 16;
-}
-
-template <>
-void MR::FixedRingBuffer< const DemoStartInfo*, 16 >::push_back(const DemoStartInfo* const& rValue) {
-    if ((u32)mCount >= 16) {
-        return;
-    }
-
-    *mEnd.mHead = rValue;
-    ++mEnd;
-    mCount++;
-}
-
-template <>
-void MR::FixedRingBuffer< const DemoStartInfo*, 16 >::iterator::operator++() {
-    const DemoStartInfo** pEnd = mEnd;
-    mHead++;
-
-    if (pEnd <= mHead) {
-        mHead = mTail;
-    }
-}

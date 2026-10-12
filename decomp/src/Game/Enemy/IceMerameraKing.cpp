@@ -119,7 +119,7 @@ void IceMerameraKing::init(const JMapInfoIter& rIter) {
     MR::tryRegisterDemoCast(this, rIter);
     mIce.init(6);
     for (s32 i = 0; i < 6; i++) {
-        ThrowingIce* newIce = new ThrowingIce("投擲用の氷");
+        ThrowingIce* newIce = new ThrowingIce("\x93\x8a\x9d\xb1\x97\x70\x82\xcc\x95\x58");
         newIce->initWithoutIter();
         mIce.push_back(newIce);
         MR::tryRegisterDemoCast(newIce, rIter);
@@ -130,7 +130,7 @@ void IceMerameraKing::init(const JMapInfoIter& rIter) {
     _A8->initWithoutIter();
     _A8->mRotation.set(mRotation);
     _A8->makeActorDead();
-    _AC = new ModelObj("壊れモデル", "IceMerameraKingBreak", nullptr, -2, -2, -2, false);
+    _AC = new ModelObj("\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "IceMerameraKingBreak", nullptr, -2, -2, -2, false);
     _AC->initWithoutIter();
     _AC->mScale.set(mScale);
     _AC->makeActorDead();
@@ -139,7 +139,7 @@ void IceMerameraKing::init(const JMapInfoIter& rIter) {
     mModelArray = new Meramera*[childNum];
 
     for (s32 i = 0; i < _F0; i++) {
-        mModelArray[i] = new Meramera("メラメラ");
+        mModelArray[i] = new Meramera("\x83\x81\x83\x89\x83\x81\x83\x89");
         MR::initChildObj(mModelArray[i], rIter, i);
         mModelArray[i]->makeActorDead();
         MR::tryRegisterDemoCast(mModelArray[i], rIter);
@@ -151,11 +151,11 @@ void IceMerameraKing::init(const JMapInfoIter& rIter) {
     mJointController = MR::createJointDelegatorWithNullChildFunc(this, &IceMerameraKing::calcJoint, "JointRoot");
     makeActorAppeared();
     MR::emitEffect(this, "BodyIce");
-    mCameraTarget = new CameraTargetDemoActor(getBaseMtx(), "アクター注目");
+    mCameraTarget = new CameraTargetDemoActor(getBaseMtx(), "\x83\x41\x83\x4e\x83\x5e\x81\x5b\x92\x8d\x96\xda");
     mCameraTarget->initWithoutIter();
     mCameraTarget->mPosition.set(_C8);
     mCameraTarget->mRotation.set(_D4);
-    mCameraTarget->setName("メラキン注目ターゲット");
+    mCameraTarget->setName("\x83\x81\x83\x89\x83\x4c\x83\x93\x92\x8d\x96\xda\x83\x5e\x81\x5b\x83\x51\x83\x62\x83\x67");
     MR::tryRegisterDemoCast(mCameraTarget, rIter);
 }
 
@@ -219,9 +219,9 @@ void IceMerameraKing::control() {
         MR::startLevelSound(this, "SE_BM_LV_ICEMERAKING_WAIT");
     }
 
-    if (MR::isDemoActive("メラキンオープニング")) {
+    if (MR::isDemoActive("\x83\x81\x83\x89\x83\x4c\x83\x93\x83\x49\x81\x5b\x83\x76\x83\x6a\x83\x93\x83\x4f")) {
         MR::startSystemLevelSE("SE_DM_LV_MUTE_BGM");
-        if (MR::isDemoPartLastStep("カメラ寄る")) {
+        if (MR::isDemoPartLastStep("\x83\x4a\x83\x81\x83\x89\x8a\xf1\x82\xe9")) {
             MR::playLevelMarioPinchBGM(_120);
             _120 = true;
             _121 = true;
@@ -435,10 +435,10 @@ void IceMerameraKing::exeDamage() {
 
     if (MR::isGreaterStep(this, 60)) {
         if (_EC == 1) {
-            if (MR::tryStartDemoRegisteredMarioPuppetable(this, "怒りデモ")) {
+            if (MR::tryStartDemoRegisteredMarioPuppetable(this, "\x93\x7b\x82\xe8\x83\x66\x83\x82")) {
                 setNerve(GET_NERVE(IceMerameraKing, HostTypeNrvAngryDemo2nd));
             }
-        } else if (MR::tryStartDemoRegisteredMarioPuppetable(this, "怒りデモ")) {
+        } else if (MR::tryStartDemoRegisteredMarioPuppetable(this, "\x93\x7b\x82\xe8\x83\x66\x83\x82")) {
             setNerve(GET_NERVE(IceMerameraKing, HostTypeNrvAngryDemo1st));
         }
     }
@@ -568,7 +568,7 @@ void IceMerameraKing::exeAngryDemo() {
     }
     MR::playLevelMarioPinchBGM(true);
 
-    if (MR::isDemoPartLastStep("怒りデモ")) {
+    if (MR::isDemoPartLastStep("\x93\x7b\x82\xe8\x83\x66\x83\x82")) {
         if (!(_EC > 2)) {
             MR::appearStarPiece(this, mPosition - mGravity * 200.0f, 8, 15.0f, 70.0f, false);
         } else {
@@ -622,7 +622,7 @@ void IceMerameraKing::exeDeathDemo() {
     }
 
     if (MR::isActionEnd(this) && MR::isHiddenModel(this) && MR::isHiddenModel(_AC)) {
-        MR::endDemo(this, "メラキンオープニング");
+        MR::endDemo(this, "\x83\x81\x83\x89\x83\x4c\x83\x93\x83\x49\x81\x5b\x83\x76\x83\x6a\x83\x93\x83\x4f");
     }
 
     if (!MR::isDemoActive()) {
@@ -667,8 +667,8 @@ bool IceMerameraKing::receiveMsgPlayerAttack(u32 msg, HitSensor* pSender, HitSen
 
         if (_EC == 0) {
             MR::stopMarioPinchBGMSoon();
-            MR::requestStartTimeKeepDemo(this, "メラキンオープニング", GET_NERVE(IceMerameraKing, HostTypeNrvDeathDemo),
-                                         GET_NERVE(IceMerameraKing, HostTypeNrvDeathDemoWait), "死亡デモ");
+            MR::requestStartTimeKeepDemo(this, "\x83\x81\x83\x89\x83\x4c\x83\x93\x83\x49\x81\x5b\x83\x76\x83\x6a\x83\x93\x83\x4f", GET_NERVE(IceMerameraKing, HostTypeNrvDeathDemo),
+                                         GET_NERVE(IceMerameraKing, HostTypeNrvDeathDemoWait), "\x8e\x80\x96\x53\x83\x66\x83\x82");
         } else {
             setNerve(GET_NERVE(IceMerameraKing, HostTypeNrvDamage));
         }
@@ -680,8 +680,8 @@ bool IceMerameraKing::receiveMsgPlayerAttack(u32 msg, HitSensor* pSender, HitSen
         _EC--;
 
         if (_EC == 0) {
-            MR::requestStartTimeKeepDemo(this, "メラキンオープニング", GET_NERVE(IceMerameraKing, HostTypeNrvDeathDemo),
-                                         GET_NERVE(IceMerameraKing, HostTypeNrvDeathDemoWait), "死亡デモ");
+            MR::requestStartTimeKeepDemo(this, "\x83\x81\x83\x89\x83\x4c\x83\x93\x83\x49\x81\x5b\x83\x76\x83\x6a\x83\x93\x83\x4f", GET_NERVE(IceMerameraKing, HostTypeNrvDeathDemo),
+                                         GET_NERVE(IceMerameraKing, HostTypeNrvDeathDemoWait), "\x8e\x80\x96\x53\x83\x66\x83\x82");
         } else {
             setNerve(GET_NERVE(IceMerameraKing, HostTypeNrvDamage));
         }
@@ -798,7 +798,7 @@ namespace {
     static const char* hScaleJointName[] = {"WideInSide", "WideOutSide", "Hirgh1"};
 };
 
-IceMerameraKingShockWave::IceMerameraKingShockWave() : ModelObj("衝撃", "IceMerameraKingShock", nullptr, -2, -2, -2, false) {
+IceMerameraKingShockWave::IceMerameraKingShockWave() : ModelObj("\x8f\xd5\x8c\x82", "IceMerameraKingShock", nullptr, -2, -2, -2, false) {
     initHitSensor(2);
     MR::addHitSensorEnemyAttack(this, "circle", 16, 15.0f, TVec3f(0.0f, -100.0f, 0.0f));
     MR::addHitSensorEnemyAttack(this, "circle_end", 16, 24.0f, TVec3f(0.0f, -100.0f, 0.0f));

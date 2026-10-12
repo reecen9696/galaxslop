@@ -79,7 +79,7 @@ void ScenarioSelectLayout_FORCE_MATCH_SDATA2() {
 }
 
 ScenarioSelectLayout::ScenarioSelectLayout(EffectSystem* pEffectSystem, const CameraContext* pCameraContext)
-    : LayoutActor("シナリオ選択レイアウト", true), mSelectedScenarioNo(-1), _24(), _28(), mStar(), mScenarioSky(), mEffectSystem(pEffectSystem),
+    : LayoutActor("\x83\x56\x83\x69\x83\x8a\x83\x49\x91\x49\x91\xf0\x83\x8c\x83\x43\x83\x41\x83\x45\x83\x67", true), mSelectedScenarioNo(-1), _24(), _28(), mStar(), mScenarioSky(), mEffectSystem(pEffectSystem),
       mCameraContext(pCameraContext), mNewTextFollowPos(0.0f, 0.0f), mNewGreenTextFollowPos(0.0f, 0.0f), mStarTopFollowPos(0.0f, 0.0f), mBackButton(),
       mMarioPaneFollowPos(0.0f, 0.0f), mMarioPaneName(), _A4(), _A8(-1) {
     mEffectHostMtx.identity();
@@ -126,10 +126,10 @@ void ScenarioSelectLayout::init(const JMapInfoIter& rIter) {
         MR::addStarPointerTargetCircle(this, ::cStarPaneName[i], ::cPointingTargetRadius, TVec2f(0.0f, 0.0f), nullptr);
     }
 
-    mScenarioSky = new MultiSceneActor("シナリオ選択の空", "ScenarioSelectSky", false);
+    mScenarioSky = new MultiSceneActor("\x83\x56\x83\x69\x83\x8a\x83\x49\x91\x49\x91\xf0\x82\xcc\x8b\xf3", "ScenarioSelectSky", false);
     mScenarioSky->initWithoutIter();
 
-    mBackButton = new BackButton("戻るボタン", false);
+    mBackButton = new BackButton("\x96\xdf\x82\xe9\x83\x7b\x83\x5e\x83\x93", false);
     mBackButton->initWithoutIter();
 
     initNerve(GET_NERVE(ScenarioSelectLayout, ScenarioSelectLayoutNrvAppearStar));
@@ -319,7 +319,7 @@ void ScenarioSelectLayout::updateSelectedScenario() {
         for (s32 i = 0; i < 7; i++) {
             star = mStar[i];
 
-            if (!star->_30 && MR::isStarPointerPointingTarget(this, ::cStarPaneName[i], 0, true, "弱")) {
+            if (!star->_30 && MR::isStarPointerPointingTarget(this, ::cStarPaneName[i], 0, true, "\x8e\xe3")) {
                 mSelectedScenarioNo = star->mScenarioNo;
                 _24 = 0;
                 return;

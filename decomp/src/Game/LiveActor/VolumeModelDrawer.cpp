@@ -8,7 +8,7 @@
 #include "Game/Util/ObjUtil.hpp"
 #include <cstdio>
 
-VolumeModelDrawInit::VolumeModelDrawInit() : NameObj("ボリュームモデル描画初期化") {
+VolumeModelDrawInit::VolumeModelDrawInit() : NameObj("\x83\x7b\x83\x8a\x83\x85\x81\x5b\x83\x80\x83\x82\x83\x66\x83\x8b\x95\x60\x89\xe6\x8f\x89\x8a\xfa\x89\xbb") {
     MR::registerPreDrawFunction(MR::Functor(&MR::setupShadowVolumeDraw), MR::DrawType_VolumeModel);
 }
 

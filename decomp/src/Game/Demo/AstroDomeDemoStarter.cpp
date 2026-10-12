@@ -12,7 +12,7 @@ void AstroDomeDemoStarter_FORCE_MATCH_SDATA2() {
 }
 
 namespace {
-    const char* const cJumpOutPartName = "飛び出す";
+    const char* const cJumpOutPartName = "\x94\xf2\x82\xd1\x8f\x6f\x82\xb7";
     const Vec cAppearRotate = {90.0f, -5.0f, 0.0f};
     // const s32 cJumpOutStopStep = _;
     // const s32 cJumpOutStopFrame = _;
@@ -68,8 +68,8 @@ void AstroDomeDemoStarter::init(const JMapInfoIter& rIter) {
     initNerve(GET_NERVE(AstroDomeDemoStarter, AstroDomeDemoStarterNrvSpinDriverAppear));
 
     MR::tryRegisterDemoCast(this, rIter);
-    MR::registerDemoActionNerve(this, GET_NERVE(AstroDomeDemoStarter, AstroDomeDemoStarterNrvSpinDriverStart), "スピンドライバ起動");
-    MR::registerDemoActionNerve(this, GET_NERVE(AstroDomeDemoStarter, AstroDomeDemoStarterNrvJumpOut), "飛び出す");
+    MR::registerDemoActionNerve(this, GET_NERVE(AstroDomeDemoStarter, AstroDomeDemoStarterNrvSpinDriverStart), "\x83\x58\x83\x73\x83\x93\x83\x68\x83\x89\x83\x43\x83\x6f\x8b\x4e\x93\xae");
+    MR::registerDemoActionNerve(this, GET_NERVE(AstroDomeDemoStarter, AstroDomeDemoStarterNrvJumpOut), "\x94\xf2\x82\xd1\x8f\x6f\x82\xb7");
     MR::registerDemoActionFunctor(this, MR::Functor(this, &AstroDomeDemoStarter::startJumpOut), nullptr);
     MR::needStageSwitchWriteA(this, rIter);
 
@@ -140,7 +140,7 @@ void AstroDomeDemoStarter::exeSpinDriverAppear() {
         MR::setBaseTRMtx(this, _94);
         MR::showModel(this);
         MR::startBck(this, "Appear");
-        MR::startBckPlayer("SpinDriverWait", 20L);
+        MR::startBckPlayer("SpinDriverWait", 20);
         MR::startSound(this, "SE_OJ_S_SPIN_DRV_APPEAR");
     }
 
@@ -148,7 +148,7 @@ void AstroDomeDemoStarter::exeSpinDriverAppear() {
     MR::startLevelSound(this, "SE_OJ_LV_SPIN_DRV_CAPTURE");
 
     TPos3f slerpMtx;
-    MR::blendMtxRotateSlerp(_C4, _94, MR::calcDemoPartStepRate("スピンドライバ出現"), slerpMtx);
+    MR::blendMtxRotateSlerp(_C4, _94, MR::calcDemoPartStepRate("\x83\x58\x83\x73\x83\x93\x83\x68\x83\x89\x83\x43\x83\x6f\x8f\x6f\x8c\xbb"), slerpMtx);
     slerpMtx.setTrans(mPosition);
     MR::setPlayerBaseMtx(slerpMtx);
 }

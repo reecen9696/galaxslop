@@ -14,7 +14,7 @@ void AirBubbleHolder::init(const JMapInfoIter& rIter) {
     AirBubble* pAirBubble;
 
     for (s32 i = 0; i < ::sCreateAirBubbleNum; i++) {
-        pAirBubble = new AirBubble("空気アワ(共用)");
+        pAirBubble = new AirBubble("\x8b\xf3\x8b\x43\x83\x41\x83\x8f(\x8b\xa4\x97\x70)");
         pAirBubble->initWithoutIter();
         pAirBubble->makeActorDead();
 

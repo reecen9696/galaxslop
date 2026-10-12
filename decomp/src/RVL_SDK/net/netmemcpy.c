@@ -1,14 +1,14 @@
 #include "revolution/types.h"
 
-static inline void NETMemCpy_DstSize32Aligned(register void* dst, register const void* src, unsigned long size) {
-    register unsigned long tmp0;
-    register unsigned long tmp1;
-    register unsigned long tmp2;
-    register unsigned long tmp3;
-    register unsigned long tmp4;
-    register unsigned long tmp5;
-    register unsigned long loopSize = size >> 5;
-    unsigned long shift = (unsigned long)src & 3;
+static inline void NETMemCpy_DstSize32Aligned(register void* dst, register const void* src, unsigned int size) {
+    register unsigned int tmp0;
+    register unsigned int tmp1;
+    register unsigned int tmp2;
+    register unsigned int tmp3;
+    register unsigned int tmp4;
+    register unsigned int tmp5;
+    register unsigned int loopSize = size >> 5;
+    unsigned int shift = (unsigned int)src & 3;
 
     switch (shift) {
     case 0:
@@ -178,12 +178,12 @@ static inline void NETMemCpy_DstSize32Aligned(register void* dst, register const
     }
 }
 
-static inline void NETMemCpy_SimpleFwd(void* dst, const void* src, unsigned long size) {
+static inline void NETMemCpy_SimpleFwd(void* dst, const void* src, unsigned int size) {
     register unsigned char* dst_u8;
     register const unsigned char* src_u8;
-    register unsigned long numWords;
-    register unsigned long remainBytes;
-    register unsigned long tmp;
+    register unsigned int numWords;
+    register unsigned int remainBytes;
+    register unsigned int tmp;
 
     src_u8 = (const unsigned char*)src;
     dst_u8 = (unsigned char*)dst;
@@ -213,12 +213,12 @@ static inline void NETMemCpy_SimpleFwd(void* dst, const void* src, unsigned long
     }
 }
 
-static inline void NETMemCpy_SimpleRev(void* dst, const void* src, unsigned long size) {
+static inline void NETMemCpy_SimpleRev(void* dst, const void* src, unsigned int size) {
     register unsigned char* dst_u8;
     register const unsigned char* src_u8;
-    register unsigned long numWords;
-    register unsigned long remainBytes;
-    register unsigned long tmp;
+    register unsigned int numWords;
+    register unsigned int remainBytes;
+    register unsigned int tmp;
 
     src_u8 = (const unsigned char*)src + size;
     dst_u8 = (unsigned char*)dst + size;
@@ -244,9 +244,9 @@ static inline void NETMemCpy_SimpleRev(void* dst, const void* src, unsigned long
     }
 }
 
-void* NETMemCpy(void* dst, const void* src, unsigned long size) {
-    unsigned long headSize;
-    unsigned long accBlkSize;
+void* NETMemCpy(void* dst, const void* src, unsigned int size) {
+    unsigned int headSize;
+    unsigned int accBlkSize;
 
     if (dst == src) {
         return dst;
@@ -258,7 +258,7 @@ void* NETMemCpy(void* dst, const void* src, unsigned long size) {
     }
 
     if (((unsigned char*)dst <= (const unsigned char*)src - 0x20 || (unsigned char*)dst >= (const unsigned char*)src) && size >= 0x40) {
-        headSize = (unsigned long)dst & 0x1F;
+        headSize = (unsigned int)dst & 0x1F;
         if (headSize != 0) {
             headSize = 0x20 - headSize;
             NETMemCpy_SimpleFwd(dst, src, headSize);

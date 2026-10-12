@@ -48,7 +48,7 @@ void FirePressureRadiate::init(const JMapInfoIter& rIter) {
     MR::initJointTransform(this);
     MR::calcGravity(this);
     MR::setGroupClipping(this, rIter, 16);
-    mGroup = MR::joinToGroupArray(this, rIter, "ファイアプレッシャー（放射）軍団", 16);
+    mGroup = MR::joinToGroupArray(this, rIter, "\x83\x74\x83\x40\x83\x43\x83\x41\x83\x76\x83\x8c\x83\x62\x83\x56\x83\x83\x81\x5b\x81\x69\x95\xfa\x8e\xcb\x81\x6a\x8c\x52\x92\x63", 16);
 
     if (MR::tryRegisterDemoCast(this, rIter)) {
         MR::tryRegisterDemoActionFunctor(this, MR::Functor(this, &FirePressureRadiate::startRelax), nullptr);

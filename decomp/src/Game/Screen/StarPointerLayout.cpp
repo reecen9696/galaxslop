@@ -113,7 +113,7 @@ void StarPointerLayout::initWithPort(s32 channel) {
     mCommandStream->setPortAndColor(mPadChannel, &::sColorA[mPadChannel]);
     mCommandStream->initWithoutIter();
 
-    mNumber = new StarPointerNumber(this, mPadChannel, "スターポインタナンバー");
+    mNumber = new StarPointerNumber(this, mPadChannel, "\x83\x58\x83\x5e\x81\x5b\x83\x7c\x83\x43\x83\x93\x83\x5e\x83\x69\x83\x93\x83\x6f\x81\x5b");
     mNumber->initWithoutIter();
     mNumber->appear();
 
@@ -541,6 +541,12 @@ void StarPointerLayout::draw() const {
         mBlur->hideAll();
         return;
     }
+#ifdef TARGET_PC
+    if (mPadChannel == WPAD_CHAN0 && port_vr_pointer_in_world()) {
+        mBlur->hideAll();
+        return;
+    }
+#endif
 
     drawDecoration();
     LayoutActor::draw();

@@ -26,14 +26,14 @@ LavaShellTower::LavaShellTower(const char* pName) : MapObjActor(pName) {
 void LavaShellTower::init(const JMapInfoIter& rIter) {
     MapObjActor::init(rIter);
     MapObjActorInitInfo info;
-    info.setupHioNode("地形オブジェ");
+    info.setupHioNode("\x92\x6e\x8c\x60\x83\x49\x83\x75\x83\x57\x83\x46");
     info.setupDefaultPos();
     info.setupConnectToScene();
     info.setupSound(4);
     info.setupGroupClipping(0x40);
     info.setupNerve(GET_NERVE(LavaShellTower, HostTypeWait));
     initialize(rIter, info);
-    MR::registerDemoActionNerve(this, GET_NERVE(LavaShellTower, HostTypeDemo), "開始");
+    MR::registerDemoActionNerve(this, GET_NERVE(LavaShellTower, HostTypeDemo), "\x8a\x4a\x8e\x6e");
     makeActorAppeared();
 }
 

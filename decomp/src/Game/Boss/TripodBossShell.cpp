@@ -49,7 +49,7 @@ void TripodBossShell::init(const JMapInfoIter& rIter) {
     MR::initCollisionParts(this, "TripodBossShell", getSensor("killer_terget"), nullptr);
     initSound(4, false);
 
-    mBreakModel = MR::createModelObjMapObjStrongLight("壊れモデル", "TripodBossShellBreak", getBaseMtx());
+    mBreakModel = MR::createModelObjMapObjStrongLight("\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "TripodBossShellBreak", getBaseMtx());
     mBreakModel->initWithoutIter();
     MR::invalidateClipping(mBreakModel);
     mBreakModel->makeActorDead();

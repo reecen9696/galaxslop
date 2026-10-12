@@ -33,8 +33,9 @@ public:
         /* 0x02 */ u8 mFlags;
         /* 0x03 */ u8 mGroupId;
         /* 0x04 */ u32 mSize;
-        /* 0x08 */ CMemBlock* mPrev;
-        /* 0x0C */ CMemBlock* mNext;
+        // 32-bit links keep the original 16-byte block header (heap memory is below 4 GiB).
+        /* 0x08 */ PTR32(CMemBlock) mPrev;
+        /* 0x0C */ PTR32(CMemBlock) mNext;
     };
 
     JKRExpHeap(void*, u32, JKRHeap*, bool);

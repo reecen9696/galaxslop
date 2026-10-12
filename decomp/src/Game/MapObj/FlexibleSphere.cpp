@@ -219,7 +219,7 @@ void FlexibleSphere::control() {
         }
 
         if (MR::isActorOnPlayer(this)) {
-            MR::tryRumblePad(this, "マリオ[しびれ]", WPAD_CHAN0);
+            MR::tryRumblePad(this, "\x83\x7d\x83\x8a\x83\x49[\x82\xb5\x82\xd1\x82\xea]", WPAD_CHAN0);
         }
     }
 }

@@ -78,7 +78,7 @@ void ChipBase::initModel(const JMapInfoIter& rIter) {
     MR::connectToSceneNoSilhouettedMapObjStrongLight(this);
 
     if (isNeedBubble(rIter)) {
-        mAirBubble = MR::createPartsModelNoSilhouettedMapObj(this, "アワ", "AirBubble", 0);
+        mAirBubble = MR::createPartsModelNoSilhouettedMapObj(this, "\x83\x41\x83\x8f", "AirBubble", 0);
         mAirBubble->initFixedPosition(TVec3f(0.0f, 0.0f, 0.0f), TVec3f(0.0f, 0.0f, 0.0f), 0);
         MR::startBck(mAirBubble, "Move");
     }

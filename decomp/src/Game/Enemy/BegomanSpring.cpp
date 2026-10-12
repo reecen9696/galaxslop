@@ -129,9 +129,9 @@ void BegomanSpring::init(const JMapInfoIter& rIter) {
     }
 
     if (MR::isEqualString(pObjectName, "BegomanSpringHide")) {
-        setName("隠れバネベーゴマン");
+        setName("\x89\x42\x82\xea\x83\x6f\x83\x6c\x83\x78\x81\x5b\x83\x53\x83\x7d\x83\x93");
         mType = 1;
-        mBaby = new BegomanBaby("隠れバネベーゴマンベビー");
+        mBaby = new BegomanBaby("\x89\x42\x82\xea\x83\x6f\x83\x6c\x83\x78\x81\x5b\x83\x53\x83\x7d\x83\x93\x83\x78\x83\x72\x81\x5b");
         mBaby->mPosition.set(mPosition);
         mBaby->initWithoutIter();
         mBaby->makeActorDead();

@@ -30,7 +30,7 @@ void CollectTico::init(const JMapInfoIter& rIter) {
     mTicoNum = MR::getChildObjNum(rIter);
     mStrayTicos = new StrayTico*[mTicoNum];
     for (s32 i = 0; i < mTicoNum; i++) {
-        mStrayTicos[i] = new StrayTico("はぐれチコ", this);
+        mStrayTicos[i] = new StrayTico("\x82\xcd\x82\xae\x82\xea\x83\x60\x83\x52", this);
         MR::initChildObj(mStrayTicos[i], rIter, i);
     }
 
@@ -38,7 +38,7 @@ void CollectTico::init(const JMapInfoIter& rIter) {
     initSound(2, false);
     initNerve(GET_NERVE(CollectTico, CollectTicoNrvWait));
     if (MR::tryRegisterDemoCast(this, rIter)) {
-        MR::registerDemoActionFunctor(this, MR::Functor(this, &CollectTico::startAppearPowerStar), "集めチコスター出現");
+        MR::registerDemoActionFunctor(this, MR::Functor(this, &CollectTico::startAppearPowerStar), "\x8f\x57\x82\xdf\x83\x60\x83\x52\x83\x58\x83\x5e\x81\x5b\x8f\x6f\x8c\xbb");
         _A0 = 1;
     }
 
@@ -58,7 +58,7 @@ void CollectTico::exeWait() {
     }
 
     if (needsDemo && !MR::isPlayerDead()) {
-        MR::requestStartDemo(this, "チコ集めコンプリート", GET_NERVE(CollectTico, CollectTicoNrvCompleteDemo),
+        MR::requestStartDemo(this, "\x83\x60\x83\x52\x8f\x57\x82\xdf\x83\x52\x83\x93\x83\x76\x83\x8a\x81\x5b\x83\x67", GET_NERVE(CollectTico, CollectTicoNrvCompleteDemo),
                              GET_NERVE(CollectTico, CollectTicoNrvTryStartDemo));
     }
 }
@@ -109,7 +109,7 @@ void CollectTico::exeFlash() {
             setNerve(GET_NERVE(CollectTico, CollectTicoNrvAppearPowerStar));
         }
 
-        MR::endDemo(this, "チコ集めコンプリート");
+        MR::endDemo(this, "\x83\x60\x83\x52\x8f\x57\x82\xdf\x83\x52\x83\x93\x83\x76\x83\x8a\x81\x5b\x83\x67");
         if (MR::isValidSwitchA(this)) {
             MR::onSwitchA(this);
         }

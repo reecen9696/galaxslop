@@ -25,7 +25,7 @@ namespace NrvKoopaStateAttackFireShort {
 };  // namespace NrvKoopaStateAttackFireShort
 
 KoopaStateAttackFireShort::KoopaStateAttackFireShort(Koopa* pKoopa)
-    : ActorStateBase< Koopa >("State[ショート炎攻撃]", pKoopa), mFireEmitted(-1), mMaxFire(3), mFireDelay(::sStepToNextAttack) {
+    : ActorStateBase< Koopa >("State[\x83\x56\x83\x87\x81\x5b\x83\x67\x89\x8a\x8d\x55\x8c\x82]", pKoopa), mFireEmitted(-1), mMaxFire(3), mFireDelay(::sStepToNextAttack) {
 }
 
 void KoopaStateAttackFireShort::init() {

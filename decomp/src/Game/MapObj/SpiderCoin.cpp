@@ -52,7 +52,7 @@ void SpiderCoin::init(const JMapInfoIter& rIter) {
     MR::initStarPointerTarget(this, 150.0f, TVec3f(0.0f, 80.0f, 0.0f));
 
     MR::declareCoin(this, 1);
-    mCocoonModel = new PartsModel(this, "まゆ", "SpaceCocoon", mBaseMtx, MR::DrawBufferType_NoSilhouettedMapObj, false);
+    mCocoonModel = new PartsModel(this, "\x82\xdc\x82\xe4", "SpaceCocoon", mBaseMtx, MR::DrawBufferType_NoSilhouettedMapObj, false);
     mCocoonModel->mScale.set(0.3f);
     mCocoonModel->initWithoutIter();
 
@@ -81,7 +81,7 @@ void SpiderCoin::exeWait() {
     }
     mPosition.set(*mPointPos);
 
-    if (MR::tryStarPointerCheck(this, true, "弱")) {
+    if (MR::tryStarPointerCheck(this, true, "\x8e\xe3")) {
         setNerve(GET_NERVE(SpiderCoin, SpiderCoinNrvTouch));
     }
 }
@@ -102,8 +102,8 @@ void SpiderCoin::exeTouch() {
         return;
     }
 
-    if (!tryRub(WPAD_CHAN0, &mPad0Velocity) && !tryRub(WPAD_CHAN1, &mPad1Velocity) && !MR::isStarPointerPointing(this, WPAD_CHAN0, true, "弱") &&
-        !MR::isStarPointerPointing(this, WPAD_CHAN1, true, "弱")) {
+    if (!tryRub(WPAD_CHAN0, &mPad0Velocity) && !tryRub(WPAD_CHAN1, &mPad1Velocity) && !MR::isStarPointerPointing(this, WPAD_CHAN0, true, "\x8e\xe3") &&
+        !MR::isStarPointerPointing(this, WPAD_CHAN1, true, "\x8e\xe3")) {
         setNerve(GET_NERVE(SpiderCoin, SpiderCoinNrvTouchAndApart));
     }
 }
@@ -115,7 +115,7 @@ void SpiderCoin::exeTouchAndApart() {
         MR::getEaseOutValue((::sStepToucnAndApart - getNerveStep()) / static_cast< f32 >(::sStepToucnAndApart), 0.0f, 1.0f, 1.0f) * ::sRotateSpeedY;
     MR::repeatDegree(&mRotation.y);
 
-    if (MR::isGreaterStep(this, ::sStepToTouch2nd) && MR::isStarPointerPointing(this, WPAD_CHAN0, true, "弱")) {
+    if (MR::isGreaterStep(this, ::sStepToTouch2nd) && MR::isStarPointerPointing(this, WPAD_CHAN0, true, "\x8e\xe3")) {
         kill();
         return;
     }
@@ -161,7 +161,7 @@ void SpiderCoin::calcAndSetBaseMtx() {
 }
 
 bool SpiderCoin::tryRub(s32 padChannel, TVec2f* pVel) {
-    if (!MR::isStarPointerPointing(this, padChannel, true, "弱") || MR::getStarPointerScreenSpeed(padChannel) < ::sPointerSpeedMin) {
+    if (!MR::isStarPointerPointing(this, padChannel, true, "\x8e\xe3") || MR::getStarPointerScreenSpeed(padChannel) < ::sPointerSpeedMin) {
         return false;
     }
 

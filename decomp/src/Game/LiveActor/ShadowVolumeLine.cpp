@@ -3,7 +3,7 @@
 #include "Game/Util/DirectDraw.hpp"
 #include "Game/Util/MathUtil.hpp"
 
-ShadowVolumeLine::ShadowVolumeLine() : ShadowVolumeDrawer("影描画[ボリュームライン]") {
+ShadowVolumeLine::ShadowVolumeLine() : ShadowVolumeDrawer("\x89\x65\x95\x60\x89\xe6[\x83\x7b\x83\x8a\x83\x85\x81\x5b\x83\x80\x83\x89\x83\x43\x83\x93]") {
     mFromShadowController = 0;
     mToShadowController = 0;
     mFromWidth = 100.0f;

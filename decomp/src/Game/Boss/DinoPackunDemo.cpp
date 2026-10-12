@@ -61,7 +61,7 @@ namespace NrvDinoPackunDemo {
     NEW_NERVE(DinoPackunDemoNrvAppearPowerStar, DinoPackunDemo, AppearPowerStar);
 };  // namespace NrvDinoPackunDemo
 
-DinoPackunDemo::DinoPackunDemo(DinoPackun* pBoss) : DinoPackunAction("ディノパックンデモ", pBoss), _14(), mDemoName() {
+DinoPackunDemo::DinoPackunDemo(DinoPackun* pBoss) : DinoPackunAction("\x83\x66\x83\x42\x83\x6d\x83\x70\x83\x62\x83\x4e\x83\x93\x83\x66\x83\x82", pBoss), _14(), mDemoName() {
     MR::createCenterScreenBlur();
 }
 
@@ -73,19 +73,19 @@ void DinoPackunDemo::control() {
 }
 
 void DinoPackunDemo::startOpeningDemo() {
-    startTryDemo("ディノパックン開始デモ", GET_NERVE(DinoPackunDemo, DinoPackunDemoNrvOpeningDemo));
+    startTryDemo("\x83\x66\x83\x42\x83\x6d\x83\x70\x83\x62\x83\x4e\x83\x93\x8a\x4a\x8e\x6e\x83\x66\x83\x82", GET_NERVE(DinoPackunDemo, DinoPackunDemoNrvOpeningDemo));
 }
 
 void DinoPackunDemo::startCryDemo() {
-    startTryDemo("ディノパックン泣きデモ", GET_NERVE(DinoPackunDemo, DinoPackunDemoNrvCryDemo));
+    startTryDemo("\x83\x66\x83\x42\x83\x6d\x83\x70\x83\x62\x83\x4e\x83\x93\x8b\x83\x82\xab\x83\x66\x83\x82", GET_NERVE(DinoPackunDemo, DinoPackunDemoNrvCryDemo));
 }
 
 void DinoPackunDemo::startAngryDemo() {
-    startTryDemo("ディノパックン怒りデモ", GET_NERVE(DinoPackunDemo, DinoPackunDemoNrvAngryDemo));
+    startTryDemo("\x83\x66\x83\x42\x83\x6d\x83\x70\x83\x62\x83\x4e\x83\x93\x93\x7b\x82\xe8\x83\x66\x83\x82", GET_NERVE(DinoPackunDemo, DinoPackunDemoNrvAngryDemo));
 }
 
 void DinoPackunDemo::startDownDemo() {
-    startTryDemo("ディノパックンダウン", GET_NERVE(DinoPackunDemo, DinoPackunDemoNrvDownDemo));
+    startTryDemo("\x83\x66\x83\x42\x83\x6d\x83\x70\x83\x62\x83\x4e\x83\x93\x83\x5f\x83\x45\x83\x93", GET_NERVE(DinoPackunDemo, DinoPackunDemoNrvDownDemo));
 }
 
 void DinoPackunDemo::startTryDemo(const char* pName, const Nerve* pNerve) {
@@ -145,7 +145,7 @@ void DinoPackunDemo::exeOpeningDemo() {
         MR::startStageBGM("MBGM_GALAXY_INTER", false);
         getHost()->mDemoPos->endDemo();
         getHost()->resetPosition();
-        getHost()->endDemo("ディノパックン開始デモ");
+        getHost()->endDemo("\x83\x66\x83\x42\x83\x6d\x83\x70\x83\x62\x83\x4e\x83\x93\x8a\x4a\x8e\x6e\x83\x66\x83\x82");
         MR::endAnimCamera(getHost(), getHost()->mCameraInfo, "OpeningDemo", -1, true);
         getHost()->activateParts();
         MR::validateCollisionParts(getHost()->getEggShell());
@@ -169,7 +169,7 @@ void DinoPackunDemo::exeCryDemo() {
 
     if (MR::isBckStopped(getHost())) {
         MR::startBossBGM(MR::BossBgmID_DinoPackunA);
-        getHost()->endDemo("ディノパックン泣きデモ");
+        getHost()->endDemo("\x83\x66\x83\x42\x83\x6d\x83\x70\x83\x62\x83\x4e\x83\x93\x8b\x83\x82\xab\x83\x66\x83\x82");
         MR::endAnimCamera(getHost(), getHost()->mCameraInfo, "CryDemo", -1, -1);
         getHost()->activateParts();
         kill();
@@ -208,7 +208,7 @@ void DinoPackunDemo::exeAngryDemo() {
 
     if (MR::isBckStopped(getHost())) {
         MR::startBossBGM(MR::BossBgmID_DinoPackunB);
-        getHost()->endDemo("ディノパックン怒りデモ");
+        getHost()->endDemo("\x83\x66\x83\x42\x83\x6d\x83\x70\x83\x62\x83\x4e\x83\x93\x93\x7b\x82\xe8\x83\x66\x83\x82");
         MR::endAnimCamera(getHost(), getHost()->mCameraInfo, "AngryDemo", -1, 1);
         getHost()->activateParts();
         kill();
@@ -250,7 +250,7 @@ void DinoPackunDemo::exeAppearPowerStar() {
 
     if (MR::isGreaterStep(this, ::sAppearPowerStarTime)) {
         if (MR::isEndPowerStarAppearDemo(getHost())) {
-            getHost()->endDemo("ディノパックンダウン");
+            getHost()->endDemo("\x83\x66\x83\x42\x83\x6d\x83\x70\x83\x62\x83\x4e\x83\x93\x83\x5f\x83\x45\x83\x93");
             MR::endAnimCamera(getHost(), getHost()->mCameraInfo, "DownDemo", -1, true);
             getHost()->kill();
             kill();

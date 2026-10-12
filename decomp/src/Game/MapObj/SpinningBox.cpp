@@ -100,7 +100,7 @@ void SpinningBox::init(const JMapInfoIter& rIter) {
 
     if (mIsIceBox) {
         MR::initCollisionParts(this, "IceBox", getSensor("body"), nullptr);
-        setName("アイスボックス");
+        setName("\x83\x41\x83\x43\x83\x58\x83\x7b\x83\x62\x83\x4e\x83\x58");
     } else {
         MR::initCollisionPartsAutoEqualScaleOne(this, "SpinningBox", getSensor("body"), nullptr);
     }
@@ -198,7 +198,7 @@ void SpinningBox::exeWait() {
         MR::validateClipping(this);
     }
 
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         setNerve(GET_NERVE(SpinningBox, HostTypeNrvPointed));
         return;
     }
@@ -229,7 +229,7 @@ void SpinningBox::exeSliding() {
         MR::invalidateClipping(this);
     }
 
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         setNerve(GET_NERVE(SpinningBox, HostTypeNrvPointed));
         return;
     }
@@ -276,7 +276,7 @@ void SpinningBox::exeSpinning() {
         MR::invalidateClipping(this);
     }
 
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         setNerve(GET_NERVE(SpinningBox, HostTypeNrvPointed));
         return;
     }
@@ -340,7 +340,7 @@ void SpinningBox::exePointed() {
     mRotateSpeed *= ::hPointedRotDamp;
     MR::startDPDFreezeLevelSound(this);
 
-    if (!MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (!MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         setNerve(GET_NERVE(SpinningBox, HostTypeNrvWait));
     }
 }

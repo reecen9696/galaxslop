@@ -78,14 +78,14 @@ namespace {
     const char* createSubModelObjName(const LiveActor* pActor, const char* pSubName) {
         u32 subLength = strlen(pSubName);
         u32 actorLength = strlen(pActor->mName);
-        u32 length = actorLength + subLength + strlen("（）") + 1;
+        u32 length = actorLength + subLength + strlen("\x81\x69\x81\x6a") + 1;
         char* pBuffer = new char[length];
-        snprintf(pBuffer, length, "%s（%s）", pActor->mName, pSubName);
+        snprintf(pBuffer, length, "%s\x81\x69%s\x81\x6a", pActor->mName, pSubName);
         return pBuffer;
     }
 
     PartsModel* createSubModel(LiveActor* pActor, const char* pSubModelName, MtxPtr pMtx, int drawBufferType) NO_INLINE {
-        const char* modelResName = MR::getModelResourceHolder(pActor)->mModelResTable->getResName(0UL);
+        const char* modelResName = MR::getModelResourceHolder(pActor)->mModelResTable->getResName(0U);
 
         if (!MR::isExistSubModel(modelResName, pSubModelName)) {
             return nullptr;
@@ -333,7 +333,7 @@ namespace MR {
             return nullptr;
         }
 
-        const char* objName = ::createSubModelObjName(pActor, "鏡内モデル");
+        const char* objName = ::createSubModelObjName(pActor, "\x8b\xbe\x93\xe0\x83\x82\x83\x66\x83\x8b");
         MirrorActor* mirror = new MirrorActor(pActor, objName, pModelName);
         mirror->initWithoutIter();
         return mirror;
@@ -779,7 +779,7 @@ namespace MR {
     }
 
     const char* getModelResName(const LiveActor* pActor) {
-        return getModelResourceHolder(pActor)->mModelResTable->getResName(0UL);
+        return getModelResourceHolder(pActor)->mModelResTable->getResName(0U);
     }
 
     bool isExistAnim(const LiveActor* pActor, const char* pName) {
@@ -2386,11 +2386,22 @@ namespace MR {
     }
 
     void validateExCollisionParts(LiveActor* pActor) {
+#ifdef TARGET_PC
+        // Bit 0x20 of the flag byte is _2 in CodeWarrior's allocation (from
+        // the most significant bit); here bitfields start at the least
+        // significant bit, where 0x20 is _5.
+        pActor->mBinder->_1EC._2 = true;
+#else
         *(u8*)&pActor->mBinder->_1EC |= 0x20;
+#endif
     }
 
     void invalidateExCollisionParts(LiveActor* pActor) {
+#ifdef TARGET_PC
+        pActor->mBinder->_1EC._2 = false;
+#else
         *(u8*)&pActor->mBinder->_1EC &= ~0x20;
+#endif
     }
 
     void onUpdateCollisionParts(LiveActor* pActor) {
@@ -2577,12 +2588,12 @@ namespace MR {
         pLod->setFarClipping(farClip);
 
         if (pLod->_10 != nullptr) {
-            const char* pResName = getModelResourceHolder(pLod->_10)->mModelResTable->getResName(0UL);
+            const char* pResName = getModelResourceHolder(pLod->_10)->mModelResTable->getResName(0U);
             tryStartAllAnim(pLod->_10, pResName);
         }
 
         if (pLod->_14 != nullptr) {
-            const char* pResName = getModelResourceHolder(pLod->_14)->mModelResTable->getResName(0UL);
+            const char* pResName = getModelResourceHolder(pLod->_14)->mModelResTable->getResName(0U);
             tryStartAllAnim(pLod->_14, pResName);
         }
 
@@ -2596,12 +2607,12 @@ namespace MR {
         pLod->setFarClipping(farClip);
 
         if (pLod->_10 != nullptr) {
-            const char* pResName = getModelResourceHolder(pLod->_10)->mModelResTable->getResName(0UL);
+            const char* pResName = getModelResourceHolder(pLod->_10)->mModelResTable->getResName(0U);
             tryStartAllAnim(pLod->_10, pResName);
         }
 
         if (pLod->_14 != nullptr) {
-            const char* pResName = getModelResourceHolder(pLod->_14)->mModelResTable->getResName(0UL);
+            const char* pResName = getModelResourceHolder(pLod->_14)->mModelResTable->getResName(0U);
             tryStartAllAnim(pLod->_14, pResName);
         }
 

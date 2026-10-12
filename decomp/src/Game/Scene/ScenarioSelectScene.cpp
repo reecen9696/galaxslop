@@ -45,7 +45,7 @@ namespace {
     }
 
     bool tryResumeInitializeThread() {
-        const char* thread = "シーン初期化";
+        const char* thread = "\x83\x56\x81\x5b\x83\x93\x8f\x89\x8a\xfa\x89\xbb";
         if (MR::isSuspendedAsyncExecuteThread(thread)) {
             MR::resumeAsyncExecuteThread(thread);
             return true;
@@ -56,13 +56,13 @@ namespace {
 };  // namespace
 
 ScenarioSelectScene::ScenarioSelectScene()
-    : Scene("シナリオ選択シーン"), _14(), _15(), _16(), mScenarioLayout(), mCinemaFrame(), _28(), mEffectSystem(), mCameraContext() {
+    : Scene("\x83\x56\x83\x69\x83\x8a\x83\x49\x91\x49\x91\xf0\x83\x56\x81\x5b\x83\x93"), _14(), _15(), _16(), mScenarioLayout(), mCinemaFrame(), _28(), mEffectSystem(), mCameraContext() {
 }
 
 void ScenarioSelectScene::init() {
     _20 = ::createDrawBuffer();
     _24 = ::createDrawBuffer();
-    mEffectSystem = new EffectSystem("エフェクトシステム", false);
+    mEffectSystem = new EffectSystem("\x83\x47\x83\x74\x83\x46\x83\x4e\x83\x67\x83\x56\x83\x58\x83\x65\x83\x80", false);
     mEffectSystem->initWithoutIter();
     mEffectSystem->entry(MR::getParticleResourceHolder(), 0x300, 0x20);
     mCameraContext = new CameraContext();

@@ -45,11 +45,11 @@ namespace {
     };
 
     static const RaceStructData sRaceStruct[] = {
-        {"ペンギンレース[オーシャンリング]", MR::EventBgmID_PenguinRace, 120, "RaceName_Penguin", "OceanRingGalaxy", 2, false},
-        {"テレサレース[ファントム]", MR::EventBgmID_TeresaRace, 120, "RaceName_TeresaPhantom", "PhantomGalaxy", 2, true},
-        {"テレサレース[デスプロムナード]", MR::EventBgmID_TeresaRace, 120, "RaceName_TeresaDeathPromenade", "TeresaMario2DGalaxy", 1, false},
-        {"サーフィン[トライアル]", MR::EventBgmID_Surfing, 0, "RaceName_SurfingTrial", "SurfingLv1Galaxy", 1, false},
-        {"サーフィン[チャレンジ]", MR::EventBgmID_Surfing, 180, "RaceName_SurfingChallenge", "SurfingLv2Galaxy", 1, false}};
+        {"\x83\x79\x83\x93\x83\x4d\x83\x93\x83\x8c\x81\x5b\x83\x58[\x83\x49\x81\x5b\x83\x56\x83\x83\x83\x93\x83\x8a\x83\x93\x83\x4f]", MR::EventBgmID_PenguinRace, 120, "RaceName_Penguin", "OceanRingGalaxy", 2, false},
+        {"\x83\x65\x83\x8c\x83\x54\x83\x8c\x81\x5b\x83\x58[\x83\x74\x83\x40\x83\x93\x83\x67\x83\x80]", MR::EventBgmID_TeresaRace, 120, "RaceName_TeresaPhantom", "PhantomGalaxy", 2, true},
+        {"\x83\x65\x83\x8c\x83\x54\x83\x8c\x81\x5b\x83\x58[\x83\x66\x83\x58\x83\x76\x83\x8d\x83\x80\x83\x69\x81\x5b\x83\x68]", MR::EventBgmID_TeresaRace, 120, "RaceName_TeresaDeathPromenade", "TeresaMario2DGalaxy", 1, false},
+        {"\x83\x54\x81\x5b\x83\x74\x83\x42\x83\x93[\x83\x67\x83\x89\x83\x43\x83\x41\x83\x8b]", MR::EventBgmID_Surfing, 0, "RaceName_SurfingTrial", "SurfingLv1Galaxy", 1, false},
+        {"\x83\x54\x81\x5b\x83\x74\x83\x42\x83\x93[\x83\x60\x83\x83\x83\x8c\x83\x93\x83\x57]", MR::EventBgmID_Surfing, 180, "RaceName_SurfingChallenge", "SurfingLv2Galaxy", 1, false}};
 
     const RaceStructData& getRaceStruceData(s32 id) {
         return ::sRaceStruct[id];
@@ -181,14 +181,14 @@ namespace NrvRaceManager {
 };  // namespace NrvRaceManager
 
 RaceManager::RaceManager()
-    : LiveActor("レース管理"), mLayout(nullptr), mRacerNum(0), mAudienceNum(0), mRank(0), mBestTime(0), mTime(0), mPlayerRacer(nullptr) {
+    : LiveActor("\x83\x8c\x81\x5b\x83\x58\x8a\xc7\x97\x9d"), mLayout(nullptr), mRacerNum(0), mAudienceNum(0), mRank(0), mBestTime(0), mTime(0), mPlayerRacer(nullptr) {
     _FC.identity();
 }
 
 void RaceManager::init(const JMapInfoIter& rIter) {
     MR::connectToSceneMapObjMovement(this);
 
-    mLayout = new RaceManagerLayout("レース管理用レイアウト");
+    mLayout = new RaceManagerLayout("\x83\x8c\x81\x5b\x83\x58\x8a\xc7\x97\x9d\x97\x70\x83\x8c\x83\x43\x83\x41\x83\x45\x83\x67");
     mLayout->init(rIter);
 
     MR::invalidateClipping(this);
@@ -267,7 +267,7 @@ void RaceManager::exeWipeIn() {
         setNerve(GET_NERVE(RaceManager, RaceManagerNrvIntro));
     } else {
         MR::onPlayerControl(true);
-        MR::endDemo(this, "レース");
+        MR::endDemo(this, "\x83\x8c\x81\x5b\x83\x58");
         std::for_each(&mRacer[0], &mRacer[mRacerNum], std::mem_func(&AbstractRacer::exitRacer));
         setNerve(GET_NERVE(RaceManager, RaceManagerNrvWait));
     }
@@ -388,7 +388,7 @@ void RaceManager::exeRank() {
         return;
     }
 
-    MR::tryStartDemoWithoutCinemaFrame(this, "レース");
+    MR::tryStartDemoWithoutCinemaFrame(this, "\x83\x8c\x81\x5b\x83\x58");
     setNerve(GET_NERVE(RaceManager, RaceManagerNrvPstWipeOut));
 }
 
@@ -396,7 +396,7 @@ bool RaceManager::startWithWipe() {
     mRank = 0;
 
     mLayout->hideAllPane();
-    MR::requestStartDemoMarioPuppetableWithoutCinemaFrame(this, "レース", GET_NERVE(RaceManager, RaceManagerNrvPrepWipe), nullptr);
+    MR::requestStartDemoMarioPuppetableWithoutCinemaFrame(this, "\x83\x8c\x81\x5b\x83\x58", GET_NERVE(RaceManager, RaceManagerNrvPrepWipe), nullptr);
 
     return true;
 }
@@ -405,7 +405,7 @@ bool RaceManager::startImmediately() {
     mRank = 0;
 
     mLayout->hideAllPane();
-    MR::requestStartDemoWithoutCinemaFrame(this, "レース", GET_NERVE(RaceManager, RaceManagerNrvPrepImme), nullptr);
+    MR::requestStartDemoWithoutCinemaFrame(this, "\x83\x8c\x81\x5b\x83\x58", GET_NERVE(RaceManager, RaceManagerNrvPrepImme), nullptr);
     MR::requestMovementOnPlayer();
     MR::stopStageBGM(90);
     MR::startSubBGM("BGM_MINIGAME_START", false);
@@ -434,7 +434,7 @@ void RaceManager::startRace() {
 
     std::for_each(&mRacer[0], &mRacer[mRacerNum], std::mem_func(&AbstractRacer::startRacer));
     MR::endStarPointerMode(this);
-    MR::endDemo(this, "レース");
+    MR::endDemo(this, "\x83\x8c\x81\x5b\x83\x58");
     MR::onPlayerControl(true);
 }
 

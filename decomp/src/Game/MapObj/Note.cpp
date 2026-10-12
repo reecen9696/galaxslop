@@ -123,7 +123,7 @@ void Note::attackSensor(HitSensor* pSender, HitSensor* pReceiver) {
     }
 }
 
-NoteGroup::NoteGroup() : LiveActorGroup("音符グループ", 0x100) {
+NoteGroup::NoteGroup() : LiveActorGroup("\x89\xb9\x95\x84\x83\x4f\x83\x8b\x81\x5b\x83\x76", 0x100) {
     mRotation = 0.0f;
 }
 

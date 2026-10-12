@@ -152,7 +152,7 @@ void Poihana::init(const JMapInfoIter& rIter) {
     MR::getJMapInfoArg4NoInit(rIter, &mCanDrown);
 
     if (mCanDrown) {
-        mWaterColumn = MR::createModelObjMapObj("エフェクト水柱", "WaterColumn", getBaseMtx());
+        mWaterColumn = MR::createModelObjMapObj("\x83\x47\x83\x74\x83\x46\x83\x4e\x83\x67\x90\x85\x92\x8c", "WaterColumn", getBaseMtx());
         mWaterColumn->mScale.set(2.0f);
         makeActorDead();
     }

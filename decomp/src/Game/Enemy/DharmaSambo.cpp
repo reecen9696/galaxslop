@@ -143,7 +143,7 @@ void DharmaSambo::init(const JMapInfoIter& rIter) {
 
     for (i = 0; i < ::hBodyPartsNum; i++) {
         MR::hideJoint(this, joint_name[i]);
-        DharmaSamboParts* part = new DharmaSamboParts(this, "だるまサンボパーツ", "DharmaSamboParts", nullptr, 18, 43, -2);
+        DharmaSamboParts* part = new DharmaSamboParts(this, "\x82\xbe\x82\xe9\x82\xdc\x83\x54\x83\x93\x83\x7b\x83\x70\x81\x5b\x83\x63", "DharmaSamboParts", nullptr, 18, 43, -2);
         part->initWithoutIter();
         part->mOriginalIndex = i;
         part->setHead(i == ::hBodyPartsNum - 1);
@@ -727,7 +727,7 @@ bool DharmaSambo::decCountAndTryToHide(bool hide) {
 
 bool DharmaSambo::isStarPointerPointingParts() {
     for (s32 i = 0; i < mParts.size(); i++) {
-        if (!MR::isDead(mParts[i]) && MR::isStarPointerPointing2POnPressButton(mParts[i], "弱", true, false)) {
+        if (!MR::isDead(mParts[i]) && MR::isStarPointerPointing2POnPressButton(mParts[i], "\x8e\xe3", true, false)) {
             return true;
         }
     }

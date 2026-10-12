@@ -5,7 +5,7 @@
 #include "JSystem/JKernel/JKRThread.hpp"
 #include <revolution.h>
 
-u32 JKRDecompExpandSize(u8*);
+#include "JSystem/JKernel/JKRDecomp.hpp"
 
 class JKRAMCommand;
 

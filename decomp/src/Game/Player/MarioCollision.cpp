@@ -82,20 +82,20 @@ void MarioCollision_FORCE_MATCH_SDATA2() {
 
 void MarioCollision_FORCE_MATCH_STRINGS(const TVec3f& rPosition) {
     MR::getAreaObj("Fur", rPosition);
-    MR::getAreaObj("めりこみ", rPosition);
-    MR::getAreaObj("空中一回転", rPosition);
+    MR::getAreaObj("\x82\xdf\x82\xe8\x82\xb1\x82\xdd", rPosition);
+    MR::getAreaObj("\x8b\xf3\x92\x86\x88\xea\x89\xf1\x93\x5d", rPosition);
     MR::getAreaObj("Spine1", rPosition);
-    MR::getAreaObj("マンホールのふた(クッパ船)", rPosition);
+    MR::getAreaObj("\x83\x7d\x83\x93\x83\x7a\x81\x5b\x83\x8b\x82\xcc\x82\xd3\x82\xbd(\x83\x4e\x83\x62\x83\x70\x91\x44)", rPosition);
     MR::getAreaObj("GhostThroughCode", rPosition);
-    MR::getAreaObj("崖ふんばり", rPosition);
-    MR::getAreaObj("壁押し", rPosition);
-    MR::getAreaObj("前方WKFALL", rPosition);
-    MR::getAreaObj("+逆-左WKFALL", rPosition);
-    MR::getAreaObj("+左WKFALL", rPosition);
-    MR::getAreaObj("+逆-右WKFALL", rPosition);
-    MR::getAreaObj("+右WKFALL", rPosition);
-    MR::getAreaObj("+後ろ1WKFALL", rPosition);
-    MR::getAreaObj("+後ろ2WKFALL", rPosition);
+    MR::getAreaObj("\x8a\x52\x82\xd3\x82\xf1\x82\xce\x82\xe8", rPosition);
+    MR::getAreaObj("\x95\xc7\x89\x9f\x82\xb5", rPosition);
+    MR::getAreaObj("\x91\x4f\x95\xfbWKFALL", rPosition);
+    MR::getAreaObj("+\x8b\x74-\x8d\xb6WKFALL", rPosition);
+    MR::getAreaObj("+\x8d\xb6WKFALL", rPosition);
+    MR::getAreaObj("+\x8b\x74-\x89\x45WKFALL", rPosition);
+    MR::getAreaObj("+\x89\x45WKFALL", rPosition);
+    MR::getAreaObj("+\x8c\xe3\x82\xeb""1WKFALL", rPosition);
+    MR::getAreaObj("+\x8c\xe3\x82\xeb""2WKFALL", rPosition);
     MR::getAreaObj("+SIDEFALL", rPosition);
     MR::getAreaObj("-L-SIDEFALL", rPosition);
     MR::getAreaObj("+R-SIDEFALL", rPosition);
@@ -113,7 +113,7 @@ void MarioCollision_FORCE_MATCH_STRINGS(const TVec3f& rPosition) {
     MR::getAreaObj("ForbidTriangleJumpCube", rPosition);
     MR::getAreaObj("GlaringLightArea", rPosition);
     MR::getAreaObj("FallsCube", rPosition);
-    MR::getAreaObj("水壁ヒット", rPosition);
+    MR::getAreaObj("\x90\x85\x95\xc7\x83\x71\x83\x62\x83\x67", rPosition);
     MR::getAreaObj("HeavySteeringCube", rPosition);
     MR::getAreaObj("DashChargeCylinder", rPosition);
     MR::getAreaObj("RasterScrollCube", rPosition);
@@ -1318,7 +1318,7 @@ void Mario::checkBaseTransPoint() {
             continue;
         }
 
-        addTrans(*normal * (hit->_60 - 1.0f), "めりこみ");
+        addTrans(*normal * (hit->_60 - 1.0f), "\x82\xdf\x82\xe8\x82\xb1\x82\xdd");
 
         if (!mMovementStates._1 && mMovementStates.jumping && !isRising() && normal->dot(*getGravityVec()) < -0.99f) {
             addVelocity(mFrontVec, 5.0f);
@@ -1439,7 +1439,7 @@ void Mario::checkHeadPoint() {
         } else if (_1FC.dot(reaction) < 0.0f) {
             mMovementStates._1 = true;
             mJumpVec.zero();
-            changeAnimation("空中一回転");
+            changeAnimation("\x8b\xf3\x92\x86\x88\xea\x89\xf1\x93\x5d");
         }
     }
 
@@ -1698,11 +1698,11 @@ bool Mario::updateBinderInfo() {
             TVec3f horizontal;
 
             if (firstCeiling && (MR::vecKillElement(mJumpVec, normal, &horizontal) < 0.0f || mPrevDrawStates._1E) && calcAngleD(normal) > 100.0f) {
-                if (strcmp(triangle->mSensor->mHost->mName, "マンホールのふた(クッパ船)")) {
+                if (strcmp(triangle->mSensor->mHost->mName, "\x83\x7d\x83\x93\x83\x7a\x81\x5b\x83\x8b\x82\xcc\x82\xd3\x82\xbd(\x83\x4e\x83\x62\x83\x70\x91\x44)")) {
                     mJumpVec = horizontal;
                 }
 
-                startPadVib(0UL);
+                startPadVib(0U);
                 firstCeiling = false;
                 *_4C8 = *triangle;
             }
@@ -1779,7 +1779,7 @@ bool Mario::checkGround() {
 
     TVec3f normal;
 
-    if (isAnimationRun("崖ふんばり")) {
+    if (isAnimationRun("\x8a\x52\x82\xd3\x82\xf1\x82\xce\x82\xe8")) {
         normal = -*getGravityVec();
     } else {
         normal = *_45C->getNormal(0);
@@ -1835,7 +1835,7 @@ bool Mario::checkGround() {
         count = 4;
     }
 
-    if (isAnimationRun("壁押し", 0)) {
+    if (isAnimationRun("\x95\xc7\x89\x9f\x82\xb5", 0)) {
         count = 4;
     }
 
@@ -1933,7 +1933,7 @@ bool Mario::checkGround() {
                 bool moved = false;
 
                 if (!mMovementStates._8) {
-                    addTrans(mFrontVec * 6.0f, "前方WKFALL");
+                    addTrans(mFrontVec * 6.0f, "\x91\x4f\x95\xfbWKFALL");
                     moved = true;
                 }
 
@@ -1945,24 +1945,24 @@ bool Mario::checkGround() {
                 } else if (!hit[1]) {
                     if ((mMovementStates._1A || mMovementStates._8 || mMovementStates._19) && mSideVec.dot(getWallNorm()) < 0.0f) {
                         if (moved) {
-                            addTrans(-mSideVec * 3.0f - mFrontVec * 6.0f, "+逆-左WKFALL");
+                            addTrans(-mSideVec * 3.0f - mFrontVec * 6.0f, "+\x8b\x74-\x8d\xb6WKFALL");
                         }
 
                         break;
                     } else {
-                        addTrans(mSideVec * 3.0f, "+左WKFALL");
+                        addTrans(mSideVec * 3.0f, "+\x8d\xb6WKFALL");
                         moved = true;
                     }
 
                 } else {
                     if ((mMovementStates._1A || mMovementStates._8 || mMovementStates._19) && -mSideVec.dot(getWallNorm()) < 0.0f) {
                         if (moved) {
-                            addTrans(mSideVec * 3.0f - mFrontVec * 6.0f, "+逆-右WKFALL");
+                            addTrans(mSideVec * 3.0f - mFrontVec * 6.0f, "+\x8b\x74-\x89\x45WKFALL");
                         }
 
                         break;
                     } else {
-                        addTrans(-mSideVec * 3.0f, "+右WKFALL");
+                        addTrans(-mSideVec * 3.0f, "+\x89\x45WKFALL");
                         moved = true;
                     }
                 }
@@ -1977,14 +1977,14 @@ bool Mario::checkGround() {
 
                 if (_3CE < 24 && mJumpVec.dot(mFrontVec) >= 0.0f && _960 != CollisionFloorCode_Slide) {
                     if (!mMovementStates._8 && !mMovementStates._32) {
-                        addTrans(mFrontVec * 3.0f, "+後ろ1WKFALL");
+                        addTrans(mFrontVec * 3.0f, "+\x8c\xe3\x82\xeb""1WKFALL");
                         mDrawStates._A = true;
                     }
 
                 } else {
                     if (!mMovementStates._19) {
                         mDrawStates._18 = true;
-                        addTrans(mFrontVec * -6.0f, "+後ろ2WKFALL");
+                        addTrans(mFrontVec * -6.0f, "+\x8c\xe3\x82\xeb""2WKFALL");
                         mDrawStates._A = true;
                     }
 
@@ -2285,7 +2285,7 @@ void Mario::updateCubeCode() {
 
     if (MR::getAreaObj("FallsCube", mActor->_2AC) != nullptr) {
         touchWater();
-        playEffectRTZ("水壁ヒット", mHeadVec, mActor->_2AC);
+        playEffectRTZ("\x90\x85\x95\xc7\x83\x71\x83\x62\x83\x67", mHeadVec, mActor->_2AC);
     }
 
     if (MR::getAreaObj("HeavySteeringCube", mPosition) != nullptr) {

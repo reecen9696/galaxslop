@@ -25,7 +25,7 @@ namespace {
 };  // namespace
 
 OceanRingPipeInside::OceanRingPipeInside(const OceanRingPipe* pPipe)
-    : LiveActor("オーシャンリングの内側"), mRingPipe(pPipe), mTexU0(), mTexV0(), mTexU1(), mTexV1(), mWaterPipeInsideTex(), mDispListLength(),
+    : LiveActor("\x83\x49\x81\x5b\x83\x56\x83\x83\x83\x93\x83\x8a\x83\x93\x83\x4f\x82\xcc\x93\xe0\x91\xa4"), mRingPipe(pPipe), mTexU0(), mTexV0(), mTexU1(), mTexV1(), mWaterPipeInsideTex(), mDispListLength(),
       mDispList() {
 }
 

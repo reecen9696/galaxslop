@@ -19,7 +19,7 @@ namespace NrvQuakeEffectGenerator {
     NEW_NERVE(HostTypeQuaking, QuakeEffectGenerator, Quaking);
 };  // namespace NrvQuakeEffectGenerator
 
-QuakeEffectGenerator::QuakeEffectGenerator() : LiveActor("地震効果生成") {
+QuakeEffectGenerator::QuakeEffectGenerator() : LiveActor("\x92\x6e\x90\x6b\x8c\xf8\x89\xca\x90\xb6\x90\xac") {
 }
 
 void QuakeEffectGenerator::init(const JMapInfoIter& rIter) {

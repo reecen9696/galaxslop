@@ -10,7 +10,7 @@ class MogucchiHillPiece : public LiveActor {
 public:
     /// @brief Creates a new `MogucchiHillPiece`.
     /// @param pName A pointer to the null-terminated name of the object.
-    MogucchiHillPiece(const char* pName = "モグッチ塚ピース");
+    MogucchiHillPiece(const char* pName = "\x83\x82\x83\x4f\x83\x62\x83\x60\x92\xcb\x83\x73\x81\x5b\x83\x58");
 
     virtual void init(const JMapInfoIter& rIter);
     virtual void appear();

@@ -85,6 +85,10 @@ public:
     bool isPreparedReset();
     void restartGameAfterResetting();
     bool isExistRequest() const;
+#ifdef TARGET_PC
+    // A scene change is requested or under way (not the normal state).
+    bool isChangingScene() const;
+#endif
     bool isSameAtNextSceneAndStage() const;
     void updateSceneControlInfo();
     Scene* getCurrentSceneForExecute() const;

@@ -14,14 +14,14 @@ TombSpiderEnvironment::TombSpiderEnvironment(LiveActor* pActor) : mActor(pActor)
     MR::createSceneObj(SceneObj_SpiderThread);
     MR::initSpiderThread(mActor->mPosition);
 
-    mPlanet = new PlanetMap("戦場[トゥームスパイダー]", "TombSpiderPlanet");
+    mPlanet = new PlanetMap("\x90\xed\x8f\xea[\x83\x67\x83\x44\x81\x5b\x83\x80\x83\x58\x83\x70\x83\x43\x83\x5f\x81\x5b]", "TombSpiderPlanet");
     mPlanet->mPosition.set(mActor->mPosition);
     mPlanet->initWithoutIter();
     mPlanet->mLODCtrl->setDistanceToLow(25000.0f);
     MR::registerDemoSimpleCastAll(mPlanet);
     mPlanet->appear();
 
-    mCocoon = new ModelObj("まゆ[トゥームスパイダー]", "TombSpiderCocoon", nullptr, -2, -2, -2, false);
+    mCocoon = new ModelObj("\x82\xdc\x82\xe4[\x83\x67\x83\x44\x81\x5b\x83\x80\x83\x58\x83\x70\x83\x43\x83\x5f\x81\x5b]", "TombSpiderCocoon", nullptr, -2, -2, -2, false);
     mCocoon->mPosition.set(mActor->mPosition);
     mCocoon->initWithoutIter();
     MR::invalidateClipping(mCocoon);

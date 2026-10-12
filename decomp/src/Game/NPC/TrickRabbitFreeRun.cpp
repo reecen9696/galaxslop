@@ -199,7 +199,7 @@ void TrickRabbitFreeRun::exeWaitStart() {
     }
 
     if (MR::updateActorState(this, mStateWaitStart)) {
-        MR::requestStartDemoMarioPuppetable(this, "逃走", GET_NERVE(TrickRabbitFreeRun, TrickRabbitFreeRunNrvRunawayStart),
+        MR::requestStartDemoMarioPuppetable(this, "\x93\xa6\x91\x96", GET_NERVE(TrickRabbitFreeRun, TrickRabbitFreeRunNrvRunawayStart),
                                             GET_NERVE(TrickRabbitFreeRun, TrickRabbitFreeRunNrvTryDemo));
     }
 }
@@ -221,7 +221,7 @@ void TrickRabbitFreeRun::exeRunawayStart() {
     }
 
     if (MR::isGreaterStep(this, 120)) {
-        MR::endDemo(this, "逃走");
+        MR::endDemo(this, "\x93\xa6\x91\x96");
         setNerve(GET_NERVE(TrickRabbitFreeRun, TrickRabbitFreeRunNrvRunaway));
     }
 }
@@ -266,7 +266,7 @@ void TrickRabbitFreeRun::exeCaught() {
 
 void TrickRabbitFreeRun::exePowerStarDemo() {
     if (MR::isFirstStep(this)) {
-        MR::endDemo(this, "捕まり");
+        MR::endDemo(this, "\x95\xdf\x82\xdc\x82\xe8");
         MR::startAfterBossBGM();
         MR::requestAppearPowerStar(this, mPosition - mGravity * 200.0f);
         MR::startAction(this, "Wait");

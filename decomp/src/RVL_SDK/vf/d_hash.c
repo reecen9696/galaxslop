@@ -203,7 +203,7 @@ static void _DeleteDataByIdx(int i_Idx) {
 }
 
 static int dHash_DeleteDataW(const u16* i_Name) {
-    long Hash = dHash_SearchHashW(i_Name);
+    int Hash = dHash_SearchHashW(i_Name);
     if (Hash != -1) {
         if (Hash >= 0) {
             _DeleteDataByIdx(Hash);

@@ -35,7 +35,7 @@ CrystalCageMoving::CrystalCageMoving(const char* pName) : MapObjActor(pName) {
 void CrystalCageMoving::init(const JMapInfoIter& rIter) {
     MapObjActor::init(rIter);
     MapObjActorInitInfo info;
-    info.setupHioNode("地形オブジェ");
+    info.setupHioNode("\x92\x6e\x8c\x60\x83\x49\x83\x75\x83\x57\x83\x46");
     info.setupDefaultPos();
     info.setupConnectToScene();
     info.setupEffect(0);
@@ -55,7 +55,7 @@ void CrystalCageMoving::init(const JMapInfoIter& rIter) {
     MR::initActorCamera(this, rIter, &mCameraInfo);
     MR::startBck(this, "Wait");
 
-    if (MR::isDemoExist("脱出スピドラ出現")) {
+    if (MR::isDemoExist("\x92\x45\x8f\x6f\x83\x58\x83\x73\x83\x68\x83\x89\x8f\x6f\x8c\xbb")) {
         MR::registerDemoActionNerve(this, GET_NERVE(CrystalCageMoving, CrystalCageMovingNrvDemoTicoMove), nullptr);
     }
 }
@@ -201,7 +201,7 @@ void CrystalCageMoving::updateHitSensor(HitSensor* pSensor) {
     } else {
         f32 radius = pSensor->mRadius;
         TPos3f joint_mtx;
-        joint_mtx.set(MR::getJointMtx(this, nullptr));
+        joint_mtx.set(MR::getJointMtx(this, 0));
         TVec3f up;
         joint_mtx.getYDir(up);
         TVec3f stack_14;
@@ -223,7 +223,7 @@ void CrystalCageMoving::initDummyModel(const JMapInfoIter& rIter) {
     TVec3f stack_8;
     PSMTXMultVec(_C8.toMtxPtr(), &::sDummyModelOffset, &stack_8);
     _C8.setTrans(stack_8);
-    mTicoModel = new ModelObj("動くクリスタルケージ中身", "Tico", _C8.toMtxPtr(), MR::DrawBufferType_CrystalItem, -2, -2, false);
+    mTicoModel = new ModelObj("\x93\xae\x82\xad\x83\x4e\x83\x8a\x83\x58\x83\x5e\x83\x8b\x83\x50\x81\x5b\x83\x57\x92\x86\x90\x67", "Tico", _C8.toMtxPtr(), MR::DrawBufferType_CrystalItem, -2, -2, false);
     mTicoModel->initWithoutIter();
     ModelObj* tico = mTicoModel;
     tico->mScale.x = 3.0f;
@@ -239,7 +239,7 @@ void CrystalCageMoving::initDummyModel(const JMapInfoIter& rIter) {
 
 void CrystalCageMoving::startBreakDemo() {
     MR::startSound(this, "SE_OJ_CRY_CAGE_MV_TICO_APR");
-    MR::requestStartTimeKeepDemo(this, "脱出スピドラ出現", nullptr, nullptr, "クリスタル破壊");
+    MR::requestStartTimeKeepDemo(this, "\x92\x45\x8f\x6f\x83\x58\x83\x73\x83\x68\x83\x89\x8f\x6f\x8c\xbb", nullptr, nullptr, "\x83\x4e\x83\x8a\x83\x58\x83\x5e\x83\x8b\x94\x6a\x89\xf3");
     MR::hideModel(this);
     ModelObj* tico = mTicoModel;
     tico->mScale.x = 1.0f;

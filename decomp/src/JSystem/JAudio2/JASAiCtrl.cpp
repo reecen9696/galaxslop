@@ -148,10 +148,17 @@ void JASDriver::updateDSP() {
     u32 subFrame = getSubFrames();
     int r26 = JASAudioThread::getDSPSyncCount();
     history[subFrame - r26] = r27;
+#ifndef TARGET_PC
+    // DSP overload guard: sub-frames that come in about as slowly as frames
+    // mean the DSP cannot keep up.  The port's DSP renders a sub-frame in no
+    // time, the moment the voices are released, so these gaps say nothing
+    // about load: the guard only cut off playing sounds whenever two frames
+    // were mixed back to back.
     if (subFrame != r26 && f32(history[0]) / r27 < 1.1f) {
         JASReport("kill DSP channel");
         JASDSPChannel::killActiveChannel();
     }
+#endif
     JASChannel::receiveBankDisposeMsg();
     JASDSPChannel::updateAll();
 

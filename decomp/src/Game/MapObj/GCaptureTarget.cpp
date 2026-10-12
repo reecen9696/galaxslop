@@ -67,7 +67,7 @@ void GCaptureTarget::init(const JMapInfoIter& rIter) {
     if (MR::tryRegisterDemoCast(this, rIter)) {
         makeActorDead();
     } else if (MR::useStageSwitchReadAppear(this, rIter)) {
-        MR::joinToGroupArray(this, rIter, "ブルースター出現グループ", 32);
+        MR::joinToGroupArray(this, rIter, "\x83\x75\x83\x8b\x81\x5b\x83\x58\x83\x5e\x81\x5b\x8f\x6f\x8c\xbb\x83\x4f\x83\x8b\x81\x5b\x83\x76", 32);
         MR::syncStageSwitchAppear(this);
         MR::initActorCamera(this, rIter, &mCameraInfo);
         makeActorDead();
@@ -99,7 +99,7 @@ void GCaptureTarget::appear() {
     setNerve(GET_NERVE(GCaptureTarget, GCaptureTargetNrvAppear));
 
     if (MR::isExistActorCamera(mCameraInfo)) {
-        MR::requestStartDemo(this, "出現", GET_NERVE(GCaptureTarget, GCaptureTargetNrvAppear),
+        MR::requestStartDemo(this, "\x8f\x6f\x8c\xbb", GET_NERVE(GCaptureTarget, GCaptureTargetNrvAppear),
                              GET_NERVE(GCaptureTarget, GCaptureTargetNrvTryDemoAppear));
     }
 }
@@ -166,7 +166,7 @@ void GCaptureTarget::exeAppear() {
 
     if (MR::isGreaterStep(this, 150)) {
         if (MR::isExistActorCamera(mCameraInfo)) {
-            MR::endDemoWaitCameraInterpolating(this, "出現");
+            MR::endDemoWaitCameraInterpolating(this, "\x8f\x6f\x8c\xbb");
             MR::endActorCamera(this, mCameraInfo, false, -1);
         }
         setNerve(GET_NERVE(GCaptureTarget, GCaptureTargetNrvWait));
@@ -215,7 +215,7 @@ void GCaptureTarget::exePointable() {
     }
     MR::setBckRate(this, mStarAnimSpeed);
 
-    if (MR::isStarPointerPointing(this, 0, true, "弱") && MR::requestGCaptureTarget(this)) {
+    if (MR::isStarPointerPointing(this, 0, true, "\x8e\xe3") && MR::requestGCaptureTarget(this)) {
         MR::invalidateClipping(this);
         setNerve(GET_NERVE(GCaptureTarget, GCaptureTargetNrvHitPointer));
     } else if (!MR::isNearPlayer(this, mPointableRange)) {
@@ -250,7 +250,7 @@ void GCaptureTarget::exeHitPointer() {
         MR::setBckRate(this, mStarAnimSpeed);
 
         bool isNear = MR::isNearPlayer(this, mPointableRange);
-        if (MR::isStarPointerPointing(this, 0, true, "弱") && isNear) {
+        if (MR::isStarPointerPointing(this, 0, true, "\x8e\xe3") && isNear) {
             MR::requestGCaptureTarget(this);
         }
 

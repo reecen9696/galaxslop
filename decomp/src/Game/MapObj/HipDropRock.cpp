@@ -129,7 +129,7 @@ void HipDropRock::initBreakModel() {
     MR::makeMtxMoment(&mtx, v2);
     mBreakModelMtx.concat(mtx);
 
-    mBreakModel = MR::createModelObjMapObj("ヒビ石壊れモデル", "HipDropRockBreak", mBreakModelMtx);
+    mBreakModel = MR::createModelObjMapObj("\x83\x71\x83\x72\x90\xce\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "HipDropRockBreak", mBreakModelMtx);
     mBreakModel->initWithoutIter();
     MR::invalidateClipping(mBreakModel);
     mBreakModel->makeActorDead();

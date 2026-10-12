@@ -74,7 +74,7 @@ namespace {
     }
 };  // namespace
 
-PukupukuStateLanding::PukupukuStateLanding(Pukupuku* pParent) : ActorStateBase< Pukupuku >("プクプク地上", pParent), mPath(), mValueCtrl(), _18() {
+PukupukuStateLanding::PukupukuStateLanding(Pukupuku* pParent) : ActorStateBase< Pukupuku >("\x83\x76\x83\x4e\x83\x76\x83\x4e\x92\x6e\x8f\xe3", pParent), mPath(), mValueCtrl(), _18() {
     mPath = new ParabolicPath();
     mValueCtrl = new ValueControl(30);
     initNerve(GET_NERVE_ANON(PukupukuStateLandingLandingMoveLand));

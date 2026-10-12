@@ -20,7 +20,7 @@ FireBarBall::~FireBarBall() {
 FireBar::~FireBar() {
 }
 
-FireBarBall::FireBarBall(LiveActor* pParent) : ModelObj("ファイアバー玉", "FireBarBall", 0, MR::DrawBufferType_NoShadowedMapObj, -2, -2, false) {
+FireBarBall::FireBarBall(LiveActor* pParent) : ModelObj("\x83\x74\x83\x40\x83\x43\x83\x41\x83\x6f\x81\x5b\x8b\xca", "FireBarBall", 0, MR::DrawBufferType_NoShadowedMapObj, -2, -2, false) {
     mFireBarParent = pParent;
 }
 

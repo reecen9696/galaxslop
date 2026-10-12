@@ -30,11 +30,11 @@ namespace NrvGameStageClearSequence {
 };  // namespace NrvGameStageClearSequence
 
 GameStageClearSequence::GameStageClearSequence()
-    : LayoutActor("ステージクリアシーケンス", true), mEffectLayout(nullptr), mEffectFollowPos(0.0f, 0.0f) {
+    : LayoutActor("\x83\x58\x83\x65\x81\x5b\x83\x57\x83\x4e\x83\x8a\x83\x41\x83\x56\x81\x5b\x83\x50\x83\x93\x83\x58", true), mEffectLayout(nullptr), mEffectFollowPos(0.0f, 0.0f) {
 }
 
 void GameStageClearSequence::init(const JMapInfoIter& rIter) {
-    mEffectLayout = new SimpleEffectLayout("スター取得", "GetStar", 1, -1);
+    mEffectLayout = new SimpleEffectLayout("\x83\x58\x83\x5e\x81\x5b\x8e\xe6\x93\xbe", "GetStar", 1, -1);
     mEffectLayout->initWithoutIter();
 
     MR::setFollowPos(&mEffectFollowPos, mEffectLayout, nullptr);

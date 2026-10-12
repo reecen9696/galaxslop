@@ -280,7 +280,7 @@ void MoviePlayingSequence::exePlayWait() {
 
         if (MR::isEqualStringCase(mInfo->mMovieName, "/MovieData/PrologueA.thp")) {
             MarioAccess::readyRemoteDemo();
-            MR::setPlayerPosOnGroundAndWait("リスタート");
+            MR::setPlayerPosOnGroundAndWait("\x83\x8a\x83\x58\x83\x5e\x81\x5b\x83\x67");
             MR::startBckPlayer("Wait");
         }
     }
@@ -365,6 +365,16 @@ bool MoviePlayingSequence::trySkip() {
     if (!MR::isActiveMoviePlayer()) {
         return false;
     }
+
+#ifdef TARGET_PC
+    // Any movie, once A has been held (port_skip_context).
+    if (port_skip_take(PORT_SKIP_MOVIE)) {
+        MR::stopMoviePlayer();
+        MR::forceCloseWipeFade();
+        setNerve(GET_NERVE(MoviePlayingSequence, HostTypeEndWait));
+        return true;
+    }
+#endif
 
     if (!MR::isEqualStringCase(mInfo->mMovieName, "/MovieData/FinalBattle.thp")) {
         return false;

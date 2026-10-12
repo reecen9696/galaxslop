@@ -25,8 +25,8 @@ void PrologueDirector_FORCE_MATCH_SDATA2() {
 }
 
 namespace {
-    static const char* sPictureBookDemoName = "プロローグデモ";
-    static const char* sArriveDemoName = "主人公ピーチ城に到着";
+    static const char* sPictureBookDemoName = "\x83\x76\x83\x8d\x83\x8d\x81\x5b\x83\x4f\x83\x66\x83\x82";
+    static const char* sArriveDemoName = "\x8e\xe5\x90\x6c\x8c\xf6\x83\x73\x81\x5b\x83\x60\x8f\xe9\x82\xc9\x93\x9e\x92\x85";
     static const s32 sPicBookStartWipeFrame = 60;
     static const s32 sPeachLetterWait = 20;
     static const s32 sPeachLetterStartWipeFrame = 60;
@@ -256,12 +256,12 @@ void PrologueDirector::createPictureBook() {
 }
 
 void PrologueDirector::createLetter() {
-    mLetter = new PrologueLetter("ピーチからの手紙");
+    mLetter = new PrologueLetter("\x83\x73\x81\x5b\x83\x60\x82\xa9\x82\xe7\x82\xcc\x8e\xe8\x8e\x86");
     mLetter->initWithoutIter();
 }
 
 void PrologueDirector::createScenery() {
-    mScenery = new ModelObj("背景書割", "DemoLetter", nullptr, MR::DrawBufferType_MapObjStrongLight, -2, -2, false);
+    mScenery = new ModelObj("\x94\x77\x8c\x69\x8f\x91\x8a\x84", "DemoLetter", nullptr, MR::DrawBufferType_MapObjStrongLight, -2, -2, false);
 
     MR::invalidateClipping(mScenery);
     mScenery->initWithoutIter();
@@ -274,7 +274,7 @@ void PrologueDirector::createScenery() {
 }
 
 void PrologueDirector::createMarioPosDummyModel() {
-    mMarioPosDummyModel = new ModelObj("マリオの経路", "DemoPeachCastleGate", nullptr, -2, -2, -2, false);
+    mMarioPosDummyModel = new ModelObj("\x83\x7d\x83\x8a\x83\x49\x82\xcc\x8c\x6f\x98\x48", "DemoPeachCastleGate", nullptr, -2, -2, -2, false);
     mMarioPosDummyModel->initWithoutIter();
 
     MR::invalidateClipping(mMarioPosDummyModel);
@@ -288,7 +288,7 @@ void PrologueDirector::createMarioPosDummyModel() {
 }
 
 void PrologueDirector::createCameraTarget() {
-    mCameraTarget = new CameraTargetMtx("カメラターゲットダミー");
+    mCameraTarget = new CameraTargetMtx("\x83\x4a\x83\x81\x83\x89\x83\x5e\x81\x5b\x83\x51\x83\x62\x83\x67\x83\x5f\x83\x7e\x81\x5b");
     mCameraTarget->mMatrix.identity();
 }
 

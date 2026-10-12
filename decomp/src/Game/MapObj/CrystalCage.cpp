@@ -45,7 +45,7 @@ void CrystalCage::init(const JMapInfoIter& rIter) {
 
     if (mHasBinding) {
         initBinder(50.0f, 0.0f, 0);
-        MR::setBinderOffsetVec(this, &_110, nullptr);
+        MR::setBinderOffsetVec(this, &_110, 0);
         MR::setBinderExceptActor(this, this);
     }
 
@@ -264,9 +264,9 @@ void CrystalCage::initModel(const char* pName) {
     MR::makeMtxUpNoSupportPos(&_94, -mGravity, _DC);
 
     if (mCrystalCageType == 2) {
-        mBreakObj = MR::createModelObjMapObjStrongLight("クリスタルケージ[大]壊れモデル", "CrystalCageLBreak", (MtxPtr)&_94);
+        mBreakObj = MR::createModelObjMapObjStrongLight("\x83\x4e\x83\x8a\x83\x58\x83\x5e\x83\x8b\x83\x50\x81\x5b\x83\x57[\x91\xe5]\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "CrystalCageLBreak", (MtxPtr)&_94);
     } else {
-        mBreakObj = MR::createModelObjMapObjStrongLight("クリスタルケージ[小]壊れモデル", "CrystalCageSBreak", (MtxPtr)&_94);
+        mBreakObj = MR::createModelObjMapObjStrongLight("\x83\x4e\x83\x8a\x83\x58\x83\x5e\x83\x8b\x83\x50\x81\x5b\x83\x57[\x8f\xac]\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "CrystalCageSBreak", (MtxPtr)&_94);
     }
 
     MR::invalidateClipping(mBreakObj);

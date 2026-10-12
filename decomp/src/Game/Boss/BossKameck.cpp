@@ -243,7 +243,7 @@ void BossKameck::initKameckHolder(const JMapInfoIter& rIter) {
         MR::getChildObjName(&objName, rIter, j);
 
         if (MR::isEqualString(objName, "ChildKameck")) {
-            Kameck* kameck = new Kameck("カメック[保持用]");
+            Kameck* kameck = new Kameck("\x83\x4a\x83\x81\x83\x62\x83\x4e[\x95\xdb\x8e\x9d\x97\x70]");
             kameck->setBeamType(2);
             MR::initChildObj(kameck, rIter, j);
             kameck->makeActorDead();
@@ -277,7 +277,7 @@ void BossKameck::initMoveRail(const JMapInfoIter& rIter) {
         MR::getChildObjName(&objName, rIter, j);
 
         if (MR::isEqualString(objName, "BossKameckMoveRail")) {
-            mMoveRail[moveRailNo] = new BossKameckMoveRail("ボスカメック移動経路");
+            mMoveRail[moveRailNo] = new BossKameckMoveRail("\x83\x7b\x83\x58\x83\x4a\x83\x81\x83\x62\x83\x4e\x88\xda\x93\xae\x8c\x6f\x98\x48");
             MR::initChildObj(mMoveRail[moveRailNo], rIter, j);
             moveRailNo++;
         }

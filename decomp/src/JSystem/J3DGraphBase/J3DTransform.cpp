@@ -72,8 +72,8 @@ void J3DCalcYBBoardMtx(Mtx mtx) {
     mtx[2][2] = vec.z * z;
 }
 
+#ifdef __MWERKS__
 asm void J3DPSCalcInverseTranspose(__REGISTER Mtx src, __REGISTER Mtx33 dst) {
-#ifdef __MWERKS__  // clang-format off
 	psq_l    f0, 0(src), 1, 0
 	psq_l    f1, 4(src), 0, 0
 	psq_l    f2, 16(src), 1, 0
@@ -126,8 +126,35 @@ lbl_8005F118:
 	li       r3, 1
 	psq_st   f8, 32(r4), 1, 0
 	blr
-#endif  // clang-format on
 }
+#else
+void J3DPSCalcInverseTranspose(Mtx src, Mtx33 dst) {
+    // Inverse-transpose of the upper 3x3 (cofactor matrix / determinant).
+    f32 c00 = src[1][1] * src[2][2] - src[2][1] * src[1][2];
+    f32 c01 = src[1][2] * src[2][0] - src[2][2] * src[1][0];
+    f32 c02 = src[1][0] * src[2][1] - src[1][1] * src[2][0];
+    f32 c10 = src[2][1] * src[0][2] - src[0][1] * src[2][2];
+    f32 c11 = src[2][2] * src[0][0] - src[0][2] * src[2][0];
+    f32 c12 = src[0][1] * src[2][0] - src[0][0] * src[2][1];
+    f32 c20 = src[0][1] * src[1][2] - src[1][1] * src[0][2];
+    f32 c21 = src[0][2] * src[1][0] - src[1][2] * src[0][0];
+    f32 c22 = src[0][0] * src[1][1] - src[0][1] * src[1][0];
+    f32 det = src[0][0] * c00 + src[1][0] * c10 + src[2][0] * c20;
+    if (det == 0.0f) {
+        return;
+    }
+    f32 inv = 1.0f / det;
+    dst[0][0] = c00 * inv;
+    dst[0][1] = c01 * inv;
+    dst[0][2] = c02 * inv;
+    dst[1][0] = c10 * inv;
+    dst[1][1] = c11 * inv;
+    dst[1][2] = c12 * inv;
+    dst[2][0] = c20 * inv;
+    dst[2][1] = c21 * inv;
+    dst[2][2] = c22 * inv;
+}
+#endif
 
 void J3DGetTranslateRotateMtx(const J3DTransformInfo& tx, Mtx dst) {
     f32 cxsz;
@@ -261,8 +288,8 @@ void J3DGetTextureMtxMayaOld(const J3DTextureSRTInfo& srt, Mtx dst) {
     dst[2][2] = 1.0f;
 }
 
+#ifdef __MWERKS__
 asm void J3DScaleNrmMtx(__REGISTER Mtx mtx, const __REGISTER Vec& scl) {
-#ifdef __MWERKS__  // clang-format off
 	nofralloc;
 
 	psq_l  fp2, 0(scl), 0, 0
@@ -294,11 +321,19 @@ asm void J3DScaleNrmMtx(__REGISTER Mtx mtx, const __REGISTER Vec& scl) {
 	fmuls  f4, fp1, fp3
 	stfs   f4, 40(mtx)
 	blr
-#endif  // clang-format on
 }
+#else
+void J3DScaleNrmMtx(Mtx mtx, const Vec& scl) {
+    for (int r = 0; r < 3; r++) {
+        mtx[r][0] *= scl.x;
+        mtx[r][1] *= scl.y;
+        mtx[r][2] *= scl.z;
+    }
+}
+#endif
 
+#ifdef __MWERKS__
 asm void J3DScaleNrmMtx33(__REGISTER Mtx33 mtx, const __REGISTER Vec& scale) {
-#ifdef __MWERKS__  // clang-format off
 	psq_l    f0, 0(mtx), 0, 0
 	psq_l    f6, 0(scale), 0, 0
 	lfs      f1, 8(mtx)
@@ -320,11 +355,19 @@ asm void J3DScaleNrmMtx33(__REGISTER Mtx33 mtx, const __REGISTER Vec& scale) {
 	psq_st   f4, 24(mtx), 0, 0
 	stfs     f5, 0x20(mtx)
 	blr
-#endif  // clang-format on
 }
+#else
+void J3DScaleNrmMtx33(Mtx33 mtx, const Vec& scale) {
+    for (int r = 0; r < 3; r++) {
+        mtx[r][0] *= scale.x;
+        mtx[r][1] *= scale.y;
+        mtx[r][2] *= scale.z;
+    }
+}
+#endif
 
+#ifdef __MWERKS__
 asm void J3DMtxProjConcat(__REGISTER Mtx mtx1, __REGISTER Mtx mtx2, __REGISTER Mtx dst) {
-#ifdef __MWERKS__  // clang-format off
 	psq_l    f2, 0(mtx1), 0, 0
 	psq_l    f3, 8(mtx1), 0, 0
 	ps_merge00 f6, f2, f2
@@ -398,8 +441,20 @@ asm void J3DMtxProjConcat(__REGISTER Mtx mtx1, __REGISTER Mtx mtx2, __REGISTER M
 	ps_madd  f0, f9, f13, f0
 	psq_st   f0, 40(dst), 0, 0
 	blr
-#endif  // clang-format on
 }
+#else
+void J3DMtxProjConcat(Mtx mtx1, Mtx mtx2, Mtx dst) {
+    // dst(3x4) = mtx1(3x4) * mtx2, where mtx2 is read as a full 4x4.
+    const f32* m2 = &mtx2[0][0];
+    Mtx tmp;
+    for (int r = 0; r < 3; r++) {
+        for (int c = 0; c < 4; c++) {
+            tmp[r][c] = mtx1[r][0] * m2[0 * 4 + c] + mtx1[r][1] * m2[1 * 4 + c] + mtx1[r][2] * m2[2 * 4 + c] + mtx1[r][3] * m2[3 * 4 + c];
+        }
+    }
+    PSMTXCopy(tmp, dst);
+}
+#endif
 
 static f32 Unit01[2] = {0.0f, 1.0f};
 
@@ -507,5 +562,14 @@ loop:
 #undef FP15
 #undef FP31
 #undef UNIT_R
+}
+#else
+void J3DPSMtxArrayConcat(Mtx mA, Mtx mB, Mtx mAB, u32 count) {
+    // mB and mAB point at arrays of `count` consecutive 3x4 matrices.
+    Mtx* pB = reinterpret_cast< Mtx* >(mB);
+    Mtx* pAB = reinterpret_cast< Mtx* >(mAB);
+    for (u32 i = 0; i < count; i++) {
+        PSMTXConcat(mA, pB[i], pAB[i]);
+    }
 }
 #endif  // clang-format on

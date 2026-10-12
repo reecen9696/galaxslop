@@ -4,7 +4,7 @@
 
 class CameraInwardSphere : public Camera {
 public:
-    CameraInwardSphere(const char* pName = "球内部カメラ");
+    CameraInwardSphere(const char* pName = "\x8b\x85\x93\xe0\x95\x94\x83\x4a\x83\x81\x83\x89");
     virtual ~CameraInwardSphere();
 
     virtual void reset();

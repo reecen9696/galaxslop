@@ -69,17 +69,17 @@ void ParticleCalcExecutor::requestMovementOnPauseIgnore() {
 }
 
 void ParticleCalcExecutor::initMovementAdaptor() {
-    mNormalAdaptor = new NameObjAdaptor("パーティクル");
+    mNormalAdaptor = new NameObjAdaptor("\x83\x70\x81\x5b\x83\x65\x83\x42\x83\x4e\x83\x8b");
     ::connectToSceneCalcAnimAdaptor(mNormalAdaptor, MR::Functor(this, &ParticleCalcExecutor::movementNormal), MR::CalcAnimType_AnimParticle);
 
-    mIgnorePause3DAdaptor = new NameObjAdaptor("ポーズ無効3Dパーティクル");
+    mIgnorePause3DAdaptor = new NameObjAdaptor("\x83\x7c\x81\x5b\x83\x59\x96\xb3\x8c\xf8""3D\x83\x70\x81\x5b\x83\x65\x83\x42\x83\x4e\x83\x8b");
     ::connectToSceneCalcAnimAdaptor(mIgnorePause3DAdaptor, MR::Functor(this, &ParticleCalcExecutor::movementIgnorePause3D),
                                   MR::CalcAnimType_AnimParticleIgnorePause);
 
-    mIgnorePause2DAdaptor = new NameObjAdaptor("ポーズ無効2Dパーティクル");
+    mIgnorePause2DAdaptor = new NameObjAdaptor("\x83\x7c\x81\x5b\x83\x59\x96\xb3\x8c\xf8""2D\x83\x70\x81\x5b\x83\x65\x83\x42\x83\x4e\x83\x8b");
     ::connectToSceneCalcAnimAdaptor(mIgnorePause2DAdaptor, MR::Functor(this, &ParticleCalcExecutor::movementIgnorePause2D),
                                   MR::CalcAnimType_AnimParticleIgnorePause);
 
-    mCheckUpdateAdaptor = new NameObjAdaptor("更新チェック");
+    mCheckUpdateAdaptor = new NameObjAdaptor("\x8d\x58\x90\x56\x83\x60\x83\x46\x83\x62\x83\x4e");
     ::connectToSceneMovementAdaptor(mCheckUpdateAdaptor, MR::Functor(this, &ParticleCalcExecutor::movementCheckUpdate), MR::MovementType_UNK_0x14);
 }

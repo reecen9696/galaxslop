@@ -32,7 +32,7 @@ namespace {
     // static const f32 sFloatAccelMax = _;
     // static const f32 sFloatCycleTune = _;
     static const f32 sFloatRotSpeedNoSign = 0.1f;
-    static const char* const sReturnPosName = "合体ブロック故郷点";
+    static const char* const sReturnPosName = "\x8d\x87\x91\xcc\x83\x75\x83\x8d\x83\x62\x83\x4e\x8c\xcc\x8b\xbd\x93\x5f";
 };  // namespace
 
 namespace NrvAssemblyBlock {
@@ -110,7 +110,7 @@ void AssemblyBlock::init(const JMapInfoIter& rIter) {
     MR::getJMapInfoArg1NoInit(rIter, &mTimer);
     MR::getJMapInfoArg7NoInit(rIter, &mObjArg7);
 
-    if (MR::getRandom(0l, 2l)) {
+    if (MR::getRandom(0, 2)) {
         mFloatRotateSpeed = ::sFloatRotSpeedNoSign;
     } else {
         mFloatRotateSpeed = -::sFloatRotSpeedNoSign;
@@ -266,7 +266,7 @@ bool AssemblyBlock::tryStartAssemble() {
 }
 
 bool AssemblyBlock::tryStartReturn() {
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         return false;
     }
 

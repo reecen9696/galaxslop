@@ -43,7 +43,7 @@ void Air::init(const JMapInfoIter& rIter) {
     if (registered) {
         bool val = true;
 
-        bool ret = MR::tryRegisterDemoActionFunctor(this, MR::Functor(this, &Air::appearFadeOut), "消滅");
+        bool ret = MR::tryRegisterDemoActionFunctor(this, MR::Functor(this, &Air::appearFadeOut), "\x8f\xc1\x96\xc5");
 
         if (!ret) {
             ret = MR::tryRegisterDemoActionFunctor(this, MR::Functor(this, &Air::appearFadeIn), nullptr);
@@ -180,7 +180,7 @@ PriorDrawAir::PriorDrawAir(const char* pName) : Air(pName) {
     MR::getSceneObj< PriorDrawAirHolder >(SceneObj_PriorDrawAirHolder)->add(this);
 }
 
-PriorDrawAirHolder::PriorDrawAirHolder() : NameObj("先描画大気保持") {
+PriorDrawAirHolder::PriorDrawAirHolder() : NameObj("\x90\xe6\x95\x60\x89\xe6\x91\xe5\x8b\x43\x95\xdb\x8e\x9d") {
     mAirCount = 0;
 }
 

@@ -118,7 +118,7 @@ void TripodBoss::init(const JMapInfoIter& rIter) {
     char lowName[32];
     sprintf(lowName, "%sLow", objName);
 
-    mLowModel = new ModelObj("三脚ボスLODモデル", lowName, getBaseMtx(), MR::DrawBufferType_TripodBoss, -2, -2, false);
+    mLowModel = new ModelObj("\x8e\x4f\x8b\x72\x83\x7b\x83\x58LOD\x83\x82\x83\x66\x83\x8b", lowName, getBaseMtx(), MR::DrawBufferType_TripodBoss, -2, -2, false);
     mLowModel->initWithoutIter();
     MR::invalidateClipping(mLowModel);
     mLowModel->makeActorAppeared();
@@ -173,8 +173,8 @@ void TripodBoss::initLeg(const JMapInfoIter& rIter) {
     sprintf(legShadowName, "%sLegShadow", objName);
 
     for (u32 i = 0; i < ARRAY_SIZE(mLegs); i++) {
-        mLegs[i] = new TripodBossLeg("三脚ボス足");
-        mStepPoints[i] = new TripodBossStepPoint("ステップ位置");
+        mLegs[i] = new TripodBossLeg("\x8e\x4f\x8b\x72\x83\x7b\x83\x58\x91\xab");
+        mStepPoints[i] = new TripodBossStepPoint("\x83\x58\x83\x65\x83\x62\x83\x76\x88\xca\x92\x75");
         mLegs[i]->setBody(this);
         mLegs[i]->setMovableArea(mMovableArea);
         mLegs[i]->initWithoutIter();
@@ -494,7 +494,7 @@ bool TripodBoss::tryBreak() {
         }
 
         setNerve(GET_NERVE(TripodBoss, TripodBossNrvTryStartDemo));
-        MR::requestStartDemoMarioPuppetable(this, "破壊", GET_NERVE(TripodBoss, TripodBossNrvPainDemo), nullptr);
+        MR::requestStartDemoMarioPuppetable(this, "\x94\x6a\x89\xf3", GET_NERVE(TripodBoss, TripodBossNrvPainDemo), nullptr);
 
         return true;
     }
@@ -511,14 +511,14 @@ void TripodBoss::requestOpeningDemo() {
         _638 = 0;
         MR::activeTripodBossParts();
         setNerve(GET_NERVE(TripodBoss, TripodBossNrvTryStartDemo));
-        MR::requestStartDemoMarioPuppetable(this, "開始", GET_NERVE(TripodBoss, TripodBossNrvStartDemo), nullptr);
+        MR::requestStartDemoMarioPuppetable(this, "\x8a\x4a\x8e\x6e", GET_NERVE(TripodBoss, TripodBossNrvStartDemo), nullptr);
     }
 }
 
 bool TripodBoss::tryDamageDemo() {
     setNerve(GET_NERVE(TripodBoss, TripodBossNrvTryStartDemo));
 
-    if (MR::tryStartDemo(this, "ダメージ")) {
+    if (MR::tryStartDemo(this, "\x83\x5f\x83\x81\x81\x5b\x83\x57")) {
         setNerve(GET_NERVE(TripodBoss, TripodBossNrvDamageDemo));
 
         return true;
@@ -528,7 +528,7 @@ bool TripodBoss::tryDamageDemo() {
 }
 
 void TripodBoss::requestEndDamageDemo() {
-    endDemo("ダメージ");
+    endDemo("\x83\x5f\x83\x81\x81\x5b\x83\x57");
     setNerve(GET_NERVE(TripodBoss, TripodBossNrvWait));
 
     TVec3f trans;
@@ -663,7 +663,7 @@ void TripodBoss::exeStartDemo() {
     calcDemoMovement();
 
     if (MR::isBckStopped(this)) {
-        endDemo("開始");
+        endDemo("\x8a\x4a\x8e\x6e");
         MR::endAnimCamera(this, mEventCamera, "StartDemo", 150, true);
         initLegIKPlacement();
         setNerve(GET_NERVE(TripodBoss, TripodBossNrvWait));
@@ -764,7 +764,7 @@ void TripodBoss::exeExplosionDemo() {
     }
 
     if (MR::isGreaterStep(this, ::sExplosionTime)) {
-        endDemo("破壊");
+        endDemo("\x94\x6a\x89\xf3");
         MR::endAnimCamera(this, mEventCamera, "EndDemo", 0, true);
         kill();
     }

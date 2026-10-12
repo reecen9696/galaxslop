@@ -32,7 +32,7 @@ void OSTicksToCalendarTime(OSTime, OSCalendarTime*);
 #ifdef __MWERKS__
 vu32 OS_BUS_CLOCK_SPEED : 0x800000F8;
 #else
-vu32 OS_BUS_CLOCK_SPEED;
+#define OS_BUS_CLOCK_SPEED (*(vu32*)0x800000F8)
 #endif
 
 #define OS_TIME_SPEED (OS_BUS_CLOCK_SPEED / 4)

@@ -153,14 +153,14 @@ fatal:
 }
 
 const char* const __DVDDeviceErrorMessage[] = {
-    "\n\n\nエラーコード００１。\n"
-    "不明なデバイスが見つかりました。",
+    "\n\n\n\x83\x47\x83\x89\x81\x5b\x83\x52\x81\x5b\x83\x68\x82\x4f\x82\x4f\x82\x50\x81\x42\n"
+    "\x95\x73\x96\xbe\x82\xc8\x83\x66\x83\x6f\x83\x43\x83\x58\x82\xaa\x8c\xa9\x82\xc2\x82\xa9\x82\xe8\x82\xdc\x82\xb5\x82\xbd\x81\x42",
 
     "\n\n\nError #001,\n"
     "unauthorized device has been detected.",
 
     "\n\n\nFehler #001:\n"
-    "Es wurde eine unzul舖sige Komponente\n"
+    "Es wurde eine unzul\xe4\x73sige Komponente\n"
     "entdeckt.",
 
     "\n\n\nErreur 001:\n"

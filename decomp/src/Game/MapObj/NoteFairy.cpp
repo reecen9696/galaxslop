@@ -155,7 +155,7 @@ void NoteFairy::init(const JMapInfoIter& rIter) {
             MR::moveCoord(this, mNoteCoord);
         }
 
-        mNoteArray[i] = new Note("音符", MR::getRailDirection(this), this);
+        mNoteArray[i] = new Note("\x89\xb9\x95\x84", MR::getRailDirection(this), this);
         mNoteArray[i]->mPosition.set(stack_24);
         mNoteArray[i]->initWithoutIter();
         mNoteArray[i]->mCounter = mTimeLimit;
@@ -300,7 +300,7 @@ void NoteFairy::exeAppearNoteBloom() {
     }
 
     if (!_CC && !_CD && MR::isStep(this, 60) && mAppearanceType != -1) {
-        MR::endDemo(this, "出現");
+        MR::endDemo(this, "\x8f\x6f\x8c\xbb");
         MR::endActorCamera(this, mCameraInfo, false, -1);
     }
 
@@ -321,7 +321,7 @@ void NoteFairy::exeAppearNoteBloom() {
 
     if (_B0 >= mMelodyNoteNum) {
         if (_CC) {
-            MR::endDemo(this, "出現");
+            MR::endDemo(this, "\x8f\x6f\x8c\xbb");
             MR::endActorCamera(this, mCameraInfo, false, -1);
         }
 
@@ -404,9 +404,9 @@ void NoteFairy::enterDemoAppear(const Nerve* pNerve, bool hasNoFrame) {
     MR::startActorCameraTargetSelf(this, mCameraInfo, -1);
 
     if (hasNoFrame) {
-        MR::requestStartDemo(this, "出現", pNerve, nullptr);
+        MR::requestStartDemo(this, "\x8f\x6f\x8c\xbb", pNerve, nullptr);
     } else {
-        MR::requestStartDemoWithoutCinemaFrame(this, "出現", pNerve, nullptr);
+        MR::requestStartDemoWithoutCinemaFrame(this, "\x8f\x6f\x8c\xbb", pNerve, nullptr);
     }
 
     MR::requestMovementOn(MR::getSceneObj< NoteGroup >(SceneObj_NoteGroup));

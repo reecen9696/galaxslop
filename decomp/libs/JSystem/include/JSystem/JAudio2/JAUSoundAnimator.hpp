@@ -151,7 +151,7 @@ public:
     }
 
     /* 0x0 */ u16 mNumSounds;
-    /* 0x4 */ JAUSoundAnimationControl* mControl;
+    /* 0x4 */ PTR32(JAUSoundAnimationControl) mControl;
     /* 0x8 */ JAUSoundAnimationSound mSounds;
 };
 

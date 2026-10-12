@@ -128,7 +128,7 @@ typedef struct __GXTexObjInt_struct {
     u32 mode1;
     u32 image0;
     u32 image3;
-    void* userData;
+    PTR32(void) userData;  // 32-bit so the object fits the 32-byte GXTexObj
     GXTexFmt fmt;
     u32 tlutName;
     u16 loadCnt;
@@ -177,3 +177,12 @@ typedef struct __GXTlutRegionInt_struct {
 #endif
 
 #endif  // GXTYPES_H
+
+#ifdef TARGET_PC
+/* The internal objects must fit in the opaque public ones (GXStruct.h). */
+_Static_assert(sizeof(GXTexObjInt) <= sizeof(GXTexObj), "GXTexObjInt too large");
+_Static_assert(sizeof(GXTlutObjInt) <= sizeof(GXTlutObj), "GXTlutObjInt too large");
+_Static_assert(sizeof(GXLightObjInt) <= sizeof(GXLightObj), "GXLightObjInt too large");
+_Static_assert(sizeof(GXTexRegionInt) <= sizeof(GXTexRegion), "GXTexRegionInt too large");
+_Static_assert(sizeof(GXTlutRegionInt) <= sizeof(GXTlutRegion), "GXTlutRegionInt too large");
+#endif

@@ -7,7 +7,7 @@ namespace NrvIconComet {
     NEW_NERVE(IconCometNrvWait, IconComet, Wait);
 };  // namespace NrvIconComet
 
-IconComet::IconComet() : LayoutActor("コメットアイコン", true) {
+IconComet::IconComet() : LayoutActor("\x83\x52\x83\x81\x83\x62\x83\x67\x83\x41\x83\x43\x83\x52\x83\x93", true) {
 }
 
 void IconComet::init(const JMapInfoIter& rIter) {

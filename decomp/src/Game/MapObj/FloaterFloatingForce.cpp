@@ -6,7 +6,7 @@
 FloaterFloatingForce::~FloaterFloatingForce() {
 }
 
-FloaterFloatingForce::FloaterFloatingForce(LiveActor* pHost, const char* pName) : MapPartsFunction(pHost, "浮力"), _18(pName), _1C(gZeroVec) {
+FloaterFloatingForce::FloaterFloatingForce(LiveActor* pHost, const char* pName) : MapPartsFunction(pHost, "\x95\x82\x97\xcd"), _18(pName), _1C(gZeroVec) {
     _28 = TVec3f(0.0f, 1.0f, 0.0f);
     mMoveConditionType = 0.0f;
 }

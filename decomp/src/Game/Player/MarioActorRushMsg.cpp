@@ -337,7 +337,7 @@ bool MarioActor::tryJumpRush() {
     if (jumpTarget != nullptr) {
         unsigned char autoBind;
         bool b = selectAutoBind(jumpTarget->mHost->mName, &autoBind);
-        if (!b && !isActionOk("ジャンプ系バインド")) {
+        if (!b && !isActionOk("\x83\x57\x83\x83\x83\x93\x83\x76\x8c\x6e\x83\x6f\x83\x43\x83\x93\x83\x68")) {
             return false;
         }
 
@@ -353,7 +353,7 @@ bool MarioActor::tryJumpRush() {
 
         bool out = jumpTarget->receiveMessage(ACTMES_AUTORUSH_BEGIN, getSensor("body"));
 
-        if (out != nullptr) {
+        if (out != 0) {
             resetSensorCount();
             mVelocity.zero();
             beginRush();
@@ -406,7 +406,7 @@ void MarioActor::tryRushInRush() {
     if (isFixJumpRushSensor(target) && isLandEffectRushSensor(sensor924)) {
         mMario->mMovementStates._3E = false;
 
-        playEffect("スーパースピンドライバ終了");
+        playEffect("\x83\x58\x81\x5b\x83\x70\x81\x5b\x83\x58\x83\x73\x83\x93\x83\x68\x83\x89\x83\x43\x83\x6f\x8f\x49\x97\xb9");
     }
 
     if (_934) {

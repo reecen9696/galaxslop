@@ -388,7 +388,7 @@ namespace MR {
     }
 
     bool isPlayerPointedBy2POnTriggerButton() {
-        return MR::isStarPointerPointing2POnTriggerButton(MarioAccess::getPlayerActor(), "弱", true, false);
+        return MR::isStarPointerPointing2POnTriggerButton(MarioAccess::getPlayerActor(), "\x8e\xe3", true, false);
     }
 
     bool isPlayerSquat() {

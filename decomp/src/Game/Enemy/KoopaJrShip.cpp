@@ -114,14 +114,14 @@ void KoopaJrShip::init(const JMapInfoIter& rIter) {
     initKoopaJr(rIter);
     initKameck(rIter);
     initKiller();
-    mShipBreakModel = MR::createModelObjMapObjStrongLight("クッパJrシップ壊れモデル", "KoopaJrShipBreak", mShipMtx);
+    mShipBreakModel = MR::createModelObjMapObjStrongLight("\x83\x4e\x83\x62\x83\x70Jr\x83\x56\x83\x62\x83\x76\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "KoopaJrShipBreak", mShipMtx);
     mShipBreakModel->makeActorDead();
-    mPodModel = MR::createModelObjMapObjStrongLight("クッパJrシップポッドモデル", "KoopaJrShipPod", mPodMtx);
+    mPodModel = MR::createModelObjMapObjStrongLight("\x83\x4e\x83\x62\x83\x70Jr\x83\x56\x83\x62\x83\x76\x83\x7c\x83\x62\x83\x68\x83\x82\x83\x66\x83\x8b", "KoopaJrShipPod", mPodMtx);
     mPodModel->makeActorDead();
 
     if (MR::tryRegisterDemoCast(this, rIter)) {
-        MR::registerDemoActionNerve(this, GET_NERVE(KoopaJrShip, HostTypeAppear), "出現");
-        MR::registerDemoActionFunctor(this, MR::Functor(this, &KoopaJrShip::setStateTurnFront), "旋廻");
+        MR::registerDemoActionNerve(this, GET_NERVE(KoopaJrShip, HostTypeAppear), "\x8f\x6f\x8c\xbb");
+        MR::registerDemoActionFunctor(this, MR::Functor(this, &KoopaJrShip::setStateTurnFront), "\x90\xf9\x89\xf4");
         MR::tryRegisterDemoCast(mShipBreakModel, rIter);
         MR::tryRegisterDemoCast(mPodModel, rIter);
         initNerve(GET_NERVE(KoopaJrShip, HostTypeAppear));
@@ -182,7 +182,7 @@ void KoopaJrShip::initShells() {
 }
 
 void KoopaJrShip::initKoopaJr(const JMapInfoIter& rIter) {
-    mJr = new KoopaJr("クッパJr");
+    mJr = new KoopaJr("\x83\x4e\x83\x62\x83\x70Jr");
     TPos3f mtx;
     mtx.set(getBaseMtx());
     mtx.setTrans(mPosition);
@@ -193,7 +193,7 @@ void KoopaJrShip::initKoopaJr(const JMapInfoIter& rIter) {
 
 void KoopaJrShip::initKameck(const JMapInfoIter& rIter) {
     for (s32 i = 0; i < 2; i++) {
-        Kameck* kameck = (Kameck*)MR::createFireBallBeamKameck("カメック[クッパＪｒシップ]");
+        Kameck* kameck = (Kameck*)MR::createFireBallBeamKameck("\x83\x4a\x83\x81\x83\x62\x83\x4e[\x83\x4e\x83\x62\x83\x70\x82\x69\x82\x92\x83\x56\x83\x62\x83\x76]");
         MR::initChildObj(kameck, rIter, i);
         kameck->makeActorDead();
         mKamecks.push_back(kameck);
@@ -202,7 +202,7 @@ void KoopaJrShip::initKameck(const JMapInfoIter& rIter) {
 
 void KoopaJrShip::initKiller() {
     for (HomingKiller** pActor = mKillers.begin(); pActor != mKillers.end(); pActor++) {
-        *pActor = new HomingKiller("ホーミングキラー");
+        *pActor = new HomingKiller("\x83\x7a\x81\x5b\x83\x7e\x83\x93\x83\x4f\x83\x4c\x83\x89\x81\x5b");
         (*pActor)->initWithoutIter();
         (*pActor)->setChaseStartEndDistance(5500.0f, 6500.0f);
     }
@@ -507,7 +507,7 @@ void KoopaJrShip::exeAppear() {
         mJr->setStateShipBattleAppear();
     }
 
-    if (MR::isDemoPartLastStep("クッパJr会話")) {
+    if (MR::isDemoPartLastStep("\x83\x4e\x83\x62\x83\x70Jr\x89\xef\x98\x62")) {
         mJr->endShipBattleTalk();
         _188 = 60;
         MR::startStageBGM("MBGM_BOSS_06_A", false);
@@ -648,7 +648,7 @@ void KoopaJrShip::exeDamage() {
 
     if (MR::isStep(this, 90)) {
         if (_D0 == 2) {
-            MR::requestStartDemoRegistered(this, nullptr, nullptr, "旋廻");
+            MR::requestStartDemoRegistered(this, nullptr, nullptr, "\x90\xf9\x89\xf4");
             return;
         }
 
@@ -705,7 +705,7 @@ void KoopaJrShip::exeBreakStart() {
             }
         }
 
-        MR::requestStartDemoRegistered(this, nullptr, nullptr, "破壊");
+        MR::requestStartDemoRegistered(this, nullptr, nullptr, "\x94\x6a\x89\xf3");
         mShipMtx.set(getBaseMtx());
         mShipBreakModel->appear();
         MR::startBck(mShipBreakModel, "Break");
@@ -783,7 +783,7 @@ void KoopaJrShip::exeTurnFront() {
         MR::startSound(this, "SE_BM_KOOPAJR_SHIP_EYE_BLINK");
     }
 
-    if (MR::isDemoPartLastStep("旋廻")) {
+    if (MR::isDemoPartLastStep("\x90\xf9\x89\xf4")) {
         _188 = 60;
         MR::startStageBGM("MBGM_BOSS_06_B", false);
 

@@ -26,7 +26,7 @@ namespace NrvBossKameckVs1 {
     NEW_NERVE(BossKameckVs1NrvEndDemo, BossKameckVs1, EndDemo);
 };  // namespace NrvBossKameckVs1
 
-BossKameckVs1::BossKameckVs1() : BossKameckSequencer("ボスカメックVs1"), mStateBattle() {
+BossKameckVs1::BossKameckVs1() : BossKameckSequencer("\x83\x7b\x83\x58\x83\x4a\x83\x81\x83\x62\x83\x4eVs1"), mStateBattle() {
 }
 
 void BossKameckVs1::init(BossKameck* pBoss, const JMapInfoIter& rIter) {

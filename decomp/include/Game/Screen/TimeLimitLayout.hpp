@@ -15,7 +15,7 @@ struct Timing {
 class TimeUpLayout : public LayoutActor {
 public:
     /// @brief Creates a new `TimeUpLayout`.
-    TimeUpLayout() : LayoutActor("タイムアップ画面", true) {
+    TimeUpLayout() : LayoutActor("\x83\x5e\x83\x43\x83\x80\x83\x41\x83\x62\x83\x76\x89\xe6\x96\xca", true) {
     }
 
     virtual void init(const JMapInfoIter& rIter);

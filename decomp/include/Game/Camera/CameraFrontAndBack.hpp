@@ -4,7 +4,7 @@
 
 class CameraFrontAndBack : public Camera {
 public:
-    CameraFrontAndBack(const char* pName = "表裏カメラ");
+    CameraFrontAndBack(const char* pName = "\x95\x5c\x97\xa0\x83\x4a\x83\x81\x83\x89");
     virtual ~CameraFrontAndBack();
 
     virtual void reset();

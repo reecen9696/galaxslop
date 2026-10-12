@@ -22,7 +22,7 @@ void ShadowController_FORCE_MATCH_SDATA2() {
     (void)-1.0f;
 }
 
-ShadowControllerHolder::ShadowControllerHolder() : NameObj("影管理"), _C(), _18(), _24() {
+ShadowControllerHolder::ShadowControllerHolder() : NameObj("\x89\x65\x8a\xc7\x97\x9d"), _C(), _18(), _24() {
     mFarClip = 4000.0f;
     _C.init(0x500);
     _18.init(0x400);

@@ -6,7 +6,7 @@ class CameraTargetMtx;
 
 class CameraFix : public Camera {
 public:
-    CameraFix(const char* pName = "完全固定カメラ");
+    CameraFix(const char* pName = "\x8a\xae\x91\x53\x8c\xc5\x92\xe8\x83\x4a\x83\x81\x83\x89");
 
     virtual void reset();
     virtual CameraTargetObj* calc();

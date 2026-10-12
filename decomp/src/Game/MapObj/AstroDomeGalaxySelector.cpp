@@ -21,8 +21,8 @@
 #include "Game/Util/StarPointerUtil.hpp"
 
 namespace {
-    const char* const cDemoNameDomeLecture = "ドームレクチャー２";
-    const char* const cDemoNameJumpOut = "マリオ飛び出し";
+    const char* const cDemoNameDomeLecture = "\x83\x68\x81\x5b\x83\x80\x83\x8c\x83\x4e\x83\x60\x83\x83\x81\x5b\x82\x51";
+    const char* const cDemoNameJumpOut = "\x83\x7d\x83\x8a\x83\x49\x94\xf2\x82\xd1\x8f\x6f\x82\xb5";
 };  // namespace
 
 namespace {
@@ -52,7 +52,7 @@ void AstroDomeGalaxySelector::init(const JMapInfoIter& rIter) {
     MR::connectToSceneMapObjMovement(this);
     MR::invalidateClipping(this);
 
-    mCameraController = new AstroDomeCameraController("天文ドームカメラ制御");
+    mCameraController = new AstroDomeCameraController("\x93\x56\x95\xb6\x83\x68\x81\x5b\x83\x80\x83\x4a\x83\x81\x83\x89\x90\xa7\x8c\xe4");
     mCameraController->initWithoutIter();
 
     mBackButton = new GalaxySelectBackButton();

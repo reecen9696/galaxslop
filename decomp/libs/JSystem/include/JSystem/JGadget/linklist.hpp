@@ -13,6 +13,9 @@
 
 #define JGADGET_LINK_LIST(type, node) JGadget::TLinkList< type, -offsetof(type, node) >
 
+#ifndef __MWERKS__
+#include <iterator>
+#else
 namespace std {
 
     struct input_iterator_tag {};
@@ -33,6 +36,7 @@ namespace std {
     };
 
 }  // namespace std
+#endif
 
 namespace JGadget {
 
@@ -164,6 +168,15 @@ namespace JGadget {
         TLinkListNode mEnd;
     };
 
+    // Node offset used by TLinkList<T, NODE_OFFSET>.  Specialise it (after T is
+    // complete) where the literal offset only matches the Wii's 32-bit layout.
+    template < typename T, int NODE_OFFSET >
+    struct TLinkListOffset {
+        static int value() {
+            return NODE_OFFSET;
+        }
+    };
+
     template < typename T, int NODE_OFFSET >
     class TLinkList : public TNodeLinkList {
     public:
@@ -237,11 +250,11 @@ namespace JGadget {
         }
 
         static TLinkListNode* Element_toNode(T* element) {
-            return (TLinkListNode*)((u8*)element - NODE_OFFSET);
+            return (TLinkListNode*)((u8*)element - TLinkListOffset< T, NODE_OFFSET >::value());
         }
 
         static T* Element_toValue(TLinkListNode* element) {
-            return (T*)((u8*)element + NODE_OFFSET);
+            return (T*)((u8*)element + TLinkListOffset< T, NODE_OFFSET >::value());
         }
 
         T& front() {

@@ -23,12 +23,12 @@
 
 #define MIN(x, y) ((x) < (y) ? (x) : (y))
 
-#define ROUND_DOWN_PTR(x, align) ((void*)((unsigned long)(x) & -(align)))
+#define ROUND_DOWN_PTR(x, align) ((void*)((unsigned int)(x) & -(align)))
 
-#define POINTER_ADD_TYPE(type_, ptr_, offset_) ((type_)((unsigned long)(ptr_) + (unsigned long)(offset_)))
+#define POINTER_ADD_TYPE(type_, ptr_, offset_) ((type_)((unsigned int)(ptr_) + (unsigned int)(offset_)))
 #define POINTER_ADD(ptr_, offset_) POINTER_ADD_TYPE(__typeof__(ptr_), ptr_, offset_)
 
-#define IS_ALIGNED(x, align) (((unsigned long)(x) & ((align) - 1)) == 0)
+#define IS_ALIGNED(x, align) (((unsigned int)(x) & ((align) - 1)) == 0)
 
 #define ARRAY_LENGTH(x) (sizeof(x) / sizeof((x)[0]))
 

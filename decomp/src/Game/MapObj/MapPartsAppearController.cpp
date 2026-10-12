@@ -15,7 +15,7 @@ namespace NrvMapPartsAppearController {
     NEW_NERVE(HostTypeDisappear, MapPartsAppearController, Disappear);
 };  // namespace NrvMapPartsAppearController
 
-MapPartsAppearController::MapPartsAppearController(LiveActor* pActor) : MapPartsFunction(pActor, "出現制御") {
+MapPartsAppearController::MapPartsAppearController(LiveActor* pActor) : MapPartsFunction(pActor, "\x8f\x6f\x8c\xbb\x90\xa7\x8c\xe4") {
     mSignMotionType = 0;
     mPostureHolder = nullptr;
     _20 = 0;

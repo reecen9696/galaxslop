@@ -10,7 +10,7 @@ namespace {
     NEW_NERVE(GameScenePauseControlNormal, GameScenePauseControl, Normal);
 };  // namespace
 
-GameScenePauseControl::GameScenePauseControl(GameScene* pScene) : NerveExecutor("GameSceneポーズ制御") {
+GameScenePauseControl::GameScenePauseControl(GameScene* pScene) : NerveExecutor("GameScene\x83\x7c\x81\x5b\x83\x59\x90\xa7\x8c\xe4") {
     mScene = pScene;
     mPauseChecker = nullptr;
     mPauseMenuOff = false;
@@ -31,6 +31,9 @@ void GameScenePauseControl::exeNormal() {
     tryStartPauseMenu();
 
     if (mPauseMenuOff) {
+#ifdef TARGET_PC
+        port_input_discard_pause_request();  // a press that closed the menu does not open it again
+#endif
         AudWrap::getSystem()->exitPauseMenu();
         mScene->setNerveAfterPauseMenu();
         mPauseMenuOff = false;
@@ -41,6 +44,16 @@ void GameScenePauseControl::exeNormal() {
 bool GameScenePauseControl::tryStartPauseMenu() {
     if (mScene->isPermitToPauseMenu()) {
         mPauseChecker->update();
+
+#ifdef TARGET_PC
+        // X or Menu on the VR controllers: one press opens the menu (the
+        // Wii needed + or - held for 12 frames, and no A, B or shake).
+        if (port_input_take_pause_request()) {
+            mScene->mPauseSeq->startPause(GamePauseSequence::ActivePause);
+            mScene->setNerve(mPauseMenuNerve);
+            return true;
+        }
+#endif
 
         if (mPauseChecker->isPermitToMinusPause()) {
             mScene->mPauseSeq->startPause(GamePauseSequence::ActivePause);

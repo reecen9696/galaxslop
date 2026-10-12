@@ -47,9 +47,9 @@ void TombSpiderDemo_FORCE_MATCH_SDATA2() {
 
 TombSpiderDemo::TombSpiderDemo(TombSpider* pParent) : mParent(pParent), mRotateSpeed(0.0f) {
     mMtx.identity();
-    MR::declareEventCamera(getCameraInfo(), "ゲートオープンデモ[トゥームスパイダー]");
-    MR::declareEventCamera(getCameraInfo(), "マリオ着地デモ[トゥームスパイダー]");
-    MR::declareEventCamera(getCameraInfo(), "チャンス開始[トゥームスパイダー]");
+    MR::declareEventCamera(getCameraInfo(), "\x83\x51\x81\x5b\x83\x67\x83\x49\x81\x5b\x83\x76\x83\x93\x83\x66\x83\x82[\x83\x67\x83\x44\x81\x5b\x83\x80\x83\x58\x83\x70\x83\x43\x83\x5f\x81\x5b]");
+    MR::declareEventCamera(getCameraInfo(), "\x83\x7d\x83\x8a\x83\x49\x92\x85\x92\x6e\x83\x66\x83\x82[\x83\x67\x83\x44\x81\x5b\x83\x80\x83\x58\x83\x70\x83\x43\x83\x5f\x81\x5b]");
+    MR::declareEventCamera(getCameraInfo(), "\x83\x60\x83\x83\x83\x93\x83\x58\x8a\x4a\x8e\x6e[\x83\x67\x83\x44\x81\x5b\x83\x80\x83\x58\x83\x70\x83\x43\x83\x5f\x81\x5b]");
     MR::initAnimCamera(TombSpiderFunction::getPlanet(mParent), getCameraInfo(), "Appear");
     MR::initAnimCamera(TombSpiderFunction::getPlanet(mParent), getCameraInfo(), "Battle2ndStart");
     MR::initAnimCamera(TombSpiderFunction::getPlanet(mParent), getCameraInfo(), "Death");
@@ -57,8 +57,8 @@ TombSpiderDemo::TombSpiderDemo(TombSpider* pParent) : mParent(pParent), mRotateS
 
 bool TombSpiderDemo::updateGateOpen() {
     if (MR::isFirstStep(mParent)) {
-        TombSpiderFunction::startTombSpiderDemo(mParent, "ゲートオープンデモ[トゥームスパイダー]", nullptr);
-        MR::startEventCamera(getCameraInfo(), "ゲートオープンデモ[トゥームスパイダー]", CameraTargetArg(mParent), -1);
+        TombSpiderFunction::startTombSpiderDemo(mParent, "\x83\x51\x81\x5b\x83\x67\x83\x49\x81\x5b\x83\x76\x83\x93\x83\x66\x83\x82[\x83\x67\x83\x44\x81\x5b\x83\x80\x83\x58\x83\x70\x83\x43\x83\x5f\x81\x5b]", nullptr);
+        MR::startEventCamera(getCameraInfo(), "\x83\x51\x81\x5b\x83\x67\x83\x49\x81\x5b\x83\x76\x83\x93\x83\x66\x83\x82[\x83\x67\x83\x44\x81\x5b\x83\x80\x83\x58\x83\x70\x83\x43\x83\x5f\x81\x5b]", CameraTargetArg(mParent), -1);
 
         TVec3f pos(mParent->mPosition);
         pos.z += ::sPlanetRadius;
@@ -102,15 +102,15 @@ bool TombSpiderDemo::updateGateOpen() {
     }
 
     if (MR::isStep(mParent, ::sStepGateOpenChangeCamera)) {
-        MR::endEventCamera(getCameraInfo(), "ゲートオープンデモ[トゥームスパイダー]", false, -1);
-        MR::startEventCameraNoTarget(getCameraInfo(), "マリオ着地デモ[トゥームスパイダー]", -1);
+        MR::endEventCamera(getCameraInfo(), "\x83\x51\x81\x5b\x83\x67\x83\x49\x81\x5b\x83\x76\x83\x93\x83\x66\x83\x82[\x83\x67\x83\x44\x81\x5b\x83\x80\x83\x58\x83\x70\x83\x43\x83\x5f\x81\x5b]", false, -1);
+        MR::startEventCameraNoTarget(getCameraInfo(), "\x83\x7d\x83\x8a\x83\x49\x92\x85\x92\x6e\x83\x66\x83\x82[\x83\x67\x83\x44\x81\x5b\x83\x80\x83\x58\x83\x70\x83\x43\x83\x5f\x81\x5b]", -1);
     }
 
     if (MR::isStep(mParent, ::sStepDemoGateOpen)) {
         MR::startSound(MR::getPlayerDemoActor(), "SE_PM_LAND_HEAVY");
         MR::startSound(MR::getPlayerDemoActor(), "SE_PV_LAND");
         TombSpiderFunction::resetPlayerPosTombSpider(mParent, false);
-        TombSpiderFunction::endTombSpiderDemo(mParent, "ゲートオープンデモ[トゥームスパイダー]", "マリオ着地デモ[トゥームスパイダー]");
+        TombSpiderFunction::endTombSpiderDemo(mParent, "\x83\x51\x81\x5b\x83\x67\x83\x49\x81\x5b\x83\x76\x83\x93\x83\x66\x83\x82[\x83\x67\x83\x44\x81\x5b\x83\x80\x83\x58\x83\x70\x83\x43\x83\x5f\x81\x5b]", "\x83\x7d\x83\x8a\x83\x49\x92\x85\x92\x6e\x83\x66\x83\x82[\x83\x67\x83\x44\x81\x5b\x83\x80\x83\x58\x83\x70\x83\x43\x83\x5f\x81\x5b]");
         return true;
     }
     return false;
@@ -118,7 +118,7 @@ bool TombSpiderDemo::updateGateOpen() {
 
 bool TombSpiderDemo::updateCocoonBreak() {
     if (MR::isFirstStep(mParent)) {
-        TombSpiderFunction::startTombSpiderAnimCameraDemo(mParent, "出現", "Appear", 0);
+        TombSpiderFunction::startTombSpiderAnimCameraDemo(mParent, "\x8f\x6f\x8c\xbb", "Appear", 0);
         TombSpiderFunction::resetPlayerPosTombSpider(mParent, true);
 
         MR::sendMsgToAllLiveActor(ACTMES_TOMB_SPIDER_BATTLE_START, nullptr);
@@ -162,7 +162,7 @@ bool TombSpiderDemo::updateBattle1stStart() {
 
 bool TombSpiderDemo::updateBattle1stEnd() {
     if (MR::isFirstStep(mParent)) {
-        TombSpiderFunction::startTombSpiderAnimCameraDemo(mParent, "１回戦終了", "Battle2ndStart", ::sStepBattle2ndStartCameraInterpolateFrame);
+        TombSpiderFunction::startTombSpiderAnimCameraDemo(mParent, "\x82\x50\x89\xf1\x90\xed\x8f\x49\x97\xb9", "Battle2ndStart", ::sStepBattle2ndStartCameraInterpolateFrame);
         TombSpiderFunction::resetPlayerPosTombSpider(mParent, true);
         MR::startBck(mParent, "ChanceDamageLast");
     }
@@ -206,7 +206,7 @@ bool TombSpiderDemo::updateBattle2ndStart() {
             MR::appearStarPieceToDirection(mParent, mParent->mPosition, dir, 1, 0.0f, 40.0f, false);
             MR::startSound(mParent, "SE_OJ_STAR_PIECE_BURST");
         }
-        TombSpiderFunction::endTombSpiderAnimCameraDemo(mParent, "１回戦終了", "Battle2ndStart");
+        TombSpiderFunction::endTombSpiderAnimCameraDemo(mParent, "\x82\x50\x89\xf1\x90\xed\x8f\x49\x97\xb9", "Battle2ndStart");
         return true;
     }
 
@@ -215,7 +215,7 @@ bool TombSpiderDemo::updateBattle2ndStart() {
 
 bool TombSpiderDemo::updateDeath() {
     if (MR::isFirstStep(mParent)) {
-        TombSpiderFunction::startTombSpiderAnimCameraDemo(mParent, "死亡", "Death", 0);
+        TombSpiderFunction::startTombSpiderAnimCameraDemo(mParent, "\x8e\x80\x96\x53", "Death", 0);
         TombSpiderFunction::resetPlayerPosTombSpider(mParent, true);
         MR::startSystemSE("SE_BV_TSPIDER_DEATH");
         MR::startBck(mParent, "Death");
@@ -241,7 +241,7 @@ bool TombSpiderDemo::updateDeath() {
         MR::emitEffect(mParent, "Death");
         MR::startSound(mParent, "SE_BM_TSPIDER_EXPLOSION");
         MR::startAfterBossBGM();
-        TombSpiderFunction::endTombSpiderAnimCameraDemo(mParent, "死亡", "Death");
+        TombSpiderFunction::endTombSpiderAnimCameraDemo(mParent, "\x8e\x80\x96\x53", "Death");
         MR::onSwitchA(mParent);
         MR::requestAppearPowerStar(mParent, mParent->mPosition);
         return true;
@@ -277,7 +277,7 @@ bool TombSpiderDemo::updateBattle1stStartJumpToPlayer() {
         if (!MR::isDead(TombSpiderFunction::getCocoon(mParent))) {
             TombSpiderFunction::getCocoon(mParent)->kill();
         }
-        TombSpiderFunction::endTombSpiderAnimCameraDemo(mParent, "出現", "Appear");
+        TombSpiderFunction::endTombSpiderAnimCameraDemo(mParent, "\x8f\x6f\x8c\xbb", "Appear");
         return true;
     }
 

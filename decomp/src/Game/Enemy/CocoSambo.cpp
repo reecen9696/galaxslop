@@ -85,7 +85,7 @@ bool CocoSambo::isNerveDying() {
     return isNerve(GET_NERVE(CocoSambo, CocoSamboNrvPressY)) || isNerve(GET_NERVE(CocoSambo, CocoSamboNrvBlow));
 }
 
-CocoSamboHead::CocoSamboHead(LiveActor* pHost) : PartsModel(pHost, "ココサンボ[頭]", "CocoSamboHead", 0, 18, 0) {
+CocoSamboHead::CocoSamboHead(LiveActor* pHost) : PartsModel(pHost, "\x83\x52\x83\x52\x83\x54\x83\x93\x83\x7b[\x93\xaa]", "CocoSamboHead", 0, 18, 0) {
     mFrontVec.set(0.0f, 0.0f, 1.0f);
 }
 
@@ -324,7 +324,7 @@ void CocoSambo::init(const JMapInfoIter& rIter) {
     mPointingActorArray = new LiveActor*[::cPointingActorNum];
 
     for (s32 i = 0; i < ::cPointingActorNum; i++) {
-        mPointingActorArray[i] = new LiveActor("ポインティング用アクター");
+        mPointingActorArray[i] = new LiveActor("\x83\x7c\x83\x43\x83\x93\x83\x65\x83\x42\x83\x93\x83\x4f\x97\x70\x83\x41\x83\x4e\x83\x5e\x81\x5b");
         mPointingActorArray[i]->initWithoutIter();
         MR::invalidateClipping(mPointingActorArray[i]);
         MR::initStarPointerTargetAtMtx(mPointingActorArray[i], 80.0f * mScale.x, MR::getJointMtx(this, ::cPointingJointName[i]),
@@ -497,7 +497,7 @@ bool CocoSambo::tryDpdPointing(const Nerve* pNerve) {
 
 bool CocoSambo::isPointing() {
     for (s32 i = 0; i < ::cPointingActorNum; i++) {
-        if (MR::isStarPointerPointing2POnPressButton(mPointingActorArray[i], "弱", true, false)) {
+        if (MR::isStarPointerPointing2POnPressButton(mPointingActorArray[i], "\x8e\xe3", true, false)) {
             return true;
         }
     }

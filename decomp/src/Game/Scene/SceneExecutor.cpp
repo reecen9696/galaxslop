@@ -113,6 +113,28 @@ void SceneFunction::executeCalcAnimListOnPlayingMovie() {
     CategoryList::execute(MR::CalcAnimType_MovieSubtitles);
 }
 
+#ifdef TARGET_PC
+// Skies are modelled around the game camera; the VR renderer draws the
+// draws between these markers around the eye instead.
+#define PORT_SKY_BUFFER(draw)                    \
+    do {                                         \
+        port_gx_marker(PORT_GX_MARK_SKY_BEGIN);  \
+        draw;                                    \
+        port_gx_marker(PORT_GX_MARK_SKY_END);    \
+    } while (0)
+// What Mario wears and carries moves with him: the VR renderer gives it his
+// motion (SpaceWarp).
+#define PORT_PLAYER_BUFFER(draw)                    \
+    do {                                            \
+        port_gx_marker(PORT_GX_MARK_PLAYER_BEGIN);  \
+        draw;                                       \
+        port_gx_marker(PORT_GX_MARK_PLAYER_END);    \
+    } while (0)
+#else
+#define PORT_SKY_BUFFER(draw) draw
+#define PORT_PLAYER_BUFFER(draw) draw
+#endif
+
 void SceneFunction::executeCalcViewAndEntryList() {
     TMtx34f mtx;
     mtx.identity();
@@ -138,10 +160,10 @@ void SceneFunction::executeDrawBufferListNormalOpaBeforeVolumeShadow() {
     CategoryList::drawXlu(MR::DrawBufferType_AstroDomeSky);
 
     if (MR::isExistPriorDrawAir()) {
-        CategoryList::drawOpa(MR::DrawBufferType_Sky);
+        PORT_SKY_BUFFER(CategoryList::drawOpa(MR::DrawBufferType_Sky));
         CategoryList::drawOpa(MR::DrawBufferType_Air);
         CategoryList::drawOpa(MR::DrawBufferType_Sun);
-        CategoryList::drawXlu(MR::DrawBufferType_Sky);
+        PORT_SKY_BUFFER(CategoryList::drawXlu(MR::DrawBufferType_Sky));
         CategoryList::drawXlu(MR::DrawBufferType_Air);
         CategoryList::drawXlu(MR::DrawBufferType_Sun);
     }
@@ -174,13 +196,13 @@ void SceneFunction::executeDrawBufferListNormalOpa() {
     CategoryList::drawOpa(MR::DrawBufferType_Ride);
     CategoryList::drawOpa(MR::DrawBufferType_Enemy);
     CategoryList::drawOpa(MR::DrawBufferType_EnemyDecoration);
-    CategoryList::drawOpa(MR::DrawBufferType_PlayerDecoration);
+    PORT_PLAYER_BUFFER(CategoryList::drawOpa(MR::DrawBufferType_PlayerDecoration));
 
     if (!MR::isExistPriorDrawAir()) {
-        CategoryList::drawOpa(MR::DrawBufferType_Sky);
+        PORT_SKY_BUFFER(CategoryList::drawOpa(MR::DrawBufferType_Sky));
         CategoryList::drawOpa(MR::DrawBufferType_Air);
         CategoryList::drawOpa(MR::DrawBufferType_Sun);
-        CategoryList::drawXlu(MR::DrawBufferType_Sky);
+        PORT_SKY_BUFFER(CategoryList::drawXlu(MR::DrawBufferType_Sky));
         CategoryList::drawXlu(MR::DrawBufferType_Air);
         CategoryList::drawXlu(MR::DrawBufferType_Sun);
     }
@@ -204,7 +226,7 @@ void SceneFunction::executeDrawBufferListNormalXlu() {
     CategoryList::drawXlu(MR::DrawBufferType_Ride);
     CategoryList::drawXlu(MR::DrawBufferType_Enemy);
     CategoryList::drawXlu(MR::DrawBufferType_EnemyDecoration);
-    CategoryList::drawXlu(MR::DrawBufferType_PlayerDecoration);
+    PORT_PLAYER_BUFFER(CategoryList::drawXlu(MR::DrawBufferType_PlayerDecoration));
 }
 
 void SceneFunction::executeDrawListOpa() {

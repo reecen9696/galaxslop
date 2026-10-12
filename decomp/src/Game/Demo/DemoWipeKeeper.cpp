@@ -4,7 +4,7 @@
 #include "Game/Util/DemoUtil.hpp"
 #include "Game/Util/ObjUtil.hpp"
 
-DemoWipeInfo::DemoWipeInfo() : mPartName(), mWipeName("フェードワイプ"), mWipeType(), mWipeFrame(-1) {
+DemoWipeInfo::DemoWipeInfo() : mPartName(), mWipeName("\x83\x74\x83\x46\x81\x5b\x83\x68\x83\x8f\x83\x43\x83\x76"), mWipeType(), mWipeFrame(-1) {
 }
 
 DemoWipeKeeper::DemoWipeKeeper(DemoExecutor* pExecutor) : DemoSheetKeeperBase(pExecutor) {
@@ -55,7 +55,7 @@ inline const char* DemoWipeKeeper::getTypeString() const {
 }
 
 inline const char* DemoWipeKeeper::getName() const {
-    return "ワイプ";
+    return "\x83\x8f\x83\x43\x83\x76";
 }
 
 #include "Game/Demo/DemoSheetKeeperInfoHolder.hpp"

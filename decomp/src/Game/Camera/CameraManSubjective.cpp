@@ -3,7 +3,7 @@
 #include "Game/Camera/CameraSubjective.hpp"
 
 CameraManSubjective::CameraManSubjective(const char* pName) : CameraMan(pName) {
-    mCamera = new CameraSubjective("主観カメラ");
+    mCamera = new CameraSubjective("\x8e\xe5\x8a\xcf\x83\x4a\x83\x81\x83\x89");
     mCamera->mCameraMan = this;
 }
 

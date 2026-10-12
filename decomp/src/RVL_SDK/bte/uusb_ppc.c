@@ -46,7 +46,7 @@
  */
 
 typedef struct {
-    long fd;  // TOOD: IOSFd
+    int fd;  // TOOD: IOSFd
     char pad0_[0x10 - (0x00 + 0x04)];
     unk1_t unsigned bulkEndpoint1;
     unk1_t unsigned bulkEndpoint2;
@@ -76,14 +76,14 @@ typedef struct {
 
 static void uusb_ReleaseCmdBufferPool(void);
 static void uusb_ReleaseAclBufferPool(void);
-static void uusb_CloseDeviceCB(long result, void* p_data);
-static void uusb_ReadIntrDataCB(long result, void* p_data);
-static void uusb_ReadBulkDataCB(long result, void* p_data);
+static void uusb_CloseDeviceCB(int result, void* p_data);
+static void uusb_ReadIntrDataCB(int result, void* p_data);
+static void uusb_ReadBulkDataCB(int result, void* p_data);
 static void uusb_issue_bulk_read(void);
 void uusb_issue_intr_read(void) NO_INLINE;
-static void uusb_WriteCtrlDataCB(long result, void* p_data);
-static void uusb_WriteBulkDataCB(long result, void* p_data);
-static long uusb_get_devId(int vid, int pid);
+static void uusb_WriteCtrlDataCB(int result, void* p_data);
+static void uusb_WriteBulkDataCB(int result, void* p_data);
+static int uusb_get_devId(int vid, int pid);
 
 /*******************************************************************************
  * variables
@@ -97,7 +97,7 @@ unsigned char __uusb_ppc_stack2[0x1000] __attribute__((aligned(32)));
 // .sdata
 // TODO: IOSFd, IOS_INVALID_FD
 UINT32 volatile wait4hci = TRUE;
-static long __ntd_ios_file_descriptor = -1l;
+static int __ntd_ios_file_descriptor = -1;
 
 // .sbss
 static int __ntd_pid;
@@ -173,7 +173,7 @@ static void uusb_ReleaseAclBufferPool(void) {
     usb.acl_buffer_pool = GKI_INVALID_POOL;
 }
 
-static void uusb_CloseDeviceCB(long result, void* p_data) {
+static void uusb_CloseDeviceCB(int result, void* p_data) {
     usb.bulkEndpoint1 = 0;
     usb.bulkEndpoint2 = 0;
     usb.intrEndpoint1 = 0;
@@ -189,7 +189,7 @@ static void uusb_CloseDeviceCB(long result, void* p_data) {
         (*usb.cback)(4, result);
 }
 
-static void uusb_ReadIntrDataCB(long result, void* p_data) {
+static void uusb_ReadIntrDataCB(int result, void* p_data) {
     unk4_t sp14 = 0;
     UINT32 len;
     void* p_buffer = NULL;
@@ -233,7 +233,7 @@ static void uusb_ReadIntrDataCB(long result, void* p_data) {
     len = (len >> 2 << 2) + 4;  // round up to 4
     memcpy(p_buffer, p_buf, len);
 
-    OSSwitchFiberEx((unsigned long)p_buffer, 0, 0, 0, (u32)&bta_ci_hci_msg_handler, (u32)(__uusb_ppc_stack1 + 4096));
+    OSSwitchFiberEx((unsigned int)p_buffer, 0, 0, 0, (u32)&bta_ci_hci_msg_handler, (u32)(__uusb_ppc_stack1 + 4096));
 
     GKI_freebuf(p_buf);
     p_buf = NULL;
@@ -242,7 +242,7 @@ end:
     uusb_issue_intr_read();
 }
 
-static void uusb_ReadBulkDataCB(long result, void* p_data) {
+static void uusb_ReadBulkDataCB(int result, void* p_data) {
     unk4_t sp14 = 0;
     UINT32 len;
     void* p_buffer = NULL;
@@ -282,7 +282,7 @@ static void uusb_ReadBulkDataCB(long result, void* p_data) {
     p_buffer = l2cap_link_chk_pkt_start(p_buffer);
 
     if (p_buffer != NULL && l2cap_link_chk_pkt_end()) {
-        OSSwitchFiberEx((unsigned long)p_buffer, 0, 0, 0, (u32)&bta_ci_hci_msg_handler, (u32)(__uusb_ppc_stack2 + 4096));
+        OSSwitchFiberEx((unsigned int)p_buffer, 0, 0, 0, (u32)&bta_ci_hci_msg_handler, (u32)(__uusb_ppc_stack2 + 4096));
         p_buffer = 0;
     }
 
@@ -346,7 +346,7 @@ void uusb_issue_intr_read(void) {
     usb.reading_intr_data = TRUE;
 }
 
-static void uusb_WriteCtrlDataCB(long result, void* p_data) {
+static void uusb_WriteCtrlDataCB(int result, void* p_data) {
     HC_BT_HDR* p_buf = NULL;
     void* p_buffer = NULL;
     IPCResult ret = 0;
@@ -388,7 +388,7 @@ static void uusb_WriteCtrlDataCB(long result, void* p_data) {
     }
 }
 
-static void uusb_WriteBulkDataCB(long result, void* p_data) {
+static void uusb_WriteBulkDataCB(int result, void* p_data) {
     HC_BT_HDR* p_buf = NULL;
     void* p_buffer = NULL;
     IPCResult ret = 0;
@@ -429,7 +429,7 @@ static void uusb_WriteBulkDataCB(long result, void* p_data) {
     }
 }
 
-static long uusb_get_devId(int vid, int pid) {
+static int uusb_get_devId(int vid, int pid) {
     IPCResult ret;
 
     if (__ntd_ohci_init_flag == TRUE) {

@@ -61,7 +61,7 @@ void MarioActor::calcViewReflectionModel() {
     PSMTXIdentity(offset.toMtxPtr());
     f32 factor;
     f32 distance = 10.0f;
-    if (isAnimationRun("ターンジャンプ")) {
+    if (isAnimationRun("\x83\x5e\x81\x5b\x83\x93\x83\x57\x83\x83\x83\x93\x83\x76")) {
         distance = 25.0f;
     }
 

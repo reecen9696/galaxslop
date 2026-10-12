@@ -154,7 +154,7 @@ bool MarioFoo::start() {
         _12 = 1;
     }
 
-    changeAnimation("フーファイター飛行開始", "フーファイター飛行");
+    changeAnimation("\x83\x74\x81\x5b\x83\x74\x83\x40\x83\x43\x83\x5e\x81\x5b\x94\xf2\x8d\x73\x8a\x4a\x8e\x6e", "\x83\x74\x81\x5b\x83\x74\x83\x40\x83\x43\x83\x5e\x81\x5b\x94\xf2\x8d\x73");
     startPadVib(2);
     _48 = MR::getAreaObj("CelestrialSphere", getTrans());
     _AC = 0;
@@ -165,8 +165,8 @@ bool MarioFoo::start() {
 bool MarioFoo::update() {
     _14++;
     if (checkTrgZ()) {
-        playSound("声尻ドロップ");
-        playSound("フーブレーキ");
+        playSound("\x90\xba\x90\x4b\x83\x68\x83\x8d\x83\x62\x83\x76");
+        playSound("\x83\x74\x81\x5b\x83\x75\x83\x8c\x81\x5b\x83\x4c");
         _11 = 1;
         _59 = 3;
     }
@@ -312,7 +312,7 @@ bool MarioFoo::update() {
     }
 
     if (stopTurn) {
-        stopAnimation("水泳ターン下");
+        stopAnimation("\x90\x85\x89\x6a\x83\x5e\x81\x5b\x83\x93\x89\xba");
     }
 
     _2C = MR::clamp(_2C, ::cUpperAngleWait, ::cLimitAngleSink);
@@ -392,12 +392,12 @@ bool MarioFoo::notice() {
 }
 
 bool MarioFoo::close() {
-    stopEffect("フーマリオブレーキ左");
-    stopEffect("フーマリオブレーキ右");
-    stopEffect("フーマリオグロー左");
-    stopEffect("フーマリオグロー右");
-    playEffect("フーマリオ解除左");
-    playEffect("フーマリオ解除右");
+    stopEffect("\x83\x74\x81\x5b\x83\x7d\x83\x8a\x83\x49\x83\x75\x83\x8c\x81\x5b\x83\x4c\x8d\xb6");
+    stopEffect("\x83\x74\x81\x5b\x83\x7d\x83\x8a\x83\x49\x83\x75\x83\x8c\x81\x5b\x83\x4c\x89\x45");
+    stopEffect("\x83\x74\x81\x5b\x83\x7d\x83\x8a\x83\x49\x83\x4f\x83\x8d\x81\x5b\x8d\xb6");
+    stopEffect("\x83\x74\x81\x5b\x83\x7d\x83\x8a\x83\x49\x83\x4f\x83\x8d\x81\x5b\x89\x45");
+    playEffect("\x83\x74\x81\x5b\x83\x7d\x83\x8a\x83\x49\x89\xf0\x8f\x9c\x8d\xb6");
+    playEffect("\x83\x74\x81\x5b\x83\x7d\x83\x8a\x83\x49\x89\xf0\x8f\x9c\x89\x45");
     stopAnimationUpper(nullptr);
     setYangleOffset(0.0f);
     u16 upperJoint = getAnimator()->getUpperJointID();
@@ -405,25 +405,25 @@ bool MarioFoo::close() {
 
     switch (_59) {
     case 0:
-        changeAnimation("飛び込み失敗回転着地");
+        changeAnimation("\x94\xf2\x82\xd1\x8d\x9e\x82\xdd\x8e\xb8\x94\x73\x89\xf1\x93\x5d\x92\x85\x92\x6e");
         break;
     case 1:
-        changeAnimation("フーファイター着地");
+        changeAnimation("\x83\x74\x81\x5b\x83\x74\x83\x40\x83\x43\x83\x5e\x81\x5b\x92\x85\x92\x6e");
         break;
     case 2:
         stopAnimation(nullptr);
         break;
     case 3:
-        changeAnimation("フーファイター解除");
+        changeAnimation("\x83\x74\x81\x5b\x83\x74\x83\x40\x83\x43\x83\x5e\x81\x5b\x89\xf0\x8f\x9c");
         getPlayer()->mJumpVec = TVec3f(0.0f, 0.0f, 0.0f);
         getPlayer()->_10._21 = true;
         break;
     }
 
     if (getPlayer()->mMovementStates.jumping) {
-        changeAnimation(nullptr, "落下");
+        changeAnimation(nullptr, "\x97\x8e\x89\xba");
     } else {
-        changeAnimation(nullptr, "基本");
+        changeAnimation(nullptr, "\x8a\xee\x96\x7b");
     }
 
     Mario* player = getPlayer();
@@ -458,16 +458,16 @@ void MarioFoo::jet() {
         speed = 0.0f;
         slowDown = 0.9f;
         _AC++;
-        if (!isAnimationRun("フーファイタースピン")) {
-            changeAnimation("フーファイター静止");
+        if (!isAnimationRun("\x83\x74\x81\x5b\x83\x74\x83\x40\x83\x43\x83\x5e\x81\x5b\x83\x58\x83\x73\x83\x93")) {
+            changeAnimation("\x83\x74\x81\x5b\x83\x74\x83\x40\x83\x43\x83\x5e\x81\x5b\x90\xc3\x8e\x7e");
         }
 
-        playEffect("フーマリオブレーキ左");
-        playEffect("フーマリオブレーキ右");
-        stopEffect("フーマリオグロー左");
-        stopEffect("フーマリオグロー右");
+        playEffect("\x83\x74\x81\x5b\x83\x7d\x83\x8a\x83\x49\x83\x75\x83\x8c\x81\x5b\x83\x4c\x8d\xb6");
+        playEffect("\x83\x74\x81\x5b\x83\x7d\x83\x8a\x83\x49\x83\x75\x83\x8c\x81\x5b\x83\x4c\x89\x45");
+        stopEffect("\x83\x74\x81\x5b\x83\x7d\x83\x8a\x83\x49\x83\x4f\x83\x8d\x81\x5b\x8d\xb6");
+        stopEffect("\x83\x74\x81\x5b\x83\x7d\x83\x8a\x83\x49\x83\x4f\x83\x8d\x81\x5b\x89\x45");
         if (!_AE) {
-            playSound("フーブレーキ");
+            playSound("\x83\x74\x81\x5b\x83\x75\x83\x8c\x81\x5b\x83\x4c");
         }
 
         _AE = 1;
@@ -482,11 +482,11 @@ void MarioFoo::jet() {
             _AE = 0;
         } else {
             if (_AE) {
-                playEffect("共通ひこうきブースト");
-                playSound("フー加速");
+                playEffect("\x8b\xa4\x92\xca\x82\xd0\x82\xb1\x82\xa4\x82\xab\x83\x75\x81\x5b\x83\x58\x83\x67");
+                playSound("\x83\x74\x81\x5b\x89\xc1\x91\xac");
                 _AE = 0;
-                if (isAnimationRun("フーファイター静止")) {
-                    changeAnimation("フーファイター飛行再開");
+                if (isAnimationRun("\x83\x74\x81\x5b\x83\x74\x83\x40\x83\x43\x83\x5e\x81\x5b\x90\xc3\x8e\x7e")) {
+                    changeAnimation("\x83\x74\x81\x5b\x83\x74\x83\x40\x83\x43\x83\x5e\x81\x5b\x94\xf2\x8d\x73\x8d\xc4\x8a\x4a");
                 }
             }
 
@@ -499,19 +499,19 @@ void MarioFoo::jet() {
             speedUp = 1.2f;
         }
 
-        stopAnimation("フーファイター静止");
-        playEffect("フーマリオグロー左");
-        playEffect("フーマリオグロー右");
-        stopEffect("フーマリオブレーキ左");
-        stopEffect("フーマリオブレーキ右");
+        stopAnimation("\x83\x74\x81\x5b\x83\x74\x83\x40\x83\x43\x83\x5e\x81\x5b\x90\xc3\x8e\x7e");
+        playEffect("\x83\x74\x81\x5b\x83\x7d\x83\x8a\x83\x49\x83\x4f\x83\x8d\x81\x5b\x8d\xb6");
+        playEffect("\x83\x74\x81\x5b\x83\x7d\x83\x8a\x83\x49\x83\x4f\x83\x8d\x81\x5b\x89\x45");
+        stopEffect("\x83\x74\x81\x5b\x83\x7d\x83\x8a\x83\x49\x83\x75\x83\x8c\x81\x5b\x83\x4c\x8d\xb6");
+        stopEffect("\x83\x74\x81\x5b\x83\x7d\x83\x8a\x83\x49\x83\x75\x83\x8c\x81\x5b\x83\x4c\x89\x45");
     }
 
     f32 soundSpeed = 50.0f * (1.0f + getStickY());
     if (!_AE) {
-        playSound("フー飛行中", soundSpeed);
+        playSound("\x83\x74\x81\x5b\x94\xf2\x8d\x73\x92\x86", soundSpeed);
     }
 
-    playSound("フー滞空中", soundSpeed);
+    playSound("\x83\x74\x81\x5b\x91\xd8\x8b\xf3\x92\x86", soundSpeed);
     if (_28 < speed) {
         if (_28 < 1.0f) {
             _28 = 1.0f;
@@ -577,7 +577,7 @@ void MarioFoo::hitWall(const TVec3f& rNormal, HitSensor* pSensor) {
             _59 = 2;
         }
 
-        playSound("フーブレーキ");
+        playSound("\x83\x74\x81\x5b\x83\x75\x83\x8c\x81\x5b\x83\x4c");
     }
 }
 
@@ -586,7 +586,7 @@ f32 MarioFoo::getStickY() const {
 }
 
 const char* MarioFoo_FORCE_MATCH_DATA(u32 index) {
-    static const char* const strings[] = {"水泳ダメージ", "水中ダメージ", "声小ダメージ", "ダメージ", "水泳ダメージ中"};
+    static const char* const strings[] = {"\x90\x85\x89\x6a\x83\x5f\x83\x81\x81\x5b\x83\x57", "\x90\x85\x92\x86\x83\x5f\x83\x81\x81\x5b\x83\x57", "\x90\xba\x8f\xac\x83\x5f\x83\x81\x81\x5b\x83\x57", "\x83\x5f\x83\x81\x81\x5b\x83\x57", "\x90\x85\x89\x6a\x83\x5f\x83\x81\x81\x5b\x83\x57\x92\x86"};
     return strings[index];
 }
 
@@ -594,12 +594,12 @@ void MarioFoo::spin() {
     if (!_60) {
         if (mActor->isRequestSpin() && !_4C) {
             _4C = 20;
-            if (!isAnimationRun("フーファイタースピン") && !checkLvlA()) {
-                playSound("声スピン");
-                playSound("スピンジャンプ");
+            if (!isAnimationRun("\x83\x74\x81\x5b\x83\x74\x83\x40\x83\x43\x83\x5e\x81\x5b\x83\x58\x83\x73\x83\x93") && !checkLvlA()) {
+                playSound("\x90\xba\x83\x58\x83\x73\x83\x93");
+                playSound("\x83\x58\x83\x73\x83\x93\x83\x57\x83\x83\x83\x93\x83\x76");
             }
 
-            changeAnimation("フーファイタースピン");
+            changeAnimation("\x83\x74\x81\x5b\x83\x74\x83\x40\x83\x43\x83\x5e\x81\x5b\x83\x58\x83\x73\x83\x93");
             MarioActor* actor = mActor;
             if (!actor->_944) {
                 actor->_945 = 0;
@@ -620,7 +620,7 @@ bool MarioFoo::passRing(const HitSensor* pSensor) {
     const TVec3f& center = pSensor->mPosition;
     if (!_4E) {
         _50 = mActor->getConst().getTable()->mSwimRingDashChargeTime;
-        changeAnimation("リングダッシュ準備");
+        changeAnimation("\x83\x8a\x83\x93\x83\x4f\x83\x5f\x83\x62\x83\x56\x83\x85\x8f\x80\x94\xf5");
     }
 
     if (_50) {
@@ -648,7 +648,7 @@ f32 MarioFoo::calcRingAcc() {
 
             if (!_50) {
                 startPadVib(3);
-                changeAnimation("リングダッシュ");
+                changeAnimation("\x83\x8a\x83\x93\x83\x4f\x83\x5f\x83\x62\x83\x56\x83\x85");
             }
 
             return 1.0f;

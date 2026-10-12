@@ -27,7 +27,7 @@ void KoopaStateJumpAway_FORCE_MATCH_SDATA2() {
     (void) 0.0f;
 }
 
-KoopaStateJumpAway::KoopaStateJumpAway(Koopa* pKoopa) : ActorStateBase< Koopa >("State[ジャンプで離れる]", pKoopa) {
+KoopaStateJumpAway::KoopaStateJumpAway(Koopa* pKoopa) : ActorStateBase< Koopa >("State[\x83\x57\x83\x83\x83\x93\x83\x76\x82\xc5\x97\xa3\x82\xea\x82\xe9]", pKoopa) {
 }
 
 void KoopaStateJumpAway::init() {

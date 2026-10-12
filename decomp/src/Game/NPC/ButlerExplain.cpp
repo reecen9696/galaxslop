@@ -20,11 +20,11 @@ void ButlerExplain::init(const JMapInfoIter& rIter) {
 
     if (MR::tryRegisterDemoCast(this, rIter)) {
         DemoFunction::tryCreateDemoTalkAnimCtrlForActor(this, "DemoWithButler", nullptr);
-        MR::registerDemoActionFunctor(this, MR::Functor(this, &ButlerExplain::startDemo), "状況説明[開始]");
+        MR::registerDemoActionFunctor(this, MR::Functor(this, &ButlerExplain::startDemo), "\x8f\xf3\x8b\xb5\x90\xe0\x96\xbe[\x8a\x4a\x8e\x6e]");
         DemoFunction::registerDemoTalkMessageCtrl(this, mMsgCtrl);
     }
 
-    MR::tryRegisterDemoCast(this, "グランドスター１帰還", rIter);
+    MR::tryRegisterDemoCast(this, "\x83\x4f\x83\x89\x83\x93\x83\x68\x83\x58\x83\x5e\x81\x5b\x82\x50\x8b\x41\x8a\xd2", rIter);
 }
 
 void ButlerExplain::control() {

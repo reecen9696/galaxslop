@@ -201,6 +201,17 @@ namespace MR {
         u32 i;
 
         for (i = 0; i < num - 1; pDst++, pSrc++, i++) {
+#ifdef TARGET_PC
+            // Code units are native-endian here (the cooked messages are
+            // little-endian): the high byte is not the first one.
+            u16 c = static_cast< u16 >(*pSrc);
+
+            if ((c >> 8) != 0 || c == 0) {
+                break;
+            }
+
+            *pDst = static_cast< char >(c);
+#else
             const char* p = reinterpret_cast< const char* >(pSrc);
 
             if (p[0] != '\0') {
@@ -212,6 +223,7 @@ namespace MR {
             }
 
             *pDst = p[1];
+#endif
         }
 
         *pDst = '\0';

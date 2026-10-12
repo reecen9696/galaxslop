@@ -108,8 +108,8 @@ namespace NrvGCapture {
 GCapture::GCapture(const char* pName)
     : LiveActor(pName), _BC(0.0f, 0.0f, 0.0f, 1.0f), mEffectPos(0, 0, 0), _D8(0, 0, 0), _E4(0, 0, 0), _F0(0, 0, 0), _FC(0, 0, 1), _108(), mTarget(),
       _110(), mCaptureRibbon(), mTractPower(), _124(), _128(0.1f), _12C(), _130(FLOAT_MAX), mGuidanceTime(), mIsStarPointerPointing(), _139() {
-    mCaptureRibbon = new GCaptureRibbon("Gキャプチャーリボン");
-    mTargetMtx = new CameraTargetMtx("カメラターゲットダミー");
+    mCaptureRibbon = new GCaptureRibbon("G\x83\x4c\x83\x83\x83\x76\x83\x60\x83\x83\x81\x5b\x83\x8a\x83\x7b\x83\x93");
+    mTargetMtx = new CameraTargetMtx("\x83\x4a\x83\x81\x83\x89\x83\x5e\x81\x5b\x83\x51\x83\x62\x83\x67\x83\x5f\x83\x7e\x81\x5b");
     mSpringValue = new SpringValue(1.0f, 1.0f, 0.05f, 0.91f, 0.0f);
     _8C.identity();
 }
@@ -551,7 +551,7 @@ void GCapture::exeHold() {
     fillGapBindTrans();
     MR::reboundVelocityFromCollision(this, 0.5f, 0.0f, 1.0f);
     bool tryAdd = tryAddVelocityReflectJumpCollision();
-    mIsStarPointerPointing = MR::isStarPointerPointing(this, 0, true, "弱");
+    mIsStarPointerPointing = MR::isStarPointerPointing(this, 0, true, "\x8e\xe3");
     addRotateAccelPointing();
     MR::attenuateVelocity(this, 0.99f);
     MR::addTransMtx(_8C, mVelocity);

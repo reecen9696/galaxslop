@@ -1,7 +1,10 @@
 #include "Game/Screen/StarPointerController.hpp"
+#include "Game/Scene/SceneObjHolder.hpp"
 #include "Game/Screen/StarPointerDirector.hpp"
 #include "Game/Util/DirectDraw.hpp"
+#include "Game/Util/CameraUtil.hpp"
 #include "Game/Util/GamePadUtil.hpp"
+#include "Game/Util/MapUtil.hpp"
 #include "Game/Util/MathUtil.hpp"
 #include "Game/Util/ScreenUtil.hpp"
 #include "Game/Util/StarPointerUtil.hpp"
@@ -46,7 +49,43 @@ void StarPointerController::storeDataFromCallback(const f32* pProjectionParams, 
 
     if (mInfo.mDrawReady == true) {
         TDDraw::invProject(&mWorldPos, v1, MR::getStarPointerViewMtx(), pProjectionParams, pViewportParams, false);
+#ifdef TARGET_PC
+        // The port cannot read the EFB depth back (GXPeekZ reports the far
+        // plane), so in scenes with collision, what the pointer is on comes
+        // from casting its ray against the map instead: the controller's aim
+        // ray in the VR diorama, else the camera ray through the cursor.
+        if (MR::isExistSceneObj(SceneObj_CollisionDirector)) {
+            f32 o[3], d[3];
+            bool vrRay = mPadChannel == WPAD_CHAN0 && port_vr_pointer_ray(o, d);
+            TVec3f origin, dir;
+            if (vrRay) {
+                origin.set(o[0], o[1], o[2]);
+                dir.set(d[0], d[1], d[2]);
+            } else {
+                origin = MR::getCamPos();
+                dir = mWorldPos - origin;  // mWorldPos lies on the far plane
+                MR::normalizeOrZero(&dir);
+            }
+            TVec3f hit;
+            if (!dir.isZero() && MR::getFirstPolyOnLineToMap(&hit, nullptr, origin, dir * 30000.0f)) {
+                mWorldPos = hit;
+            } else if (vrRay) {
+                mWorldPos = origin + dir * 30000.0f;
+            }
+            // The VR laser reaches as far as star bits fly.
+            TVec3f aimEnd;
+            f32 reach;
+            if (vrRay && MR::calcVrPointerAimEnd(&aimEnd, &reach, mPadChannel)) {
+                port_vr_pointer_reach(reach);
+            }
+        }
+#endif
         mInfo.mViewDistZ = calcViewDistanceZ(mWorldPos, MR::getStarPointerViewMtx());
+#ifdef TARGET_PC
+        if (mPadChannel == WPAD_CHAN0) {
+            port_vr_pointer_depth(mInfo.mViewDistZ);
+        }
+#endif
     }
 
     mPastInfo = mInfo;

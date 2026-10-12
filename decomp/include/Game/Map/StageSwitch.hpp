@@ -52,6 +52,17 @@ public:
     void createAndAddZone(const SwitchIdInfo& rInfo);
     ZoneSwitch* getZoneSwitch(const SwitchIdInfo& rInfo);
     ZoneSwitch* findZoneSwitchFromTable(const SwitchIdInfo& rInfo);
+#ifdef TARGET_PC
+    ZoneSwitch* getGlobalSwitches() { return mGlobalSwitches; }  // debug (PETARI_SWITCH)
+    ZoneSwitch* getZoneSwitches(s32 zoneId) {                     // debug (PETARI_SWITCH)
+        for (int i = 0; i < mSwitches.size(); i++) {
+            if (mSwitches[i].mZoneId == zoneId) {
+                return mSwitches[i].mSwitch;
+            }
+        }
+        return nullptr;
+    }
+#endif
 
 private:
     /* 0x0C */ MR::Vector< MR::FixedArray< ContainerSwitch, 20 > > mSwitches;

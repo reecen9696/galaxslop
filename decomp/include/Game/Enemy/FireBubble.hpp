@@ -4,7 +4,7 @@
 
 class FireBubble : public LiveActor {
 public:
-    FireBubble(const char* = "バブル");
+    FireBubble(const char* = "\x83\x6f\x83\x75\x83\x8b");
     virtual void init(const JMapInfoIter& rIter);
     virtual void appear();
     virtual void kill();

@@ -4,7 +4,7 @@
 
 class CameraCharmedTripodBoss : public Camera {
 public:
-    CameraCharmedTripodBoss(const char* pName = "三脚ボスジョイント注視カメラ");
+    CameraCharmedTripodBoss(const char* pName = "\x8e\x4f\x8b\x72\x83\x7b\x83\x58\x83\x57\x83\x87\x83\x43\x83\x93\x83\x67\x92\x8d\x8e\x8b\x83\x4a\x83\x81\x83\x89");
 
     virtual void reset();
     virtual CameraTargetObj* calc();

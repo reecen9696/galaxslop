@@ -75,7 +75,7 @@ void CoinSpot::exeIsInTornado() {
     }
 
     if (_98 >= _8C || MR::isGreaterStep(this, 180)) {
-        MR::deleteEffect(this, "光");
+        MR::deleteEffect(this, "\x8c\xf5");
         kill();
     }
 }

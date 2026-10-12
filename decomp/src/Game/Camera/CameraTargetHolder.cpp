@@ -7,8 +7,8 @@ namespace {
 
 CameraTargetHolder::CameraTargetHolder() {
     mTarget = nullptr;
-    mTargetActor = new CameraTargetActor("アクター注目");
-    mTargetPlayer = new CameraTargetPlayer("マリオ注目");
+    mTargetActor = new CameraTargetActor("\x83\x41\x83\x4e\x83\x5e\x81\x5b\x92\x8d\x96\xda");
+    mTargetPlayer = new CameraTargetPlayer("\x83\x7d\x83\x8a\x83\x49\x92\x8d\x96\xda");
 }
 
 void CameraTargetHolder::movement() {

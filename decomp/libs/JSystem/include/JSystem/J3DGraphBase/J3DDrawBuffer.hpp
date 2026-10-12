@@ -30,6 +30,8 @@ inline f32 J3DCalcZValue(__REGISTER MtxPtr m, __REGISTER Vec v) {
     // clang-format on
 
     return out;
+#else
+    return (v.z * m[2][2] + v.x * m[2][0]) + (m[2][3] + v.y * m[2][1]);
 #endif
 }
 

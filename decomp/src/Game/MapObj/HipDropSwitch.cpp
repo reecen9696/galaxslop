@@ -147,7 +147,7 @@ void HipDropSwitch::exeOff() {
         mSpringValue->reset();
     }
 
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         _CE = true;
     }
 

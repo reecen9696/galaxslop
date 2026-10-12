@@ -29,7 +29,7 @@ namespace NrvPoltaStateGenerateRock {
 };  // namespace NrvPoltaStateGenerateRock
 
 PoltaStateGenerateRock::PoltaStateGenerateRock(Polta* pPolta)
-    : ActorStateBase< Polta >("ポルタ岩生成", pPolta), mPatternIndex(), mIndexIntoPattern(), mMaxIndexIntoPattern(5), mEndDelayStep(180) {
+    : ActorStateBase< Polta >("\x83\x7c\x83\x8b\x83\x5e\x8a\xe2\x90\xb6\x90\xac", pPolta), mPatternIndex(), mIndexIntoPattern(), mMaxIndexIntoPattern(5), mEndDelayStep(180) {
     initNerve(GET_NERVE(PoltaStateGenerateRock, PoltaStateGenerateRockNrvSign));
 }
 

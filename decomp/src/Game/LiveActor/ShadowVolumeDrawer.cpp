@@ -9,7 +9,7 @@ namespace {
     static Color8 sDebugShapeColor(0xFF, 0, 0, 0x80);
 };  // namespace
 
-ShadowVolumeDrawInit::ShadowVolumeDrawInit() : NameObj("シャドウボリューム描画初期化") {
+ShadowVolumeDrawInit::ShadowVolumeDrawInit() : NameObj("\x83\x56\x83\x83\x83\x68\x83\x45\x83\x7b\x83\x8a\x83\x85\x81\x5b\x83\x80\x95\x60\x89\xe6\x8f\x89\x8a\xfa\x89\xbb") {
     MR::registerPreDrawFunction(MR::Functor(&MR::setupShadowVolumeDraw), MR::DrawType_ShadowVolume);
 }
 

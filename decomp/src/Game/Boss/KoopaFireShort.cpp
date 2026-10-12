@@ -45,7 +45,7 @@ namespace NrvKoopaFireShort {
 };  // namespace NrvKoopaFireShort
 
 KoopaFireShort::KoopaFireShort(const Koopa* pKoopa)
-    : LiveActor("クッパの炎（ショート）"), mKoopa(pKoopa), mFront(0.0f, 0.0f, 1.0f), mSpeed(), mOffset() {
+    : LiveActor("\x83\x4e\x83\x62\x83\x70\x82\xcc\x89\x8a\x81\x69\x83\x56\x83\x87\x81\x5b\x83\x67\x81\x6a"), mKoopa(pKoopa), mFront(0.0f, 0.0f, 1.0f), mSpeed(), mOffset() {
 }
 
 void KoopaFireShort::init(const JMapInfoIter& rIter) {
@@ -164,7 +164,7 @@ void KoopaFireShort::exeFly() {
         MR::validateHitSensors(this);
     }
 
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         TVec3f gravity = -mGravity;
         MR::calcStarPointerWorldVelocityDirectionOnPlane(&mVelocity, mPosition, gravity, 1);
 

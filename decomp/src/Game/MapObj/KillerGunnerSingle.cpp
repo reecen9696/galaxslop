@@ -78,7 +78,7 @@ void KillerGunnerSingle::exeCharge() {
 
 void KillerGunnerSingle::exeShoot() {
     if (MR::isFirstStep(this)) {
-        MR::startRumbleWithShakeCameraWeak(this, "中", "弱", 500.0f, 1000.0f);
+        MR::startRumbleWithShakeCameraWeak(this, "\x92\x86", "\x8e\xe3", 500.0f, 1000.0f);
     }
 
     if (MR::isStep(this, 0)) {

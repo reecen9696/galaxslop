@@ -329,7 +329,7 @@ void TrickRabbitSnow::exeVanish() {
     TVec3f trans;
     TVec3f rotate;
 
-    if (MR::tryFindLinkNamePos(this, "隠れ位置", &trans, &rotate)) {
+    if (MR::tryFindLinkNamePos(this, "\x89\x42\x82\xea\x88\xca\x92\x75", &trans, &rotate)) {
         mPosition.set(trans);
         mRotation.set(rotate);
         MR::makeQuatAndFrontFromRotate(&mRotateQuat, &mFrontVec, this);
@@ -404,7 +404,7 @@ void TrickRabbitSnow::exeCaught() {
     if (MR::isFirstStep(this) && MR::isDemoActive()) {
         setNerve(GET_NERVE(TrickRabbitFreeRun, TrickRabbitSnowNrvCaught));
     } else if (MR::updateActorState(this, mStateCaught)) {
-        MR::endDemo(this, "捕まり");
+        MR::endDemo(this, "\x95\xdf\x82\xdc\x82\xe8");
         MR::forwardNode(mMsgCtrl);
         mSpotMarkLight->kill();
         mFootPrint->clear();

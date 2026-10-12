@@ -127,7 +127,7 @@ u32 LayoutHolder::count(const char* pExtension, const char* pRoot) {
         if (pFinder->mFileIsFolder) {
             if (pFinder->mName[0] != '.') {
                 char path[128];
-                sprintf(path, "%s%s%s", pRoot, "/", pFinder->mName);
+                sprintf(path, "%s%s%s", pRoot, "/", pFinder->mName);  // MSL prints nothing for a NULL pRoot
                 resCount += count(pExtension, path);
             }
         } else {

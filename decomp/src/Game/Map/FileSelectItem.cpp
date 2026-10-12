@@ -419,22 +419,22 @@ void FileSelectItem::control() {
 }
 
 void FileSelectItem::createNew() {
-    mPlanetMapObj = MR::createPartsModelMapObj(this, "ニューフェイス", "FileSelectDataPlanet", _A4);
+    mPlanetMapObj = MR::createPartsModelMapObj(this, "\x83\x6a\x83\x85\x81\x5b\x83\x74\x83\x46\x83\x43\x83\x58", "FileSelectDataPlanet", _A4);
     mPlanetMapObj->mScale.set(30.0f);
     mPlanetMapObj->makeActorDead();
 }
 
 void FileSelectItem::createFellows() {
     for (u32 i = 0; i < 5; i++) {
-        mModels[i] = new FileSelectModel(::sFellowModel[i], _D4, "キャラフェイス");
+        mModels[i] = new FileSelectModel(::sFellowModel[i], _D4, "\x83\x4c\x83\x83\x83\x89\x83\x74\x83\x46\x83\x43\x83\x58");
     }
 }
 
 void FileSelectItem::createMii() {
     if (_8C || !mIconID->isMii()) {
-        mFaceParts = MiiFacePartsHolder::createPartsFromDefault("Miiフェイス", 0);
+        mFaceParts = MiiFacePartsHolder::createPartsFromDefault("Mii\x83\x74\x83\x46\x83\x43\x83\x58", 0);
     } else {
-        mFaceParts = MiiFacePartsHolder::createPartsFromReceipe("Miiフェイス",
+        mFaceParts = MiiFacePartsHolder::createPartsFromReceipe("Mii\x83\x74\x83\x46\x83\x43\x83\x58",
                                                                 MiiFaceRecipe(RFLDataSource_Official, mIconID->getMiiIndex(), RFLResolution_256, 33));
     }
 
@@ -446,7 +446,7 @@ void FileSelectItem::createMii() {
 }
 
 void FileSelectItem::createNumber() {
-    _A0 = new FileSelectNumber("ファイル番号");
+    _A0 = new FileSelectNumber("\x83\x74\x83\x40\x83\x43\x83\x8b\x94\xd4\x8d\x86");
     _A0->initWithoutIter();
     _A0->setNumber(_140);
 }
@@ -660,7 +660,7 @@ void FileSelectItem::updateRotate() {
 }
 
 void FileSelectItem::playPointedME() {
-    switch (MR::getRandom(0l, 5l)) {
+    switch (MR::getRandom(0, 5)) {
     case 0:
         MR::startSystemME("ME_ASTRO_DOME_HIT_GALAXY1");
 
@@ -685,7 +685,7 @@ void FileSelectItem::playPointedME() {
 }
 
 void FileSelectItem::playPointedNotUsingME() {
-    switch (MR::getRandom(0l, 5l)) {
+    switch (MR::getRandom(0, 5)) {
     case 0:
         MR::startSystemME("ME_ASTRO_DOME_HIT_GALAXY_N1");
 
@@ -798,7 +798,7 @@ void FileSelectItem::deleteCompleteEffect() {
 
 namespace FileSelectItemSub {
 
-    ScaleController::ScaleController() : NerveExecutor("ファイルセレクタアイコンサイズ管理") {
+    ScaleController::ScaleController() : NerveExecutor("\x83\x74\x83\x40\x83\x43\x83\x8b\x83\x5a\x83\x8c\x83\x4e\x83\x5e\x83\x41\x83\x43\x83\x52\x83\x93\x83\x54\x83\x43\x83\x59\x8a\xc7\x97\x9d") {
         _8 = 1.0f;
         initNerve(GET_NERVE_DIRECT(FileSelectItemSub, ScaleControllerNrvSmall));
     }
@@ -821,7 +821,7 @@ namespace FileSelectItemSub {
         MR::setNerveAtStep(this, GET_NERVE_DIRECT(FileSelectItemSub, ScaleControllerNrvBig), 30);
     }
 
-    BlinkController::BlinkController(FileSelectItem* pItem) : NerveExecutor("ファイルセレクタアイコン瞬き管理") {
+    BlinkController::BlinkController(FileSelectItem* pItem) : NerveExecutor("\x83\x74\x83\x40\x83\x43\x83\x8b\x83\x5a\x83\x8c\x83\x4e\x83\x5e\x83\x41\x83\x43\x83\x52\x83\x93\x8f\x75\x82\xab\x8a\xc7\x97\x9d") {
         mItem = pItem;
         _C = 0;
         _10 = 0;
@@ -830,7 +830,7 @@ namespace FileSelectItemSub {
 
     void BlinkController::exeOpen() {
         if (MR::isFirstStep(this)) {
-            _C = MR::getRandom(180l, 300l);
+            _C = MR::getRandom(180, 300);
             _10 = 0;
         }
 

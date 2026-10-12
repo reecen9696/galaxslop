@@ -49,34 +49,34 @@ namespace {
         /* 0x08 */ const char* pSoundBV;
     };
 
-    const AnimSoundInfo sAnimSoundTable[] = {{"ジャンプ", "SE_BM_GHOST_MARIO_JUMP_S", "SE_BV_GHOST_MARIO_JUMP_S"},
-                                             {"ジャンプB", "SE_BM_GHOST_MARIO_JUMP_M", "SE_BV_GHOST_MARIO_JUMP_M"},
-                                             {"ジャンプC", "SE_BM_GHOST_MARIO_JUMP_L", "SE_BV_GHOST_MARIO_JUMP_L"},
-                                             {"壁ジャンプ", "SE_BM_GHOST_MARIO_JUMP_S", "SE_BV_GHOST_MARIO_JUMP_S"},
-                                             {"埋まり脱出ジャンプ", "SE_BM_GHOST_MARIO_JUMP_S", "SE_BV_GHOST_MARIO_JUMP_S"},
-                                             {"幅とび", "SE_BM_GHOST_MARIO_JUMP_L", "SE_BV_GHOST_MARIO_JUMP_L"},
-                                             {"しゃがみジャンプ", "SE_BM_GHOST_MARIO_JUMP_L", "SE_BV_GHOST_MARIO_JUMP_L"},
-                                             {"崖つかまり開始", nullptr, "SE_BV_GHOST_MARIO_HANG"},
-                                             {"崖つかまり終了", nullptr, "SE_BV_GHOST_MARIO_CLIMB"},
-                                             {"壁押し", nullptr, "SE_BV_GHOST_MARIO_HANG"},
-                                             {"ヒップドロップ開始", "SE_BM_GHOST_MARIO_HIP_DROP_TURN", "SE_BV_GHOST_MARIO_HIPDROP_S"},
-                                             {"ヒップドロップ着地", "SE_BM_GHOST_MARIO_HIP_DROP_LAND", "SE_BV_GHOST_MARIO_HIPDROP_E"},
-                                             {"埋まり脱出ジャンプ", "SE_BM_GHOST_MARIO_JUMP_S", "SE_BV_GHOST_MARIO_JUMP_S"},
-                                             {"水泳スピン", "SE_BM_GHOST_MARIO_SPIN", "SE_BV_GHOST_MARIO_SPIN"},
-                                             {"水泳ジェット開始", nullptr, "SE_BV_GHOST_MARIO_SWM_ACCEL"},
-                                             {"カメ持ちリング準備", nullptr, "SE_BV_GHOST_MARIO_TAKE"},
-                                             {"カメ持ちリング", nullptr, "SE_BV_GHOST_MARIO_SWM_ACCEL"},
-                                             {"投げ", nullptr, "SE_BV_GHOST_MARIO_THROW"},
-                                             {"空中ひねり", "SE_BM_GHOST_MARIO_SPIN", "SE_BV_GHOST_MARIO_SPIN"},
-                                             {"地上ひねり", "SE_BM_GHOST_MARIO_SPIN", "SE_BV_GHOST_MARIO_SPIN"},
-                                             {"空パンチ", "SE_BM_GHOST_MARIO_SPIN", "SE_BV_GHOST_MARIO_SPIN"},
-                                             {"アイスひねり", "SE_BM_GHOST_MARIO_SPIN", "SE_BV_GHOST_MARIO_SPIN"},
-                                             {"アイスひねり移動", "SE_BM_GHOST_MARIO_SPIN", "SE_BV_GHOST_MARIO_SPIN"},
-                                             {"スケートアクセルジャンプ", "SE_BM_GHOST_MARIO_JUMP_L", "SE_BV_GHOST_MARIO_JUMP_L"},
-                                             {"スケートジャンプ2", "SE_BM_GHOST_MARIO_JUMP_L", "SE_BV_GHOST_MARIO_JUMP_L"},
-                                             {"氷上力行右", nullptr, "SE_BV_GHOST_MARIO_JUMP_S"},
-                                             {"氷上力行左", nullptr, "SE_BV_GHOST_MARIO_JUMP_S"},
-                                             {"ショートジャンプ", "SE_BM_GHOST_MARIO_JUMP_S", "SE_BV_GHOST_MARIO_JUMP_S"}};
+    const AnimSoundInfo sAnimSoundTable[] = {{"\x83\x57\x83\x83\x83\x93\x83\x76", "SE_BM_GHOST_MARIO_JUMP_S", "SE_BV_GHOST_MARIO_JUMP_S"},
+                                             {"\x83\x57\x83\x83\x83\x93\x83\x76""B", "SE_BM_GHOST_MARIO_JUMP_M", "SE_BV_GHOST_MARIO_JUMP_M"},
+                                             {"\x83\x57\x83\x83\x83\x93\x83\x76""C", "SE_BM_GHOST_MARIO_JUMP_L", "SE_BV_GHOST_MARIO_JUMP_L"},
+                                             {"\x95\xc7\x83\x57\x83\x83\x83\x93\x83\x76", "SE_BM_GHOST_MARIO_JUMP_S", "SE_BV_GHOST_MARIO_JUMP_S"},
+                                             {"\x96\x84\x82\xdc\x82\xe8\x92\x45\x8f\x6f\x83\x57\x83\x83\x83\x93\x83\x76", "SE_BM_GHOST_MARIO_JUMP_S", "SE_BV_GHOST_MARIO_JUMP_S"},
+                                             {"\x95\x9d\x82\xc6\x82\xd1", "SE_BM_GHOST_MARIO_JUMP_L", "SE_BV_GHOST_MARIO_JUMP_L"},
+                                             {"\x82\xb5\x82\xe1\x82\xaa\x82\xdd\x83\x57\x83\x83\x83\x93\x83\x76", "SE_BM_GHOST_MARIO_JUMP_L", "SE_BV_GHOST_MARIO_JUMP_L"},
+                                             {"\x8a\x52\x82\xc2\x82\xa9\x82\xdc\x82\xe8\x8a\x4a\x8e\x6e", nullptr, "SE_BV_GHOST_MARIO_HANG"},
+                                             {"\x8a\x52\x82\xc2\x82\xa9\x82\xdc\x82\xe8\x8f\x49\x97\xb9", nullptr, "SE_BV_GHOST_MARIO_CLIMB"},
+                                             {"\x95\xc7\x89\x9f\x82\xb5", nullptr, "SE_BV_GHOST_MARIO_HANG"},
+                                             {"\x83\x71\x83\x62\x83\x76\x83\x68\x83\x8d\x83\x62\x83\x76\x8a\x4a\x8e\x6e", "SE_BM_GHOST_MARIO_HIP_DROP_TURN", "SE_BV_GHOST_MARIO_HIPDROP_S"},
+                                             {"\x83\x71\x83\x62\x83\x76\x83\x68\x83\x8d\x83\x62\x83\x76\x92\x85\x92\x6e", "SE_BM_GHOST_MARIO_HIP_DROP_LAND", "SE_BV_GHOST_MARIO_HIPDROP_E"},
+                                             {"\x96\x84\x82\xdc\x82\xe8\x92\x45\x8f\x6f\x83\x57\x83\x83\x83\x93\x83\x76", "SE_BM_GHOST_MARIO_JUMP_S", "SE_BV_GHOST_MARIO_JUMP_S"},
+                                             {"\x90\x85\x89\x6a\x83\x58\x83\x73\x83\x93", "SE_BM_GHOST_MARIO_SPIN", "SE_BV_GHOST_MARIO_SPIN"},
+                                             {"\x90\x85\x89\x6a\x83\x57\x83\x46\x83\x62\x83\x67\x8a\x4a\x8e\x6e", nullptr, "SE_BV_GHOST_MARIO_SWM_ACCEL"},
+                                             {"\x83\x4a\x83\x81\x8e\x9d\x82\xbf\x83\x8a\x83\x93\x83\x4f\x8f\x80\x94\xf5", nullptr, "SE_BV_GHOST_MARIO_TAKE"},
+                                             {"\x83\x4a\x83\x81\x8e\x9d\x82\xbf\x83\x8a\x83\x93\x83\x4f", nullptr, "SE_BV_GHOST_MARIO_SWM_ACCEL"},
+                                             {"\x93\x8a\x82\xb0", nullptr, "SE_BV_GHOST_MARIO_THROW"},
+                                             {"\x8b\xf3\x92\x86\x82\xd0\x82\xcb\x82\xe8", "SE_BM_GHOST_MARIO_SPIN", "SE_BV_GHOST_MARIO_SPIN"},
+                                             {"\x92\x6e\x8f\xe3\x82\xd0\x82\xcb\x82\xe8", "SE_BM_GHOST_MARIO_SPIN", "SE_BV_GHOST_MARIO_SPIN"},
+                                             {"\x8b\xf3\x83\x70\x83\x93\x83\x60", "SE_BM_GHOST_MARIO_SPIN", "SE_BV_GHOST_MARIO_SPIN"},
+                                             {"\x83\x41\x83\x43\x83\x58\x82\xd0\x82\xcb\x82\xe8", "SE_BM_GHOST_MARIO_SPIN", "SE_BV_GHOST_MARIO_SPIN"},
+                                             {"\x83\x41\x83\x43\x83\x58\x82\xd0\x82\xcb\x82\xe8\x88\xda\x93\xae", "SE_BM_GHOST_MARIO_SPIN", "SE_BV_GHOST_MARIO_SPIN"},
+                                             {"\x83\x58\x83\x50\x81\x5b\x83\x67\x83\x41\x83\x4e\x83\x5a\x83\x8b\x83\x57\x83\x83\x83\x93\x83\x76", "SE_BM_GHOST_MARIO_JUMP_L", "SE_BV_GHOST_MARIO_JUMP_L"},
+                                             {"\x83\x58\x83\x50\x81\x5b\x83\x67\x83\x57\x83\x83\x83\x93\x83\x76""2", "SE_BM_GHOST_MARIO_JUMP_L", "SE_BV_GHOST_MARIO_JUMP_L"},
+                                             {"\x95\x58\x8f\xe3\x97\xcd\x8d\x73\x89\x45", nullptr, "SE_BV_GHOST_MARIO_JUMP_S"},
+                                             {"\x95\x58\x8f\xe3\x97\xcd\x8d\x73\x8d\xb6", nullptr, "SE_BV_GHOST_MARIO_JUMP_S"},
+                                             {"\x83\x56\x83\x87\x81\x5b\x83\x67\x83\x57\x83\x83\x83\x93\x83\x76", "SE_BM_GHOST_MARIO_JUMP_S", "SE_BV_GHOST_MARIO_JUMP_S"}};
 
     static const AnimSoundInfo* getAnimSoundInfo(const char* pAnimName) {
         for (u32 i = 0; i < ARRAY_SIZE(sAnimSoundTable); i++) {
@@ -139,7 +139,7 @@ void GhostPlayer::init(const JMapInfoIter& rIter) {
     char gstPath[256];
     char arcPath[256];
 
-    mRaceManagerLayout = new RaceManagerLayout("レース管理用レイアウト");
+    mRaceManagerLayout = new RaceManagerLayout("\x83\x8c\x81\x5b\x83\x58\x8a\xc7\x97\x9d\x97\x70\x83\x8c\x83\x43\x83\x41\x83\x45\x83\x67");
     mRaceManagerLayout->init(rIter);
 
     mCurrentPacket = nullptr;
@@ -189,12 +189,12 @@ void GhostPlayer::init(const JMapInfoIter& rIter) {
     _90 = 0;
     mCameraInfo = nullptr;
     if (MR::isValidInfo(rIter)) {
-        MR::initMultiActorCamera(this, rIter, &mCameraInfo, "レース開始1");
-        MR::initMultiActorCamera(this, rIter, &mCameraInfo, "レース開始2");
-        MR::initMultiActorCamera(this, rIter, &mCameraInfo, "レース開始3");
-        MR::initMultiActorCamera(this, rIter, &mCameraInfo, "レース終了");
+        MR::initMultiActorCamera(this, rIter, &mCameraInfo, "\x83\x8c\x81\x5b\x83\x58\x8a\x4a\x8e\x6e""1");
+        MR::initMultiActorCamera(this, rIter, &mCameraInfo, "\x83\x8c\x81\x5b\x83\x58\x8a\x4a\x8e\x6e""2");
+        MR::initMultiActorCamera(this, rIter, &mCameraInfo, "\x83\x8c\x81\x5b\x83\x58\x8a\x4a\x8e\x6e""3");
+        MR::initMultiActorCamera(this, rIter, &mCameraInfo, "\x83\x8c\x81\x5b\x83\x58\x8f\x49\x97\xb9");
     }
-    mCameraTargetMtx = new CameraTargetMtx("カメラターゲットダミー");
+    mCameraTargetMtx = new CameraTargetMtx("\x83\x4a\x83\x81\x83\x89\x83\x5e\x81\x5b\x83\x51\x83\x62\x83\x67\x83\x5f\x83\x7e\x81\x5b");
     initNerve(GET_NERVE(GhostPlayer, HostTypeNrvWait));
     MR::needStageSwitchReadAppear(this, rIter);
     MR::syncStageSwitchAppear(this);
@@ -203,7 +203,7 @@ void GhostPlayer::init(const JMapInfoIter& rIter) {
     _112 = true;
     MR::getRotatedAxisZ(&mInitialDirection, mRotation);
     PSMTXCopy(getBaseMtx(), mTargetRotationMtx);
-    mJetTurtleShadow = new JetTurtleShadow("カメシャドウモデル");
+    mJetTurtleShadow = new JetTurtleShadow("\x83\x4a\x83\x81\x83\x56\x83\x83\x83\x68\x83\x45\x83\x82\x83\x66\x83\x8b");
     mJetTurtleShadow->initWithoutIter();
     mHandRPos = new FixedPosition(this, "HandR", TVec3f(15.59f, 42.5f, 42.93f), TVec3f(-17.05f, -0.7f, 113.55f));
     MR::declareStarPiece(this, 50);
@@ -296,27 +296,27 @@ void GhostPlayer::exePreStartDemo0() {
         TPos3f* cameraTargetMatrix = &mCameraTargetMtx->mMatrix;
         cameraTargetMatrix->set(getBaseMtx());
 
-        MR::startMultiActorCameraTargetOther(this, mCameraInfo, "レース開始1", CameraTargetArg(mCameraTargetMtx), -1);
-        warpPosition("ゴーストデモゴースト位置");
+        MR::startMultiActorCameraTargetOther(this, mCameraInfo, "\x83\x8c\x81\x5b\x83\x58\x8a\x4a\x8e\x6e""1", CameraTargetArg(mCameraTargetMtx), -1);
+        warpPosition("\x83\x53\x81\x5b\x83\x58\x83\x67\x83\x66\x83\x82\x83\x53\x81\x5b\x83\x58\x83\x67\x88\xca\x92\x75");
     }
 
     if (getNerveStep() == 1) {
         Mtx playerPosMtx;
         TVec3f playerPosVec;
 
-        MR::findNamePos("ゴーストデモマリオ位置", playerPosMtx);
+        MR::findNamePos("\x83\x53\x81\x5b\x83\x58\x83\x67\x83\x66\x83\x82\x83\x7d\x83\x8a\x83\x49\x88\xca\x92\x75", playerPosMtx);
         MR::extractMtxTrans(playerPosMtx, &playerPosVec);
         MR::setPlayerPosAndWait(playerPosVec);
         MR::setPlayerBaseMtx(playerPosMtx);
-        MR::startBckPlayerJ("レース見る");
+        MR::startBckPlayerJ("\x83\x8c\x81\x5b\x83\x58\x8c\xa9\x82\xe9");
         MR::resetPlayerEffect();
-        MR::tryStartDemo(this, "レース準備");
+        MR::tryStartDemo(this, "\x83\x8c\x81\x5b\x83\x58\x8f\x80\x94\xf5");
         MR::requestMovementOn(this);
         MR::requestMovementOnPlayer();
     }
     if (getNerveStep() == 60) {
         mIsHidden = false;
-        setAnimation("ゴースト出現");
+        setAnimation("\x83\x53\x81\x5b\x83\x58\x83\x67\x8f\x6f\x8c\xbb");
         MR::validateShadow(this, nullptr);
     }
     if (getNerveStep() == 107) {
@@ -329,19 +329,19 @@ void GhostPlayer::exePreStartDemo0() {
         MR::startSound(this, "SE_BV_GHOST_MARIO_PROVOKE");
     }
     if (getNerveStep() == 240) {
-        MR::endMultiActorCamera(this, mCameraInfo, "レース開始1", false, -1);
+        MR::endMultiActorCamera(this, mCameraInfo, "\x83\x8c\x81\x5b\x83\x58\x8a\x4a\x8e\x6e""1", false, -1);
         TPos3f* cameraTargetMatrix = &mCameraTargetMtx->mMatrix;
         cameraTargetMatrix->set(getBaseMtx());
-        MR::startMultiActorCameraTargetOther(this, mCameraInfo, "レース開始2", CameraTargetArg(mCameraTargetMtx), -1);
+        MR::startMultiActorCameraTargetOther(this, mCameraInfo, "\x83\x8c\x81\x5b\x83\x58\x8a\x4a\x8e\x6e""2", CameraTargetArg(mCameraTargetMtx), -1);
         setNerve(GET_NERVE(GhostPlayer, HostTypeNrvPreStartDemo1));
-        setAnimation("レース見る");
+        setAnimation("\x83\x8c\x81\x5b\x83\x58\x8c\xa9\x82\xe9");
     } else if (isRequestSkipDemo()) {
-        MR::endMultiActorCamera(this, mCameraInfo, "レース開始1", false, -1);
-        MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "レース開始3", -1);
+        MR::endMultiActorCamera(this, mCameraInfo, "\x83\x8c\x81\x5b\x83\x58\x8a\x4a\x8e\x6e""1", false, -1);
+        MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "\x83\x8c\x81\x5b\x83\x58\x8a\x4a\x8e\x6e""3", -1);
         setNerve(GET_NERVE(GhostPlayer, HostTypeNrvPreStartDemo2));
         if (getNerveStep() < 60) {
             mIsHidden = false;
-            setAnimation("ゴースト出現");
+            setAnimation("\x83\x53\x81\x5b\x83\x58\x83\x67\x8f\x6f\x8c\xbb");
             MR::validateShadow(this, nullptr);
         }
     }
@@ -356,12 +356,12 @@ bool GhostPlayer::isRequestSkipDemo() const {
 
 void GhostPlayer::exePreStartDemo1() {
     if (getNerveStep() == 240) {
-        MR::endMultiActorCamera(this, mCameraInfo, "レース開始2", false, -1);
-        MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "レース開始3", -1);
+        MR::endMultiActorCamera(this, mCameraInfo, "\x83\x8c\x81\x5b\x83\x58\x8a\x4a\x8e\x6e""2", false, -1);
+        MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "\x83\x8c\x81\x5b\x83\x58\x8a\x4a\x8e\x6e""3", -1);
         setNerve(GET_NERVE(GhostPlayer, HostTypeNrvPreStartDemo2));
     } else if (isRequestSkipDemo()) {
-        MR::endMultiActorCamera(this, mCameraInfo, "レース開始2", false, -1);
-        MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "レース開始3", -1);
+        MR::endMultiActorCamera(this, mCameraInfo, "\x83\x8c\x81\x5b\x83\x58\x8a\x4a\x8e\x6e""2", false, -1);
+        MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "\x83\x8c\x81\x5b\x83\x58\x8a\x4a\x8e\x6e""3", -1);
         setNerve(GET_NERVE(GhostPlayer, HostTypeNrvPreStartDemo2));
     }
 }
@@ -373,22 +373,22 @@ void GhostPlayer::exePreStartDemo2() {
         mRaceManagerLayout->playCountAndGo();
         mRaceManagerLayout->hideRecordPane();
         mRaceManagerLayout->hideBestRecordPane();
-        setAnimation("ゴーストレース開始");
-        MR::startBckPlayerJ("レース開始");
+        setAnimation("\x83\x53\x81\x5b\x83\x58\x83\x67\x83\x8c\x81\x5b\x83\x58\x8a\x4a\x8e\x6e");
+        MR::startBckPlayerJ("\x83\x8c\x81\x5b\x83\x58\x8a\x4a\x8e\x6e");
 
         Mtx raceStartMarioPos;
-        MR::findNamePos("レース開始時マリオ位置", raceStartMarioPos);
+        MR::findNamePos("\x83\x8c\x81\x5b\x83\x58\x8a\x4a\x8e\x6e\x8e\x9e\x83\x7d\x83\x8a\x83\x49\x88\xca\x92\x75", raceStartMarioPos);
         MR::setPlayerBaseMtx(raceStartMarioPos);
 
         mPosition = mStartPos;
-        MR::endDemo(this, "レース準備");
+        MR::endDemo(this, "\x83\x8c\x81\x5b\x83\x58\x8f\x80\x94\xf5");
     }
 
     if (MR::getPlayerTriggerZ()) {
-        MR::startBckPlayerJ("レースクラウチング開始");
+        MR::startBckPlayerJ("\x83\x8c\x81\x5b\x83\x58\x83\x4e\x83\x89\x83\x45\x83\x60\x83\x93\x83\x4f\x8a\x4a\x8e\x6e");
         MR::startSoundPlayer("SE_PV_SQUAT", -1);
     } else if (MR::testSubPadReleaseZ(WPAD_CHAN0)) {
-        MR::startBckPlayerJ("レース開始");
+        MR::startBckPlayerJ("\x83\x8c\x81\x5b\x83\x58\x8a\x4a\x8e\x6e");
     }
 
     if (getNerveStep() % 60 == 0) {
@@ -417,9 +417,9 @@ void GhostPlayer::exePreStartDemo2() {
         setNerve(GET_NERVE(GhostPlayer, HostTypeNrvRun));
         MR::onPlayerControl(true);
         MR::noticePlayerDashChance();
-        MR::startBckPlayerJ("基本");
+        MR::startBckPlayerJ("\x8a\xee\x96\x7b");
         MR::startSystemSE("SE_SY_RACE_START");
-        MR::endMultiActorCamera(this, mCameraInfo, "レース開始3", false, -1);
+        MR::endMultiActorCamera(this, mCameraInfo, "\x83\x8c\x81\x5b\x83\x58\x8a\x4a\x8e\x6e""3", false, -1);
     }
 }
 
@@ -431,13 +431,13 @@ void GhostPlayer::exeWinDemo() {
 
         TVec3f playerPosVec;
         Mtx playerPosMtx;
-        MR::findNamePos("負け時マリオ位置", playerPosMtx);
+        MR::findNamePos("\x95\x89\x82\xaf\x8e\x9e\x83\x7d\x83\x8a\x83\x49\x88\xca\x92\x75", playerPosMtx);
         MR::extractMtxTrans(playerPosMtx, &playerPosVec);
         MR::setPlayerPosAndWait(playerPosVec);
         MR::setPlayerBaseMtx(playerPosMtx);
 
-        MR::startBckPlayerJ("レース見る");
-        MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "レース終了", -1);
+        MR::startBckPlayerJ("\x83\x8c\x81\x5b\x83\x58\x8c\xa9\x82\xe9");
+        MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "\x83\x8c\x81\x5b\x83\x58\x8f\x49\x97\xb9", -1);
         mIsDemoCameraActive = true;
 
         HitSensor* sensorBody = getSensor("body");
@@ -452,9 +452,9 @@ void GhostPlayer::exeWinDemo() {
         MR::startSubBGM("BGM_RACE_LOSE", false);
         mRaceManagerLayout->appear();
         mRaceManagerLayout->playLose();
-        setAnimation("ゴースト勝利");
+        setAnimation("\x83\x53\x81\x5b\x83\x58\x83\x67\x8f\x9f\x97\x98");
         MR::startSound(this, "SE_BV_GHOST_MARIO_WIN");
-        MR::tryStartDemo(this, "レース終了");
+        MR::tryStartDemo(this, "\x83\x8c\x81\x5b\x83\x58\x8f\x49\x97\xb9");
         MR::requestMovementOn(this);
         MR::requestMovementOnPlayer();
         if (mPowerStarTarget != nullptr) {
@@ -470,20 +470,20 @@ void GhostPlayer::exeWinDemo() {
 
     if (MR::isStep(this, 180)) {
         if (mIsDemoCameraActive) {
-            MR::endMultiActorCamera(this, mCameraInfo, "レース終了", true, -1);
+            MR::endMultiActorCamera(this, mCameraInfo, "\x83\x8c\x81\x5b\x83\x58\x8f\x49\x97\xb9", true, -1);
             mIsDemoCameraActive = false;
         }
-        MR::endDemo(this, "レース終了");
+        MR::endDemo(this, "\x83\x8c\x81\x5b\x83\x58\x8f\x49\x97\xb9");
         MR::forceKillPlayerByGhostRace();
     }
 }
 
 void GhostPlayer::exeLostDemo() {
     if (MR::isFirstStep(this)) {
-        warpPosition("負け時マリオ位置");
+        warpPosition("\x95\x89\x82\xaf\x8e\x9e\x83\x7d\x83\x8a\x83\x49\x88\xca\x92\x75");
         mXanimePlayer->changeAnimation("DieSwimEvent");
         mVelocity.zero();
-        setAnimation("レース負け");
+        setAnimation("\x83\x8c\x81\x5b\x83\x58\x95\x89\x82\xaf");
     }
 }
 
@@ -514,10 +514,10 @@ void GhostPlayer::initAnimation() {
     mXanimePlayer = new XanimePlayer(MR::getJ3DModel(this), pResource);
     mXanimePlayer->duplicateSimpleGroup();
     mModelManager->mXanimePlayer = mXanimePlayer;
-    mXanimePlayer->setDefaultAnimation("基本");
+    mXanimePlayer->setDefaultAnimation("\x8a\xee\x96\x7b");
     mXanimePlayer->getCore()->enableJointTransform(MR::getJ3DModelData(this));
     mXanimePlayerUpper = new XanimePlayer(MR::getJ3DModel(this), pResource, mXanimePlayer);
-    mXanimePlayerUpper->changeAnimation("基本");
+    mXanimePlayerUpper->changeAnimation("\x8a\xee\x96\x7b");
 }
 
 void GhostPlayer::setAnimation(const char* pName) {
@@ -694,14 +694,14 @@ u32 GhostPlayer::receiveGhostPacket(GhostPacket* pPacket) {
         ::playSound(this, animName);
 
         bool isSpecialAnim = false;
-        if (strcmp(animName, "基本") == 0) {
+        if (strcmp(animName, "\x8a\xee\x96\x7b") == 0) {
             isSpecialAnim = true;
             setAnimationWeight(mAnimTrackWeights);
-        } else if (strcmp(animName, "壁押し") == 0) {
+        } else if (strcmp(animName, "\x95\xc7\x89\x9f\x82\xb5") == 0) {
             isSpecialAnim = true;
-        } else if (strcmp(animName, "しゃがみ歩き") == 0) {
+        } else if (strcmp(animName, "\x82\xb5\x82\xe1\x82\xaa\x82\xdd\x95\xe0\x82\xab") == 0) {
             isSpecialAnim = true;
-        } else if (strcmp(animName, "がんばり走り") == 0) {
+        } else if (strcmp(animName, "\x82\xaa\x82\xf1\x82\xce\x82\xe8\x91\x96\x82\xe8") == 0) {
             isSpecialAnim = true;
         }
 
@@ -719,41 +719,41 @@ u32 GhostPlayer::receiveGhostPacket(GhostPacket* pPacket) {
         const char* currentAnimName = mXanimePlayer->getCurrentAnimationName();
         ::playSound(this, currentAnimName);
 
-        if (strcmp(currentAnimName, "基本") == 0) {
+        if (strcmp(currentAnimName, "\x8a\xee\x96\x7b") == 0) {
             isSpecialAnim = true;
             setAnimationWeight(mAnimTrackWeights);
         }
-        if (strcmp(currentAnimName, "壁押し") == 0) {
+        if (strcmp(currentAnimName, "\x95\xc7\x89\x9f\x82\xb5") == 0) {
             isSpecialAnim = true;
         }
-        if (strcmp(currentAnimName, "しゃがみ歩き") == 0) {
+        if (strcmp(currentAnimName, "\x82\xb5\x82\xe1\x82\xaa\x82\xdd\x95\xe0\x82\xab") == 0) {
             isSpecialAnim = true;
         }
-        if (strcmp(currentAnimName, "がんばり走り") == 0) {
+        if (strcmp(currentAnimName, "\x82\xaa\x82\xf1\x82\xce\x82\xe8\x91\x96\x82\xe8") == 0) {
             isSpecialAnim = true;
         }
-        if (strcmp(currentAnimName, "スケートアクセルジャンプ") == 0) {
+        if (strcmp(currentAnimName, "\x83\x58\x83\x50\x81\x5b\x83\x67\x83\x41\x83\x4e\x83\x5a\x83\x8b\x83\x57\x83\x83\x83\x93\x83\x76") == 0) {
             isSpecialAnim = true;
         }
-        if (strcmp(currentAnimName, "スケートジャンプ2") == 0) {
+        if (strcmp(currentAnimName, "\x83\x58\x83\x50\x81\x5b\x83\x67\x83\x57\x83\x83\x83\x93\x83\x76""2") == 0) {
             isSpecialAnim = true;
         }
-        if (strcmp(currentAnimName, "スケートジャンプ3") == 0) {
+        if (strcmp(currentAnimName, "\x83\x58\x83\x50\x81\x5b\x83\x67\x83\x57\x83\x83\x83\x93\x83\x76""3") == 0) {
             isSpecialAnim = true;
         }
 
-        if (strstr(currentAnimName, "水泳ジェット") != nullptr) {
+        if (strstr(currentAnimName, "\x90\x85\x89\x6a\x83\x57\x83\x46\x83\x62\x83\x67") != nullptr) {
             mHasJetTurtle = true;
-        } else if (strstr(currentAnimName, "カメ持ち") != nullptr) {
+        } else if (strstr(currentAnimName, "\x83\x4a\x83\x81\x8e\x9d\x82\xbf") != nullptr) {
             mHasJetTurtle = true;
-        } else if (strstr(currentAnimName, "投げ") != nullptr) {
+        } else if (strstr(currentAnimName, "\x93\x8a\x82\xb0") != nullptr) {
             mHasJetTurtle = false;
             mXanimePlayerUpper->stopAnimation();
             MR::getJ3DModelData(this)->getJointTree().getJointNodePointer(MR::getJointIndex(this, "Spine1"))->setMtxCalc(nullptr);
         }
 
-        if (mHasJetTurtle && (strcmp(currentAnimName, "基本") != 0 || strcmp(currentAnimName, "ジャンプ") != 0)) {
-            mXanimePlayerUpper->changeAnimation("ひろいウエイト");
+        if (mHasJetTurtle && (strcmp(currentAnimName, "\x8a\xee\x96\x7b") != 0 || strcmp(currentAnimName, "\x83\x57\x83\x83\x83\x93\x83\x76") != 0)) {
+            mXanimePlayerUpper->changeAnimation("\x82\xd0\x82\xeb\x82\xa2\x83\x45\x83\x47\x83\x43\x83\x67");
             mXanimePlayerUpper->overWriteMtxCalc(MR::getJointIndex(this, "PartsControl"));
         }
 

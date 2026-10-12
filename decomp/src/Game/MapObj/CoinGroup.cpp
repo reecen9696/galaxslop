@@ -49,7 +49,7 @@ void CoinGroup::init(const JMapInfoIter& rIter) {
     placementCoin();
 
     if (MR::tryRegisterDemoCast(this, rIter)) {
-        MR::registerDemoActionFunctor(this, MR::Functor(this, &CoinGroup::appearCoinAll), "コイン出現");
+        MR::registerDemoActionFunctor(this, MR::Functor(this, &CoinGroup::appearCoinAll), "\x83\x52\x83\x43\x83\x93\x8f\x6f\x8c\xbb");
     } else if (MR::useStageSwitchReadAppear(this, rIter)) {
         MR::connectToSceneMapObjMovement(this);
         MR::syncStageSwitchAppear(this);
@@ -109,7 +109,7 @@ void CoinGroup::appear() {
     LiveActor::appear();
 
     if (isNerve(GET_NERVE(CoinGroup, CoinGroupNrvDemoAppear))) {
-        MR::requestStartDemo(this, "出現", GET_NERVE(CoinGroup, CoinGroupNrvDemoAppear), GET_NERVE(CoinGroup, CoinGroupNrvTryStartDemo));
+        MR::requestStartDemo(this, "\x8f\x6f\x8c\xbb", GET_NERVE(CoinGroup, CoinGroupNrvDemoAppear), GET_NERVE(CoinGroup, CoinGroupNrvTryStartDemo));
     }
 }
 
@@ -138,7 +138,7 @@ void CoinGroup::exeDemoAppear() {
     }
 
     if (MR::isGreaterStep(this, ::sDemoAppearTime)) {
-        MR::endDemo(this, "出現");
+        MR::endDemo(this, "\x8f\x6f\x8c\xbb");
         MR::endActorCamera(this, mCameraInfo, false, -1);
         setNerve(GET_NERVE(CoinGroup, CoinGroupNrvKill));
         kill();

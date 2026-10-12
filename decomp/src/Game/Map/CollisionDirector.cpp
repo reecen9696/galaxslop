@@ -7,7 +7,7 @@
 
 #define CATEGORY_KEEPER_NUM 4
 
-CollisionDirector::CollisionDirector() : NameObj("地形コリジョン"), mCategoryKeeper(), mCode() {
+CollisionDirector::CollisionDirector() : NameObj("\x92\x6e\x8c\x60\x83\x52\x83\x8a\x83\x57\x83\x87\x83\x93"), mCategoryKeeper(), mCode() {
     mCode = new CollisionCode();
     mCategoryKeeper = new CollisionCategorizedKeeper*[CATEGORY_KEEPER_NUM];
 

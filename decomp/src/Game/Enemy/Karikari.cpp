@@ -117,7 +117,7 @@ Karikari::Karikari(const char* pName)
 
 void Karikari::init(const JMapInfoIter& rIter) {
     MR::createSceneObj(SceneObj_KarikariDirector);
-    MR::joinToGroup(this, "カリカリディレクター");
+    MR::joinToGroup(this, "\x83\x4a\x83\x8a\x83\x4a\x83\x8a\x83\x66\x83\x42\x83\x8c\x83\x4e\x83\x5e\x81\x5b");
     MR::initDefaultPos(this, rIter);
     MR::useStageSwitchWriteDead(this, rIter);
     if (MR::useStageSwitchReadAppear(this, rIter)) {
@@ -768,7 +768,7 @@ bool Karikari::tryDPDAttacked() {
     // FIXME: TVec2 copy operations are done via memregs, not float regs
     // https://decomp.me/scratch/W6YWF
 
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         MR::startDPDHitSound();
         s32 padChannel = *MR::getStarPointerLastPointedPort(this);
         TVec2f pointerVel(*MR::getStarPointerScreenVelocity(padChannel));

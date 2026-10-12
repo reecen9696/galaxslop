@@ -817,11 +817,11 @@ void Hanachan::init(const JMapInfoIter& rIter) {
     MR::declareStarPiece(this, 6);
     appear();
 
-    mBodyParts[0] = new HanachanParts(this, 0, "頭パーツ", "HanachanHead");
-    mBodyParts[1] = new HanachanParts(this, 1, "体パーツ", "HanachanBodyS");
-    mBodyParts[2] = new HanachanParts(this, 2, "体パーツ", "HanachanBody");
-    mBodyParts[3] = new HanachanParts(this, 3, "体パーツ", "HanachanBodyS");
-    mBodyParts[4] = new HanachanParts(this, 4, "体パーツ", "HanachanBody");
+    mBodyParts[0] = new HanachanParts(this, 0, "\x93\xaa\x83\x70\x81\x5b\x83\x63", "HanachanHead");
+    mBodyParts[1] = new HanachanParts(this, 1, "\x91\xcc\x83\x70\x81\x5b\x83\x63", "HanachanBodyS");
+    mBodyParts[2] = new HanachanParts(this, 2, "\x91\xcc\x83\x70\x81\x5b\x83\x63", "HanachanBody");
+    mBodyParts[3] = new HanachanParts(this, 3, "\x91\xcc\x83\x70\x81\x5b\x83\x63", "HanachanBodyS");
+    mBodyParts[4] = new HanachanParts(this, 4, "\x91\xcc\x83\x70\x81\x5b\x83\x63", "HanachanBody");
 
     mBodyParts[0]->initWithoutIter();
     mBodyParts[1]->initWithoutIter();
@@ -1280,7 +1280,7 @@ void Hanachan::setDelayAllPartsAtId(s32 id, s32 delay, s32 step) {
 
 bool Hanachan::isStarPointerPointing() {
     for (s32 i = 0; i < mBodyParts.size(); i++) {
-        if (MR::isStarPointerPointing2POnPressButton(mBodyParts[i], "弱", true, false)) {
+        if (MR::isStarPointerPointing2POnPressButton(mBodyParts[i], "\x8e\xe3", true, false)) {
             return true;
         }
     }

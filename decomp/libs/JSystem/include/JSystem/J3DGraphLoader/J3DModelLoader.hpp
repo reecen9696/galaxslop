@@ -64,130 +64,130 @@ struct J3DModelInfoBlock : public J3DModelBlock {
     u16 mFlags;
     u32 mPacketNum;
     u32 mVtxNum;
-    void* mpHierarchy;
+    PTR32(void) mpHierarchy;
 };
 
 struct J3DVertexBlock : public J3DModelBlock {
-    void* mpVtxAttrFmtList;
-    void* mpVtxPosArray;
-    void* mpVtxNrmArray;
-    void* mpVtxNBTArray;
-    void* mpVtxColorArray[2];
-    void* mpVtxTexCoordArray[8];
+    PTR32(void) mpVtxAttrFmtList;
+    PTR32(void) mpVtxPosArray;
+    PTR32(void) mpVtxNrmArray;
+    PTR32(void) mpVtxNBTArray;
+    PTR32(void) mpVtxColorArray[2];
+    PTR32(void) mpVtxTexCoordArray[8];
 };
 
 struct J3DEnvelopeBlock : public J3DModelBlock {
     u16 mWEvlpMtxNum;
-    void* mpWEvlpMixMtxNum;
-    void* mpWEvlpMixIndex;
-    void* mpWEvlpMixWeight;
-    void* mpInvJointMtx;
+    PTR32(void) mpWEvlpMixMtxNum;
+    PTR32(void) mpWEvlpMixIndex;
+    PTR32(void) mpWEvlpMixWeight;
+    PTR32(void) mpInvJointMtx;
 };
 
 struct J3DDrawBlock : public J3DModelBlock {
     u16 mMtxNum;
-    void* mpDrawMtxFlag;
-    void* mpDrawMtxIndex;
+    PTR32(void) mpDrawMtxFlag;
+    PTR32(void) mpDrawMtxIndex;
 };
 
 struct J3DJointBlock : public J3DModelBlock {
     /* 0x08 */ u16 mJointNum;
-    /* 0x0C */ void* mpJointInitData;
-    /* 0x10 */ void* mpIndexTable;
-    /* 0x14 */ void* mpNameTable;
+    /* 0x0C */ PTR32(void) mpJointInitData;
+    /* 0x10 */ PTR32(void) mpIndexTable;
+    /* 0x14 */ PTR32(void) mpNameTable;
 };  // size 0x18
 
 struct J3DMaterialBlock : public J3DModelBlock {
     u16 mMaterialNum;
-    void* mpMaterialInitData;
-    void* mpMaterialID;
-    void* mpNameTable;
-    void* mpIndInitData;
-    void* mpCullMode;
-    void* mpMatColor;
-    void* mpColorChanNum;
-    void* mpColorChanInfo;
-    void* mpAmbColor;
-    void* mpLightInfo;
-    void* mpTexGenNum;
-    void* mpTexCoordInfo;
-    void* mpTexCoord2Info;
-    void* mpTexMtxInfo;
-    void* field_0x44;
-    void* mpTexNo;
-    void* mpTevOrderInfo;
-    void* mpTevColor;
-    void* mpTevKColor;
-    void* mpTevStageNum;
-    void* mpTevStageInfo;
-    void* mpTevSwapModeInfo;
-    void* mpTevSwapModeTableInfo;
-    void* mpFogInfo;
-    void* mpAlphaCompInfo;
-    void* mpBlendInfo;
-    void* mpZModeInfo;
-    void* mpZCompLoc;
-    void* mpDither;
-    void* mpNBTScaleInfo;
+    PTR32(void) mpMaterialInitData;
+    PTR32(void) mpMaterialID;
+    PTR32(void) mpNameTable;
+    PTR32(void) mpIndInitData;
+    PTR32(void) mpCullMode;
+    PTR32(void) mpMatColor;
+    PTR32(void) mpColorChanNum;
+    PTR32(void) mpColorChanInfo;
+    PTR32(void) mpAmbColor;
+    PTR32(void) mpLightInfo;
+    PTR32(void) mpTexGenNum;
+    PTR32(void) mpTexCoordInfo;
+    PTR32(void) mpTexCoord2Info;
+    PTR32(void) mpTexMtxInfo;
+    PTR32(void) field_0x44;
+    PTR32(void) mpTexNo;
+    PTR32(void) mpTevOrderInfo;
+    PTR32(void) mpTevColor;
+    PTR32(void) mpTevKColor;
+    PTR32(void) mpTevStageNum;
+    PTR32(void) mpTevStageInfo;
+    PTR32(void) mpTevSwapModeInfo;
+    PTR32(void) mpTevSwapModeTableInfo;
+    PTR32(void) mpFogInfo;
+    PTR32(void) mpAlphaCompInfo;
+    PTR32(void) mpBlendInfo;
+    PTR32(void) mpZModeInfo;
+    PTR32(void) mpZCompLoc;
+    PTR32(void) mpDither;
+    PTR32(void) mpNBTScaleInfo;
 };
 
 struct J3DMaterialBlock_v21 : public J3DModelBlock {
     u16 mMaterialNum;
-    void* mpMaterialInitData;
-    void* mpMaterialID;
-    void* mpNameTable;
-    void* mpCullMode;
-    void* mpMatColor;
-    void* mpColorChanNum;
-    void* mpColorChanInfo;
-    void* mpTexGenNum;
-    void* mpTexCoordInfo;
-    void* mpTexCoord2Info;
-    void* mpTexMtxInfo;
-    void* field_0x38;
-    void* mpTexNo;
-    void* mpTevOrderInfo;
-    void* mpTevColor;
-    void* mpTevKColor;
-    void* mpTevStageNum;
-    void* mpTevStageInfo;
-    void* mpTevSwapModeInfo;
-    void* mpTevSwapModeTableInfo;
-    void* mpFogInfo;
-    void* mpAlphaCompInfo;
-    void* mpBlendInfo;
-    void* mpZModeInfo;
-    void* mpZCompLoc;
-    void* mpDither;
-    void* mpNBTScaleInfo;
+    PTR32(void) mpMaterialInitData;
+    PTR32(void) mpMaterialID;
+    PTR32(void) mpNameTable;
+    PTR32(void) mpCullMode;
+    PTR32(void) mpMatColor;
+    PTR32(void) mpColorChanNum;
+    PTR32(void) mpColorChanInfo;
+    PTR32(void) mpTexGenNum;
+    PTR32(void) mpTexCoordInfo;
+    PTR32(void) mpTexCoord2Info;
+    PTR32(void) mpTexMtxInfo;
+    PTR32(void) field_0x38;
+    PTR32(void) mpTexNo;
+    PTR32(void) mpTevOrderInfo;
+    PTR32(void) mpTevColor;
+    PTR32(void) mpTevKColor;
+    PTR32(void) mpTevStageNum;
+    PTR32(void) mpTevStageInfo;
+    PTR32(void) mpTevSwapModeInfo;
+    PTR32(void) mpTevSwapModeTableInfo;
+    PTR32(void) mpFogInfo;
+    PTR32(void) mpAlphaCompInfo;
+    PTR32(void) mpBlendInfo;
+    PTR32(void) mpZModeInfo;
+    PTR32(void) mpZCompLoc;
+    PTR32(void) mpDither;
+    PTR32(void) mpNBTScaleInfo;
 };
 
 struct J3DMaterialDLBlock : public J3DModelBlock {
     u16 mMaterialNum;
-    void* mpDisplayListInit;
-    void* mpPatchingInfo;
-    void* mpCurrentMtxInfo;
-    void* mpMaterialMode;
-    void* _1C;
-    void* mpNameTable;
+    PTR32(void) mpDisplayListInit;
+    PTR32(void) mpPatchingInfo;
+    PTR32(void) mpCurrentMtxInfo;
+    PTR32(void) mpMaterialMode;
+    PTR32(void) _1C;
+    PTR32(void) mpNameTable;
 };
 
 struct J3DShapeBlock : public J3DModelBlock {
     u16 mShapeNum;          // 0x00
-    void* mpShapeInitData;  // 0x04
-    void* mpIndexTable;     // 0x08
-    void* mpNameTable;      // 0x0C
-    void* mpVtxDescList;
-    void* mpMtxTable;
-    void* mpDisplayListData;
-    void* mpMtxInitData;
-    void* mpDrawInitData;
+    PTR32(void) mpShapeInitData;  // 0x04
+    PTR32(void) mpIndexTable;     // 0x08
+    PTR32(void) mpNameTable;      // 0x0C
+    PTR32(void) mpVtxDescList;
+    PTR32(void) mpMtxTable;
+    PTR32(void) mpDisplayListData;
+    PTR32(void) mpMtxInitData;
+    PTR32(void) mpDrawInitData;
 };
 
 struct J3DTextureBlock : public J3DModelBlock {
     u16 mTextureNum;
-    void* mpTextureRes;
-    void* mpNameTable;
+    PTR32(void) mpTextureRes;
+    PTR32(void) mpNameTable;
 };
 
 class J3DModelLoader {

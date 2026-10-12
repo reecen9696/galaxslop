@@ -7,6 +7,7 @@
 #include "Game/Util/MathUtil.hpp"
 #include "Game/Util/ObjUtil.hpp"
 #include <cstdio>
+#include <cstdlib>
 
 const GXLightID cLightDataIDs[8] = {GX_LIGHT0, GX_LIGHT1, GX_LIGHT2, GX_LIGHT3, GX_LIGHT4, GX_LIGHT5, GX_LIGHT6, GX_LIGHT7};
 
@@ -170,8 +171,38 @@ namespace {
         GXLoadLightObjImm(&lightObj, lightID);
     }
 
+#ifdef TARGET_PC
+    // In the VR diorama the actors are seen from the headset, not from the
+    // game camera.  Lights that follow the camera (positions given in view
+    // space: nearly all character lights) follow the headset instead, and
+    // so does the rim light on the camera (GX_LIGHT2): lit from the game
+    // camera, a face seen from the front took the rim light across it.
+    // Returns the view space position of `rCameraRel` placed relative to the
+    // headset (x right, y up, z back, as in view space).
+    bool vrCameraLightPos(TVec3f* pViewPos, const TVec3f& rCameraRel) {
+        static const bool sOff = getenv("PETARI_VRLIGHT_OFF") != nullptr;  // debug: the game camera's lights
+        f32 head[12], tanX, tanY;
+        if (sOff || !port_vr_cull_view(head, &tanX, &tanY)) {
+            return false;
+        }
+        // Columns: the headset's left, up and forward axes and its position.
+        TVec3f world(head[3], head[7], head[11]);
+        for (int i = 0; i < 3; i++) {
+            f32 axis[3] = {-rCameraRel.x, rCameraRel.y, -rCameraRel.z};
+            world.x += head[0 * 4 + i] * axis[i];
+            world.y += head[1 * 4 + i] * axis[i];
+            world.z += head[2 * 4 + i] * axis[i];
+        }
+        MR::getCameraViewMtx().mult(world, *pViewPos);
+        return true;
+    }
+#endif
+
     inline void loadCameraLight(const LightInfo& rInfo, GXLightID lightID) {
         TVec3f position(rInfo.mPos);
+#ifdef TARGET_PC
+        vrCameraLightPos(&position, TVec3f(rInfo.mPos));
+#endif
         ::loadLightDiffuse(GXColor(rInfo.mColor), position, lightID);
     }
 
@@ -192,7 +223,11 @@ void LightFunction::loadActorLightInfo(const ActorLightInfo* pInfo) {
 
     u8 alpha = pInfo->mAlpha2;
     GXColor c = {0, 0, 0, alpha};
-    ::loadLightDiffuse(c, TVec3f(0.0f, 0.0f, 0.0f), GX_LIGHT2);
+    TVec3f rimPos(0.0f, 0.0f, 0.0f);  // on the camera
+#ifdef TARGET_PC
+    vrCameraLightPos(&rimPos, TVec3f(0.0f, 0.0f, 0.0f));
+#endif
+    ::loadLightDiffuse(c, rimPos, GX_LIGHT2);
     GXSetChanAmbColor(GX_COLOR0A0, GXColor(pInfo->mColor));
 }
 

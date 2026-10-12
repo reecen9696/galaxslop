@@ -84,7 +84,7 @@ bool MarioActor::checkBeeWallStick(TVec3f& rVec) {
         _240 = rVec;
         mMario->setGravityVec(rVec);
         mMario->setHeadVec(-rVec);
-        mMario->setFrontVecKeepUp(head, 1UL);
+        mMario->setFrontVecKeepUp(head, 1U);
         setBlendMtxTimer(2);
 
         _38C = 5;
@@ -215,7 +215,7 @@ void MarioActor::updateGravityVec(bool reset, bool usePosition) {
                     mMario->_430 = 0;
                 }
 
-                changeAnimation("ショートジャンプ");
+                changeAnimation("\x83\x56\x83\x87\x81\x5b\x83\x67\x83\x57\x83\x83\x83\x93\x83\x76");
                 resetGround = true;
             }
 

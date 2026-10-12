@@ -38,7 +38,7 @@ void BallBeamer::makeArchiveList(NameObjArchiveListCollector* pCollector, const 
 }
 
 void BallBeamer::init(const JMapInfoIter& rIter) {
-    initModelManagerWithAnm("BallBeamer", nullptr, nullptr);
+    initModelManagerWithAnm("BallBeamer", 0, 0);
     MR::initDefaultPos(this, rIter);
     mPosition.y = mPosition.y - 50.0f;
     MR::connectToSceneEnemy(this);
@@ -46,8 +46,8 @@ void BallBeamer::init(const JMapInfoIter& rIter) {
     initHitSensor(1);
     MR::addHitSensorPush(this, "Body", 8, 120.0f, TVec3f(0.0f, -20.0f, 0.0f));
     MR::initShadowVolumeSphere(this, 120.0f);
-    initEffectKeeper(3, nullptr, nullptr);
-    initSound(2, nullptr);
+    initEffectKeeper(3, 0, 0);
+    initSound(2, 0);
     initNerve(GET_NERVE(BallBeamer, BallBeamerNrvWait));
     makeActorAppeared();
     if (MR::useStageSwitchReadA(this, rIter)) {
@@ -70,9 +70,9 @@ void BallBeamer::init(const JMapInfoIter& rIter) {
     MR::getJMapInfoArg2NoInit(rIter, &arg2);
     for (int i = 0; i < 12; i++) {
         if (arg2 == 0) {
-            mBeams[i] = new RingBeam("リングビーム", this, true, true);
+            mBeams[i] = new RingBeam("\x83\x8a\x83\x93\x83\x4f\x83\x72\x81\x5b\x83\x80", this, true, true);
         } else {
-            mBeams[i] = new RingBeam("リングビーム", this, true, false);
+            mBeams[i] = new RingBeam("\x83\x8a\x83\x93\x83\x4f\x83\x72\x81\x5b\x83\x80", this, true, false);
         }
         mBeams[i]->init(rIter);
         mBeams[i]->setSpeed(arg0);

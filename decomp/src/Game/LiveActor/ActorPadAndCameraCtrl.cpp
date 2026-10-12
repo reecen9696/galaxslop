@@ -115,19 +115,19 @@ namespace {
             return;
         }
 
-        if (MR::isEqualStringCase(pName, "最強")) {
+        if (MR::isEqualStringCase(pName, "\x8d\xc5\x8b\xad")) {
             MR::shakeCameraVeryStrong();
-        } else if (MR::isEqualStringCase(pName, "強")) {
+        } else if (MR::isEqualStringCase(pName, "\x8b\xad")) {
             MR::shakeCameraStrong();
-        } else if (MR::isEqualStringCase(pName, "中強")) {
+        } else if (MR::isEqualStringCase(pName, "\x92\x86\x8b\xad")) {
             MR::shakeCameraNormalStrong();
-        } else if (MR::isEqualStringCase(pName, "中")) {
+        } else if (MR::isEqualStringCase(pName, "\x92\x86")) {
             MR::shakeCameraNormal();
-        } else if (MR::isEqualStringCase(pName, "中弱")) {
+        } else if (MR::isEqualStringCase(pName, "\x92\x86\x8e\xe3")) {
             MR::shakeCameraNormalWeak();
-        } else if (MR::isEqualStringCase(pName, "弱")) {
+        } else if (MR::isEqualStringCase(pName, "\x8e\xe3")) {
             MR::shakeCameraWeak();
-        } else if (MR::isEqualStringCase(pName, "最弱")) {
+        } else if (MR::isEqualStringCase(pName, "\x8d\xc5\x8e\xe3")) {
             MR::shakeCameraVeryWeak();
         }
     }

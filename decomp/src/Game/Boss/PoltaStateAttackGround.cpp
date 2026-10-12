@@ -14,7 +14,7 @@ namespace NrvPoltaStateAttackGround {
     NEW_NERVE(PoltaStateAttackGroundNrvToWait, PoltaStateAttackGround, ToWait);
 };  // namespace NrvPoltaStateAttackGround
 
-PoltaStateAttackGround::PoltaStateAttackGround(Polta* pPolta) : ActorStateBase< Polta >("[state]地面叩き攻撃", pPolta), mIsAffectBody(true) {
+PoltaStateAttackGround::PoltaStateAttackGround(Polta* pPolta) : ActorStateBase< Polta >("[state]\x92\x6e\x96\xca\x92\x40\x82\xab\x8d\x55\x8c\x82", pPolta), mIsAffectBody(true) {
     initNerve(GET_NERVE(PoltaStateAttackGround, PoltaStateAttackGroundNrvStart));
     mAttackStartLength = MR::getBckFrameMax(getHost(), "AttackFrontStart");
     mAttackLength = MR::getBckFrameMax(getHost(), "AttackFront");

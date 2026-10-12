@@ -26,7 +26,7 @@ ElectricBall::Ball::Ball() : mHost(), mPosition(gZeroVec), mIsActive() {
 }
 
 void ElectricBall::Ball::init(LiveActor* pActor) {
-    mHost = new PartsModel(pActor, "ビリビリボール", "ElectricBall", nullptr, -1, false);
+    mHost = new PartsModel(pActor, "\x83\x72\x83\x8a\x83\x72\x83\x8a\x83\x7b\x81\x5b\x83\x8b", "ElectricBall", nullptr, -1, false);
     mHost->initWithoutIter();
     mHost->makeActorAppeared();
 

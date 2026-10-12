@@ -36,7 +36,7 @@ void KoopaStateAttackShockWave_FORCE_MATCH_SDATA2() {
 }
 
 KoopaStateAttackShockWave::KoopaStateAttackShockWave(Koopa* pKoopa)
-    : ActorStateBase< Koopa >("State[衝撃波攻撃]", pKoopa), mMaxAttacks(1), mAttacks(), mJumpVelocity(::sJumpSpeed), mGravity(::sJumpGravity),
+    : ActorStateBase< Koopa >("State[\x8f\xd5\x8c\x82\x94\x67\x8d\x55\x8c\x82]", pKoopa), mMaxAttacks(1), mAttacks(), mJumpVelocity(::sJumpSpeed), mGravity(::sJumpGravity),
       mJumpDelay(::sLandStep) {
 }
 

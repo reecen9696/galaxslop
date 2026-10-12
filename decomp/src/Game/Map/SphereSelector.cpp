@@ -31,14 +31,14 @@ namespace NrvSphereSelector {
 };  // namespace NrvSphereSelector
 
 SphereSelector::SphereSelector()
-    : LiveActor("スフィアセレクター"), mSphereGroup(), mHandle(), mSelectedTarget(), _98(), mPointingTarget(), _A4(), _A8(0.0f, 0.0f),
+    : LiveActor("\x83\x58\x83\x74\x83\x42\x83\x41\x83\x5a\x83\x8c\x83\x4e\x83\x5e\x81\x5b"), mSphereGroup(), mHandle(), mSelectedTarget(), _98(), mPointingTarget(), _A4(), _A8(0.0f, 0.0f),
       mIsPointingInvalid(), _B1() {
 }
 
 void SphereSelector::init(const JMapInfoIter& rIter) {
     MR::connectToSceneMapObjDecorationMovement(this);
     MR::invalidateClipping(this);
-    mSphereGroup = new LiveActorGroup("スフィアセレクターアクターグループ", 32);
+    mSphereGroup = new LiveActorGroup("\x83\x58\x83\x74\x83\x42\x83\x41\x83\x5a\x83\x8c\x83\x4e\x83\x5e\x81\x5b\x83\x41\x83\x4e\x83\x5e\x81\x5b\x83\x4f\x83\x8b\x81\x5b\x83\x76", 32);
     initNerve(GET_NERVE(SphereSelector, SphereSelectorNrvSelectStart));
     makeActorDead();
 }
@@ -119,7 +119,7 @@ bool SphereSelector::isMoveClickedPos() const {
 }
 
 void SphereSelector::playSelectedME() {
-    switch (MR::getRandom(0L, 4L)) {
+    switch (MR::getRandom(0, 4)) {
     case 0:
         MR::startSystemME("ME_ASTRO_DOME_SELECT1");
         break;
@@ -136,7 +136,7 @@ void SphereSelector::playSelectedME() {
 }
 
 void SphereSelector::playCanceledME() {
-    switch (MR::getRandom(0L, 4L)) {
+    switch (MR::getRandom(0, 4)) {
     case 0:
         MR::startSystemME("ME_ASTRO_DOME_CALCEL1");
         break;

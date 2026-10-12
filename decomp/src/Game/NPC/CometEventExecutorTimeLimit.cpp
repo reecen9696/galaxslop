@@ -15,7 +15,7 @@ namespace NrvCometEventExecutorTimeLimit {
 };  // namespace NrvCometEventExecutorTimeLimit
 
 CometEventExecutorTimeLimit::CometEventExecutorTimeLimit(u32 timeLimit)
-    : LiveActor("制限時間コメット実行者"), mTimeLimitLayout(nullptr), mTimeLimit(timeLimit) {
+    : LiveActor("\x90\xa7\x8c\xc0\x8e\x9e\x8a\xd4\x83\x52\x83\x81\x83\x62\x83\x67\x8e\xc0\x8d\x73\x8e\xd2"), mTimeLimitLayout(nullptr), mTimeLimit(timeLimit) {
 }
 
 void CometEventExecutorTimeLimit::init(const JMapInfoIter&) {

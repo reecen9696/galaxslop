@@ -4,7 +4,7 @@
 #include "Game/Util/SceneUtil.hpp"
 #include "Game/Util/StringUtil.hpp"
 
-NamePosHolder::NamePosHolder() : NameObj("位置テーブル保持"), mPosNum(), mInfos() {
+NamePosHolder::NamePosHolder() : NameObj("\x88\xca\x92\x75\x83\x65\x81\x5b\x83\x75\x83\x8b\x95\xdb\x8e\x9d"), mPosNum(), mInfos() {
     mPosNum = MR::getGeneralPosNum();
     mInfos = new NamePosInfo[mPosNum];
 

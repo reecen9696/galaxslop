@@ -7,8 +7,8 @@
 
 namespace {
     const char* const cGrandStarReturnDemoTable[] = {
-        "グランドスター１帰還", "グランドスター２帰還", "グランドスター３帰還",
-        "グランドスター４帰還", "グランドスター５帰還", "グランドスター６帰還",
+        "\x83\x4f\x83\x89\x83\x93\x83\x68\x83\x58\x83\x5e\x81\x5b\x82\x50\x8b\x41\x8a\xd2", "\x83\x4f\x83\x89\x83\x93\x83\x68\x83\x58\x83\x5e\x81\x5b\x82\x51\x8b\x41\x8a\xd2", "\x83\x4f\x83\x89\x83\x93\x83\x68\x83\x58\x83\x5e\x81\x5b\x82\x52\x8b\x41\x8a\xd2",
+        "\x83\x4f\x83\x89\x83\x93\x83\x68\x83\x58\x83\x5e\x81\x5b\x82\x53\x8b\x41\x8a\xd2", "\x83\x4f\x83\x89\x83\x93\x83\x68\x83\x58\x83\x5e\x81\x5b\x82\x54\x8b\x41\x8a\xd2", "\x83\x4f\x83\x89\x83\x93\x83\x68\x83\x58\x83\x5e\x81\x5b\x82\x55\x8b\x41\x8a\xd2",
     };
 };  // namespace
 
@@ -45,22 +45,22 @@ namespace AstroDemoFunction {
 
     void tryRegisterAstroDemoAll(LiveActor* pParam1, const JMapInfoIter& rIter) {
         AstroDemoFunction::tryRegisterGrandStarReturn(pParam1, rIter);
-        AstroDemoFunction::tryRegisterDemo(pParam1, "グランドスター帰還[２回目以降]", rIter);
-        AstroDemoFunction::tryRegisterDemo(pParam1, "パワースター帰還", rIter);
-        AstroDemoFunction::tryRegisterDemo(pParam1, "ロゼッタ状況説明デモ", rIter);
-        AstroDemoFunction::tryRegisterDemo(pParam1, "ロゼッタ最終決戦デモ", rIter);
-        AstroDemoFunction::tryRegisterDemo(pParam1, "ロゼッタコメット説明デモ", rIter);
-        AstroDemoFunction::tryRegisterDemo(pParam1, "ロゼッタトーチの炎説明デモ", rIter);
-        AstroDemoFunction::tryRegisterDemo(pParam1, "ロゼッタトーチの炎進捗デモ", rIter);
-        AstroDemoFunction::tryRegisterDemo(pParam1, "ロゼッタ天文台機能回復デモ", rIter);
-        AstroDemoFunction::tryRegisterDemo(pParam1, "ロゼッタキノピオ探検隊デモ", rIter);
-        AstroDemoFunction::tryRegisterDemo(pParam1, "ルイージ失踪デモ", rIter);
-        AstroDemoFunction::tryRegisterDemo(pParam1, "ロゼッタカウントダウン開始デモ", rIter);
-        AstroDemoFunction::tryRegisterDemo(pParam1, "ロゼッタノーマルエンディング後デモ", rIter);
-        AstroDemoFunction::tryRegisterDemo(pParam1, "ロゼッタ銀河の中心説明デモ", rIter);
-        AstroDemoFunction::tryRegisterDemo(pParam1, "ロゼッタルイージデモ", rIter);
-        AstroDemoFunction::tryRegisterDemo(pParam1, "バトラーグリーンドライバ説明", rIter);
-        AstroDemoFunction::tryRegisterDemo(pParam1, "バトラーマップレクチャー", rIter);
+        AstroDemoFunction::tryRegisterDemo(pParam1, "\x83\x4f\x83\x89\x83\x93\x83\x68\x83\x58\x83\x5e\x81\x5b\x8b\x41\x8a\xd2[\x82\x51\x89\xf1\x96\xda\x88\xc8\x8d\x7e]", rIter);
+        AstroDemoFunction::tryRegisterDemo(pParam1, "\x83\x70\x83\x8f\x81\x5b\x83\x58\x83\x5e\x81\x5b\x8b\x41\x8a\xd2", rIter);
+        AstroDemoFunction::tryRegisterDemo(pParam1, "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x8f\xf3\x8b\xb5\x90\xe0\x96\xbe\x83\x66\x83\x82", rIter);
+        AstroDemoFunction::tryRegisterDemo(pParam1, "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x8d\xc5\x8f\x49\x8c\x88\x90\xed\x83\x66\x83\x82", rIter);
+        AstroDemoFunction::tryRegisterDemo(pParam1, "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x83\x52\x83\x81\x83\x62\x83\x67\x90\xe0\x96\xbe\x83\x66\x83\x82", rIter);
+        AstroDemoFunction::tryRegisterDemo(pParam1, "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x83\x67\x81\x5b\x83\x60\x82\xcc\x89\x8a\x90\xe0\x96\xbe\x83\x66\x83\x82", rIter);
+        AstroDemoFunction::tryRegisterDemo(pParam1, "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x83\x67\x81\x5b\x83\x60\x82\xcc\x89\x8a\x90\x69\x92\xbb\x83\x66\x83\x82", rIter);
+        AstroDemoFunction::tryRegisterDemo(pParam1, "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x93\x56\x95\xb6\x91\xe4\x8b\x40\x94\x5c\x89\xf1\x95\x9c\x83\x66\x83\x82", rIter);
+        AstroDemoFunction::tryRegisterDemo(pParam1, "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x83\x4c\x83\x6d\x83\x73\x83\x49\x92\x54\x8c\x9f\x91\xe0\x83\x66\x83\x82", rIter);
+        AstroDemoFunction::tryRegisterDemo(pParam1, "\x83\x8b\x83\x43\x81\x5b\x83\x57\x8e\xb8\xe7\x48\x83\x66\x83\x82", rIter);
+        AstroDemoFunction::tryRegisterDemo(pParam1, "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x83\x4a\x83\x45\x83\x93\x83\x67\x83\x5f\x83\x45\x83\x93\x8a\x4a\x8e\x6e\x83\x66\x83\x82", rIter);
+        AstroDemoFunction::tryRegisterDemo(pParam1, "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x83\x6d\x81\x5b\x83\x7d\x83\x8b\x83\x47\x83\x93\x83\x66\x83\x42\x83\x93\x83\x4f\x8c\xe3\x83\x66\x83\x82", rIter);
+        AstroDemoFunction::tryRegisterDemo(pParam1, "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x8b\xe2\x89\xcd\x82\xcc\x92\x86\x90\x53\x90\xe0\x96\xbe\x83\x66\x83\x82", rIter);
+        AstroDemoFunction::tryRegisterDemo(pParam1, "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x83\x8b\x83\x43\x81\x5b\x83\x57\x83\x66\x83\x82", rIter);
+        AstroDemoFunction::tryRegisterDemo(pParam1, "\x83\x6f\x83\x67\x83\x89\x81\x5b\x83\x4f\x83\x8a\x81\x5b\x83\x93\x83\x68\x83\x89\x83\x43\x83\x6f\x90\xe0\x96\xbe", rIter);
+        AstroDemoFunction::tryRegisterDemo(pParam1, "\x83\x6f\x83\x67\x83\x89\x81\x5b\x83\x7d\x83\x62\x83\x76\x83\x8c\x83\x4e\x83\x60\x83\x83\x81\x5b", rIter);
     }
 
     void tryRegisterGrandStarReturn(LiveActor* pParam1, const JMapInfoIter& rIter) {
@@ -126,8 +126,8 @@ namespace AstroDemoFunction {
 
     void tryRegisterDemoForLuigiAndKinopio(LiveActor* pParam1, const JMapInfoIter& rIter) {
         AstroDemoFunction::tryRegisterGrandStarReturn(pParam1, rIter);
-        AstroDemoFunction::tryRegisterDemo(pParam1, "ロゼッタルイージデモ", rIter);
-        AstroDemoFunction::tryRegisterDemo(pParam1, "バトラーグリーンドライバ説明", rIter);
-        AstroDemoFunction::tryRegisterDemo(pParam1, "ロゼッタ最終決戦デモ", rIter);
+        AstroDemoFunction::tryRegisterDemo(pParam1, "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x83\x8b\x83\x43\x81\x5b\x83\x57\x83\x66\x83\x82", rIter);
+        AstroDemoFunction::tryRegisterDemo(pParam1, "\x83\x6f\x83\x67\x83\x89\x81\x5b\x83\x4f\x83\x8a\x81\x5b\x83\x93\x83\x68\x83\x89\x83\x43\x83\x6f\x90\xe0\x96\xbe", rIter);
+        AstroDemoFunction::tryRegisterDemo(pParam1, "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x8d\xc5\x8f\x49\x8c\x88\x90\xed\x83\x66\x83\x82", rIter);
     }
 };  // namespace AstroDemoFunction

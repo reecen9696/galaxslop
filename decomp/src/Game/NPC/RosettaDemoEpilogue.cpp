@@ -11,10 +11,10 @@ namespace NrvRosettaDemoEpilogue {
 };  // namespace NrvRosettaDemoEpilogue
 
 RosettaDemoEpilogue::RosettaDemoEpilogue(Rosetta* pRosetta, const JMapInfoIter& rIter)
-    : NerveExecutor("ロゼッタデモ実行者"), mRosetta(pRosetta), mIsFadeOut() {
+    : NerveExecutor("\x83\x8d\x83\x5b\x83\x62\x83\x5e\x83\x66\x83\x82\x8e\xc0\x8d\x73\x8e\xd2"), mRosetta(pRosetta), mIsFadeOut() {
     DemoFunction::tryCreateDemoTalkAnimCtrlForScene(pRosetta, rIter, "DemoEpilogueB", nullptr, 0, 0);
     DemoFunction::registerDemoTalkMessageCtrl(mRosetta, mRosetta->mMsgCtrl);
-    MR::registerDemoActionFunctor(mRosetta, MR::Functor(this, &RosettaDemoEpilogue::startDemo), "エピローグ[開始]");
+    MR::registerDemoActionFunctor(mRosetta, MR::Functor(this, &RosettaDemoEpilogue::startDemo), "\x83\x47\x83\x73\x83\x8d\x81\x5b\x83\x4f[\x8a\x4a\x8e\x6e]");
     mRosetta->mLodCtrl->invalidate();
     initNerve(GET_NERVE(RosettaDemoEpilogue, RosettaDemoEpilogueNrvDemo));
 }
@@ -26,7 +26,7 @@ void RosettaDemoEpilogue::startDemo() {
 }
 
 void RosettaDemoEpilogue::exeDemo() {
-    if (MR::isDemoPartActive("エピローグ[フェードアウト]")) {
+    if (MR::isDemoPartActive("\x83\x47\x83\x73\x83\x8d\x81\x5b\x83\x4f[\x83\x74\x83\x46\x81\x5b\x83\x68\x83\x41\x83\x45\x83\x67]")) {
         mIsFadeOut = true;
     }
 

@@ -4,7 +4,7 @@
 
 class CameraSubjective : public Camera {
 public:
-    CameraSubjective(const char* pName = "主観カメラ");
+    CameraSubjective(const char* pName = "\x8e\xe5\x8a\xcf\x83\x4a\x83\x81\x83\x89");
 
     virtual void reset();
     virtual CameraTargetObj* calc();

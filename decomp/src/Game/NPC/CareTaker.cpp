@@ -144,7 +144,7 @@ void Caretaker::init(const JMapInfoIter& rIter) {
         mBombTimerLayout->setTimeLimit(mTidyTimeLimit * 60);
         mBombTimerLayout->kill();
 
-        _168 = MR::joinToGroupArray(this, rIter, "ゴミ管理", 32);
+        _168 = MR::joinToGroupArray(this, rIter, "\x83\x53\x83\x7e\x8a\xc7\x97\x9d", 32);
 
         if (mMsgCtrl != nullptr) {
             MR::registerBranchFunc(getMsgCtrl(), TalkMessageFunc(this, &Caretaker::branchFuncStar));
@@ -364,7 +364,7 @@ void Caretaker::exePreTalk() {
     }
 
     if (MR::tryTalkSelectLeft(mMsgCtrl)) {
-        MR::tryStartDemoMarioPuppetableWithoutCinemaFrame(this, "ゴミ掃除タイムアタック");
+        MR::tryStartDemoMarioPuppetableWithoutCinemaFrame(this, "\x83\x53\x83\x7e\x91\x7c\x8f\x9c\x83\x5e\x83\x43\x83\x80\x83\x41\x83\x5e\x83\x62\x83\x4e");
         MR::startAction(this, "Wait");
         MR::startBckPlayer("Watch");
         setNerve(GET_NERVE(Caretaker, CaretakerNrvPreWipeOut));
@@ -388,7 +388,7 @@ void Caretaker::exePreWipeOut() {
     MR::setRailCoordSpeed(this, 0.0f);
     MR::setRailCoord(this, 0.0f);
     MR::setDefaultPose(this);
-    MR::setPlayerPosOnGroundAndWait("バトルシップ・タイムアタック前位置");
+    MR::setPlayerPosOnGroundAndWait("\x83\x6f\x83\x67\x83\x8b\x83\x56\x83\x62\x83\x76\x81\x45\x83\x5e\x83\x43\x83\x80\x83\x41\x83\x5e\x83\x62\x83\x4e\x91\x4f\x88\xca\x92\x75");
     MR::endNPCTalkCamera(false, 0);
     MR::callInvalidateClippingAllGroupMember(this);
     mBombTimerLayout->appear();
@@ -412,7 +412,7 @@ void Caretaker::exePreWipeIn() {
 
 void Caretaker::exePreWait() {
     if (MR::isFirstStep(this)) {
-        MR::endDemo(this, "ゴミ掃除タイムアタック");
+        MR::endDemo(this, "\x83\x53\x83\x7e\x91\x7c\x8f\x9c\x83\x5e\x83\x43\x83\x80\x83\x41\x83\x5e\x83\x62\x83\x4e");
         MR::offPlayerControl();
         MR::onSwitchB(this);
     }
@@ -451,7 +451,7 @@ void Caretaker::exeTidy() {
         updateCounterSE();
 
         if (MR::canStartDemo() && (mBombTimerLayout->isReadyToTimeUp() || MR::isOnSwitchA(this))) {
-            MR::tryStartDemoMarioPuppetableWithoutCinemaFrame(this, "ゴミ掃除タイムアタック");
+            MR::tryStartDemoMarioPuppetableWithoutCinemaFrame(this, "\x83\x53\x83\x7e\x91\x7c\x8f\x9c\x83\x5e\x83\x43\x83\x80\x83\x41\x83\x5e\x83\x62\x83\x4e");
             setNerve(GET_NERVE(Caretaker, CaretakerNrvPstWipeOut));
         }
     }
@@ -497,7 +497,7 @@ void Caretaker::exePstWipeOut() {
     MR::callValidateClippingAllGroupMember(this);
     MR::Effect::forceDeleteAllEmitters(MR::getEffectSystem());
     MR::tryPlayerKillTakingActor();
-    MR::setPlayerPosOnGroundAndWait("バトルシップ・タイムアタック後位置");
+    MR::setPlayerPosOnGroundAndWait("\x83\x6f\x83\x67\x83\x8b\x83\x56\x83\x62\x83\x76\x81\x45\x83\x5e\x83\x43\x83\x80\x83\x41\x83\x5e\x83\x62\x83\x4e\x8c\xe3\x88\xca\x92\x75");
     MR::startBckPlayer("Watch");
     MR::startNPCTalkCamera(getMsgCtrl(), getBaseMtx(), 1.3f, 1);
     setNerve(GET_NERVE(Caretaker, CaretakerNrvPstWipeIn));
@@ -530,7 +530,7 @@ void Caretaker::exePstTalk() {
         return;
     }
 
-    MR::endDemo(this, "ゴミ掃除タイムアタック");
+    MR::endDemo(this, "\x83\x53\x83\x7e\x91\x7c\x8f\x9c\x83\x5e\x83\x43\x83\x80\x83\x41\x83\x5e\x83\x62\x83\x4e");
     MR::endNPCTalkCamera(false, -1);
 
     if (MR::isOnSwitchA(this)) {

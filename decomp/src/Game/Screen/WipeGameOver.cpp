@@ -7,7 +7,7 @@ namespace NrvWipeGameOver {
     NEW_NERVE(WipeGameOverActive, WipeGameOver, Active);
 };  // namespace NrvWipeGameOver
 
-WipeGameOver::WipeGameOver() : WipeLayoutBase("ゲームオーバー") {
+WipeGameOver::WipeGameOver() : WipeLayoutBase("\x83\x51\x81\x5b\x83\x80\x83\x49\x81\x5b\x83\x6f\x81\x5b") {
 }
 
 void WipeGameOver::init(const JMapInfoIter& rIter) {

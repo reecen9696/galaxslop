@@ -153,7 +153,7 @@ void KameckFireBall::exeWait() {
         }
     }
 
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", 1, 0)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", 1, 0)) {
         kill();
     } else if (MR::isGreaterStep(this, ::sLife) || MR::isInWater(mPosition)) {
         kill();

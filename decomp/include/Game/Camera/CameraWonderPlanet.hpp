@@ -4,7 +4,7 @@
 
 class CameraWonderPlanet : public Camera {
 public:
-    CameraWonderPlanet(const char* pName = "ワンダープラネットカメラ");
+    CameraWonderPlanet(const char* pName = "\x83\x8f\x83\x93\x83\x5f\x81\x5b\x83\x76\x83\x89\x83\x6c\x83\x62\x83\x67\x83\x4a\x83\x81\x83\x89");
     virtual ~CameraWonderPlanet();
 
     virtual void reset();

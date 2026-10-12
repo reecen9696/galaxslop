@@ -259,7 +259,7 @@ void GameSystemResetAndPowerProcess::handleCheckDiskAsync(s32 result, DVDCommand
 }
 
 GameSystemResetAndPowerProcess::GameSystemResetAndPowerProcess()
-    : LayoutActor("リセット・電源", false), mResetTriggerChecker(), mFadeinoutControl(), mResetOperation(ResetOperation_Restart), _5C(true),
+    : LayoutActor("\x83\x8a\x83\x5a\x83\x62\x83\x67\x81\x45\x93\x64\x8c\xb9", false), mResetTriggerChecker(), mFadeinoutControl(), mResetOperation(ResetOperation_Restart), _5C(true),
       mIsValidPowerOff(), _5E() {
     mResetTriggerChecker = new TriggerChecker();
 

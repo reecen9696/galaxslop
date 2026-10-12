@@ -74,7 +74,7 @@ TrickRabbit::TrickRabbit(const char* pName)
 void TrickRabbit::init(const JMapInfoIter& rIter) {
     MR::initDefaultPos(this, rIter);
 
-    if (MR::isEqualString(mName, "いたずら幽霊ウサギ")) {
+    if (MR::isEqualString(mName, "\x82\xa2\x82\xbd\x82\xb8\x82\xe7\x97\x48\x97\xec\x83\x45\x83\x54\x83\x4d")) {
         _E1 = true;
     } else {
         _E1 = false;
@@ -274,7 +274,7 @@ bool TrickRabbit::requestCaught() {
 }
 
 bool TrickRabbit::tryStartDemoRunnaway() {
-    if (MR::tryStartDemoMarioPuppetable(this, "逃走")) {
+    if (MR::tryStartDemoMarioPuppetable(this, "\x93\xa6\x91\x96")) {
         MR::startEventBGM(MR::EventBgmID_Chase);
         if (mMultiEventCamera != nullptr) {
             mMultiEventCamera->start(CameraTargetArg(this), 0);
@@ -298,7 +298,7 @@ bool TrickRabbit::tryStartDemoRunnaway() {
 }
 
 void TrickRabbit::endDemoRunnaway() {
-    MR::endDemo(this, "逃走");
+    MR::endDemo(this, "\x93\xa6\x91\x96");
     if (mMultiEventCamera != nullptr) {
         mMultiEventCamera->endForce();
     }
@@ -760,7 +760,7 @@ void TrickRabbit::exeCaught() {
 void TrickRabbit::exeWaitPowerStarDemo() {
     TVec3f stack_20;
     if (MR::isFirstStep(this)) {
-        MR::endDemo(this, "捕まり");
+        MR::endDemo(this, "\x95\xdf\x82\xdc\x82\xe8");
         MR::startAfterBossBGM();
         TVec3f stack_14(mPosition - (mGravity * 200.0f));
         MR::requestAppearPowerStar(this, stack_14);

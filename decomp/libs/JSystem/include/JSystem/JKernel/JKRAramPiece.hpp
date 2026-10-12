@@ -53,8 +53,8 @@ public:
     static JKRAMCommand* orderAsync(int direction, u32 source, u32 destination, u32 length, JKRAramBlock* block,
                                     JKRAMCommand::AsyncCallback callback);
     static BOOL sync(JKRAMCommand*, int);
-    static BOOL orderSync(int, unsigned long, unsigned long, unsigned long, JKRAramBlock*);
-    static void doneDMA(unsigned long);
+    static BOOL orderSync(int, unsigned int, unsigned int, unsigned int, JKRAramBlock*);
+    static void doneDMA(unsigned int);
     static void startDMA(JKRAMCommand*);
 
     static OSMutex mMutex;

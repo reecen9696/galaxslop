@@ -54,7 +54,7 @@ void CometRetryButton::init(const JMapInfoIter& rIter) {
     mButtonNoPaneCtrl->mNotPointingAnimName = pSelectOut;
     mButtonNoPaneCtrl->mDisappearAnimName = pEnd;
 
-    mPlayerMissLeft = new PlayerMissLeft("ミス時のプレイヤー残機表示");
+    mPlayerMissLeft = new PlayerMissLeft("\x83\x7e\x83\x58\x8e\x9e\x82\xcc\x83\x76\x83\x8c\x83\x43\x83\x84\x81\x5b\x8e\x63\x8b\x40\x95\x5c\x8e\xa6");
     mPlayerMissLeft->initWithoutIter();
     mPlayerMissLeft->kill();
 

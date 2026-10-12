@@ -30,7 +30,7 @@ namespace NrvMapPartsSeesaw1AxisRotator {
 }  // namespace NrvMapPartsSeesaw1AxisRotator
 
 MapPartsSeesaw1AxisRotator::MapPartsSeesaw1AxisRotator(LiveActor* pHost, const char* pMoveSound, f32 moveSoundSpeed)
-    : MapPartsRotatorBase(pHost, "シーソー(1軸)"), mAngularSpeedMax(), mInertiaConst(::sInertiaConstDefault), mRotateAngle(), mRestoreForce(),
+    : MapPartsRotatorBase(pHost, "\x83\x56\x81\x5b\x83\x5c\x81\x5b(1\x8e\xb2)"), mAngularSpeedMax(), mInertiaConst(::sInertiaConstDefault), mRotateAngle(), mRestoreForce(),
       mHipDrop(), mRotateAxis(0.0f, 0.0f, 1.0f), mAngularVelocity(), mAngularAccel(), mInitialUp(0.0f, 1.0f, 0.0f), mMoveSound(pMoveSound),
       mMoveSoundSpeed(moveSoundSpeed) {
     mRotateMtx.identity();

@@ -6,13 +6,13 @@
 #include <JSystem/J2DGraph/J2DPicture.hpp>
 #include <JSystem/JUtility/JUTVideo.hpp>
 
-SystemWipeHolder::SystemWipeHolder() : WipeHolderBase(4, "システムワイプ保持"), _1C(false) {
+SystemWipeHolder::SystemWipeHolder() : WipeHolderBase(4, "\x83\x56\x83\x58\x83\x65\x83\x80\x83\x8f\x83\x43\x83\x76\x95\xdb\x8e\x9d"), _1C(false) {
 }
 
 void SystemWipeHolder::init(const JMapInfoIter& rIter) {
-    addWipeLayout(new WipeFade("フェードワイプ", Color8(0, 0, 0, 255)));
-    addWipeLayout(new WipeRing(false, "円ワイプ"));
-    addWipeLayout(new WipeFade("白フェードワイプ", Color8(255, 255, 255, 255)));
+    addWipeLayout(new WipeFade("\x83\x74\x83\x46\x81\x5b\x83\x68\x83\x8f\x83\x43\x83\x76", Color8(0, 0, 0, 255)));
+    addWipeLayout(new WipeRing(false, "\x89\x7e\x83\x8f\x83\x43\x83\x76"));
+    addWipeLayout(new WipeFade("\x94\x92\x83\x74\x83\x46\x81\x5b\x83\x68\x83\x8f\x83\x43\x83\x76", Color8(255, 255, 255, 255)));
 }
 
 bool SystemWipeHolder::isCurrentAlive() const {
@@ -48,7 +48,7 @@ void SystemWipeHolder::draw() const {
 }
 
 void SystemWipeHolder::setWipeRingCenter(const TVec3f& rCenter) {
-    static_cast< WipeRing* >(findWipe("円ワイプ"))->setCenterPos(rCenter);
+    static_cast< WipeRing* >(findWipe("\x89\x7e\x83\x8f\x83\x43\x83\x76"))->setCenterPos(rCenter);
 }
 
 void SystemWipeHolder::startGameScreenCapture() {

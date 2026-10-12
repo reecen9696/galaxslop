@@ -39,7 +39,7 @@ namespace {
 };  // namespace
 
 GameSequenceProgress::GameSequenceProgress()
-    : NerveExecutor("シーケンス進行"), mStarPointerOnOffController(), mStorySequenceExecutor(), mFindingLuigiEventScheduler(),
+    : NerveExecutor("\x83\x56\x81\x5b\x83\x50\x83\x93\x83\x58\x90\x69\x8d\x73"), mStarPointerOnOffController(), mStorySequenceExecutor(), mFindingLuigiEventScheduler(),
       mGalaxyCometScheduler(), mLuigiLeftSupplier(), mPlayerMissLeft(), mMinFrame(), mIsPlayTicoSound(), mIsCancelScenarioSelect(),
       mIsForceWipe(true) {
     initNerve(GET_NERVE_ANON(GameSequenceProgressBooting));
@@ -53,7 +53,7 @@ GameSequenceProgress::GameSequenceProgress()
 void GameSequenceProgress::initAfterResourceLoaded() {
     mGalaxyCometScheduler = new GalaxyCometScheduler();
 
-    mPlayerMissLeft = new PlayerMissLeft("ミス時のプレイヤー残機表示");
+    mPlayerMissLeft = new PlayerMissLeft("\x83\x7e\x83\x58\x8e\x9e\x82\xcc\x83\x76\x83\x8c\x83\x43\x83\x84\x81\x5b\x8e\x63\x8b\x40\x95\x5c\x8e\xa6");
     mPlayerMissLeft->initWithoutIter();
 
     mFindingLuigiEventScheduler->initAfterResourceLoaded();
@@ -116,7 +116,7 @@ void GameSequenceProgress::startScene() {
             MR::forceOpenSystemWipeFade();
         }
 
-        if (!GameDataFunction::isPassedStoryEvent("スピン権利")) {
+        if (!GameDataFunction::isPassedStoryEvent("\x83\x58\x83\x73\x83\x93\x8c\xa0\x97\x98")) {
             MR::setPlayerSwingPermission(false);
         }
     }

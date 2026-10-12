@@ -32,7 +32,7 @@ namespace {
         {
             0,
             1,
-            "天文ドームスター帰還",
+            "\x93\x56\x95\xb6\x83\x68\x81\x5b\x83\x80\x83\x58\x83\x5e\x81\x5b\x8b\x41\x8a\xd2",
         },
         {
             13,
@@ -42,7 +42,7 @@ namespace {
         {
             0,
             1,
-            "天文ドームスター帰還",
+            "\x93\x56\x95\xb6\x83\x68\x81\x5b\x83\x80\x83\x58\x83\x5e\x81\x5b\x8b\x41\x8a\xd2",
         },
         {
             5,
@@ -57,7 +57,7 @@ namespace {
         {
             0,
             1,
-            "パワースター帰還",
+            "\x83\x70\x83\x8f\x81\x5b\x83\x58\x83\x5e\x81\x5b\x8b\x41\x8a\xd2",
         },
         {
             13,
@@ -67,7 +67,7 @@ namespace {
         {
             0,
             1,
-            "グランドスター帰還[２回目以降]",
+            "\x83\x4f\x83\x89\x83\x93\x83\x68\x83\x58\x83\x5e\x81\x5b\x8b\x41\x8a\xd2[\x82\x51\x89\xf1\x96\xda\x88\xc8\x8d\x7e]",
         },
         {
             13,
@@ -87,12 +87,12 @@ namespace {
         {
             0,
             1,
-            "グランドスター１帰還",
+            "\x83\x4f\x83\x89\x83\x93\x83\x68\x83\x58\x83\x5e\x81\x5b\x82\x50\x8b\x41\x8a\xd2",
         },
         {
             0,
             1,
-            "ロゼッタ状況説明デモ",
+            "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x8f\xf3\x8b\xb5\x90\xe0\x96\xbe\x83\x66\x83\x82",
         },
         {
             13,
@@ -102,12 +102,12 @@ namespace {
         {
             0,
             1,
-            "パワースター帰還",
+            "\x83\x70\x83\x8f\x81\x5b\x83\x58\x83\x5e\x81\x5b\x8b\x41\x8a\xd2",
         },
         {
             0,
             1,
-            "ロゼッタキノピオ探検隊デモ",
+            "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x83\x4c\x83\x6d\x83\x73\x83\x49\x92\x54\x8c\x9f\x91\xe0\x83\x66\x83\x82",
         },
         {
             13,
@@ -117,17 +117,17 @@ namespace {
         {
             0,
             1,
-            "グランドスター２帰還",
+            "\x83\x4f\x83\x89\x83\x93\x83\x68\x83\x58\x83\x5e\x81\x5b\x82\x51\x8b\x41\x8a\xd2",
         },
         {
             0,
             1,
-            "ロゼッタトーチの炎説明デモ",
+            "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x83\x67\x81\x5b\x83\x60\x82\xcc\x89\x8a\x90\xe0\x96\xbe\x83\x66\x83\x82",
         },
         {
             0,
             1,
-            "バトラーマップレクチャー",
+            "\x83\x6f\x83\x67\x83\x89\x81\x5b\x83\x7d\x83\x62\x83\x76\x83\x8c\x83\x4e\x83\x60\x83\x83\x81\x5b",
         },
         {
             13,
@@ -137,12 +137,12 @@ namespace {
         {
             0,
             1,
-            "パワースター帰還",
+            "\x83\x70\x83\x8f\x81\x5b\x83\x58\x83\x5e\x81\x5b\x8b\x41\x8a\xd2",
         },
         {
             0,
             1,
-            "ロゼッタコメット説明デモ",
+            "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x83\x52\x83\x81\x83\x62\x83\x67\x90\xe0\x96\xbe\x83\x66\x83\x82",
         },
         {
             13,
@@ -152,12 +152,12 @@ namespace {
         {
             0,
             1,
-            "グランドスター３帰還",
+            "\x83\x4f\x83\x89\x83\x93\x83\x68\x83\x58\x83\x5e\x81\x5b\x82\x52\x8b\x41\x8a\xd2",
         },
         {
             0,
             1,
-            "ロゼッタ銀河の中心説明デモ",
+            "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x8b\xe2\x89\xcd\x82\xcc\x92\x86\x90\x53\x90\xe0\x96\xbe\x83\x66\x83\x82",
         },
         {
             13,
@@ -167,12 +167,12 @@ namespace {
         {
             0,
             1,
-            "パワースター帰還",
+            "\x83\x70\x83\x8f\x81\x5b\x83\x58\x83\x5e\x81\x5b\x8b\x41\x8a\xd2",
         },
         {
             0,
             1,
-            "ロゼッタルイージデモ",
+            "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x83\x8b\x83\x43\x81\x5b\x83\x57\x83\x66\x83\x82",
         },
         {
             13,
@@ -182,12 +182,12 @@ namespace {
         {
             0,
             1,
-            "グランドスター４帰還",
+            "\x83\x4f\x83\x89\x83\x93\x83\x68\x83\x58\x83\x5e\x81\x5b\x82\x53\x8b\x41\x8a\xd2",
         },
         {
             0,
             1,
-            "ロゼッタ天文台機能回復デモ",
+            "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x93\x56\x95\xb6\x91\xe4\x8b\x40\x94\x5c\x89\xf1\x95\x9c\x83\x66\x83\x82",
         },
         {
             13,
@@ -197,7 +197,7 @@ namespace {
         {
             0,
             1,
-            "グランドスター５帰還",
+            "\x83\x4f\x83\x89\x83\x93\x83\x68\x83\x58\x83\x5e\x81\x5b\x82\x54\x8b\x41\x8a\xd2",
         },
         {
             13,
@@ -207,7 +207,7 @@ namespace {
         {
             0,
             1,
-            "ロゼッタカウントダウン開始デモ",
+            "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x83\x4a\x83\x45\x83\x93\x83\x67\x83\x5f\x83\x45\x83\x93\x8a\x4a\x8e\x6e\x83\x66\x83\x82",
         },
         {
             13,
@@ -217,7 +217,7 @@ namespace {
         {
             0,
             1,
-            "グランドスター６帰還",
+            "\x83\x4f\x83\x89\x83\x93\x83\x68\x83\x58\x83\x5e\x81\x5b\x82\x55\x8b\x41\x8a\xd2",
         },
         {
             13,
@@ -227,7 +227,7 @@ namespace {
         {
             0,
             1,
-            "ロゼッタトーチの炎進捗デモ",
+            "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x83\x67\x81\x5b\x83\x60\x82\xcc\x89\x8a\x90\x69\x92\xbb\x83\x66\x83\x82",
         },
         {
             13,
@@ -242,7 +242,7 @@ namespace {
         {
             0,
             1,
-            "ロゼッタ最終決戦デモ",
+            "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x8d\xc5\x8f\x49\x8c\x88\x90\xed\x83\x66\x83\x82",
         },
         {
             12,
@@ -252,7 +252,7 @@ namespace {
         {
             0,
             3,
-            "スターピース解説前半",
+            "\x83\x58\x83\x5e\x81\x5b\x83\x73\x81\x5b\x83\x58\x89\xf0\x90\xe0\x91\x4f\x94\xbc",
         },
         {
             1,
@@ -267,12 +267,12 @@ namespace {
         {
             0,
             1,
-            "天文ドームスター帰還",
+            "\x93\x56\x95\xb6\x83\x68\x81\x5b\x83\x80\x83\x58\x83\x5e\x81\x5b\x8b\x41\x8a\xd2",
         },
         {
             0,
             4,
-            "バトラー報告",
+            "\x83\x6f\x83\x67\x83\x89\x81\x5b\x95\xf1\x8d\x90",
         },
         {
             13,
@@ -282,12 +282,12 @@ namespace {
         {
             0,
             1,
-            "パワースター帰還",
+            "\x83\x70\x83\x8f\x81\x5b\x83\x58\x83\x5e\x81\x5b\x8b\x41\x8a\xd2",
         },
         {
             0,
             7,
-            "バトラーグリーンドライバ説明",
+            "\x83\x6f\x83\x67\x83\x89\x81\x5b\x83\x4f\x83\x8a\x81\x5b\x83\x93\x83\x68\x83\x89\x83\x43\x83\x6f\x90\xe0\x96\xbe",
         },
         {
             13,
@@ -297,12 +297,12 @@ namespace {
         {
             0,
             1,
-            "パワースター帰還",
+            "\x83\x70\x83\x8f\x81\x5b\x83\x58\x83\x5e\x81\x5b\x8b\x41\x8a\xd2",
         },
         {
             0,
             8,
-            "バトラーグリーンドライバ説明",
+            "\x83\x6f\x83\x67\x83\x89\x81\x5b\x83\x4f\x83\x8a\x81\x5b\x83\x93\x83\x68\x83\x89\x83\x43\x83\x6f\x90\xe0\x96\xbe",
         },
         {
             13,
@@ -312,12 +312,12 @@ namespace {
         {
             0,
             2,
-            "ドームレクチャー１",
+            "\x83\x68\x81\x5b\x83\x80\x83\x8c\x83\x4e\x83\x60\x83\x83\x81\x5b\x82\x50",
         },
         {
             7,
             0,
-            "バトラー情報Ａ",
+            "\x83\x6f\x83\x67\x83\x89\x81\x5b\x8f\xee\x95\xf1\x82\x60",
         },
         {
             12,
@@ -327,7 +327,7 @@ namespace {
         {
             0,
             1,
-            "ルイージ失踪デモ",
+            "\x83\x8b\x83\x43\x81\x5b\x83\x57\x8e\xb8\xe7\x48\x83\x66\x83\x82",
         },
         {
             13,
@@ -346,7 +346,7 @@ namespace {
         {
             0,
             1,
-            "エピローグデモ",
+            "\x83\x47\x83\x73\x83\x8d\x81\x5b\x83\x4f\x83\x66\x83\x82",
         },
         {
             11,
@@ -390,7 +390,7 @@ namespace {
         {
             0,
             1,
-            "エピローグデモ",
+            "\x83\x47\x83\x73\x83\x8d\x81\x5b\x83\x4f\x83\x66\x83\x82",
         },
         {
             11,
@@ -427,7 +427,7 @@ namespace {
         },
     };
     const StorySequenceExecutorType::DemoSequenceInfo cDemoRosettaPicureBookTalk[] = {
-        {0, 1, "ロゼッタ朗読"},
+        {0, 1, "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x98\x4e\x93\xc7"},
         {
             1,
             1,
@@ -438,7 +438,7 @@ namespace {
         },
     };
     const StorySequenceExecutorType::DemoSequenceInfo cDemoRosettaTalkAfterNormalEnding[] = {
-        {0, 1, "ロゼッタノーマルエンディング後デモ"},
+        {0, 1, "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x83\x6d\x81\x5b\x83\x7d\x83\x8b\x83\x47\x83\x93\x83\x66\x83\x42\x83\x93\x83\x4f\x8c\xe3\x83\x66\x83\x82"},
         {
             6,
             1,
@@ -456,27 +456,27 @@ namespace {
     const DemoFortressDiscoverCheckList cDemoFortressDiscoverCheckListTable[] = {
         {
             "TriLegLv1Galaxy",
-            "クッパＪｒロボプラント発見",
+            "\x83\x4e\x83\x62\x83\x70\x82\x69\x82\x92\x83\x8d\x83\x7b\x83\x76\x83\x89\x83\x93\x83\x67\x94\xad\x8c\xa9",
             false,
         },
         {
             "KoopaBattleVs1Galaxy",
-            "クッパスタープラント発見",
+            "\x83\x4e\x83\x62\x83\x70\x83\x58\x83\x5e\x81\x5b\x83\x76\x83\x89\x83\x93\x83\x67\x94\xad\x8c\xa9",
             true,
         },
         {
             "KoopaJrShipLv1Galaxy",
-            "クッパＪｒシッププラント発見",
+            "\x83\x4e\x83\x62\x83\x70\x82\x69\x82\x92\x83\x56\x83\x62\x83\x76\x83\x76\x83\x89\x83\x93\x83\x67\x94\xad\x8c\xa9",
             false,
         },
         {
             "KoopaBattleVs2Galaxy",
-            "クッパダークマタープラント発見",
+            "\x83\x4e\x83\x62\x83\x70\x83\x5f\x81\x5b\x83\x4e\x83\x7d\x83\x5e\x81\x5b\x83\x76\x83\x89\x83\x93\x83\x67\x94\xad\x8c\xa9",
             true,
         },
         {
             "FloaterOtaKingGalaxy",
-            "クッパＪｒクリーチャープラント発見",
+            "\x83\x4e\x83\x62\x83\x70\x82\x69\x82\x92\x83\x4e\x83\x8a\x81\x5b\x83\x60\x83\x83\x81\x5b\x83\x76\x83\x89\x83\x93\x83\x67\x94\xad\x8c\xa9",
             false,
         },
     };
@@ -717,7 +717,7 @@ void StorySequenceExecutor::exePlayDemoSequence() {
         exePlayDemoSequence();
         break;
     case 12:
-        if (tryNextDemoInfo() != nullptr) {
+        if (tryNextDemoInfo() != 0) {
             exePlayDemoSequence();
         } else {
             _48.clear();
@@ -729,7 +729,7 @@ void StorySequenceExecutor::exePlayDemoSequence() {
 
         break;
     case 13:
-        if (tryNextDemoInfo() != nullptr) {
+        if (tryNextDemoInfo() != 0) {
             exePlayDemoSequence();
         } else {
             const Nerve* pNerve;
@@ -754,7 +754,7 @@ void StorySequenceExecutor::exeWaitTimeKeepDemoEnd() {
         return;
     }
 
-    if (MR::isEqualString(getCurrentDemoInfo()->_4, "エピローグデモ")) {
+    if (MR::isEqualString(getCurrentDemoInfo()->_4, "\x83\x47\x83\x73\x83\x8d\x81\x5b\x83\x4f\x83\x66\x83\x82")) {
         MR::offPlayerControl();
     }
 
@@ -768,7 +768,7 @@ void StorySequenceExecutor::exeWaitSaveEnd() {
         return;
     }
 
-    MR::endDemo(mSaveObj, "セーブ");
+    MR::endDemo(mSaveObj, "\x83\x5a\x81\x5b\x83\x75");
 
     _48[0]++;
 
@@ -966,12 +966,12 @@ void StorySequenceExecutor::decideNextEventForClearGalaxy(GalaxyMoveArgument* pM
 
 void StorySequenceExecutor::decideNextEventForMoveGalaxy(GalaxyMoveArgument* pMoveArgument) {
     if (pMoveArgument->isEqualStage("AstroDome")) {
-        if (!GameDataFunction::isPassedStoryEvent("バトラー情報Ａ")) {
+        if (!GameDataFunction::isPassedStoryEvent("\x83\x6f\x83\x67\x83\x89\x81\x5b\x8f\xee\x95\xf1\x82\x60")) {
             prepareDemoSequence(::cDemoAstroDomeLecture);
             return;
         }
 
-        if (GameDataFunction::hasPowerStar("EggStarGalaxy", 1) && !GameDataFunction::isPassedStoryEvent("スターピースレクチャー")) {
+        if (GameDataFunction::hasPowerStar("EggStarGalaxy", 1) && !GameDataFunction::isPassedStoryEvent("\x83\x58\x83\x5e\x81\x5b\x83\x73\x81\x5b\x83\x58\x83\x8c\x83\x4e\x83\x60\x83\x83\x81\x5b")) {
             prepareDemoSequence(::cDemoStarPieceLectureRetry);
             return;
         }
@@ -1027,10 +1027,10 @@ void StorySequenceExecutor::decideNextStageForGalaxyOut(GalaxyMoveArgument* pMov
 void StorySequenceExecutor::overwriteGalaxyNameAfterLoading(GalaxyMoveArgument* pMoveArgument) {
     if (GameDataFunction::hasGrandStar(1)) {
         setNextStageToAstroGalaxy(pMoveArgument);
-    } else if (GameDataFunction::isPassedStoryEvent("ピーチ城浮上後") || !GameDataFunction::isDataMario()) {
+    } else if (GameDataFunction::isPassedStoryEvent("\x83\x73\x81\x5b\x83\x60\x8f\xe9\x95\x82\x8f\xe3\x8c\xe3") || !GameDataFunction::isDataMario()) {
         pMoveArgument->mStageName = "HeavensDoorGalaxy";
         pMoveArgument->mScenarioNo = 1;
-    } else if (GameDataFunction::isPassedStoryEvent("クッパ襲来後")) {
+    } else if (GameDataFunction::isPassedStoryEvent("\x83\x4e\x83\x62\x83\x70\x8f\x50\x97\x88\x8c\xe3")) {
         pMoveArgument->mStageName = "PeachCastleGardenGalaxy";
         pMoveArgument->mScenarioNo = 1;
         pMoveArgument->mIDInfo = JMapIdInfo(1, 0);
@@ -1117,7 +1117,7 @@ void StorySequenceExecutor::prepareDemoSequence(
 void StorySequenceExecutor::prepareDemoSequenceButlerFortressDiscover(const GalaxyMoveArgument* pMoveArgument,
                                                                       const DemoFortressDiscoverCheckList& rCheckList) {
     const StorySequenceExecutorType::DemoSequenceInfo* pDemoInfo =
-        addDynamicDemoSequenceInfo(0, rCheckList._8 ? ::EVENT_BUTLER_REPORT_KOOPA_FORTRESS : ::EVENT_BUTLER_REPORT_FORTRESS, "バトラー報告");
+        addDynamicDemoSequenceInfo(0, rCheckList._8 ? ::EVENT_BUTLER_REPORT_KOOPA_FORTRESS : ::EVENT_BUTLER_REPORT_FORTRESS, "\x83\x6f\x83\x67\x83\x89\x81\x5b\x95\xf1\x8d\x90");
 
     addDynamicDemoSequenceInfo(7, 0, rCheckList.mStoryEventName);
 
@@ -1136,7 +1136,7 @@ bool StorySequenceExecutor::tryStartDemo(const char* pParam1) {
 }
 
 bool StorySequenceExecutor::tryStartSave() {
-    if (MR::tryStartDemoWithoutCinemaFrameValidHandPointerFinger(mSaveObj, "セーブ")) {
+    if (MR::tryStartDemoWithoutCinemaFrameValidHandPointerFinger(mSaveObj, "\x83\x5a\x81\x5b\x83\x75")) {
         GameSequenceFunction::startGameDataSaveSequence(false, false);
 
         _B0 = true;
@@ -1149,7 +1149,7 @@ bool StorySequenceExecutor::tryStartSave() {
 
 bool StorySequenceExecutor::tryWaitSaveEnd() {
     if (!GameSequenceFunction::isActiveSaveDataHandleSequence()) {
-        MR::endDemo(mSaveObj, "セーブ");
+        MR::endDemo(mSaveObj, "\x83\x5a\x81\x5b\x83\x75");
 
         return true;
     }

@@ -139,7 +139,7 @@ static u32 sync_stack[5];
 
 void DsyncFrame2(u32 param_0, u32 param_1, u32 param_2) {
     if (DspRunningStatus != 1) {
-        OSReport("Yield中です\n");
+        OSReport("Yield\x92\x86\x82\xc5\x82\xb7\n");
         sync_stack[0] = param_0;
         lbl_806B75B9 = 1;
         sync_stack[1] = param_1;

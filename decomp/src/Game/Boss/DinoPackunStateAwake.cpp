@@ -8,7 +8,7 @@ namespace NrvDinoPackunStateAwake {
     NEW_NERVE(DinoPackunStateAwakeNrvFind, DinoPackunStateAwake, Find);
 };  // namespace NrvDinoPackunStateAwake
 
-DinoPackunStateAwake::DinoPackunStateAwake(DinoPackun* pHost) : ActorStateBase< DinoPackun >("ディノパックン気付く", pHost) {
+DinoPackunStateAwake::DinoPackunStateAwake(DinoPackun* pHost) : ActorStateBase< DinoPackun >("\x83\x66\x83\x42\x83\x6d\x83\x70\x83\x62\x83\x4e\x83\x93\x8b\x43\x95\x74\x82\xad", pHost) {
     initNerve(GET_NERVE(DinoPackunStateAwake, DinoPackunStateAwakeNrvFind));
 }
 

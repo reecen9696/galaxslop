@@ -176,7 +176,7 @@ void SkeletalFishGuardHolder::createAndInitGuard() {
     mGuards = new SkeletalFishGuard*[mNumGuards];
 
     for (s32 i = 0; i < mNumGuards; i++) {
-        mGuards[i] = new SkeletalFishGuard(mFishBoss, "スカルシャークガード");
+        mGuards[i] = new SkeletalFishGuard(mFishBoss, "\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x83\x4b\x81\x5b\x83\x68");
         mGuards[i]->initWithoutIter();
     }
 }

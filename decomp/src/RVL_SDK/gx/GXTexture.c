@@ -329,12 +329,12 @@ void GXInitTexObjTlut(GXTexObj* obj, u32 tlut_name) {
 #pragma force_active on
 void GXInitTexObjUserData(GXTexObj* obj, void* user_data) {
     GX_SETUP_TEXOBJ(t, obj)
-    t->userData = user_data;
+    t->userData = (u32)(uintptr_t)user_data;
 }
 
 void* GXGetTexObjUserData(const GXTexObj* obj) {
     GX_SETUP_TEXOBJ(t, obj)
-    return t->userData;
+    return (void*)(uintptr_t)t->userData;
 }
 #pragma pop
 

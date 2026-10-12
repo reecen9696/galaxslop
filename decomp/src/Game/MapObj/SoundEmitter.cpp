@@ -90,7 +90,7 @@ void SoundEmitter::exePlaySound() {
     } break;
     case 0x16:
     case 0x17: {
-        if (MR::isDemoActive("ロゼッタ状況説明デモ")) {
+        if (MR::isDemoActive("\x83\x8d\x83\x5b\x83\x62\x83\x5e\x8f\xf3\x8b\xb5\x90\xe0\x96\xbe\x83\x66\x83\x82")) {
             return;
         }
     } break;

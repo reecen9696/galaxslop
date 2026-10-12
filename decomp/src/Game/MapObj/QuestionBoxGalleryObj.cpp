@@ -28,9 +28,9 @@ void QuestionBoxGalleryObj::init(const JMapInfoIter& rIter) {
     MapObjActorInitInfo rInitInfo;
 
     if (MR::isEqualSubString(mObjectName, "Planet")) {
-        rInitInfo.setupHioNode("惑星");
+        rInitInfo.setupHioNode("\x98\x66\x90\xaf");
     } else {
-        rInitInfo.setupHioNode("地形オブジェ");
+        rInitInfo.setupHioNode("\x92\x6e\x8c\x60\x83\x49\x83\x75\x83\x57\x83\x46");
     }
 
     rInitInfo.setupDefaultPos();

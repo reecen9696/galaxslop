@@ -39,7 +39,7 @@ namespace NrvPoltaDemo {
     NEW_NERVE(PoltaDemoNrvDownDemo, PoltaDemo, DownDemo);
 };  // namespace NrvPoltaDemo
 
-PoltaDemo::PoltaDemo(Polta* pPolta) : PoltaActionBase("ポルタデモ", pPolta), mCurDemoNerve(), mCurDemoName() {
+PoltaDemo::PoltaDemo(Polta* pPolta) : PoltaActionBase("\x83\x7c\x83\x8b\x83\x5e\x83\x66\x83\x82", pPolta), mCurDemoNerve(), mCurDemoName() {
 }
 
 void PoltaDemo::init() {
@@ -50,15 +50,15 @@ void PoltaDemo::control() {
 }
 
 void PoltaDemo::startOpeningDemo() {
-    startTryDemo("ポルタ開始デモ", GET_NERVE(PoltaDemo, PoltaDemoNrvOpeningDemo));
+    startTryDemo("\x83\x7c\x83\x8b\x83\x5e\x8a\x4a\x8e\x6e\x83\x66\x83\x82", GET_NERVE(PoltaDemo, PoltaDemoNrvOpeningDemo));
 }
 
 void PoltaDemo::startPowerUpDemo() {
-    startTryDemo("ポルタパワーアップデモ", GET_NERVE(PoltaDemo, PoltaDemoNrvPowerUpDemo));
+    startTryDemo("\x83\x7c\x83\x8b\x83\x5e\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76\x83\x66\x83\x82", GET_NERVE(PoltaDemo, PoltaDemoNrvPowerUpDemo));
 }
 
 void PoltaDemo::startDownDemo() {
-    startTryDemo("ポルタダウンデモ", GET_NERVE(PoltaDemo, PoltaDemoNrvDownDemo));
+    startTryDemo("\x83\x7c\x83\x8b\x83\x5e\x83\x5f\x83\x45\x83\x93\x83\x66\x83\x82", GET_NERVE(PoltaDemo, PoltaDemoNrvDownDemo));
 }
 
 void PoltaDemo::startDemoSetting() {
@@ -96,7 +96,7 @@ void PoltaDemo::exeOpeningDemo() {
         MR::startAction(getHost(), "OpeningDemo");
         MR::startBckPlayer("BattleWait");
         PoltaFunction::onMovement(getHost());
-        MR::setPlayerPos("ポルタ開始デモプレイヤー位置");
+        MR::setPlayerPos("\x83\x7c\x83\x8b\x83\x5e\x8a\x4a\x8e\x6e\x83\x66\x83\x82\x83\x76\x83\x8c\x83\x43\x83\x84\x81\x5b\x88\xca\x92\x75");
         getHost()->mFormationModel->appear();
         MR::startAction(getHost()->mFormationModel, "OpeningDemo");
     }
@@ -111,7 +111,7 @@ void PoltaDemo::exeOpeningDemo() {
 
     if (MR::isActionEnd(getHost())) {
         MR::endAnimCamera(getHost(), getHost()->mCameraInfo, "OpeningDemo", -1, true);
-        MR::endDemo(getHost(), "ポルタ開始デモ");
+        MR::endDemo(getHost(), "\x83\x7c\x83\x8b\x83\x5e\x8a\x4a\x8e\x6e\x83\x66\x83\x82");
         getHost()->mFormationModel->kill();
         kill();
     }
@@ -131,7 +131,7 @@ void PoltaDemo::exePowerUpDemo() {
         MR::startAction(PoltaFunction::getLeftArmActor(getHost()), "PowerUpDemo");
         MR::startAction(PoltaFunction::getRightArmActor(getHost()), "PowerUpDemo");
         MR::startBckPlayer("BattleWait");
-        MR::setPlayerPos("ポルタデモプレイヤー位置");
+        MR::setPlayerPos("\x83\x7c\x83\x8b\x83\x5e\x83\x66\x83\x82\x83\x76\x83\x8c\x83\x43\x83\x84\x81\x5b\x88\xca\x92\x75");
         getHost()->mFormationModel->appear();
         getHost()->mLeftArm->mFormationModel->appear();
         getHost()->mRightArm->mFormationModel->appear();
@@ -144,7 +144,7 @@ void PoltaDemo::exePowerUpDemo() {
         MR::startCenterScreenBlur(::sPowerUpBlurTime, ::sPowerUpBlurOffset, ::sPowerUpBlurAlpha, ::sPowerUpBlurFadeIn, ::sPowerUpBlurFadeOut);
     }
     if (MR::isActionEnd(getHost())) {
-        MR::endDemo(getHost(), "ポルタパワーアップデモ");
+        MR::endDemo(getHost(), "\x83\x7c\x83\x8b\x83\x5e\x83\x70\x83\x8f\x81\x5b\x83\x41\x83\x62\x83\x76\x83\x66\x83\x82");
         MR::endAnimCamera(getHost(), getHost()->mCameraInfo, "PowerUpDemo", -1, true);
         MR::startStageBGM("MBGM_BOSS_09_B", false);
         MR::validateShadowAll(getHost()->mLeftArm);
@@ -165,10 +165,10 @@ void PoltaDemo::exeDownDemo() {
         MR::startAction(getHost(), "DownDemo");
         MR::startBckPlayer("BattleWait");
         PoltaFunction::onMovement(getHost());
-        MR::setPlayerPos("ポルタデモプレイヤー位置");
+        MR::setPlayerPos("\x83\x7c\x83\x8b\x83\x5e\x83\x66\x83\x82\x83\x76\x83\x8c\x83\x43\x83\x84\x81\x5b\x88\xca\x92\x75");
     }
     if (MR::isActionEnd(getHost())) {
-        MR::endDemo(getHost(), "ポルタダウンデモ");
+        MR::endDemo(getHost(), "\x83\x7c\x83\x8b\x83\x5e\x83\x5f\x83\x45\x83\x93\x83\x66\x83\x82");
         MR::endAnimCamera(getHost(), getHost()->mCameraInfo, "DownDemo", -1, true);
         getHost()->kill();
         kill();

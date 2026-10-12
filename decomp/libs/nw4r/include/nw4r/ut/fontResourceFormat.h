@@ -22,13 +22,13 @@ namespace nw4r {
             u16 sheetLine;
             u16 sheetWidth;
             u16 sheetHeight;
-            u8* sheetImage;
+            PTR32(u8) sheetImage;
         };
 
         struct FontWidth {
             u16 indexBegin;
             u16 indexEnd;
-            FontWidth* pNext;
+            PTR32(FontWidth) pNext;
             CharWidths widthTable[];
         };
 
@@ -37,7 +37,7 @@ namespace nw4r {
             u16 ccodeEnd;
             u16 mappingMethod;
             u16 reserved;
-            FontCodeMap* pNext;
+            PTR32(FontCodeMap) pNext;
             u16 mapInfo[];
         };
 
@@ -47,9 +47,9 @@ namespace nw4r {
             u16 alterCharIndex;
             CharWidths defaultWidth;
             u8 encoding;
-            FontTextureGlyph* pGlyph;
-            FontWidth* pWidth;
-            FontCodeMap* pMap;
+            PTR32(FontTextureGlyph) pGlyph;
+            PTR32(FontWidth) pWidth;
+            PTR32(FontCodeMap) pMap;
             u8 height;
             u8 width;
             u8 ascent;

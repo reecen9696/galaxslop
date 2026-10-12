@@ -54,7 +54,7 @@ namespace NrvKoopaSequencerVs3 {
 };  // namespace NrvKoopaSequencerVs3
 
 KoopaSequencerVs3::KoopaSequencerVs3()
-    : KoopaSequencer("クッパ戦（Ｖｓ３進行役）", 3), mBattleLv1(), mBattleLv2(), mBattleMain(), mDemoFallToPlanetLv2(), mDemoFallToPlanetLv3() {
+    : KoopaSequencer("\x83\x4e\x83\x62\x83\x70\x90\xed\x81\x69\x82\x75\x82\x93\x82\x52\x90\x69\x8d\x73\x96\xf0\x81\x6a", 3), mBattleLv1(), mBattleLv2(), mBattleMain(), mDemoFallToPlanetLv2(), mDemoFallToPlanetLv3() {
 }
 
 void KoopaSequencerVs3::init(Koopa* pKoopa, const JMapInfoIter& rIter) {
@@ -76,22 +76,22 @@ void KoopaSequencerVs3::init(Koopa* pKoopa, const JMapInfoIter& rIter) {
     mBattleLv2 = new KoopaBattleVs3Lv2(mKoopa);
     mBattleLv2->init();
 
-    mBattleMain = new KoopaBattleMain("クッパ戦闘（Ｖｓ３Ｌｖ３）", mKoopa);
+    mBattleMain = new KoopaBattleMain("\x83\x4e\x83\x62\x83\x70\x90\xed\x93\xac\x81\x69\x82\x75\x82\x93\x82\x52\x82\x6b\x82\x96\x82\x52\x81\x6a", mKoopa);
     mBattleMain->init();
 
-    MR::initDemoSheetTalkAnim(KoopaFunction::getKoopaDemoKoopaJr(mKoopa), rIter, "クッパＶｓ３ピーチ登場", "DemoKoopaMeetPeach", nullptr);
+    MR::initDemoSheetTalkAnim(KoopaFunction::getKoopaDemoKoopaJr(mKoopa), rIter, "\x83\x4e\x83\x62\x83\x70\x82\x75\x82\x93\x82\x52\x83\x73\x81\x5b\x83\x60\x93\x6f\x8f\xea", "DemoKoopaMeetPeach", nullptr);
 
-    MR::initTalkAnimDemoCast(mKoopa, rIter, "クッパＶｓ３ピーチ登場", "DemoKoopaMeetPeach");
-    MR::initTalkAnimDemoCast(KoopaFunction::getKoopaDemoPeach(mKoopa), rIter, "クッパＶｓ３ピーチ登場", "DemoKoopaMeetPeach");
-    MR::initTalkAnimDemoCast(KoopaFunction::getKoopaDemoKoopaJrShip(mKoopa), rIter, "クッパＶｓ３ピーチ登場", "DemoKoopaMeetPeach");
+    MR::initTalkAnimDemoCast(mKoopa, rIter, "\x83\x4e\x83\x62\x83\x70\x82\x75\x82\x93\x82\x52\x83\x73\x81\x5b\x83\x60\x93\x6f\x8f\xea", "DemoKoopaMeetPeach");
+    MR::initTalkAnimDemoCast(KoopaFunction::getKoopaDemoPeach(mKoopa), rIter, "\x83\x4e\x83\x62\x83\x70\x82\x75\x82\x93\x82\x52\x83\x73\x81\x5b\x83\x60\x93\x6f\x8f\xea", "DemoKoopaMeetPeach");
+    MR::initTalkAnimDemoCast(KoopaFunction::getKoopaDemoKoopaJrShip(mKoopa), rIter, "\x83\x4e\x83\x62\x83\x70\x82\x75\x82\x93\x82\x52\x83\x73\x81\x5b\x83\x60\x93\x6f\x8f\xea", "DemoKoopaMeetPeach");
 
     KoopaFunction::initKoopaAnimCamera(mKoopa, "DemoKoopaBattleStairsVs3Start");
 
-    MR::initDemoSheetTalkAnim(mKoopa, rIter, "クッパＶｓ３本戦開始", "DemoKoopaVs3Start", nullptr);
+    MR::initDemoSheetTalkAnim(mKoopa, rIter, "\x83\x4e\x83\x62\x83\x70\x82\x75\x82\x93\x82\x52\x96\x7b\x90\xed\x8a\x4a\x8e\x6e", "DemoKoopaVs3Start", nullptr);
 
-    MR::initTalkAnimDemoCast(KoopaFunction::getKoopaDemoKoopaJr(mKoopa), rIter, "クッパＶｓ３本戦開始", "DemoKoopaVs3Start");
-    MR::initTalkAnimDemoCast(KoopaFunction::getKoopaDemoPeach(mKoopa), rIter, "クッパＶｓ３本戦開始", "DemoKoopaVs3Start");
-    MR::initTalkAnimDemoCast(KoopaFunction::getKoopaDemoKoopaJrShip(mKoopa), rIter, "クッパＶｓ３本戦開始", "DemoKoopaVs3Start");
+    MR::initTalkAnimDemoCast(KoopaFunction::getKoopaDemoKoopaJr(mKoopa), rIter, "\x83\x4e\x83\x62\x83\x70\x82\x75\x82\x93\x82\x52\x96\x7b\x90\xed\x8a\x4a\x8e\x6e", "DemoKoopaVs3Start");
+    MR::initTalkAnimDemoCast(KoopaFunction::getKoopaDemoPeach(mKoopa), rIter, "\x83\x4e\x83\x62\x83\x70\x82\x75\x82\x93\x82\x52\x96\x7b\x90\xed\x8a\x4a\x8e\x6e", "DemoKoopaVs3Start");
+    MR::initTalkAnimDemoCast(KoopaFunction::getKoopaDemoKoopaJrShip(mKoopa), rIter, "\x83\x4e\x83\x62\x83\x70\x82\x75\x82\x93\x82\x52\x96\x7b\x90\xed\x8a\x4a\x8e\x6e", "DemoKoopaVs3Start");
 
     KoopaFunction::initKoopaAnimCamera(mKoopa, "DemoKoopaVs3Down");
 
@@ -100,7 +100,7 @@ void KoopaSequencerVs3::init(Koopa* pKoopa, const JMapInfoIter& rIter) {
 
 void KoopaSequencerVs3::exeWaitPlayer() {
     if (MR::isFirstStep(this)) {
-        KoopaFunction::setKoopaPos(mKoopa, "デモ中心");
+        KoopaFunction::setKoopaPos(mKoopa, "\x83\x66\x83\x82\x92\x86\x90\x53");
 
         MR::startAction(mKoopa, "Wait");
 
@@ -125,7 +125,7 @@ void KoopaSequencerVs3::exeWaitPlayer() {
         }
     }
 
-    if (MR::isDemoActive("クッパＶｓ３ピーチ登場") && MR::isDemoLastStep()) {
+    if (MR::isDemoActive("\x83\x4e\x83\x62\x83\x70\x82\x75\x82\x93\x82\x52\x83\x73\x81\x5b\x83\x60\x93\x6f\x8f\xea") && MR::isDemoLastStep()) {
         KoopaFunction::endKoopaDemoMeetPeach(mKoopa);
     }
 
@@ -144,7 +144,7 @@ void KoopaSequencerVs3::exeBattleStairs() {
 
         setNerve(GET_NERVE(KoopaSequencerVs3, KoopaSequencerVs3NrvWaitDemo));
 
-        MR::requestStartTimeKeepDemoMarioPuppetable(this, mKoopa, "クッパＶｓ３本戦開始",
+        MR::requestStartTimeKeepDemoMarioPuppetable(this, mKoopa, "\x83\x4e\x83\x62\x83\x70\x82\x75\x82\x93\x82\x52\x96\x7b\x90\xed\x8a\x4a\x8e\x6e",
                                                     GET_NERVE(KoopaSequencerVs3, KoopaSequencerVs3NrvDemoBattleStart), nullptr, nullptr);
     }
 }
@@ -242,7 +242,7 @@ void KoopaSequencerVs3::exeBattleFinal() {
 }
 
 void KoopaSequencerVs3::exeWaitDemoDown() {
-    if (KoopaFunction::tryStartKoopaAndMarioCameraDemo(mKoopa, "クッパＶｓ３ダウン", "DemoKoopaVs3Down", "ダウンデモ")) {
+    if (KoopaFunction::tryStartKoopaAndMarioCameraDemo(mKoopa, "\x83\x4e\x83\x62\x83\x70\x82\x75\x82\x93\x82\x52\x83\x5f\x83\x45\x83\x93", "DemoKoopaVs3Down", "\x83\x5f\x83\x45\x83\x93\x83\x66\x83\x82")) {
         setNerve(GET_NERVE(KoopaSequencerVs3, KoopaSequencerVs3NrvDemoDown));
     }
 }
@@ -285,8 +285,8 @@ void KoopaSequencerVs3::exeDemoDown() {
         MR::overlayWithPreviousScreen(3);
     }
 
-    if (KoopaFunction::tryEndKoopaCameraDemo(mKoopa, "クッパＶｓ３ダウン", "DemoKoopaVs3Down")) {
-        MR::setPlayerPosAndWait("ダウンデモ後（マリオ）");
+    if (KoopaFunction::tryEndKoopaCameraDemo(mKoopa, "\x83\x4e\x83\x62\x83\x70\x82\x75\x82\x93\x82\x52\x83\x5f\x83\x45\x83\x93", "DemoKoopaVs3Down")) {
+        MR::setPlayerPosAndWait("\x83\x5f\x83\x45\x83\x93\x83\x66\x83\x82\x8c\xe3\x81\x69\x83\x7d\x83\x8a\x83\x49\x81\x6a");
 
         MR::requestAppearPowerStar(mKoopa, KoopaFunction::getKoopaPlanetLv3(mKoopa)->mPosition);
         KoopaFunction::startKoopaPlateDamageAnimPowerStarAppear(mKoopa);

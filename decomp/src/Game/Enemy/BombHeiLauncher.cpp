@@ -70,10 +70,10 @@ void BombHeiLauncher::init(const JMapInfoIter& rIter) {
     makeActorDead();
 
     if (isBombHeiLauncher) {
-        mBomb = new BombHei("ボム兵");
+        mBomb = new BombHei("\x83\x7b\x83\x80\x95\xba");
         mBomb->mType = BombHei::BOMB_HEI;
     } else {
-        mBomb = new BombHei("ボム");
+        mBomb = new BombHei("\x83\x7b\x83\x80");
         mBomb->mType = BombHei::BOMB;
     }
 

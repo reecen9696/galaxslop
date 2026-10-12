@@ -57,7 +57,7 @@ void Manual2P::init(const JMapInfoIter& rIter) {
     mRightPaneCtrl = new ButtonPaneController(this, "RightButton", "PicRButton", 0, true);
     mRightPaneCtrl->_22 = 0;
 
-    mBackButton = new BackButton("マニュアルの戻るボタン", true);
+    mBackButton = new BackButton("\x83\x7d\x83\x6a\x83\x85\x83\x41\x83\x8b\x82\xcc\x96\xdf\x82\xe9\x83\x7b\x83\x5e\x83\x93", true);
     mBackButton->initWithoutIter();
 
     initNerve(GET_NERVE_ANON(Manual2PNrvAppear));

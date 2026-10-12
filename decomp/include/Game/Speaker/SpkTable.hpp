@@ -30,5 +30,5 @@ public:
     /* 0x0 */ bool mInitialized;
     /* 0x4 */ s32 mResourceCount;
     /* 0x8 */ SpkParameters* mParameters;
-    /* 0xC */ const char** mNames;
+    /* 0xC */ PTR32(const char)* mNames;  // 4-byte name slots in the file
 };

@@ -9,7 +9,7 @@ void ShadowVolumeBox_FORCE_MATCH_SDATA2() {
     f32 f2 = 0.5f;
 }
 
-ShadowVolumeBox::ShadowVolumeBox() : ShadowVolumeDrawer("影描画[ボリュームボックス]"), mSize(100.0f, 100.0f, 100.0f) {
+ShadowVolumeBox::ShadowVolumeBox() : ShadowVolumeDrawer("\x89\x65\x95\x60\x89\xe6[\x83\x7b\x83\x8a\x83\x85\x81\x5b\x83\x80\x83\x7b\x83\x62\x83\x4e\x83\x58]"), mSize(100.0f, 100.0f, 100.0f) {
     for (u32 idx = 0; idx < ARRAY_SIZE(mPoints); idx++) {
         mPoints[idx].zero();
     }

@@ -57,7 +57,7 @@ void PenguinRacerLeader::init(const JMapInfoIter& rIter) {
     mLodCtrl = MR::createLodCtrlNPC(this, rIter);
     makeActorAppeared();
 
-    MR::initMultiActorCamera(this, rIter, &mCameraInfo, "会話");  // conversation
+    MR::initMultiActorCamera(this, rIter, &mCameraInfo, "\x89\xef\x98\x62");  // conversation
 
     NPCActorItem item("PenguinRacerLeader");
     MR::getNPCItemData(&item, 0);
@@ -83,7 +83,7 @@ bool PenguinRacerLeader::eventFunc(u32 state) {
 
     if (state == 1) {
         if (mTakeOutStar->takeOut()) {
-            MR::endMultiActorCamera(this, mCameraInfo, "会話", false, -1);
+            MR::endMultiActorCamera(this, mCameraInfo, "\x89\xef\x98\x62", false, -1);
             return true;
         }
         return false;
@@ -94,7 +94,7 @@ bool PenguinRacerLeader::eventFunc(u32 state) {
 
 void PenguinRacerLeader::exeWait() {
     if (!tryReaction() && MR::tryTalkNearPlayerAndStartTalkAction(this) && mRaceDisabled == 0) {
-        MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "会話", -1);
+        MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "\x89\xef\x98\x62", -1);
         setNerve(GET_NERVE(PenguinRacerLeader, PenguinRacerLeaderNrvPre));
     }
 }
@@ -108,7 +108,7 @@ void PenguinRacerLeader::exePre() {
         RaceManagerFunction::startRaceWithWipe();
         setNerve(GET_NERVE(PenguinRacerLeader, PenguinRacerLeaderNrvReady));
     } else {
-        MR::endMultiActorCamera(this, mCameraInfo, "会話", false, -1);
+        MR::endMultiActorCamera(this, mCameraInfo, "\x89\xef\x98\x62", false, -1);
         setNerve(GET_NERVE(PenguinRacerLeader, PenguinRacerLeaderNrvWait));
     }
 }
@@ -121,7 +121,7 @@ void PenguinRacerLeader::exePost() {
         return;
     }
 
-    MR::endMultiActorCamera(this, mCameraInfo, "会話", true, -1);
+    MR::endMultiActorCamera(this, mCameraInfo, "\x89\xef\x98\x62", true, -1);
 
     if (RaceManagerFunction::getRaceRank() == 1) {
         setNerve(GET_NERVE(PenguinRacerLeader, PenguinRacerLeaderNrvTalk));
@@ -144,7 +144,7 @@ void PenguinRacerLeader::resetRacer(const RaceManager* pRaceManager) {
     PenguinRacer::resetRacer(pRaceManager);
     turnToPlayer(180.0f);
     calcAndSetBaseMtx();
-    MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "会話", 0);
+    MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "\x89\xef\x98\x62", 0);
     setNerve(GET_NERVE(PenguinRacerLeader, PenguinRacerLeaderNrvPost));
 }
 

@@ -339,9 +339,9 @@ void Meramera::initShadow() {
 
     MR::initShadowController(this, 2);
 
-    MR::addShadowSurfaceCircle(this, "水面用", scale * ::sShadowRadius);
-    MR::setShadowDropStartOffset(this, "水面用", ::sBaseScale);
-    MR::addShadowVolumeSphere(this, "地面用", scale * ::sShadowRadius);
+    MR::addShadowSurfaceCircle(this, "\x90\x85\x96\xca\x97\x70", scale * ::sShadowRadius);
+    MR::setShadowDropStartOffset(this, "\x90\x85\x96\xca\x97\x70", ::sBaseScale);
+    MR::addShadowVolumeSphere(this, "\x92\x6e\x96\xca\x97\x70", scale * ::sShadowRadius);
 }
 
 void Meramera::initAppearState(const JMapInfoIter& rIter) {
@@ -727,7 +727,7 @@ bool Meramera::tryEndChase() {
 }
 
 bool Meramera::tryRunaway() {
-    if (MR::isGreaterStep(this, MR::getRandom(0L, 0L) + ::sRunawayTime)) {
+    if (MR::isGreaterStep(this, MR::getRandom(0, 0) + ::sRunawayTime)) {
         setNerve(GET_NERVE(Meramera, MerameraNrvRunaway));
         return true;
     }
@@ -1094,7 +1094,7 @@ void Meramera::exeRunaway() {
 
                 MR::startSound(this, "SE_EM_MERAMERA_JUMP");
 
-                mRunawayTimer = MR::getRandom(0L, 10L) + 30;
+                mRunawayTimer = MR::getRandom(0, 10) + 30;
             }
         }
 

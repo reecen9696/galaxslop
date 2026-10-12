@@ -150,7 +150,7 @@ bool MarblePlanet::receiveMsgEnemyAttack(u32 msg, HitSensor* pSender, HitSensor*
 }
 
 void MarblePlanet::initCoreAndElectron() {
-    mCorePlanetModel = MR::createModelObjMapObj("ビー玉惑星コア", "MarblePlanetCore", getBaseMtx());
+    mCorePlanetModel = MR::createModelObjMapObj("\x83\x72\x81\x5b\x8b\xca\x98\x66\x90\xaf\x83\x52\x83\x41", "MarblePlanetCore", getBaseMtx());
     MR::invalidateClipping(mCorePlanetModel);
     MR::startBck(mCorePlanetModel, "MarblePlanetCore");
     MR::startBtk(mCorePlanetModel, "MarblePlanetCore");
@@ -177,7 +177,7 @@ void MarblePlanet::initCoreAndElectron() {
             position.scaleAdd(1000.0f, front, *pos);
             TVec3f rotation;
             rotation.setAll< f32 >((360.0f * i) / mNumElectrons);
-            mPlanetElectrons[i] = new MarblePlanetElectron(this, position, rotation, "ビー玉惑星電子");
+            mPlanetElectrons[i] = new MarblePlanetElectron(this, position, rotation, "\x83\x72\x81\x5b\x8b\xca\x98\x66\x90\xaf\x93\x64\x8e\x71");
             mPlanetElectrons[i]->initWithoutIter();
         }
     }
@@ -204,7 +204,7 @@ void MarblePlanetElectron::init(const JMapInfoIter& rIter) {
     MR::addEffectHitNormal(this, 0);
     initSound(4, false);
     MR::invalidateClipping(this);
-    mElectronShadow = new MarblePlanetElectronShadow(this, mParentPlanet->mPosition, "電子影");
+    mElectronShadow = new MarblePlanetElectronShadow(this, mParentPlanet->mPosition, "\x93\x64\x8e\x71\x89\x65");
     mElectronShadow->initWithoutIter();
     MR::calcGravity(this);
     mGravity.negate();

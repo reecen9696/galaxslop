@@ -33,6 +33,7 @@ void GXProject(f32 x, f32 y, f32 z, const f32 mtx[3][4], const f32* pm, const f3
 
 // clang-format off
 
+#ifdef __MWERKS__
 static void WriteProjPS(const register f32 proj[6], register volatile void* dest)
 {
     register f32 p01, p23, p45;
@@ -61,6 +62,23 @@ static void Copy6Floats(const register f32 src[6], register f32 dst[6]) {
 }
 
 // clang-format on
+
+#else
+static void WriteProjPS(const f32 proj[6], volatile void* dest) {
+    int i;
+    (void)dest;
+    for (i = 0; i < 6; i++) {
+        GX_WRITE_F32(proj[i]);
+    }
+}
+
+static void Copy6Floats(const f32 src[6], f32 dst[6]) {
+    int i;
+    for (i = 0; i < 6; i++) {
+        dst[i] = src[i];
+    }
+}
+#endif
 
 void __GXSetProjection(void) {
     volatile void* wgpipe = (volatile void*)0xCC008000;
@@ -101,6 +119,7 @@ void GXGetProjectionv(f32* ptr) {
 
 // clang-format off
 
+#ifdef __MWERKS__
 static void  WriteMTXPS3x3from3x4(register void* mtx, register volatile void* dest) {
     register f32 a00_a01, a02_a03, a10_a11;
     register f32 a12_a13, a20_a21, a22_a23;
@@ -161,6 +180,39 @@ static void WriteMTXPS4x2(const register f32 mtx[3][4], register volatile void* 
 }
 
 // clang-format on
+
+#else
+static void WriteMTXPS3x3from3x4(void* mtx, volatile void* dest) {
+    const f32(*m)[4] = (const f32(*)[4])mtx;
+    int r;
+    (void)dest;
+    for (r = 0; r < 3; r++) {
+        GX_WRITE_F32(m[r][0]);
+        GX_WRITE_F32(m[r][1]);
+        GX_WRITE_F32(m[r][2]);
+    }
+}
+
+static void WriteMTXPS4x3(const f32 src[3][4], volatile void* dst) {
+    int r, c;
+    (void)dst;
+    for (r = 0; r < 3; r++) {
+        for (c = 0; c < 4; c++) {
+            GX_WRITE_F32(src[r][c]);
+        }
+    }
+}
+
+static void WriteMTXPS4x2(const f32 mtx[3][4], volatile void* dest) {
+    int r, c;
+    (void)dest;
+    for (r = 0; r < 2; r++) {
+        for (c = 0; c < 4; c++) {
+            GX_WRITE_F32(mtx[r][c]);
+        }
+    }
+}
+#endif
 
 void GXLoadPosMtxImm(const f32 mtx[3][4], u32 id) {
     u32 reg, addr;

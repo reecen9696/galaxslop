@@ -64,7 +64,7 @@ namespace NrvBossKameckStateBattle {
 };  // namespace NrvBossKameckStateBattle
 
 BossKameckStateBattle::BossKameckStateBattle(BossKameck* pBoss)
-    : ActorStateBase< BossKameck >("ボスカメック戦闘状態", pBoss), mMoveRail(), mBattlePattarn(), mBeam(), mBeamEventListener(),
+    : ActorStateBase< BossKameck >("\x83\x7b\x83\x58\x83\x4a\x83\x81\x83\x62\x83\x4e\x90\xed\x93\xac\x8f\xf3\x91\xd4", pBoss), mMoveRail(), mBattlePattarn(), mBeam(), mBeamEventListener(),
       _20(0.0f, 0.0f, 0.0f), _2C(-1), _30(1), _34(), _38(), mIsFinal(), mIsVs2() {
 }
 
@@ -168,7 +168,7 @@ bool BossKameckStateBattle::tryAttackWait() {
 }
 
 bool BossKameckStateBattle::trySummonKameck() {
-    if (mBattlePattarn->_10 == nullptr) {
+    if (mBattlePattarn->_10 == 0) {
         return false;
     }
 

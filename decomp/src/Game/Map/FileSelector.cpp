@@ -265,12 +265,12 @@ void FileSelector::initUserFileArray() {
 }
 
 void FileSelector::createCameraController() {
-    mCameraController = new FileSelectCameraController("ファイルセレクトカメラ制御");
+    mCameraController = new FileSelectCameraController("\x83\x74\x83\x40\x83\x43\x83\x8b\x83\x5a\x83\x8c\x83\x4e\x83\x67\x83\x4a\x83\x81\x83\x89\x90\xa7\x8c\xe4");
     mCameraController->initWithoutIter();
 }
 
 void FileSelector::createSky() {
-    mSky = new FileSelectSky("ファイルセレクト画面の空");
+    mSky = new FileSelectSky("\x83\x74\x83\x40\x83\x43\x83\x8b\x83\x5a\x83\x8c\x83\x4e\x83\x67\x89\xe6\x96\xca\x82\xcc\x8b\xf3");
     mSky->initWithoutIter();
     mSky->appear();
 }
@@ -279,12 +279,12 @@ namespace {
     inline FileSelectItem* createFileItem(s32 id) {
         FileSelectIconID iconId = FileSelectIconID();
 
-        return new FileSelectItem(id, true, iconId, "ファイルセレクトアイテム");
+        return new FileSelectItem(id, true, iconId, "\x83\x74\x83\x40\x83\x43\x83\x8b\x83\x5a\x83\x8c\x83\x4e\x83\x67\x83\x41\x83\x43\x83\x65\x83\x80");
     }
 };  // namespace
 
 void FileSelector::createFileItems() {
-    mItems = new DeriveActorGroup< FileSelectItem >("全ファイルアイテム保持", USER_FILE_NUM);
+    mItems = new DeriveActorGroup< FileSelectItem >("\x91\x53\x83\x74\x83\x40\x83\x43\x83\x8b\x83\x41\x83\x43\x83\x65\x83\x80\x95\xdb\x8e\x9d", USER_FILE_NUM);
     _98 = new TVec3f[USER_FILE_NUM]();
 
     calcBasePos(0.0f);
@@ -311,14 +311,14 @@ void FileSelector::createOperationButton() {
 }
 
 void FileSelector::createBackButton() {
-    mBackButton = new BackButton("戻るボタン", false);
+    mBackButton = new BackButton("\x96\xdf\x82\xe9\x83\x7b\x83\x5e\x83\x93", false);
     mBackButton->initWithoutIter();
 
     MR::connectToScene(mBackButton, MR::MovementType_Layout, MR::CalcAnimType_Layout, MR::DrawBufferType_None, MR::DrawType_LayoutDecoration);
 }
 
 void FileSelector::createBrosButton() {
-    mBrosButton = new BrosButton("ルイージ切り替えボタン");
+    mBrosButton = new BrosButton("\x83\x8b\x83\x43\x81\x5b\x83\x57\x90\xd8\x82\xe8\x91\xd6\x82\xa6\x83\x7b\x83\x5e\x83\x93");
     mBrosButton->initWithoutIter();
 }
 
@@ -336,7 +336,7 @@ void FileSelector::createSysInfoWindow() {
 }
 
 void FileSelector::createFileInfo() {
-    mFileInfo = new FileSelectInfo(RFL_NAME_LEN + 1, "ファイル情報");
+    mFileInfo = new FileSelectInfo(RFL_NAME_LEN + 1, "\x83\x74\x83\x40\x83\x43\x83\x8b\x8f\xee\x95\xf1");
     mFileInfo->initWithoutIter();
 }
 
@@ -351,13 +351,21 @@ void FileSelector::createMiiSelect() {
 }
 
 void FileSelector::createMiiConfirmIcon() {
-    mMiiConfirmIcon = new MiiConfirmIcon("Mii確認用アイコン");
+    mMiiConfirmIcon = new MiiConfirmIcon("Mii\x8a\x6d\x94\x46\x97\x70\x83\x41\x83\x43\x83\x52\x83\x93");
     mMiiConfirmIcon->initWithoutIter();
     MR::connectToScene(mMiiConfirmIcon, MR::MovementType_Layout, MR::CalcAnimType_Layout, MR::DrawBufferType_None, MR::DrawType_LayoutDecoration);
 }
 
 void FileSelector::createMiiFont() {
     JKRMemArchive* pArchive = MR::receiveArchive("/LayoutData/MiiFont.arc");
+#ifdef TARGET_PC
+    // Only the Korean release ships a Mii name font; the other regions keep
+    // the layouts' own fonts.
+    if (pArchive == nullptr) {
+        mFont = nullptr;
+        return;
+    }
+#endif
     mFont = new nw4r::ut::ResFont();
     mFont->SetResource(pArchive->getResource("/MiiFont26.brfnt"));
     mFont->SetAlternateChar('?');
@@ -367,7 +375,7 @@ void FileSelector::createMiiFont() {
 }
 
 void FileSelector::createManual() {
-    mManual = new Manual2P("２Ｐマニュアル");
+    mManual = new Manual2P("\x82\x51\x82\x6f\x83\x7d\x83\x6a\x83\x85\x83\x41\x83\x8b");
     mManual->initWithoutIter();
 }
 
@@ -804,9 +812,16 @@ bool FileSelector::isUserFileCorrupted(s32 id) const {
 }
 
 bool FileSelector::isUserFileAppearLuigi(s32 id) const {
+#ifdef TARGET_PC
+    // Luigi can be chosen for every file, new ones included, without first
+    // finishing the game with Mario: the Mario/Luigi switch shows on each
+    // file's start screen, and the Luigi icon in the icon choice.
+    return true;
+#else
     id--;
 
     return !mUserFile[id].mIsPlayerMario || mUserFile[id].isViewCompleteEnding();
+#endif
 }
 
 bool FileSelector::isUserFileLuigi(s32 id) const {
@@ -869,7 +884,7 @@ s32 FileSelector::getMissCount(s32 id) const {
 }
 
 void FileSelector::playSelectedME() {
-    switch (MR::getRandom(0L, 4L)) {
+    switch (MR::getRandom(0, 4)) {
     case 0:
         MR::startSystemME("ME_ASTRO_DOME_SELECT1");
         break;

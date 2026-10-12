@@ -36,7 +36,7 @@ void Sky::init(const JMapInfoIter& rIter) {
     MR::useStageSwitchReadAppear(this, rIter);
 
     if (MR::isEqualString(objName, "SummerSky")) {
-        mSpaceInner = new SpaceInner("内側宇宙");
+        mSpaceInner = new SpaceInner("\x93\xe0\x91\xa4\x89\x46\x92\x88");
         mSpaceInner->initWithoutIter();
 
         if (MR::isValidSwitchB(this)) {
@@ -48,7 +48,7 @@ void Sky::init(const JMapInfoIter& rIter) {
     MR::getJMapInfoArg0NoInit(rIter, &arg0);
 
     if (arg0 == 0) {
-        mReflectionModel = new MirrorReflectionModel(this, "鏡内モデル", objName, getBaseMtx());
+        mReflectionModel = new MirrorReflectionModel(this, "\x8b\xbe\x93\xe0\x83\x82\x83\x66\x83\x8b", objName, getBaseMtx());
         mReflectionModel->initWithoutIter();
     }
 

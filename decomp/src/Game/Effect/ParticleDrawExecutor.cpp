@@ -127,24 +127,24 @@ void ParticleDrawExecutor::drawWithViewMtxAfterImageEffect(const TPos3f& rViewMt
 }
 
 void ParticleDrawExecutor::initDrawAdaptor() {
-    _4 = new NameObjAdaptor("3Dパーティクル");
+    _4 = new NameObjAdaptor("3D\x83\x70\x81\x5b\x83\x65\x83\x42\x83\x4e\x83\x8b");
     ::connectToSceneDrawAdaptor(_4, MR::Functor(this, &ParticleDrawExecutor::draw3D), MR::DrawType_EffectDraw3D);
 
-    _8 = new NameObjAdaptor("2Dパーティクル");
+    _8 = new NameObjAdaptor("2D\x83\x70\x81\x5b\x83\x65\x83\x42\x83\x4e\x83\x8b");
     ::connectToSceneDrawAdaptor(_8, MR::Functor(this, &ParticleDrawExecutor::draw2D), MR::DrawType_EffectDraw2D);
 
-    _C = new NameObjAdaptor("インダイレクトパーティクル");
+    _C = new NameObjAdaptor("\x83\x43\x83\x93\x83\x5f\x83\x43\x83\x8c\x83\x4e\x83\x67\x83\x70\x81\x5b\x83\x65\x83\x42\x83\x4e\x83\x8b");
     ::connectToSceneDrawAdaptor(_C, MR::Functor(this, &ParticleDrawExecutor::drawIndirect), MR::DrawType_EffectDrawIndirect);
 
-    _10 = new NameObjAdaptor("インダイレクト後パーティクル");
+    _10 = new NameObjAdaptor("\x83\x43\x83\x93\x83\x5f\x83\x43\x83\x8c\x83\x4e\x83\x67\x8c\xe3\x83\x70\x81\x5b\x83\x65\x83\x42\x83\x4e\x83\x8b");
     ::connectToSceneDrawAdaptor(_10, MR::Functor(this, &ParticleDrawExecutor::drawAfterIndirect), MR::DrawType_EffectDrawAfterIndirect);
 
-    _14 = new NameObjAdaptor("2Dモデル用パーティクル");
+    _14 = new NameObjAdaptor("2D\x83\x82\x83\x66\x83\x8b\x97\x70\x83\x70\x81\x5b\x83\x65\x83\x42\x83\x4e\x83\x8b");
     ::connectToSceneDrawAdaptor(_14, MR::Functor(this, &ParticleDrawExecutor::drawFor2DModel), MR::DrawType_EffectDrawFor2DModel);
 
-    _18 = new NameObjAdaptor("ブルーム用パーティクル");
+    _18 = new NameObjAdaptor("\x83\x75\x83\x8b\x81\x5b\x83\x80\x97\x70\x83\x70\x81\x5b\x83\x65\x83\x42\x83\x4e\x83\x8b");
     ::connectToSceneDrawAdaptor(_18, MR::Functor(this, &ParticleDrawExecutor::drawForBloomEffect), MR::DrawType_EffectDrawForBloomEffect);
 
-    _1C = new NameObjAdaptor("イメージエフェクト後パーティクル");
+    _1C = new NameObjAdaptor("\x83\x43\x83\x81\x81\x5b\x83\x57\x83\x47\x83\x74\x83\x46\x83\x4e\x83\x67\x8c\xe3\x83\x70\x81\x5b\x83\x65\x83\x42\x83\x4e\x83\x8b");
     ::connectToSceneDrawAdaptor(_1C, MR::Functor(this, &ParticleDrawExecutor::drawAfterImageEffect), MR::DrawType_EffectDrawAfterImageEffect);
 }

@@ -2,6 +2,9 @@
 
 #include <limits>
 #include <revolution.h>
+#include <string.h>
+#undef bcopy
+#undef bzero
 
 extern const s16 sIIRCutoff[128][4];
 

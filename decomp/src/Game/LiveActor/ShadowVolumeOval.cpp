@@ -5,7 +5,7 @@
 #include "Game/Util/MtxUtil.hpp"
 #include <JSystem/JGeometry/TMatrix.hpp>
 
-ShadowVolumeOval::ShadowVolumeOval() : ShadowVolumeModel("影描画[ボリューム楕球]"), mSize(100.0f, 100.0f, 200.0f) {
+ShadowVolumeOval::ShadowVolumeOval() : ShadowVolumeModel("\x89\x65\x95\x60\x89\xe6[\x83\x7b\x83\x8a\x83\x85\x81\x5b\x83\x80\x91\xc8\x8b\x85]"), mSize(100.0f, 100.0f, 200.0f) {
     initVolumeModel("ShadowVolumeSphere");
 }
 

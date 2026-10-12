@@ -249,9 +249,9 @@ void MeteorStrike::initModel() {
     }
 
     if (mType == MeteorStrikeType_Cannon) {
-        mBrokenModel = MR::createModelObjMapObjStrongLight("メテオキャノン壊れモデル", "MeteorCannonBreak", nullptr);
+        mBrokenModel = MR::createModelObjMapObjStrongLight("\x83\x81\x83\x65\x83\x49\x83\x4c\x83\x83\x83\x6d\x83\x93\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "MeteorCannonBreak", nullptr);
     } else {
-        mBrokenModel = MR::createModelObjMapObjStrongLight("メテオストライク壊れモデル", "MeteorStrikeBreak", nullptr);
+        mBrokenModel = MR::createModelObjMapObjStrongLight("\x83\x81\x83\x65\x83\x49\x83\x58\x83\x67\x83\x89\x83\x43\x83\x4e\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "MeteorStrikeBreak", nullptr);
     }
 
     mBrokenModel->mPosition.set(mPosition);
@@ -292,7 +292,7 @@ void MeteorStrike::emitEffectColumn(const TPos3f& rPos) {
 void MeteorStrike::startRumble() {
     f32 strongDistMax = mType == MeteorStrikeType_Cannon ? ::cRumbleDistanceCannonL : ::cRumbleDistance;
     f32 mediumDistMax = mType == MeteorStrikeType_Cannon ? FLOAT_MAX : ::cRumbleDistance * 2;
-    MR::startRumbleWithShakeCameraWeak(this, "強", "中", strongDistMax, mediumDistMax);
+    MR::startRumbleWithShakeCameraWeak(this, "\x8b\xad", "\x92\x86", strongDistMax, mediumDistMax);
 }
 
 bool MeteorStrike::isInScreen() const {

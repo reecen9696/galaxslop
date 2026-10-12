@@ -18,7 +18,7 @@ StarPointerBlur::~StarPointerBlur() {
 }
 
 StarPointerBlur::StarPointerBlur(JUTTexture* pTexture)
-    : NameObj("スターポインタ用ブラー"), mTexture(pTexture), mPadChannel(WPAD_CHAN0), mMainColor(nullptr), mSubColor(nullptr), mBlurPoints(nullptr),
+    : NameObj("\x83\x58\x83\x5e\x81\x5b\x83\x7c\x83\x43\x83\x93\x83\x5e\x97\x70\x83\x75\x83\x89\x81\x5b"), mTexture(pTexture), mPadChannel(WPAD_CHAN0), mMainColor(nullptr), mSubColor(nullptr), mBlurPoints(nullptr),
       mBlurThicks(nullptr), mBlurTexCoords(nullptr), mNumHiddenPoints(0), _2C(false), _2D(false), _30(0), _34(0), _38(0), _3C(0) {
     mBlurPoints = new BlurPoint[BLUR_POINT_NUM];
     mBlurThicks = new f32[BLUR_POINT_NUM];

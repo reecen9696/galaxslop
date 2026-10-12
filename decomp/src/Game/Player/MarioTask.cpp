@@ -179,14 +179,14 @@ void Mario::startHandy() {
 
 bool Mario::taskOnHandy(u32) {
     if (!mActor->_468) {
-        stopEffect("いい汗");
+        stopEffect("\x82\xa2\x82\xa2\x8a\xbe");
         return false;
     }
 
     if (mTargetWalkSpeedIndex > 2) {
-        playEffect("いい汗");
+        playEffect("\x82\xa2\x82\xa2\x8a\xbe");
     } else {
-        stopEffect("いい汗");
+        stopEffect("\x82\xa2\x82\xa2\x8a\xbe");
     }
 
     return true;
@@ -195,9 +195,9 @@ bool Mario::taskOnHandy(u32) {
 void Mario::startHipDropBlur() {
     if (isPlayerModeHopper()) {
         if (gIsLuigi) {
-            playEffect("ホッパー尻落ルイージ");
+            playEffect("\x83\x7a\x83\x62\x83\x70\x81\x5b\x90\x4b\x97\x8e\x83\x8b\x83\x43\x81\x5b\x83\x57");
         } else {
-            playEffect("ホッパー尻落");
+            playEffect("\x83\x7a\x83\x62\x83\x70\x81\x5b\x90\x4b\x97\x8e");
         }
 
         pushTask(&Mario::taskOnHipDropBlurHopper, 0x80);
@@ -205,9 +205,9 @@ void Mario::startHipDropBlur() {
     }
 
     if (gIsLuigi) {
-        playEffect("尻落ルイージ");
+        playEffect("\x90\x4b\x97\x8e\x83\x8b\x83\x43\x81\x5b\x83\x57");
     } else {
-        playEffect("尻落");
+        playEffect("\x90\x4b\x97\x8e");
     }
 
     pushTask(&Mario::taskOnHipDropBlur, 0x80);
@@ -216,9 +216,9 @@ void Mario::startHipDropBlur() {
 bool Mario::taskOnHipDropBlurHopper(u32) {
     if (!getPlayer()->mMovementStates._B || mMovementStates._1 || isStatusActive(MarioStatus_Swim)) {
         if (gIsLuigi) {
-            stopEffect("ホッパー尻落ルイージ");
+            stopEffect("\x83\x7a\x83\x62\x83\x70\x81\x5b\x90\x4b\x97\x8e\x83\x8b\x83\x43\x81\x5b\x83\x57");
         } else {
-            stopEffect("ホッパー尻落");
+            stopEffect("\x83\x7a\x83\x62\x83\x70\x81\x5b\x90\x4b\x97\x8e");
         }
 
         return false;
@@ -230,9 +230,9 @@ bool Mario::taskOnHipDropBlurHopper(u32) {
 bool Mario::taskOnHipDropBlur(u32) {
     if (!getPlayer()->mMovementStates._B || mMovementStates._1 || isStatusActive(MarioStatus_Swim)) {
         if (gIsLuigi) {
-            stopEffect("尻落ルイージ");
+            stopEffect("\x90\x4b\x97\x8e\x83\x8b\x83\x43\x81\x5b\x83\x57");
         } else {
-            stopEffect("尻落");
+            stopEffect("\x90\x4b\x97\x8e");
         }
 
         return false;
@@ -322,7 +322,7 @@ void Mario::startHipDropSlide(const HitSensor* pSensor) {
     _A64 = pSensor->mRadius;
     _70C = getAirGravityVec();
 
-    changeAnimation("ヒップドロップ滑り");
+    changeAnimation("\x83\x71\x83\x62\x83\x76\x83\x68\x83\x8d\x83\x62\x83\x76\x8a\x8a\x82\xe8");
 }
 
 void Mario::startJumpDropSlide(const HitSensor* pSensor) {
@@ -365,9 +365,9 @@ void Mario::startJumpDropSlide(const HitSensor* pSensor) {
         if (dot > sHopperJumpSlideDotMin) {
             f32 frontDot = mFrontVec.dot(slideDir);
             if (frontDot > sZero) {
-                changeAnimation("ジャンプ順滑り");
+                changeAnimation("\x83\x57\x83\x83\x83\x93\x83\x76\x8f\x87\x8a\x8a\x82\xe8");
             } else {
-                changeAnimation("ジャンプ逆滑り");
+                changeAnimation("\x83\x57\x83\x83\x83\x93\x83\x76\x8b\x74\x8a\x8a\x82\xe8");
             }
         }
     }

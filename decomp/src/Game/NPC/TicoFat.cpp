@@ -222,10 +222,10 @@ void TicoFat::init(const JMapInfoIter& rIter) {
     mMeter = new FullnessMeter(this, _1E4, _1E4 - _1E0);
     mMeter->initWithoutIter();
     mMeter->setNumber(_1E4 - _1E0);
-    MR::initMultiActorCamera(this, rIter, &mCameraInfo, "変身");
-    MR::initMultiActorCamera(this, rIter, &mCameraInfo, "飛行");
-    MR::initMultiActorCamera(this, rIter, &mCameraInfo, "喜び");
-    MR::declareEventCameraProgrammable("デブチコカメラ");
+    MR::initMultiActorCamera(this, rIter, &mCameraInfo, "\x95\xcf\x90\x67");
+    MR::initMultiActorCamera(this, rIter, &mCameraInfo, "\x94\xf2\x8d\x73");
+    MR::initMultiActorCamera(this, rIter, &mCameraInfo, "\x8a\xec\x82\xd1");
+    MR::declareEventCameraProgrammable("\x83\x66\x83\x75\x83\x60\x83\x52\x83\x4a\x83\x81\x83\x89");
     MR::useStageSwitchWriteA(this, rIter);
     MR::getNPCItemData(&item, 0);
     equipment(item, 0);
@@ -246,7 +246,7 @@ void TicoFat::init(const JMapInfoIter& rIter) {
     MR::startBrk(this, "Normal");
     MR::setBrkFrameAndStop(this, 0.0f);
     setScale(calcScale());
-    MR::joinToGroupArray(this, rIter, "惑星出現", 32);
+    MR::joinToGroupArray(this, rIter, "\x98\x66\x90\xaf\x8f\x6f\x8c\xbb", 32);
     AstroDemoFunction::tryRegisterSimpleCastIfAstroGalaxy(this);
     setDefaults();
     _12C = 1000.0f;
@@ -288,7 +288,7 @@ void TicoFat::setCameraParam() {
     trans = _C0;
     TVec3f* ptr = &trans;
     MR::setProgrammableCameraParam(
-        "デブチコカメラ", (*ptr + (xDir * 0.0f) + (yDir * 0.0f)) + (zDir * 0.0f),
+        "\x83\x66\x83\x75\x83\x60\x83\x52\x83\x4a\x83\x81\x83\x89", (*ptr + (xDir * 0.0f) + (yDir * 0.0f)) + (zDir * 0.0f),
         (*ptr + (xDir * 0.0f)) + ((yDir * 100.0f)) + (zDir * MR::getLinerValueFromMinMax(calcScale(), 1.0f, 1.9f, 1300.0f, 1680.0f)), yDir, false);
 }
 
@@ -330,13 +330,13 @@ void TicoFat::control() {
             if (_170 == 0) {
                 _170 = 1;
                 CameraTargetArg arg(this);
-                MR::startGlobalEventCamera("デブチコカメラ", arg, 120);
+                MR::startGlobalEventCamera("\x83\x66\x83\x75\x83\x60\x83\x52\x83\x4a\x83\x81\x83\x89", arg, 120);
                 setCameraParam();
             }
         } else {
             if (_170) {
                 _170 = 0;
-                MR::endGlobalEventCamera("デブチコカメラ", 120, true);
+                MR::endGlobalEventCamera("\x83\x66\x83\x75\x83\x60\x83\x52\x83\x4a\x83\x81\x83\x89", 120, true);
             }
         }
 
@@ -778,13 +778,13 @@ void TicoFat::exeTest() {
         setMessage(2);
     }
 
-    if (MR::tryStartDemo(this, "変身")) {
+    if (MR::tryStartDemo(this, "\x95\xcf\x90\x67")) {
         MR::invalidateHitSensors(this);
         MR::stopPlayerFpView();
         MR::tryTalkForceWithoutDemo(_16C);
 
         if (_1EC == 6) {
-            MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "喜び", -1);
+            MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "\x8a\xec\x82\xd1", -1);
         }
 
         MR::requestMovementOn(_94);
@@ -822,7 +822,7 @@ void TicoFat::exeMeta() {
 
 void TicoFat::exeDemo() {
     if (MR::isFirstStep(this)) {
-        MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "変身", -1);
+        MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "\x95\xcf\x90\x67", -1);
         MR::startAction(this, getActionName("Demo"));
         MR::startSound(this, "SE_SM_TICOFAT_META");
     }
@@ -846,7 +846,7 @@ void TicoFat::exeDemo() {
     }
 
     if (MR::isBckStopped(this)) {
-        MR::endMultiActorCamera(this, mCameraInfo, "変身", false, -1);
+        MR::endMultiActorCamera(this, mCameraInfo, "\x95\xcf\x90\x67", false, -1);
         if (_1DC == -1 && MR::isExistRail(this)) {
             setNerve(GET_NERVE(TicoFat, TicoFatNrvFly));
         } else {
@@ -859,7 +859,7 @@ void TicoFat::exeDemo() {
 void TicoFat::exeFly() {
     if (MR::isFirstStep(this)) {
         _1F8 = 0.0f;
-        MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "飛行", -1);
+        MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "\x94\xf2\x8d\x73", -1);
         MR::startAction(this, getActionName("Fly"));
         MR::startSound(this, "SE_DM_TICOFAT_MORPH_FLY");
         MR::tryRumblePadWeak(this, WPAD_CHAN0);
@@ -965,8 +965,8 @@ void TicoFat::exeAfter() {
     }
 
     if (MR::isGreaterEqualStep(this, 60)) {
-        MR::endMultiActorCamera(this, mCameraInfo, "飛行", false, -1);
-        MR::endDemo(this, "変身");
+        MR::endMultiActorCamera(this, mCameraInfo, "\x94\xf2\x8d\x73", false, -1);
+        MR::endDemo(this, "\x95\xcf\x90\x67");
         disappear(true);
         kill();
     }

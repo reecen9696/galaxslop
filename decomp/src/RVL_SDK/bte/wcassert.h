@@ -66,7 +66,7 @@
 #endif
 
 /* WARNING: This function does not have a definition. */
-void wc_assert(char const *message, char const *file, unsigned long int line);
+void wc_assert(char const *message, char const *file, unsigned int line);
 
 #ifdef __cplusplus
 	}

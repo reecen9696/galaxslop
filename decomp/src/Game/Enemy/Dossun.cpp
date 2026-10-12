@@ -189,7 +189,7 @@ void Dossun::exeFalling() {
 void Dossun::exeOnGround() {
     if (MR::isFirstStep(this)) {
         mPosition.set(_98);
-        MR::startRumbleWithShakeCameraNormalWeak(this, "中", "弱", ::sCamShakeDistanceStrong, ::sCamShakeDistanceWeak);
+        MR::startRumbleWithShakeCameraNormalWeak(this, "\x92\x86", "\x8e\xe3", ::sCamShakeDistanceStrong, ::sCamShakeDistanceWeak);
         MR::startSound(this, "SE_OJ_DOSSUN_LAND");
         MR::emitEffect(this, "Land");
     }

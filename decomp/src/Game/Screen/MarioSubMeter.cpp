@@ -59,9 +59,9 @@ MarioSubMeter::~MarioSubMeter() {
 }
 
 void MarioSubMeter::init(const JMapInfoIter& rIter) {
-    mFlyMeter = new SubMeterLayout("ハチメーター", "FlyMeter");
+    mFlyMeter = new SubMeterLayout("\x83\x6e\x83\x60\x83\x81\x81\x5b\x83\x5e\x81\x5b", "FlyMeter");
     mFlyMeter->initWithoutIter();
 
-    mAirMeter = new SubMeterLayout("水中メーター", "AirMeter");
+    mAirMeter = new SubMeterLayout("\x90\x85\x92\x86\x83\x81\x81\x5b\x83\x5e\x81\x5b", "AirMeter");
     mAirMeter->initWithoutIter();
 }

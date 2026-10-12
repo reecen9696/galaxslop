@@ -8,10 +8,10 @@
 #include "Game/Util/StringUtil.hpp"
 
 void DinoPackunStateDamage_FORCE_MATCH_STRINGS() {
-    MR::isEqualString("ディノパックンダメージ状態", "ディノパックンダメージ状態");
+    MR::isEqualString("\x83\x66\x83\x42\x83\x6d\x83\x70\x83\x62\x83\x4e\x83\x93\x83\x5f\x83\x81\x81\x5b\x83\x57\x8f\xf3\x91\xd4", "\x83\x66\x83\x42\x83\x6d\x83\x70\x83\x62\x83\x4e\x83\x93\x83\x5f\x83\x81\x81\x5b\x83\x57\x8f\xf3\x91\xd4");
     MR::isEqualString("SE_BV_D_PAKKUN_SPIN_HIT", "SE_BV_D_PAKKUN_SPIN_HIT");
     MR::isEqualString("SE_BM_D_PAKKUN_SLAVER", "SE_BM_D_PAKKUN_SLAVER");
-    MR::isEqualString("ディノパックンダメージ", "ディノパックンダメージ");
+    MR::isEqualString("\x83\x66\x83\x42\x83\x6d\x83\x70\x83\x62\x83\x4e\x83\x93\x83\x5f\x83\x81\x81\x5b\x83\x57", "\x83\x66\x83\x42\x83\x6d\x83\x70\x83\x62\x83\x4e\x83\x93\x83\x5f\x83\x81\x81\x5b\x83\x57");
 }
 
 namespace {
@@ -28,7 +28,7 @@ namespace NrvDinoPackunStateDamage {
     NEW_NERVE(DinoPackunStateDamageNrvLastDamage, DinoPackunStateDamage, LastDamage);
 };  // namespace NrvDinoPackunStateDamage
 
-DinoPackunStateDamage::DinoPackunStateDamage(DinoPackun* pHost) : ActorStateBase< DinoPackun >("ディノパックンダメージ状態", pHost), _10(), _14(1) {
+DinoPackunStateDamage::DinoPackunStateDamage(DinoPackun* pHost) : ActorStateBase< DinoPackun >("\x83\x66\x83\x42\x83\x6d\x83\x70\x83\x62\x83\x4e\x83\x93\x83\x5f\x83\x81\x81\x5b\x83\x57\x8f\xf3\x91\xd4", pHost), _10(), _14(1) {
     initNerve(GET_NERVE(DinoPackunStateDamage, DinoPackunStateDamageNrvPunched));
 }
 
@@ -172,7 +172,7 @@ void DinoPackunStateDamage::exeEggBroken() {
     }
 
     if (MR::isGreaterStep(this, 120)) {
-        getHost()->endDemo("ディノパックンダメージ");
+        getHost()->endDemo("\x83\x66\x83\x42\x83\x6d\x83\x70\x83\x62\x83\x4e\x83\x93\x83\x5f\x83\x81\x81\x5b\x83\x57");
         getHost()->getEggBrokenModel()->kill();
         kill();
         getHost()->endDamageCamera();
@@ -235,14 +235,14 @@ void DinoPackunStateDamage::updateDamage() {
     }
 
     if (MR::isBckStopped(getHost())) {
-        getHost()->endDemo("ディノパックンダメージ");
+        getHost()->endDemo("\x83\x66\x83\x42\x83\x6d\x83\x70\x83\x62\x83\x4e\x83\x93\x83\x5f\x83\x81\x81\x5b\x83\x57");
         kill();
         getHost()->endDamageCamera();
     }
 }
 
 void DinoPackunStateDamage::exeTryPulledDemo() {
-    if (MR::tryStartDemoMarioPuppetable(getHost(), "ディノパックンダメージ")) {
+    if (MR::tryStartDemoMarioPuppetable(getHost(), "\x83\x66\x83\x42\x83\x6d\x83\x70\x83\x62\x83\x4e\x83\x93\x83\x5f\x83\x81\x81\x5b\x83\x57")) {
         setNerve(GET_NERVE(DinoPackunStateDamage, DinoPackunStateDamageNrvPulled));
     }
 }

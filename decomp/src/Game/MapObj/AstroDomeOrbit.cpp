@@ -24,7 +24,7 @@ namespace {
     const static Color8 cBloomColor(0x00, 0xB4, 0x64, 0xFF);
 };  // namespace
 
-AstroDomeOrbit::AstroDomeOrbit() : LiveActor("天文ドームの軌道"), mOrbitRadius(5000.0f), mAngle() {
+AstroDomeOrbit::AstroDomeOrbit() : LiveActor("\x93\x56\x95\xb6\x83\x68\x81\x5b\x83\x80\x82\xcc\x8b\x4f\x93\xb9"), mOrbitRadius(5000.0f), mAngle() {
 }
 
 void AstroDomeOrbit::init(const JMapInfoIter& rIter) {
@@ -32,7 +32,7 @@ void AstroDomeOrbit::init(const JMapInfoIter& rIter) {
 
     MR::invalidateClipping(this);
 
-    MR::createAdaptorAndConnectToDrawBloomModel("天文ドーム軌道ブルーム描画", MR::Functor(this, &AstroDomeOrbit::drawBloom));
+    MR::createAdaptorAndConnectToDrawBloomModel("\x93\x56\x95\xb6\x83\x68\x81\x5b\x83\x80\x8b\x4f\x93\xb9\x83\x75\x83\x8b\x81\x5b\x83\x80\x95\x60\x89\xe6", MR::Functor(this, &AstroDomeOrbit::drawBloom));
 
     makeActorDead();
 }

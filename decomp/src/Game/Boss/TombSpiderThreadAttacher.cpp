@@ -11,7 +11,7 @@ namespace NrvTombSpiderThreadAttacher {
 };  // namespace NrvTombSpiderThreadAttacher
 
 TombSpiderThreadAttacher::TombSpiderThreadAttacher(LiveActor* pActor, const char* pJointName, f32 radius, f32 offset)
-    : LiveActor("巣の付着点"), mJointMtx(nullptr), mRadius(radius), mZOffset(offset) {
+    : LiveActor("\x91\x83\x82\xcc\x95\x74\x92\x85\x93\x5f"), mJointMtx(nullptr), mRadius(radius), mZOffset(offset) {
     mJointMtx = MR::getJointMtx(pActor, pJointName);
 }
 

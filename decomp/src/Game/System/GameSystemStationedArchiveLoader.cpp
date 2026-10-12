@@ -69,12 +69,12 @@ PlayerHeapHolder::PlayerHeapHolder() : mCondition(), mNapaHeap(), mGDDRHeap(), m
 void PlayerHeapHolder::adjust() {
     JKRExpHeap* napa = mNapaHeap;
     if (!napa->isEmpty()) {
-        napa->alloc(0x10000, nullptr);
+        napa->alloc(0x10000, 0);
     }
 
     JKRExpHeap* gddr = mGDDRHeap;
     if (!gddr->isEmpty()) {
-        gddr->alloc(0x10000, nullptr);
+        gddr->alloc(0x10000, 0);
     }
 
     MR::adjustHeapSize(mNapaHeap, nullptr);
@@ -107,7 +107,7 @@ JKRExpHeap* PlayerHeapHolder::createHeap(u32 size, JKRHeap* pParent) {
     return JKRExpHeap::create(size, pParent, true);
 }
 
-GameSystemStationedArchiveLoader::GameSystemStationedArchiveLoader() : NerveExecutor("常駐データ初期化"), mHeapHolder(), _C() {
+GameSystemStationedArchiveLoader::GameSystemStationedArchiveLoader() : NerveExecutor("\x8f\xed\x92\x93\x83\x66\x81\x5b\x83\x5e\x8f\x89\x8a\xfa\x89\xbb"), mHeapHolder(), _C() {
     initNerve(GET_NERVE_ANON(GameSystemStationedArchiveLoaderLoadAudio1stWaveData));
 }
 
@@ -178,14 +178,14 @@ void GameSystemStationedArchiveLoader::exeLoadStationedArchivePlayer() {
         mHeapHolder = new PlayerHeapHolder();
 
         MR::startFunctionAsyncExecute(MR::Functor(this, &GameSystemStationedArchiveLoader::startToLoadStationedArchivePlayer, true), 14,
-                                      "常駐リソース読み込み");
+                                      "\x8f\xed\x92\x93\x83\x8a\x83\x5c\x81\x5b\x83\x58\x93\xc7\x82\xdd\x8d\x9e\x82\xdd");
     } else if (trySuspend()) {
-        MR::suspendAsyncExecuteThread("常駐リソース読み込み");
+        MR::suspendAsyncExecuteThread("\x8f\xed\x92\x93\x83\x8a\x83\x5c\x81\x5b\x83\x58\x93\xc7\x82\xdd\x8d\x9e\x82\xdd");
         setNerve(GET_NERVE_ANON(GameSystemStationedArchiveLoaderSuspended));
         return;
     }
 
-    if (MR::tryEndFunctionAsyncExecute("常駐リソース読み込み")) {
+    if (MR::tryEndFunctionAsyncExecute("\x8f\xed\x92\x93\x83\x8a\x83\x5c\x81\x5b\x83\x58\x93\xc7\x82\xdd\x8d\x9e\x82\xdd")) {
         createAndAddPlayerArchives(mHeapHolder->mIsDataMario);
 
         if (mHeapHolder != nullptr) {
@@ -199,17 +199,17 @@ void GameSystemStationedArchiveLoader::exeLoadStationedArchivePlayer() {
 void GameSystemStationedArchiveLoader::exeLoadStationedArchiveOthers() {
     if (MR::isFirstStep(this)) {
         if (!tryAsyncExecuteIfNotSuspend(MR::Functor(this, &GameSystemStationedArchiveLoader::startToLoadStationedArchiveOthers),
-                                         "常駐リソース読み込み")) {
+                                         "\x8f\xed\x92\x93\x83\x8a\x83\x5c\x81\x5b\x83\x58\x93\xc7\x82\xdd\x8d\x9e\x82\xdd")) {
             setNerve(GET_NERVE_ANON(GameSystemStationedArchiveLoaderSuspended));
             return;
         }
     } else if (trySuspend()) {
-        MR::suspendAsyncExecuteThread("常駐リソース読み込み");
+        MR::suspendAsyncExecuteThread("\x8f\xed\x92\x93\x83\x8a\x83\x5c\x81\x5b\x83\x58\x93\xc7\x82\xdd\x8d\x9e\x82\xdd");
         setNerve(GET_NERVE_ANON(GameSystemStationedArchiveLoaderSuspended));
         return;
     }
 
-    if (MR::tryEndFunctionAsyncExecute("常駐リソース読み込み")) {
+    if (MR::tryEndFunctionAsyncExecute("\x8f\xed\x92\x93\x83\x8a\x83\x5c\x81\x5b\x83\x58\x93\xc7\x82\xdd\x8d\x9e\x82\xdd")) {
         createAndAddOtherArchives();
         setNerve(GET_NERVE_ANON(GameSystemStationedArchiveLoaderLoadStationedArchivePlayer));
     }
@@ -235,10 +235,10 @@ void GameSystemStationedArchiveLoader::exeChangeArchivePlayer() {
         mHeapHolder->dispose();
         bool isMario = mHeapHolder->mIsDataMario;
         MR::startFunctionAsyncExecute(MR::Functor(this, &GameSystemStationedArchiveLoader::startToLoadStationedArchivePlayer, isMario), 14,
-                                      "プレイヤーリソース読み込み");
+                                      "\x83\x76\x83\x8c\x83\x43\x83\x84\x81\x5b\x83\x8a\x83\x5c\x81\x5b\x83\x58\x93\xc7\x82\xdd\x8d\x9e\x82\xdd");
     }
 
-    if (MR::tryEndFunctionAsyncExecute("プレイヤーリソース読み込み")) {
+    if (MR::tryEndFunctionAsyncExecute("\x83\x76\x83\x8c\x83\x43\x83\x84\x81\x5b\x83\x8a\x83\x5c\x81\x5b\x83\x58\x93\xc7\x82\xdd\x8d\x9e\x82\xdd")) {
         createAndAddPlayerArchives(mHeapHolder->mIsDataMario);
         setNerve(GET_NERVE_ANON(GameSystemStationedArchiveLoaderEnd));
     }

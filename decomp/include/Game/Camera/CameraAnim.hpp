@@ -52,7 +52,7 @@ class KeyCamAnmDataAccessor;
 
 class CameraAnim : public Camera {
 public:
-    CameraAnim(const char* pName = "アニメーションカメラ");
+    CameraAnim(const char* pName = "\x83\x41\x83\x6a\x83\x81\x81\x5b\x83\x56\x83\x87\x83\x93\x83\x4a\x83\x81\x83\x89");
 
     virtual void reset();
     virtual CameraTargetObj* calc();

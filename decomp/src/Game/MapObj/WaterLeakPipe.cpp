@@ -29,7 +29,7 @@ IceStepNoSlip::~IceStepNoSlip() {
 WaterLeakPipe::~WaterLeakPipe() {
 }
 
-IceStepNoSlip::IceStepNoSlip(MtxPtr mtx) : ModelObj("アイス床", "IceStepNoSlip", mtx, MR::DrawBufferType_IndirectMapObjStrongLight, -2, -2, false) {
+IceStepNoSlip::IceStepNoSlip(MtxPtr mtx) : ModelObj("\x83\x41\x83\x43\x83\x58\x8f\xb0", "IceStepNoSlip", mtx, MR::DrawBufferType_IndirectMapObjStrongLight, -2, -2, false) {
 }
 
 void IceStepNoSlip::init(const JMapInfoIter& rIter) {

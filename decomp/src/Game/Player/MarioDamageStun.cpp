@@ -6,14 +6,14 @@ MarioStun::MarioStun(MarioActor* pActor) : MarioState(pActor, MarioStatus_Stun),
 }
 
 bool MarioStun::close() {
-    stopAnimation("しびれ");  // "hesitation"
+    stopAnimation("\x82\xb5\x82\xd1\x82\xea");  // "hesitation"
     return true;
 }
 
 bool MarioStun::start() {
-    changeAnimationNonStop("しびれ");
-    startPadVib("マリオ[しびれ]");
-    playSound("声しびれ");
+    changeAnimationNonStop("\x82\xb5\x82\xd1\x82\xea");
+    startPadVib("\x83\x7d\x83\x8a\x83\x49[\x82\xb5\x82\xd1\x82\xea]");
+    playSound("\x90\xba\x82\xb5\x82\xd1\x82\xea");
     _14 = 0x3c;
     _12 = 0;
     return true;
@@ -37,7 +37,7 @@ bool MarioStun::update() {
         }
 
         if (getPlayer()->mMovementStates._1) {
-            changeAnimation("しびれ回復");
+            changeAnimation("\x82\xb5\x82\xd1\x82\xea\x89\xf1\x95\x9c");
         }
     }
 

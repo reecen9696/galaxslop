@@ -4,7 +4,7 @@
 
 class CameraTalk : public Camera {
 public:
-    CameraTalk(const char* pName = "会話カメラ");
+    CameraTalk(const char* pName = "\x89\xef\x98\x62\x83\x4a\x83\x81\x83\x89");
 
     virtual void reset();
     virtual CameraTargetObj* calc();

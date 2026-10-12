@@ -18,7 +18,7 @@ namespace NrvGalaxySelectInfo {
 };  // namespace NrvGalaxySelectInfo
 
 GalaxySelectInfo::GalaxySelectInfo(bool param1)
-    : LayoutActor("ギャラクシー選択情報", true), _20(param1), _24(nullptr), _28(false), mFadeinoutControl(nullptr), mInfoLayoutSetter(nullptr) {
+    : LayoutActor("\x83\x4d\x83\x83\x83\x89\x83\x4e\x83\x56\x81\x5b\x91\x49\x91\xf0\x8f\xee\x95\xf1", true), _20(param1), _24(nullptr), _28(false), mFadeinoutControl(nullptr), mInfoLayoutSetter(nullptr) {
     mFadeinoutControl = new ValueControl(::cFadeinoutFrame);
     mFadeinoutControl->setZero();
 }

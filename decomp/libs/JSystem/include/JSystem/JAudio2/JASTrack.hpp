@@ -401,3 +401,13 @@ struct JASTrack : public JASPoolAllocObject_MultiThreaded< JASTrack > {
     };
     /* 0x248 */ JGadget::TLinkListNode mNode;
 };
+
+#ifndef __MWERKS__
+// The list typedef uses the Wii offset; resolve the real one once JASTrack is complete.
+template <>
+struct JGadget::TLinkListOffset< JASTrack, -0x248 > {
+    static int value() {
+        return -static_cast< int >(offsetof(JASTrack, mNode));
+    }
+};
+#endif

@@ -116,7 +116,7 @@ void Balloonfish::exeWait() {
     }
 
     // "weak"
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         mNerveBeforeBind = mSpine->getCurrentNerve();
         setNerve(GET_NERVE(Balloonfish, HostTypeNrvStarPointerBind));
         return;
@@ -175,7 +175,7 @@ void Balloonfish::exeDash() {
     }
 
     // "weak"
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         mNerveBeforeBind = mSpine->getCurrentNerve();
         setNerve(GET_NERVE(Balloonfish, HostTypeNrvStarPointerBind));
         return;
@@ -196,7 +196,7 @@ void Balloonfish::exeStarPointerBind() {
     mVelocity.zero();
 
     // "weak"
-    if (!MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (!MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         setNerve(mNerveBeforeBind);
     }
 }

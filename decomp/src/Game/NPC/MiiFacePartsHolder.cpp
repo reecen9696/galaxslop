@@ -16,7 +16,7 @@
 #include <JSystem/JKernel/JKRMemArchive.hpp>
 #include <JSystem/JKernel/JKRSolidHeap.hpp>
 
-MiiFacePartsHolder::MiiFacePartsHolder(int partsNumMax) : LiveActorGroup("Mii顔モデル保持", partsNumMax), JKRDisposer(), mRFLWorkBuffer(), _34() {
+MiiFacePartsHolder::MiiFacePartsHolder(int partsNumMax) : LiveActorGroup("Mii\x8a\xe7\x83\x82\x83\x66\x83\x8b\x95\xdb\x8e\x9d", partsNumMax), JKRDisposer(), mRFLWorkBuffer(), _34() {
 }
 
 MiiFacePartsHolder::~MiiFacePartsHolder() {
@@ -34,7 +34,7 @@ void MiiFacePartsHolder::init(const JMapInfoIter& rIter) {
     _38 = RFLInitResAsync(mRFLWorkBuffer, pResBuffer, resSize, false);
 
     MR::connectToScene(this, MR::MovementType_None, MR::CalcAnimType_NPC, MR::DrawBufferType_None, MR::DrawType_MiiFacePartsHolder);
-    MR::connectToScene(MR::createDrawAdaptor("Miiモデル再作成", MR::Functor(this, &MiiFacePartsHolder::reinitCharModel)), MR::MovementType_None,
+    MR::connectToScene(MR::createDrawAdaptor("Mii\x83\x82\x83\x66\x83\x8b\x8d\xc4\x8d\xec\x90\xac", MR::Functor(this, &MiiFacePartsHolder::reinitCharModel)), MR::MovementType_None,
                        MR::CalcAnimType_None, MR::DrawBufferType_None, MR::DrawType_MiiFaceNew);
 }
 

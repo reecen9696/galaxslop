@@ -19,8 +19,14 @@ GXTexObj clear_z_tobj;
 
 Mtx e_mtx = {{1.0f, 0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f, 0.0f}};
 
+#if defined(__MWERKS__) || defined(__BIG_ENDIAN__)
 u32 clearZTexData[] ATTRIBUTE_ALIGN(32) = {0x00FF00FF, 0x00FF00FF, 0x00FF00FF, 0x00FF00FF, 0x00FF00FF, 0x00FF00FF, 0x00FF00FF, 0x00FF00FF,
                                            0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+#else
+// Texture memory is big-endian: Z24X8 texels of 0xFFFFFF (far).
+u32 clearZTexData[] ATTRIBUTE_ALIGN(32) = {0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00, 0xFF00FF00,
+                                           0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+#endif
 
 namespace {
     s32 getDisplayingXfbIndex() NO_INLINE;
@@ -165,6 +171,18 @@ void MainLoopFramework::exchangeXfb_triple() {
         if (nextIdx >= 3 || nextIdx < 0) {
             nextIdx = 0;
         }
+#ifdef TARGET_PC
+        // The buffer to draw into next is still on display: the game drew
+        // two frames within one retrace.  On the console the retrace
+        // interrupt moves the display on while this spins; the port only
+        // takes interrupts at safe points, which this loop had none of, so
+        // the game hung here for good (a black cinematic after the first
+        // Grand Star).
+        if (nextIdx == ::getDisplayingXfbIndex()) {
+            port_host_sleep_ns(200000);
+            port_irq_poll();
+        }
+#endif
     } while (nextIdx == ::getDisplayingXfbIndex());
     pXfbMgr->mDrawingXfbIndex = nextIdx;
 }
@@ -317,9 +335,9 @@ void MainLoopFramework::clearEfb(int param1, int param2, int param3, int param4,
     u16 fbWidth = JUTVideo::getManager()->getRenderMode()->fbWidth;
     u16 efbHeight = JUTVideo::getManager()->getRenderMode()->efbHeight;
     Mtx44 proj;
-    C_MTXOrtho(proj, 0f, efbHeight, 0f, fbWidth, 0f, 1f);
+    C_MTXOrtho(proj, 0.0f, efbHeight, 0.0f, fbWidth, 0.0f, 1.0f);
     GXSetProjection(proj, GX_ORTHOGRAPHIC);
-    GXSetViewport(0f, 0f, fbWidth, efbHeight, 0f, 1f);
+    GXSetViewport(0.0f, 0.0f, fbWidth, efbHeight, 0.0f, 1.0f);
     GXSetScissor(0, 0, fbWidth, efbHeight);
     GXLoadPosMtxImm(e_mtx, GX_PNMTX0);
     GXSetCurrentMtx(GX_PNMTX0);
@@ -390,8 +408,8 @@ void MainLoopFramework::calcCombinationRatio() {
     }
 
     mCombinationRatio = (f32)var2 / (u32)mLastFrameTime;
-    if (mCombinationRatio > 1f) {
-        mCombinationRatio = 1f;
+    if (mCombinationRatio > 1.0f) {
+        mCombinationRatio = 1.0f;
     }
 }
 
@@ -444,8 +462,11 @@ namespace {
 
             u32 msg;
             do {
-                if (!OSReceiveMessage(JUTVideo::getManager()->getMessageQueue(), (OSMessage*)&msg, OS_MESSAGE_BLOCK)) {
+                OSMessage received;  // pointer-sized on the port; the value is a retrace count
+                if (!OSReceiveMessage(JUTVideo::getManager()->getMessageQueue(), &received, OS_MESSAGE_BLOCK)) {
                     msg = dummy;
+                } else {
+                    msg = static_cast< u32 >(reinterpret_cast< uintptr_t >(received));
                 }
             } while ((s32)(msg - nextCount) < 0);
             nextCount = msg + count;

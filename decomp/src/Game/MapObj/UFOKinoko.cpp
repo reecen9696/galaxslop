@@ -29,7 +29,7 @@ void UFOKinoko::init(const JMapInfoIter& rIter) {
     MR::getMapPartsArgShadowType(&argShadowType, rIter);
     bool hasShadow = !MR::isMapPartsShadowTypeNone(argShadowType);
     MapObjActorInitInfo info;
-    info.setupHioNode("地形オブジェ");
+    info.setupHioNode("\x92\x6e\x8c\x60\x83\x49\x83\x75\x83\x57\x83\x46");
     info.setupDefaultPos();
     info.setupConnectToScene();
     info.setupEffect(nullptr);
@@ -58,7 +58,7 @@ void UFOKinoko::init(const JMapInfoIter& rIter) {
     MapObjActorUtil::startRotator(this);
 
     if (MR::isDemoCast(this, nullptr)) {
-        MR::tryRegisterDemoActionFunctor(this, MR::Functor(this, &UFOKinoko::startMove), "ＵＦＯキノコ登場");
+        MR::tryRegisterDemoActionFunctor(this, MR::Functor(this, &UFOKinoko::startMove), "\x82\x74\x82\x65\x82\x6e\x83\x4c\x83\x6d\x83\x52\x93\x6f\x8f\xea");
     }
 }
 

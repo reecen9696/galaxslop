@@ -56,11 +56,11 @@ void RunawayRabbitCollect::init(const JMapInfoIter& rIter) {
     for (s32 i = 0; i < MR::getChildObjNum(rIter); i++) {
         MR::getChildObjName(&childObjName, rIter, i);
         if (MR::isEqualString(childObjName, "RunawayRabbit")) {
-            mRabbit[mRabbitNum] = new RunawayRabbit("球面逃げウサギ", this);
+            mRabbit[mRabbitNum] = new RunawayRabbit("\x8b\x85\x96\xca\x93\xa6\x82\xb0\x83\x45\x83\x54\x83\x4d", this);
             MR::initChildObj(mRabbit[mRabbitNum], rIter, i);
             mRabbitNum++;
         } else if (MR::isEqualString(childObjName, "RunawayTico")) {
-            mTico[mTicoNum] = new RunawayTico("逃げチコ");
+            mTico[mTicoNum] = new RunawayTico("\x93\xa6\x82\xb0\x83\x60\x83\x52");
             MR::initChildObj(mTico[mTicoNum], rIter, i);
             mTicoNum++;
         }

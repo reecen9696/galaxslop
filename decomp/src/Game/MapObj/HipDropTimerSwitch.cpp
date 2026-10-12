@@ -185,7 +185,7 @@ void HipDropTimerSwitch::exeOff() {
     }
 
     // "Weak"
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         mIsLightPressed = true;
     }
 

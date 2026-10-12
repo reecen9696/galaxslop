@@ -21,7 +21,7 @@ void TripodBossCoin::init(const JMapInfoIter& rIter) {
     MR::connectToSceneMapObjDecorationMovement(this);
     MR::getJMapInfoArg0NoInit(rIter, &mJointID);
 
-    mCoin = static_cast< Coin* >(MR::createCoin(this, "コイン(三脚ボス用)"));
+    mCoin = static_cast< Coin* >(MR::createCoin(this, "\x83\x52\x83\x43\x83\x93(\x8e\x4f\x8b\x72\x83\x7b\x83\x58\x97\x70)"));
     mCoin->initWithoutIter();
 
     mSpine = new Spine(this, GET_NERVE(TripodBossCoin, TripodBossCoinNrvNonActive));

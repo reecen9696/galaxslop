@@ -46,12 +46,12 @@ namespace NrvInformationObserver {
     NEW_NERVE(InformationObserverNrvDisp, InformationObserver, Disp);
 };  // namespace NrvInformationObserver
 
-InformationObserver::InformationObserver() : LiveActor("初出監視"), mType(Type_Bee), _90(false), mDisplayFrame(-1) {
+InformationObserver::InformationObserver() : LiveActor("\x8f\x89\x8f\x6f\x8a\xc4\x8e\x8b"), mType(Type_Bee), _90(false), mDisplayFrame(-1) {
 }
 
 void InformationObserver::init(const JMapInfoIter& rIter) {
     MR::connectToSceneLayoutMovement(this);
-    MR::declareEventCameraProgrammable("初出監視カメラ");
+    MR::declareEventCameraProgrammable("\x8f\x89\x8f\x6f\x8a\xc4\x8e\x8b\x83\x4a\x83\x81\x83\x89");
     initNerve(GET_NERVE(InformationObserver, InformationObserverNrvWait));
     MR::invalidateClipping(this);
     makeActorDead();
@@ -66,7 +66,7 @@ void InformationObserver::entry(TYPE type, LiveActor* pParam2) {
         MR::pauseTimeKeepDemo(_94);
         setNerve(GET_NERVE(InformationObserver, InformationObserverNrvDisp));
     } else {
-        MR::requestStartDemoWithoutCinemaFrame(this, "初出表示", GET_NERVE(InformationObserver, InformationObserverNrvDisp),
+        MR::requestStartDemoWithoutCinemaFrame(this, "\x8f\x89\x8f\x6f\x95\x5c\x8e\xa6", GET_NERVE(InformationObserver, InformationObserverNrvDisp),
                                                GET_NERVE(InformationObserver, InformationObserverNrvWait));
     }
 
@@ -103,7 +103,7 @@ void InformationObserver::exeDisp() {
     if (_90) {
         MR::resumeTimeKeepDemo(_94);
     } else {
-        MR::endDemo(this, "初出表示");
+        MR::endDemo(this, "\x8f\x89\x8f\x6f\x95\x5c\x8e\xa6");
     }
 
     if (sAttr[mType].mBgmName != nullptr) {

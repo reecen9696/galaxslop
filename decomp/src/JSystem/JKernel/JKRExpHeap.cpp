@@ -19,8 +19,9 @@ JKRExpHeap* JKRExpHeap::createRoot(int heapNum, bool errorFlag) {
         char* arena;
         u32 arenaSize;
         JKRHeap::initArena(&arena, &arenaSize, heapNum);
-        char* area = arena + 0x90;
-        u32 size = arenaSize - 0x90;
+        const u32 headerSize = ALIGN_NEXT(sizeof(JKRExpHeap), 0x10);  // 0x90 on the Wii
+        char* area = arena + headerSize;
+        u32 size = arenaSize - headerSize;
         heap = new (arena) JKRExpHeap(area, size, nullptr, errorFlag);
         JKRHeap::sRootHeap = heap;
     }
@@ -726,7 +727,7 @@ bool JKRExpHeap::check() {
                 JUTWarningConsole_f(":::addr %08x: bad previous pointer (%08x)\n", block->mNext, block->mNext->mPrev);
             }
 
-            if (reinterpret_cast< u32 >(block) + block->mSize + sizeof(CMemBlock) > reinterpret_cast< u32 >(block->mNext)) {
+            if (reinterpret_cast< u32 >(block) + block->mSize + sizeof(CMemBlock) > static_cast< u32 >(block->mNext)) {
                 ok = false;
                 JUTWarningConsole_f(":::addr %08x: bad block size (%08x)\n", block, block->mSize);
             }

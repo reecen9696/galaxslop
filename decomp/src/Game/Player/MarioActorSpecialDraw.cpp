@@ -229,7 +229,7 @@ void MarioActor::hideBeeFur() {
 
     if (mMario->isPlayerModeInvincible()) {
         _A6E = 0;
-        stopEffect("無敵中");
+        stopEffect("\x96\xb3\x93\x47\x92\x86");
     }
 }
 
@@ -637,6 +637,46 @@ void MarioActor::drawRasterScroll(f32 amplitude, s16 period, f32 wavelength) con
         return;
     }
 
+#ifdef TARGET_PC
+    // GX's one-pixel lines leave gaps when the EFB is rendered at a higher
+    // resolution. Copy the scene once and cover each native row with a
+    // textured strip; the same geometry then works for every eye/scale.
+    const u16 width = MR::getFrameBufferWidth();
+    const u16 height = MR::getScreenHeight();
+    static u8* image = new (0x20) u8[GXGetTexBufferSize(width, height, GX_TF_RGB565, GX_FALSE, 0)];
+    GXDrawDone();
+    GXTexModeSync();
+    GXPixModeSync();
+    TDDraw::setup(1, 0, 2);
+    GXSetTexCopyDst(width, height, GX_TF_RGB565, GX_FALSE);
+    GXSetTexCopySrc(0, 0, width, height);
+    GXCopyTex(image, GX_FALSE);
+    GXTexModeSync();
+    GXPixModeSync();
+    GXTexObj texture;
+    GXInitTexObj(&texture, image, width, height, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXLoadTexObj(&texture, GX_TEXMAP0);
+    const f32 phase = (_37C * JMath::TAngleConstant_< f32 >::RADIAN_DEG360()) / period;
+    const f32 spatialPhase = TWO_PI / wavelength;
+    const f32 screenWidth = MR::getScreenWidth();
+    for (u32 row = 0; row < height; row++) {
+        const f32 angle = MR::sin(spatialPhase * row) * JGeometry::TUtil< f32 >::PI();
+        const f32 offset = amplitude * MR::sin(angle + phase);
+        const f32 top = static_cast< f32 >(row) / height;
+        const f32 bottom = static_cast< f32 >(row + 1) / height;
+        GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, 4);
+        GXPosition3f32(offset, row, 0.0f);
+        GXTexCoord2f32(0.0f, top);
+        GXPosition3f32(offset + screenWidth, row, 0.0f);
+        GXTexCoord2f32(1.0f, top);
+        GXPosition3f32(offset, row + 1, 0.0f);
+        GXTexCoord2f32(0.0f, bottom);
+        GXPosition3f32(offset + screenWidth, row + 1, 0.0f);
+        GXTexCoord2f32(1.0f, bottom);
+        GXEnd();
+    }
+    GXDrawDone();
+#else
     u32 next;
     u32 stripHeight = 4;
     GXTexObj textures[2];
@@ -681,6 +721,7 @@ void MarioActor::drawRasterScroll(f32 amplitude, s16 period, f32 wavelength) con
     }
 
     GXDrawDone();
+#endif
 }
 
 void MarioActor::drawMosaic() const {
@@ -695,7 +736,7 @@ void MarioActor::calcSpinEffect() {
     _6D4 = 0.0f;
     _6D8 = 0.0f;
 
-    if (selectAction("スピン回復エフェクト") != 1) {
+    if (selectAction("\x83\x58\x83\x73\x83\x93\x89\xf1\x95\x9c\x83\x47\x83\x74\x83\x46\x83\x4e\x83\x67") != 1) {
         return;
     }
 
@@ -821,8 +862,8 @@ void MarioActor::updateDarkMask(u16 unused) {
     u8* previous = mMaskTextures[_B88]->mImage;
     _B88 = 1 - _B88;
     u8* image = mMaskTextures[_B88]->mImage;
-    u8 x = MR::getRandom(0L, 8L);
-    u8 y = MR::getRandom(0L, 8L);
+    u8 x = MR::getRandom(0, 8);
+    u8 y = MR::getRandom(0, 8);
     s32 index = x + y * 8;
     image[index] = 0xF0;
     previous[index] = 0xF0;
@@ -905,7 +946,7 @@ void MarioActor::showBeeFur() {
     if (mMario->isPlayerModeInvincible()) {
         MR::showJoint(getJ3DModel(), "Face0");
         _A6E = 2;
-        playEffect("無敵中");
+        playEffect("\x96\xb3\x93\x47\x92\x86");
     }
 }
 

@@ -29,11 +29,11 @@ void CameraManGame_FORCE_MATCH_SDATA2() {
 
 namespace {
     static const f32 sMinDistance = 300.0f;
-    const char* sThruCamName = "デフォルトカメラ";
-    const char* sDefaultWaterCamName = "デフォルト水中カメラ";
-    const char* sDefaultWaterSurfaceCamName = "デフォルト水面カメラ";
-    const char* sDefaultFooFighterCamName = "デフォルトフーファイターカメラ";
-    const char* sStartAnimCamName = "スタートアニメカメラ";
+    const char* sThruCamName = "\x83\x66\x83\x74\x83\x48\x83\x8b\x83\x67\x83\x4a\x83\x81\x83\x89";
+    const char* sDefaultWaterCamName = "\x83\x66\x83\x74\x83\x48\x83\x8b\x83\x67\x90\x85\x92\x86\x83\x4a\x83\x81\x83\x89";
+    const char* sDefaultWaterSurfaceCamName = "\x83\x66\x83\x74\x83\x48\x83\x8b\x83\x67\x90\x85\x96\xca\x83\x4a\x83\x81\x83\x89";
+    const char* sDefaultFooFighterCamName = "\x83\x66\x83\x74\x83\x48\x83\x8b\x83\x67\x83\x74\x81\x5b\x83\x74\x83\x40\x83\x43\x83\x5e\x81\x5b\x83\x4a\x83\x81\x83\x89";
+    const char* sStartAnimCamName = "\x83\x58\x83\x5e\x81\x5b\x83\x67\x83\x41\x83\x6a\x83\x81\x83\x4a\x83\x81\x83\x89";
     static const f32 sZoomRadius = 100.0f;
     static const s32 sInterpolateOffCounterMax = 5;
 };  // namespace
@@ -85,7 +85,7 @@ void CameraManGame::zoomIn() {
     mZoomedIn = true;
 
     CameraParamChunkID_Tmp chunkID = CameraParamChunkID_Tmp();
-    chunkID.createOtherID(0, "ズームカメラ");
+    chunkID.createOtherID(0, "\x83\x59\x81\x5b\x83\x80\x83\x4a\x83\x81\x83\x89");
 
     CameraParamChunk* chunk = mChunkHolder->getChunk(chunkID);
 
@@ -500,7 +500,7 @@ void CameraManGame::createStartAnimCamera() {
 
 void CameraManGame::createZoomCamera() {
     CameraParamChunkID_Tmp chunkID = CameraParamChunkID_Tmp();
-    chunkID.createOtherID(0, "ズームカメラ");
+    chunkID.createOtherID(0, "\x83\x59\x81\x5b\x83\x80\x83\x4a\x83\x81\x83\x89");
     CameraParamChunk* chunk = mChunkHolder->createChunk(chunkID, nullptr);
 
     CameraDirector* director = CameraLocalUtil::getCameraDirector();
@@ -677,7 +677,7 @@ bool CameraManGame::tryZoomCamera() {
     }
 
     CameraParamChunkID_Tmp chunkID = CameraParamChunkID_Tmp();
-    chunkID.createOtherID(0, "ズームカメラ");
+    chunkID.createOtherID(0, "\x83\x59\x81\x5b\x83\x80\x83\x4a\x83\x81\x83\x89");
 
     setChunk(chunkID);
 
@@ -686,7 +686,7 @@ bool CameraManGame::tryZoomCamera() {
 
 bool CameraManGame::isZoomCamera() const {
     CameraParamChunkID_Tmp chunkID = CameraParamChunkID_Tmp();
-    chunkID.createOtherID(0, "ズームカメラ");
+    chunkID.createOtherID(0, "\x83\x59\x81\x5b\x83\x80\x83\x4a\x83\x81\x83\x89");
 
     CameraParamChunk* chunk = mChunkHolder->getChunk(chunkID);
 

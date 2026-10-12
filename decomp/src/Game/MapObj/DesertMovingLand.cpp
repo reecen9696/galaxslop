@@ -11,7 +11,7 @@
 #include <revolution/mtx.h>
 
 namespace {
-    static const char* cDemoName = "砂漠ＵＦＯ上昇";
+    static const char* cDemoName = "\x8d\xbb\x94\x99\x82\x74\x82\x65\x82\x6e\x8f\xe3\x8f\xb8";
 };  // namespace
 
 namespace NrvDesertMovingLand {
@@ -167,7 +167,7 @@ void DesertMovingLand::exeMoveSign() {
     if (MR::isFirstStep(this)) {
         MR::startBck(this, "Vibration");
 
-        if (MR::isDemoActive("砂ＵＦＯ下降"))
+        if (MR::isDemoActive("\x8d\xbb\x82\x74\x82\x65\x82\x6e\x89\xba\x8d\x7e"))
             MR::stopStageBGM(60);
 
         MR::shakeCameraInfinity(this, 0.15f, 1.2f);
@@ -180,7 +180,7 @@ void DesertMovingLand::exeMoveSign() {
             setNerve(GET_NERVE(DesertMovingLand, HostTypeMoveUp));
         else {
             if (isNerve(GET_NERVE(DesertMovingLand, HostTypeMoveDownSign))) {
-                if (MR::isDemoActive("砂ＵＦＯ下降"))
+                if (MR::isDemoActive("\x8d\xbb\x82\x74\x82\x65\x82\x6e\x89\xba\x8d\x7e"))
                     MR::startEventBGM(MR::EventBgmID_Hurry);
 
                 setNerve(GET_NERVE(DesertMovingLand, HostTypeMoveDown));

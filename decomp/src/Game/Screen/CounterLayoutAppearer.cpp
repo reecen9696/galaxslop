@@ -16,7 +16,7 @@ namespace NrvCounterLayoutAppearer {
 }  // namespace NrvCounterLayoutAppearer
 
 CounterLayoutAppearer::CounterLayoutAppearer(LayoutActor* pActor, const TVec2f& rAppearOffset)
-    : NerveExecutor("カウンタ出現制御"), mLayout(pActor), mAppearOffset(rAppearOffset), mFollowPos(0.0f, 0.0f), _1C(0.0f, 0.0f) {
+    : NerveExecutor("\x83\x4a\x83\x45\x83\x93\x83\x5e\x8f\x6f\x8c\xbb\x90\xa7\x8c\xe4"), mLayout(pActor), mAppearOffset(rAppearOffset), mFollowPos(0.0f, 0.0f), _1C(0.0f, 0.0f) {
     MR::setFollowPos(&mFollowPos, pActor, nullptr);
     MR::setFollowTypeAdd(mLayout, nullptr);
     initNerve(GET_NERVE(CounterLayoutAppearer, CounterLayoutAppearerNrvHide));

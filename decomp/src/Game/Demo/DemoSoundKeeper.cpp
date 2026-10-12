@@ -20,7 +20,17 @@ DemoSoundKeeper::DemoSoundKeeper(DemoExecutor* pExecutor) : DemoSheetKeeperBase(
         pMap->getValue(i, "PartName", &info.mPartName);
         pMap->getValue(i, "Bgm", &info.mBgm);
         pMap->getValue(i, "SystemSe", &info.mSystemSe);
+#ifdef __MWERKS__
         pMap->getValue(i, "ReturnBgm", reinterpret_cast< s32* >(&info.mReturnBgm));
+#else
+        {
+            // The original stores a 32-bit value into this bool; on the
+            // big-endian console the bool receives the value's top byte.
+            s32 returnBgm = 0;
+            pMap->getValue(i, "ReturnBgm", &returnBgm);
+            info.mReturnBgm = static_cast< u8 >(static_cast< u32 >(returnBgm) >> 24) != 0;
+        }
+#endif
         pMap->getValue(i, "BgmWipeoutFrame", &info.mBgmWipeoutFrame);
         mInfo.push_back(info);
     }
@@ -67,7 +77,7 @@ inline const char* DemoSoundKeeper::getTypeString() const {
 }
 
 inline const char* DemoSoundKeeper::getName() const {
-    return "サウンド";
+    return "\x83\x54\x83\x45\x83\x93\x83\x68";
 }
 
 #include "Game/Demo/DemoSheetKeeperInfoHolder.hpp"

@@ -10,7 +10,7 @@ public:
         /* 0x2 */ CameraType_PlayerUp,
     };
 
-    CameraFixedPoint(const char* pName = "定点カメラ");
+    CameraFixedPoint(const char* pName = "\x92\xe8\x93\x5f\x83\x4a\x83\x81\x83\x89");
 
     virtual void reset();
     virtual CameraTargetObj* calc();

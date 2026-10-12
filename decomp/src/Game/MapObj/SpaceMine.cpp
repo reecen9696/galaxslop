@@ -26,7 +26,7 @@ SpaceMine::SpaceMine(const char* pName)
 void SpaceMine::init(const JMapInfoIter& rIter) {
     MapObjActor::init(rIter);
     MapObjActorInitInfo info;
-    info.setupHioNode("地形オブジェ");
+    info.setupHioNode("\x92\x6e\x8c\x60\x83\x49\x83\x75\x83\x57\x83\x46");
     info.setupDefaultPos();
     info.setupConnectToScene();
     info.setupEffect(nullptr);
@@ -70,7 +70,7 @@ bool SpaceMine::isCalcShadowAlways() const {
 void SpaceMine::kill() {
     MR::emitEffect(this, "Explosion");
     MR::startSound(this, "SE_OJ_SPACEMINE_EXPLOSION");
-    MR::tryRumblePad(this, "中", 0);
+    MR::tryRumblePad(this, "\x92\x86", 0);
     MapObjActor::kill();
 }
 

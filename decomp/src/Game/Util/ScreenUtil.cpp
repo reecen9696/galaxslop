@@ -35,11 +35,11 @@
 
 
 namespace {
-    char sWipeCircle[] = "円ワイプ";
-    char sWipeFade[] = "フェードワイプ";
-    char sWipeWhiteFade[] = "白フェードワイプ";
-    char sWipeGameOver[] = "ゲームオーバー";
-    char sWipeKoopa[] = "クッパ";
+    char sWipeCircle[] = "\x89\x7e\x83\x8f\x83\x43\x83\x76";
+    char sWipeFade[] = "\x83\x74\x83\x46\x81\x5b\x83\x68\x83\x8f\x83\x43\x83\x76";
+    char sWipeWhiteFade[] = "\x94\x92\x83\x74\x83\x46\x81\x5b\x83\x68\x83\x8f\x83\x43\x83\x76";
+    char sWipeGameOver[] = "\x83\x51\x81\x5b\x83\x80\x83\x49\x81\x5b\x83\x6f\x81\x5b";
+    char sWipeKoopa[] = "\x83\x4e\x83\x62\x83\x70";
     char sSoundOneUp[] = "SE_SY_1UP";
 
     CaptureScreenDirector* getCaptureScreenDirector() NO_INLINE {

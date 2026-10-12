@@ -12,14 +12,14 @@ typedef struct {
     u8 unpacked;
     u8 _4;
     GXTlutFmt format;
-    char* data;
+    PTR32(char) data;
 } TPLClutHeader, *TPLClutHeaderPtr;
 
 typedef struct {
     u16 height;
     u16 width;
     u32 format;
-    char* data;
+    PTR32(char) data;
     GXTexWrapMode wrapS;
     GXTexWrapMode wrapT;
     GXTexFilter minFilter;
@@ -32,14 +32,14 @@ typedef struct {
 } TPLHeader, *TPLHeaderPtr;
 
 typedef struct {
-    TPLHeaderPtr textureHeader;
-    TPLClutHeaderPtr CLUTHeader;
+    PTR32(TPLHeader) textureHeader;
+    PTR32(TPLClutHeader) CLUTHeader;
 } TPLDescriptor, *TPLDescriptorPtr;
 
 typedef struct {
     u32 versionNumber;
     u32 numDescriptors;
-    TPLDescriptorPtr descriptorArray;
+    PTR32(TPLDescriptor) descriptorArray;
 } TPLPalette, *TPLPalettePtr;
 
 void TPLBind(TPLPalettePtr);

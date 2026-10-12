@@ -25,7 +25,7 @@ namespace NrvBossBegomanHead {
 };  // namespace NrvBossBegomanHead
 
 BossBegomanHead::BossBegomanHead(LiveActor* pParent, MtxPtr pMtx)
-    : PartsModel(pParent, "スイッチ頭", "BossBegomanHead", pMtx, MR::DrawBufferType_Enemy, false), mAngle(), mJointDelegator() {
+    : PartsModel(pParent, "\x83\x58\x83\x43\x83\x62\x83\x60\x93\xaa", "BossBegomanHead", pMtx, MR::DrawBufferType_Enemy, false), mAngle(), mJointDelegator() {
 }
 
 void BossBegomanHead::init(const JMapInfoIter& rIter) {

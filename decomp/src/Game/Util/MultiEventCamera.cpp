@@ -110,21 +110,21 @@ void MultiEventCamera::changeTargetPlayer() {
 
 bool MultiEventCamera::isActive(s32 param1) const {
     char name[256];
-    snprintf(name, sizeof(name), "%s:%03d:%02d番目", mName, mCameraInfo->mCameraSetID, param1);
+    snprintf(name, sizeof(name), "%s:%03d:%02d\x94\xd4\x96\xda", mName, mCameraInfo->mCameraSetID, param1);
 
     return MR::isEventCameraActive(mCameraInfo, name);
 }
 
 void MultiEventCamera::declareEventCamera(s32 param1) {
     char name[256];
-    snprintf(name, sizeof(name), "%s:%03d:%02d番目", mName, mCameraInfo->mCameraSetID, param1);
+    snprintf(name, sizeof(name), "%s:%03d:%02d\x94\xd4\x96\xda", mName, mCameraInfo->mCameraSetID, param1);
 
     return MR::declareEventCamera(mCameraInfo, name);
 }
 
 void MultiEventCamera::startCamera() {
     char name[256];
-    snprintf(name, sizeof(name), "%s:%03d:%02d番目", mName, mCameraInfo->mCameraSetID, _8);
+    snprintf(name, sizeof(name), "%s:%03d:%02d\x94\xd4\x96\xda", mName, mCameraInfo->mCameraSetID, _8);
 
     MR::startEventCamera(mCameraInfo, name, mTarget, -1);
 
@@ -133,7 +133,7 @@ void MultiEventCamera::startCamera() {
 
 void MultiEventCamera::endCamera(s32 type) {
     char name[256];
-    snprintf(name, sizeof(name), "%s:%03d:%02d番目", mName, mCameraInfo->mCameraSetID, _8);
+    snprintf(name, sizeof(name), "%s:%03d:%02d\x94\xd4\x96\xda", mName, mCameraInfo->mCameraSetID, _8);
 
     switch (type) {
     case CameraType_Soon:
@@ -149,7 +149,7 @@ void MultiEventCamera::endCamera(s32 type) {
 
 void MultiEventCamera::changeTarget(const CameraTargetArg& rTarget) {
     char name[256];
-    snprintf(name, sizeof(name), "%s:%03d:%02d番目", mName, mCameraInfo->mCameraSetID, _8);
+    snprintf(name, sizeof(name), "%s:%03d:%02d\x94\xd4\x96\xda", mName, mCameraInfo->mCameraSetID, _8);
 
     MR::changeEventCameraTarget(mCameraInfo, name, rTarget);
 }

@@ -9,7 +9,7 @@ public:
         CameraType_Interpolate = 1,
     };
 
-    CameraDead(const char* pName = "通常死亡カメラ");
+    CameraDead(const char* pName = "\x92\xca\x8f\xed\x8e\x80\x96\x53\x83\x4a\x83\x81\x83\x89");
 
     virtual void reset();
     virtual CameraTargetObj* calc();

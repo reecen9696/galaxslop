@@ -13,7 +13,7 @@
 #include "Game/Util/SoundUtil.hpp"
 #include <cstdio>
 
-SkeletalFishBossBattleDirector::SkeletalFishBossBattleDirector(SkeletalFishBoss* pBoss) : NameObj("スカルシャークボス戦指揮") {
+SkeletalFishBossBattleDirector::SkeletalFishBossBattleDirector(SkeletalFishBoss* pBoss) : NameObj("\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x83\x7b\x83\x58\x90\xed\x8e\x77\x8a\xf6") {
     mFishBoss = pBoss;
     _90 = 0;
     _D4 = 0;
@@ -24,7 +24,7 @@ SkeletalFishBossBattleDirector::SkeletalFishBossBattleDirector(SkeletalFishBoss*
     }
 
     for (s32 i = 0; i < ARRAY_SIZE(mGuardModels); i++) {
-        ModelObj* guardMdl = new ModelObj("デモ用スカルシャークガード", "SkeletalFishGuard", nullptr, MR::DrawBufferType_Enemy, -2, -2, false);
+        ModelObj* guardMdl = new ModelObj("\x83\x66\x83\x82\x97\x70\x83\x58\x83\x4a\x83\x8b\x83\x56\x83\x83\x81\x5b\x83\x4e\x83\x4b\x81\x5b\x83\x68", "SkeletalFishGuard", nullptr, MR::DrawBufferType_Enemy, -2, -2, false);
         mGuardModels[i] = guardMdl;
         mGuardModels[i]->initWithoutIter();
         MR::initLightCtrl(mGuardModels[i]);
@@ -37,13 +37,13 @@ void SkeletalFishBossBattleDirector::initiate() {
     LiveActorGroup* group = MR::getGroupFromArray(mFishBoss);
 
     for (s32 i = 0; i < group->getObjNum(); i++) {
-        if (strcmp(group->getActor(i)->getName(), "海底火山巨大石柱") == 0 || strcmp(group->getActor(i)->getName(), "海底火山石柱（小）") == 0) {
+        if (strcmp(group->getActor(i)->getName(), "\x8a\x43\x92\xea\x89\xce\x8e\x52\x8b\x90\x91\xe5\x90\xce\x92\x8c") == 0 || strcmp(group->getActor(i)->getName(), "\x8a\x43\x92\xea\x89\xce\x8e\x52\x90\xce\x92\x8c\x81\x69\x8f\xac\x81\x6a") == 0) {
             mColumns[_90] = static_cast< SubmarineVolcanoBigColumn* >(group->getActor(i));
             _90++;
         }
 
-        if (strcmp(group->getActor(i)->getName(), "羽虫Ｓ")) {
-            if (strcmp(group->getActor(i)->getName(), "羽虫Ｌ")) {
+        if (strcmp(group->getActor(i)->getName(), "\x89\x48\x92\x8e\x82\x72")) {
+            if (strcmp(group->getActor(i)->getName(), "\x89\x48\x92\x8e\x82\x6b")) {
                 continue;
             }
         }

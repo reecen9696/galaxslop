@@ -16,6 +16,7 @@ void GhostPacket::read(u8* pOut, u32 len) {
     }
 }
 
+#ifdef __MWERKS__
 void GhostPacket::read(u32* pOut) {
     read((u8*)pOut, 4);
 }
@@ -23,6 +24,20 @@ void GhostPacket::read(u32* pOut) {
 void GhostPacket::read(s16* pOut) {
     read((u8*)pOut, 2);
 }
+#else
+// Ghost data stays big-endian on disk; assemble values byte by byte.
+void GhostPacket::read(u32* pOut) {
+    u8 b[4];
+    read(b, 4);
+    *pOut = (u32(b[0]) << 24) | (u32(b[1]) << 16) | (u32(b[2]) << 8) | u32(b[3]);
+}
+
+void GhostPacket::read(s16* pOut) {
+    u8 b[2];
+    read(b, 2);
+    *pOut = s16((u16(b[0]) << 8) | u16(b[1]));
+}
+#endif
 
 void GhostPacket::read(char** pOut) {
     char* v3 = (char*)&mDataPtr[mCurOffs];
@@ -42,7 +57,13 @@ void GhostPacket::read(TVec3Sc* pOut) {
 }
 
 void GhostPacket::read(TVec3s* pOut) {
+#ifdef __MWERKS__
     read((u8*)&pOut->x, 2);
     read((u8*)&pOut->y, 2);
     read((u8*)&pOut->z, 2);
+#else
+    read(&pOut->x);
+    read(&pOut->y);
+    read(&pOut->z);
+#endif
 }

@@ -432,7 +432,7 @@ void NPCActor::initialize(const JMapInfoIter& rIter, const NPCActorCaps& rCaps) 
 
     if (rCaps._70 != nullptr) {
         mScaleController = new AnimScaleController(&::sParam);
-        mDelegator = MR::createJointDelegatorWithNullChildFunc(this, &calcJointScale, rCaps._70);
+        mDelegator = MR::createJointDelegatorWithNullChildFunc(this, &NPCActor::calcJointScale, rCaps._70);
     }
 
     if (rCaps._67) {
@@ -545,7 +545,7 @@ void NPCActor::control() {
         _E3 = true;
     }
 
-    if (mStarPointerTarget != nullptr && MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (mStarPointerTarget != nullptr && MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         _E4 = true;
     }
 

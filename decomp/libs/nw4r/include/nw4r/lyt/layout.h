@@ -35,11 +35,7 @@ namespace nw4r {
             ORIGINTYPE_MAX
         };
 
-#ifdef __MWERKS__
         typedef ut::LinkList< AnimTransform, offsetof(AnimTransform, mLink) > AnimTransformList;
-#else
-        typedef ut::LinkList< AnimTransform, 0 > AnimTransformList;
-#endif
 
         class Layout {
         public:

@@ -26,8 +26,8 @@ namespace NrvAstroCountDownPlate {
 namespace {
     const char* cMaterialName01 = "StarNumber01_v_x";
     const char* cMaterialName10 = "StarNumber01_v_x(2)";
-    const char* cLastBattleDemoName = "ロゼッタ最終決戦デモ";
-    const char* cStartCountDownDemoName = "ロゼッタカウントダウン開始デモ";
+    const char* cLastBattleDemoName = "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x8d\xc5\x8f\x49\x8c\x88\x90\xed\x83\x66\x83\x82";
+    const char* cStartCountDownDemoName = "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x83\x4a\x83\x45\x83\x93\x83\x67\x83\x5f\x83\x45\x83\x93\x8a\x4a\x8e\x6e\x83\x66\x83\x82";
     static const s32 sStepForCountToZero = 50;
 };  // namespace
 

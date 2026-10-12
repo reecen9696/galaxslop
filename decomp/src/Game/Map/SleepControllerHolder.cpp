@@ -14,7 +14,7 @@ namespace {
     }
 };  // namespace
 
-SleepControllerHolder::SleepControllerHolder() : NameObj("オブジェスリープ管理"), mSleepControl() {
+SleepControllerHolder::SleepControllerHolder() : NameObj("\x83\x49\x83\x75\x83\x57\x83\x46\x83\x58\x83\x8a\x81\x5b\x83\x76\x8a\xc7\x97\x9d"), mSleepControl() {
     MR::connectToSceneMapObjMovement(this);
 }
 

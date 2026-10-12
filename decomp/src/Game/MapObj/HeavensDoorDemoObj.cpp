@@ -39,7 +39,7 @@ void HeavensDoorDemoObj::init(const JMapInfoIter& rIter) {
     if (MR::isDemoCast(this, nullptr)) {
         MR::tryRegisterDemoActionNerve(this, GET_NERVE(HeavensDoorDemoObj, HeavensDoorDemoObjNrvVanish), nullptr);
         if (MapObjActor::isObjectName("HeavensDoorInsideCage")) {
-            MR::tryRegisterDemoActionFunctor(this, MR::Functor(this, &HeavensDoorDemoObj::startInsideCageDemo), "ミニ太陽消失");
+            MR::tryRegisterDemoActionFunctor(this, MR::Functor(this, &HeavensDoorDemoObj::startInsideCageDemo), "\x83\x7e\x83\x6a\x91\xbe\x97\x7a\x8f\xc1\x8e\xb8");
         }
     }
 }

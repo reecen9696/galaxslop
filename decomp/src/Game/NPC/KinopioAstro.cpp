@@ -187,17 +187,17 @@ void KinopioAstro::init(const JMapInfoIter& rIter) {
     }
 
     if (mObjArg0 == 2) {
-        if (MR::isDemoCast(this, "ルイージ失踪デモ")) {
+        if (MR::isDemoCast(this, "\x83\x8b\x83\x43\x81\x5b\x83\x57\x8e\xb8\xe7\x48\x83\x66\x83\x82")) {
             TVec3f followOffset(MR::getMessageBalloonFollowOffset(mMsgCtrl));
             TalkMessageCtrl* pMsgCtrl = MR::createTalkCtrlDirectOnRootNodeAutomatic(this, rIter, "AstroGalaxy_Kinopio100", followOffset, nullptr);
             MR::registerEventFunc(pMsgCtrl, TalkMessageFunc(this, &KinopioAstro::eventFunc));
-            DemoFunction::registerDemoTalkMessageCtrlDirect(this, pMsgCtrl, "ルイージ失踪デモ");
-            MR::registerDemoActionFunctor(this, MR::Functor(this, &KinopioAstro::startDemo), "開始");
-            MR::registerDemoActionFunctor(this, MR::Functor(this, &KinopioAstro::endDemo), "終了");
+            DemoFunction::registerDemoTalkMessageCtrlDirect(this, pMsgCtrl, "\x83\x8b\x83\x43\x81\x5b\x83\x57\x8e\xb8\xe7\x48\x83\x66\x83\x82");
+            MR::registerDemoActionFunctor(this, MR::Functor(this, &KinopioAstro::startDemo), "\x8a\x4a\x8e\x6e");
+            MR::registerDemoActionFunctor(this, MR::Functor(this, &KinopioAstro::endDemo), "\x8f\x49\x97\xb9");
         }
 
         if (MR::isAnyPlayerLeftSupply()) {
-            mPeachLetter = new PeachLetter("ピーチ姫からの手紙");
+            mPeachLetter = new PeachLetter("\x83\x73\x81\x5b\x83\x60\x95\x50\x82\xa9\x82\xe7\x82\xcc\x8e\xe8\x8e\x86");
             mPeachLetter->initWithoutIter();
             _194 = true;
             if (MR::isLuigiLeftSupply()) {

@@ -18,7 +18,7 @@ MeteorStrikeLauncher::MeteorStrikeLauncher(const char* pName)
 
 void MeteorStrikeLauncher::init(const JMapInfoIter& rIter) {
     const char* pName = mName;
-    setName("メテオストライクランチャー");
+    setName("\x83\x81\x83\x65\x83\x49\x83\x58\x83\x67\x83\x89\x83\x43\x83\x4e\x83\x89\x83\x93\x83\x60\x83\x83\x81\x5b");
 
     initMapToolInfo(rIter);
 

@@ -60,8 +60,14 @@ public:
     struct SDIFileEntry {
         /* 0x0 */ u16 mFileID;
         /* 0x2 */ u16 mHash;
+#if defined(__MWERKS__) || defined(__BIG_ENDIAN__)
         /* 0x4 */ u32 mFlag : 8;
         /* 0x5 */ u32 mNameOffset : 24;
+#else
+        /* little-endian bit allocation: same word, fields listed low bits first */
+        u32 mNameOffset : 24;
+        u32 mFlag : 8;
+#endif
         union {
             /* 0x8 */ u32 mDataOffset;
             /* 0x8 */ u32 mDirIndex;
@@ -69,7 +75,7 @@ public:
         union {
             /* 0xC */ u32 mDataSize;
         };
-        void* /* 0x10 */ mFileData;
+        PTR32(void) /* 0x10 */ mFileData;
     };
 
     struct SDIDirEntry {

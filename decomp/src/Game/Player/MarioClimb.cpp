@@ -29,10 +29,10 @@ bool MarioClimb::update() {
 }
 
 bool MarioClimb::start() {
-    changeAnimation("匍匐前進", "匍匐前進");
+    changeAnimation("\x99\xb3\x99\xb4\x91\x4f\x90\x69", "\x99\xb3\x99\xb4\x91\x4f\x90\x69");
 
     if (mActor->_468 != 0) {
-        changeAnimationUpper("ひろいウエイト");
+        changeAnimationUpper("\x82\xd0\x82\xeb\x82\xa2\x83\x45\x83\x47\x83\x43\x83\x67");
     }
 
     mTimer = 15;
@@ -43,9 +43,9 @@ bool MarioClimb::close() {
     getPlayer()->mWalkSpeed = getStickP();
 
     if (getPlayer()->getMovementStates()._1) {
-        stopAnimation("匍匐前進", "基本");
+        stopAnimation("\x99\xb3\x99\xb4\x91\x4f\x90\x69", "\x8a\xee\x96\x7b");
     } else {
-        stopAnimation("匍匐前進", "落下");
+        stopAnimation("\x99\xb3\x99\xb4\x91\x4f\x90\x69", "\x97\x8e\x89\xba");
         getPlayer()->set3BC(8);
     }
 

@@ -146,7 +146,7 @@ bool GalaxyMapIcon::isPointing() const {
         return false;
     }
 
-    return MR::isStarPointerPointingPane(this, "GalaxyIcon", 0, true, "弱");
+    return MR::isStarPointerPointingPane(this, "GalaxyIcon", 0, true, "\x8e\xe3");
 }
 
 void GalaxyMapIcon::syncStatus() {

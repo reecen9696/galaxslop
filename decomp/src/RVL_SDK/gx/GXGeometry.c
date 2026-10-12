@@ -2,7 +2,7 @@
 #include "revolution/gx.h"
 #include "revolution/gx/GXRegs.h"
 
-inline void __GXSetAmbMat(u32 amState) {
+void __GXSetAmbMat(u32 amState) {
     if (amState & 0x100) {
         GX_WRITE_XF_REG(0x100A, gx->ambColor[0], 0);
     }
@@ -20,7 +20,7 @@ inline void __GXSetAmbMat(u32 amState) {
     }
 }
 
-inline void __GXSetLightChan(u32 chState) {
+void __GXSetLightChan(u32 chState) {
     u32 d, i, chIndx = 0x100E;
 
     if (chState & 0x1000000) {
@@ -42,7 +42,7 @@ inline void __GXSetLightChan(u32 chState) {
     }
 }
 
-inline void __GXSetTexGen(u32 tgState) {
+void __GXSetTexGen(u32 tgState) {
     u32 d, i, tgIndx = 0x1040;
     u32 dtgIndx = 0x1050;
 

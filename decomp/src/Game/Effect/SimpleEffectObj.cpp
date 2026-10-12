@@ -16,13 +16,13 @@ namespace NrvSimpleEffectObj {
 
 namespace {
     const s_effectDataTable sEffectDataTable[] = {
-        {"IceLayerBreak", "SE_OJ_ICE_LAYER_BREAK", nullptr, 0, "最強", 7},
-        {"LavaVolcanoEruption", nullptr, nullptr, 0, "最強", 0},
+        {"IceLayerBreak", "SE_OJ_ICE_LAYER_BREAK", nullptr, 0, "\x8d\xc5\x8b\xad", 7},
+        {"LavaVolcanoEruption", nullptr, nullptr, 0, "\x8d\xc5\x8b\xad", 0},
         {"LavaHomeVolcanoFallingRock", nullptr, "SE_AT_LV_FALLING_ROCK", -1, nullptr, 0},
-        {"WaterLayerBreak", "SE_OJ_WATER_LAYER_BREAK", nullptr, 0, "最強", 7},
+        {"WaterLayerBreak", "SE_OJ_WATER_LAYER_BREAK", nullptr, 0, "\x8d\xc5\x8b\xad", 7},
         {"DrainPipeBubbleA", nullptr, "SE_OJ_LV_PIPE_BUBBLE_A", -1, nullptr, 0},
         {"DrainPipeBubbleB", nullptr, "SE_OJ_LV_PIPE_BUBBLE_B", -1, nullptr, 0},
-        {"StarPieceClusterBreak", "SE_OJ_CRYSTAL_CAGE_L_BREAK", nullptr, 0, "最強", 7},
+        {"StarPieceClusterBreak", "SE_OJ_CRYSTAL_CAGE_L_BREAK", nullptr, 0, "\x8d\xc5\x8b\xad", 7},
         {"BattleShipExplosionMetal", "SE_AT_BTLSHIP_EXPLODE_METAL", nullptr, -1, nullptr, 0},
         {"BattleShipExplosionRock", "SE_AT_BTLSHIP_EXPLODE_ROCK", nullptr, -1, nullptr, 0},
         {"Steam", nullptr, "SE_OJ_LV_HD_STEAM", -1, nullptr, 0},

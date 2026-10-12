@@ -17,7 +17,7 @@ void ShockWaveGenerator_FORCE_MATCH_SDATA2() {
 }
 
 namespace {
-    static const char* cDemoCameraName = "衝撃波カメラ";
+    static const char* cDemoCameraName = "\x8f\xd5\x8c\x82\x94\x67\x83\x4a\x83\x81\x83\x89";
     static const s32 sStepForGenerate = 50;
     static const s32 sStepForDemoEcho = 1;
     static const f32 sHitCylinderRadius = 400.0f;

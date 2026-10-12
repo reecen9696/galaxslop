@@ -3,7 +3,7 @@
 #include "Game/Util.hpp"
 
 namespace {
-    static const char* sDefaultAreaLightName = "デフォルト";
+    static const char* sDefaultAreaLightName = "\x83\x66\x83\x74\x83\x48\x83\x8b\x83\x67";
 
     static LightInfoCoin sDefaultLightSetCoin = {{{0xFF, 0xFF, 0, 0}, {0.0f, 0.0f, 0.0f}, true}, {0xFF, 0xFF, 0xFF, 0, 65.0f}};
 };  // namespace

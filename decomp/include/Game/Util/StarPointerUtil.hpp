@@ -54,6 +54,13 @@ namespace MR {
     TVec2f* getStarPointerScreenVelocity(s32);
     void getStarPointerWorldVelocityDirection(TVec3f*, s32);
     TVec3f* getStarPointerWorldPosUsingDepth(s32);
+#ifdef TARGET_PC
+    // VR: the end of the pointing controller's laser in the world (the aim
+    // ray's first map surface, or open space as far past the player as the
+    // original aims star bits past its camera) and its distance along the
+    // ray.  Returns false while the pointer does not aim into the diorama.
+    bool calcVrPointerAimEnd(TVec3f* pEnd, f32* pReach, s32 channel);
+#endif
     void calcStarPointerWorldPointingPos(TVec3f*, const TVec3f&, s32);
     void calcStarPointerWorldPointingPosInsideEdge(TVec3f*, const TVec3f&, s32);
     bool calcStarPointerPosOnPlane(TVec3f*, const TVec3f&, const TVec3f&, s32, bool);
@@ -92,6 +99,9 @@ namespace MR {
     void requestStarPointerModeBlueStarReady(void*);
     void requestStarPointerModeBigBubble(void*, const TVec3f&);
     bool isStarPointerModeBlueStarReady();
+#ifdef TARGET_PC
+    s32 getStarPointerModeForPort();
+#endif
     bool isStarPointerModeStarPieceTarget();
     bool isStarPointerModeMarioLauncher();
     bool isStarPointerModeHomeButton();

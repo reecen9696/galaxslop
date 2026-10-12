@@ -198,7 +198,13 @@ void FileSelectInfo::reflectInfo() {
         MR::hidePane(this, "Complete2");
     }
 
+#ifdef TARGET_PC
+    // Every file can be played with Mario or Luigi (FileSelector::isUserFileAppearLuigi):
+    // always say which one is selected.
+    bool bVar1 = true;
+#else
     bool bVar1 = !mIsSelectedMarioPrev || mIsViewCompleteEnding;
+#endif
 
     if (bVar1) {
         MR::showPane(this, "BrosIcon");
@@ -216,7 +222,7 @@ void FileSelectInfo::reflectInfo() {
 }
 
 namespace FileSelectInfoSub {
-    SlideState::SlideState(FileSelectInfo* pHost) : NerveExecutor("スライド状態"), mHost(pHost) {
+    SlideState::SlideState(FileSelectInfo* pHost) : NerveExecutor("\x83\x58\x83\x89\x83\x43\x83\x68\x8f\xf3\x91\xd4"), mHost(pHost) {
         initNerve(GET_NERVE_GLOBAL(SlideStateNrvNormalPos));
     }
 
@@ -256,7 +262,7 @@ namespace FileSelectInfoSub {
 }  // namespace FileSelectInfoSub
 
 namespace FileSelectInfoSub {
-    CharaState::CharaState(FileSelectInfo* pHost) : NerveExecutor("キャラ選択状態"), mHost(pHost) {
+    CharaState::CharaState(FileSelectInfo* pHost) : NerveExecutor("\x83\x4c\x83\x83\x83\x89\x91\x49\x91\xf0\x8f\xf3\x91\xd4"), mHost(pHost) {
         initNerve(GET_NERVE_GLOBAL(CharaStateNrvMario));
     }
 

@@ -14,7 +14,7 @@ void FollowCollisionArea_FORCE_MATCH_SDATA2() {
 FollowCollisionArea::~FollowCollisionArea() {
 }
 
-FollowCollisionArea::FollowCollisionArea(const TVec3f& rSize, MtxPtr pMatrix, f32 offset) : NameObj("追従コリジョンエリア") {
+FollowCollisionArea::FollowCollisionArea(const TVec3f& rSize, MtxPtr pMatrix, f32 offset) : NameObj("\x92\xc7\x8f\x5d\x83\x52\x83\x8a\x83\x57\x83\x87\x83\x93\x83\x47\x83\x8a\x83\x41") {
     _38 = rSize;
     _34 = pMatrix;
     _44 = offset;

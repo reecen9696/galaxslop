@@ -351,6 +351,10 @@ bool JAUSection::loadWaveArc(u32 bankNo) {
             return true;
         }
     }
+#ifdef TARGET_PC
+    port_log("JAUSection::loadWaveArc(%u): registered %d, bank %p", (unsigned)bankNo, (int)data_.registeredWaveBankTables.test(bankNo),
+             (void*)sectionHeap_->getWaveBankTable().getWaveBank(bankNo));
+#endif
 
     return false;
 }

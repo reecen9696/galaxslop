@@ -120,14 +120,14 @@ void Plant::init(const JMapInfoIter& pMapInfoIter) {
     mStalk = new PlantStalk();
     mStalk->init(pMapInfoIter);
 
-    mSeedPartsModel = new PartsModel(this, "種（伸び植物）", "PlantSeed", mSeedMtx, -1, false);
+    mSeedPartsModel = new PartsModel(this, "\x8e\xed\x81\x69\x90\x4c\x82\xd1\x90\x41\x95\xa8\x81\x6a", "PlantSeed", mSeedMtx, -1, false);
     mSeedPartsModel->initWithoutIter();
     MR::initShadowVolumeSphere(mSeedPartsModel, 50.0f);
     mSeedPartsModel->mPosition.set(mPosition);
     mSeedMtx.setTrans(mPosition);
 
     updateTopMtx();
-    mTopPartsModel = new PartsModel(this, "先端（伸び植物）", "PlantTop", mTopMtx, -1, false);
+    mTopPartsModel = new PartsModel(this, "\x90\xe6\x92\x5b\x81\x69\x90\x4c\x82\xd1\x90\x41\x95\xa8\x81\x6a", "PlantTop", mTopMtx, -1, false);
     mTopPartsModel->initWithoutIter();
     mTopPartsModel->kill();
 
@@ -137,8 +137,8 @@ void Plant::init(const JMapInfoIter& pMapInfoIter) {
     MR::addHitSensorMapObj(this, "seed", 5, 300.0f, TVec3f(0.0f, 50.0f, 0.0f));
     MR::addHitSensorRide(this, "Ride", 8, 50.0f, TVec3f(0.0f, 0.0f, 0.0f));
 
-    MR::initMultiActorCamera(this, pMapInfoIter, &mCameraInfo, "出現デモ");
-    MR::initMultiActorCamera(this, pMapInfoIter, &mCameraInfo, "掴まり");
+    MR::initMultiActorCamera(this, pMapInfoIter, &mCameraInfo, "\x8f\x6f\x8c\xbb\x83\x66\x83\x82");
+    MR::initMultiActorCamera(this, pMapInfoIter, &mCameraInfo, "\x92\xcd\x82\xdc\x82\xe8");
 
     if (MR::useStageSwitchReadAppear(this, pMapInfoIter)) {
         MR::syncStageSwitchAppear(this);
@@ -181,8 +181,8 @@ void Plant::exeSeedWait() {
 }
 
 void Plant::exeWaitDemoWaitGrowUp() {
-    if (MR::tryStartDemoWithoutCinemaFrame(this, "伸び植物（成長）")) {
-        MR::startMultiActorCameraTargetOther(this, mCameraInfo, "出現デモ", CameraTargetArg(mTopPartsModel), -1);
+    if (MR::tryStartDemoWithoutCinemaFrame(this, "\x90\x4c\x82\xd1\x90\x41\x95\xa8\x81\x69\x90\xac\x92\xb7\x81\x6a")) {
+        MR::startMultiActorCameraTargetOther(this, mCameraInfo, "\x8f\x6f\x8c\xbb\x83\x66\x83\x82", CameraTargetArg(mTopPartsModel), -1);
         MR::requestMovementOn(mSeedPartsModel);
         setNerve(GET_NERVE(Plant, PlantNrvDemoWaitGrowUp));
     }
@@ -345,7 +345,7 @@ void Plant::exeHangDown() {
     updateBindLeaf();
 
     if (MR::isRailReachedNearGoal(this, ::sHangReachedDistance)) {
-        MR::endMultiActorCameraAtLanding(this, mCameraInfo, "掴まり", -1);
+        MR::endMultiActorCameraAtLanding(this, mCameraInfo, "\x92\xcd\x82\xdc\x82\xe8", -1);
         MR::startBckPlayer("GrowPlantJump");
         MR::endBindAndPlayerJump(this, TVec3f(0.0f, 0.0f, 0.0f), 0);
         mRider = nullptr;
@@ -519,7 +519,7 @@ bool Plant::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pReceiver) {
         MR::tryRumblePadMiddle(this, WPAD_CHAN0);
         MR::startSound(mRider, "SE_PM_GRAB_OBJ");
         MR::startSound(mRider, "SE_PV_CATCH");
-        MR::startMultiActorCameraNoTarget(this, mCameraInfo, "掴まり", -1);
+        MR::startMultiActorCameraNoTarget(this, mCameraInfo, "\x92\xcd\x82\xdc\x82\xe8", -1);
         return true;
     }
 
@@ -534,7 +534,7 @@ bool Plant::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pReceiver) {
     }
 
     if (MR::isMsgRushCancel(msg)) {
-        MR::endMultiActorCamera(this, mCameraInfo, "掴まり", false, -1);
+        MR::endMultiActorCamera(this, mCameraInfo, "\x92\xcd\x82\xdc\x82\xe8", false, -1);
         mRider = nullptr;
         setNerve(GET_NERVE(Plant, PlantNrvGrowthWaitInvalid));
         return true;
@@ -568,8 +568,8 @@ bool Plant::updateGrowUp() {
 
     if (growStalk) {
         if (mPlayAppearDemo) {
-            MR::endDemo(this, "伸び植物（成長）");
-            MR::endMultiActorCamera(this, mCameraInfo, "出現デモ", false, -1);
+            MR::endDemo(this, "\x90\x4c\x82\xd1\x90\x41\x95\xa8\x81\x69\x90\xac\x92\xb7\x81\x6a");
+            MR::endMultiActorCamera(this, mCameraInfo, "\x8f\x6f\x8c\xbb\x83\x66\x83\x82", false, -1);
         }
 
         if (mRider != nullptr) {
@@ -689,7 +689,7 @@ bool Plant::tryReachGoal() {
     MR::startSound(mRider, "SE_PM_JUMP_L");
     MR::startSound(mRider, "SE_PV_JUMP_JOY");
 
-    MR::endMultiActorCameraAtLanding(this, mCameraInfo, "掴まり", -1);
+    MR::endMultiActorCameraAtLanding(this, mCameraInfo, "\x92\xcd\x82\xdc\x82\xe8", -1);
     MR::endBindAndPlayerForceWeakGravityJump(this, endUp);
     mRider = nullptr;
 

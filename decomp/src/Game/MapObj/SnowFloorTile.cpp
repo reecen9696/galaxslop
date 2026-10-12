@@ -261,10 +261,10 @@ f32 SnowFloorTile::doMove(TVec2f from, TVec2f to, f32 radius, f32 amount) {
     s32 top = static_cast< s16 >(to.y - outerRadius) - 1;
     s32 right = static_cast< s16 >(to.x + outerRadius) + 1;
     s32 bottom = static_cast< s16 >(to.y + outerRadius) + 1;
-    minX = MR::clamp(left, 0L, static_cast< s32 >(mTextureSize));
-    u32 minY = MR::clamp(top, 0L, static_cast< s32 >(mTextureSize));
-    u32 maxX = MR::clamp(right, 0L, static_cast< s32 >(mTextureSize));
-    u32 maxY = MR::clamp(bottom, 0L, static_cast< s32 >(mTextureSize));
+    minX = MR::clamp(left, 0, static_cast< s32 >(mTextureSize));
+    u32 minY = MR::clamp(top, 0, static_cast< s32 >(mTextureSize));
+    u32 maxX = MR::clamp(right, 0, static_cast< s32 >(mTextureSize));
+    u32 maxY = MR::clamp(bottom, 0, static_cast< s32 >(mTextureSize));
     f32 radiusSq;
     f32 totalSnow = 0.0f;
     outerRadius *= outerRadius;
@@ -335,10 +335,10 @@ void SnowFloorTile::doErase(TVec2f point, f32 radius, f32 amount) {
     s32 top = static_cast< s16 >(point.y - radius) - 1;
     s32 right = static_cast< s16 >(point.x + radius) + 1;
     s32 bottom = static_cast< s16 >(point.y + radius) + 1;
-    minX = MR::clamp(left, 0L, static_cast< s32 >(mTextureSize));
-    u32 minY = MR::clamp(top, 0L, static_cast< s32 >(mTextureSize));
-    u32 maxX = MR::clamp(right, 0L, static_cast< s32 >(mTextureSize));
-    u32 maxY = MR::clamp(bottom, 0L, static_cast< s32 >(mTextureSize));
+    minX = MR::clamp(left, 0, static_cast< s32 >(mTextureSize));
+    u32 minY = MR::clamp(top, 0, static_cast< s32 >(mTextureSize));
+    u32 maxX = MR::clamp(right, 0, static_cast< s32 >(mTextureSize));
+    u32 maxY = MR::clamp(bottom, 0, static_cast< s32 >(mTextureSize));
     f32 radiusSq = radius * radius;
 
     for (u32 y = minY; y < maxY; y++) {
@@ -387,7 +387,7 @@ void SnowFloorTile::createTexture() {
 
 void SnowFloorTile::attackSensor(HitSensor* pSender, HitSensor* pReceiver) {
     if (MR::isSensorEnemy(pReceiver)) {
-        if (MR::isEqualString(pReceiver->mHost->mName, "マリオ炎球")) {
+        if (MR::isEqualString(pReceiver->mHost->mName, "\x83\x7d\x83\x8a\x83\x49\x89\x8a\x8b\x85")) {
             TVec3f localPoint;
             calcLocalPoint(pReceiver->mPosition, &localPoint, 200.0f);
             doErase(TVec2f(localPoint.x, localPoint.y), 30.0f / mCellSize, ::cHipdropDigAmount);
@@ -420,10 +420,10 @@ void SnowFloorTile::draw() const {
         s32 g = ::sColorG + i * ::sColorStepG;
         s32 b = ::sColorB + i * ::sColorStepB;
         s32 a = ::sColorA + i * ::sColorStepA;
-        MR::clamp(static_cast< s32 >(r), 0L, 255L);
-        MR::clamp(static_cast< s32 >(g), 0L, 255L);
-        MR::clamp(static_cast< s32 >(b), 0L, 255L);
-        MR::clamp(static_cast< s32 >(a), 0L, 255L);
+        MR::clamp(static_cast< s32 >(r), 0, 255);
+        MR::clamp(static_cast< s32 >(g), 0, 255);
+        MR::clamp(static_cast< s32 >(b), 0, 255);
+        MR::clamp(static_cast< s32 >(a), 0, 255);
         Color8 color(r, g, b, a);
         GXSetTevColor(GX_TEVREG1, color);
         drawLayer(i);

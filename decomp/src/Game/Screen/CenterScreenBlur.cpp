@@ -12,7 +12,7 @@ namespace NrvCenterScreenBlur {
     NEW_NERVE(CenterScreenBlurNrvFadeOut, CenterScreenBlur, FadeOut);
 };  // namespace NrvCenterScreenBlur
 
-CenterScreenBlur::CenterScreenBlur() : LiveActor("画面中心ブラー"), mTime(), mFadeIn(), mFadeOut(), mOffset(), mAlpha(), mBlendRate() {
+CenterScreenBlur::CenterScreenBlur() : LiveActor("\x89\xe6\x96\xca\x92\x86\x90\x53\x83\x75\x83\x89\x81\x5b"), mTime(), mFadeIn(), mFadeOut(), mOffset(), mAlpha(), mBlendRate() {
 }
 
 void CenterScreenBlur::init(const JMapInfoIter& rIter) {

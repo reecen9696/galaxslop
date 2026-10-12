@@ -73,9 +73,21 @@ public:
         if (pName == nullptr) {
             return mLayout->mpRootPane;
         } else {
+#ifdef TARGET_PC
+            nw4r::lyt::Pane* pPane = mLayout->mpRootPane->FindPaneByName(pName, true);
+            return pPane != nullptr ? pPane : missingPane(pName);
+#else
             return mLayout->mpRootPane->FindPaneByName(pName, true);
+#endif
         }
     }
+#ifdef TARGET_PC
+    // A pane the layout lacks (the decompilation's names come from the
+    // Korean release, and a misspelt name crashed the galaxy name plates):
+    // logged once, and an empty stand-in pane is returned, so the callers'
+    // walks over it do nothing instead of dereferencing null.
+    static nw4r::lyt::Pane* missingPane(const char* pName);
+#endif
 
     nw4r::lyt::Pane* findPaneByName(const char*) const;
     void replaceIndDummyTexture();

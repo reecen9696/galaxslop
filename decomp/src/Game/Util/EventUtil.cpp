@@ -18,28 +18,28 @@
 #include <cstdio>
 
 void EventUtil_FORCE_MATCH_STRINGS() {
-    MR::isEqualString("ハチマリオ初変身", "ハチマリオ初変身");
-    MR::isEqualString("テレサマリオ初変身", "テレサマリオ初変身");
-    MR::isEqualString("ホッパーマリオ初変身", "ホッパーマリオ初変身");
-    MR::isEqualString("ファイアマリオ初変身", "ファイアマリオ初変身");
-    MR::isEqualString("アイスマリオ初変身", "アイスマリオ初変身");
-    MR::isEqualString("フライングマリオ初変身", "フライングマリオ初変身");
-    MR::isEqualString("無敵マリオ初変身", "無敵マリオ初変身");
-    MR::isEqualString("ライフアップキノコ解説", "ライフアップキノコ解説");
-    MR::isEqualString("１ＵＰキノコ解説", "１ＵＰキノコ解説");
-    MR::isEqualString("クッパ襲来後", "クッパ襲来後");
-    MR::isEqualString("ピーチ城浮上後", "ピーチ城浮上後");
-    MR::isEqualString("チコガイドデモ終了", "チコガイドデモ終了");
-    MR::isEqualString("スピン権利", "スピン権利");
-    MR::isEqualString("天球儀レクチャー", "天球儀レクチャー");
-    MR::isEqualString("ギャラクシー移動レクチャー", "ギャラクシー移動レクチャー");
-    MR::isEqualString("スターピースレクチャー", "スターピースレクチャー");
-    MR::isEqualString("サーフィンチュートリアル", "サーフィンチュートリアル");
-    MR::isEqualString("タマコロチュートリアル", "タマコロチュートリアル");
+    MR::isEqualString("\x83\x6e\x83\x60\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67", "\x83\x6e\x83\x60\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67");
+    MR::isEqualString("\x83\x65\x83\x8c\x83\x54\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67", "\x83\x65\x83\x8c\x83\x54\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67");
+    MR::isEqualString("\x83\x7a\x83\x62\x83\x70\x81\x5b\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67", "\x83\x7a\x83\x62\x83\x70\x81\x5b\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67");
+    MR::isEqualString("\x83\x74\x83\x40\x83\x43\x83\x41\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67", "\x83\x74\x83\x40\x83\x43\x83\x41\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67");
+    MR::isEqualString("\x83\x41\x83\x43\x83\x58\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67", "\x83\x41\x83\x43\x83\x58\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67");
+    MR::isEqualString("\x83\x74\x83\x89\x83\x43\x83\x93\x83\x4f\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67", "\x83\x74\x83\x89\x83\x43\x83\x93\x83\x4f\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67");
+    MR::isEqualString("\x96\xb3\x93\x47\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67", "\x96\xb3\x93\x47\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67");
+    MR::isEqualString("\x83\x89\x83\x43\x83\x74\x83\x41\x83\x62\x83\x76\x83\x4c\x83\x6d\x83\x52\x89\xf0\x90\xe0", "\x83\x89\x83\x43\x83\x74\x83\x41\x83\x62\x83\x76\x83\x4c\x83\x6d\x83\x52\x89\xf0\x90\xe0");
+    MR::isEqualString("\x82\x50\x82\x74\x82\x6f\x83\x4c\x83\x6d\x83\x52\x89\xf0\x90\xe0", "\x82\x50\x82\x74\x82\x6f\x83\x4c\x83\x6d\x83\x52\x89\xf0\x90\xe0");
+    MR::isEqualString("\x83\x4e\x83\x62\x83\x70\x8f\x50\x97\x88\x8c\xe3", "\x83\x4e\x83\x62\x83\x70\x8f\x50\x97\x88\x8c\xe3");
+    MR::isEqualString("\x83\x73\x81\x5b\x83\x60\x8f\xe9\x95\x82\x8f\xe3\x8c\xe3", "\x83\x73\x81\x5b\x83\x60\x8f\xe9\x95\x82\x8f\xe3\x8c\xe3");
+    MR::isEqualString("\x83\x60\x83\x52\x83\x4b\x83\x43\x83\x68\x83\x66\x83\x82\x8f\x49\x97\xb9", "\x83\x60\x83\x52\x83\x4b\x83\x43\x83\x68\x83\x66\x83\x82\x8f\x49\x97\xb9");
+    MR::isEqualString("\x83\x58\x83\x73\x83\x93\x8c\xa0\x97\x98", "\x83\x58\x83\x73\x83\x93\x8c\xa0\x97\x98");
+    MR::isEqualString("\x93\x56\x8b\x85\x8b\x56\x83\x8c\x83\x4e\x83\x60\x83\x83\x81\x5b", "\x93\x56\x8b\x85\x8b\x56\x83\x8c\x83\x4e\x83\x60\x83\x83\x81\x5b");
+    MR::isEqualString("\x83\x4d\x83\x83\x83\x89\x83\x4e\x83\x56\x81\x5b\x88\xda\x93\xae\x83\x8c\x83\x4e\x83\x60\x83\x83\x81\x5b", "\x83\x4d\x83\x83\x83\x89\x83\x4e\x83\x56\x81\x5b\x88\xda\x93\xae\x83\x8c\x83\x4e\x83\x60\x83\x83\x81\x5b");
+    MR::isEqualString("\x83\x58\x83\x5e\x81\x5b\x83\x73\x81\x5b\x83\x58\x83\x8c\x83\x4e\x83\x60\x83\x83\x81\x5b", "\x83\x58\x83\x5e\x81\x5b\x83\x73\x81\x5b\x83\x58\x83\x8c\x83\x4e\x83\x60\x83\x83\x81\x5b");
+    MR::isEqualString("\x83\x54\x81\x5b\x83\x74\x83\x42\x83\x93\x83\x60\x83\x85\x81\x5b\x83\x67\x83\x8a\x83\x41\x83\x8b", "\x83\x54\x81\x5b\x83\x74\x83\x42\x83\x93\x83\x60\x83\x85\x81\x5b\x83\x67\x83\x8a\x83\x41\x83\x8b");
+    MR::isEqualString("\x83\x5e\x83\x7d\x83\x52\x83\x8d\x83\x60\x83\x85\x81\x5b\x83\x67\x83\x8a\x83\x41\x83\x8b", "\x83\x5e\x83\x7d\x83\x52\x83\x8d\x83\x60\x83\x85\x81\x5b\x83\x67\x83\x8a\x83\x41\x83\x8b");
     MR::isEqualString("RosettaTalkAboutTico", "RosettaTalkAboutTico");
     MR::isEqualString("SpecialStarGrand7", "SpecialStarGrand7");
     MR::isEqualString("ViewCompleteEnding", "ViewCompleteEnding");
-    MR::isEqualString("バトラー情報Ａ", "バトラー情報Ａ");
+    MR::isEqualString("\x83\x6f\x83\x67\x83\x89\x81\x5b\x8f\xee\x95\xf1\x82\x60", "\x83\x6f\x83\x67\x83\x89\x81\x5b\x8f\xee\x95\xf1\x82\x60");
     MR::isEqualString("SpecialStarGreenAll", "SpecialStarGreenAll");
     MR::isEqualString("SpecialStarRed1", "SpecialStarRed1");
     MR::isEqualString("ViewNormalEnding", "ViewNormalEnding");
@@ -156,91 +156,91 @@ namespace MR {
     }
 
     void onGameEventFlagBeeMarioAtFirst() {
-        GameDataFunction::onGameEventFlag("ハチマリオ初変身");
+        GameDataFunction::onGameEventFlag("\x83\x6e\x83\x60\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67");
     }
 
     void onGameEventFlagTeresaMarioAtFirst() {
-        GameDataFunction::onGameEventFlag("テレサマリオ初変身");
+        GameDataFunction::onGameEventFlag("\x83\x65\x83\x8c\x83\x54\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67");
     }
 
     void onGameEventFlagHopperMarioAtFirst() {
-        GameDataFunction::onGameEventFlag("ホッパーマリオ初変身");
+        GameDataFunction::onGameEventFlag("\x83\x7a\x83\x62\x83\x70\x81\x5b\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67");
     }
 
     void onGameEventFlagFireMarioAtFirst() {
-        GameDataFunction::onGameEventFlag("ファイアマリオ初変身");
+        GameDataFunction::onGameEventFlag("\x83\x74\x83\x40\x83\x43\x83\x41\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67");
     }
 
     void onGameEventFlagIceMarioAtFirst() {
-        GameDataFunction::onGameEventFlag("アイスマリオ初変身");
+        GameDataFunction::onGameEventFlag("\x83\x41\x83\x43\x83\x58\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67");
     }
 
     void onGameEventFlagFlyingMarioAtFirst() {
-        GameDataFunction::onGameEventFlag("フライングマリオ初変身");
+        GameDataFunction::onGameEventFlag("\x83\x74\x83\x89\x83\x43\x83\x93\x83\x4f\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67");
     }
 
     void onGameEventFlagInvincibleMarioAtFirst() {
-        GameDataFunction::onGameEventFlag("無敵マリオ初変身");
+        GameDataFunction::onGameEventFlag("\x96\xb3\x93\x47\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67");
     }
 
     void onGameEventFlagLifeUpAtFirst() {
-        GameDataFunction::onGameEventFlag("ライフアップキノコ解説");
+        GameDataFunction::onGameEventFlag("\x83\x89\x83\x43\x83\x74\x83\x41\x83\x62\x83\x76\x83\x4c\x83\x6d\x83\x52\x89\xf0\x90\xe0");
     }
 
     void onGameEventFlagOneUpAtFirst() {
-        GameDataFunction::onGameEventFlag("１ＵＰキノコ解説");
+        GameDataFunction::onGameEventFlag("\x82\x50\x82\x74\x82\x6f\x83\x4c\x83\x6d\x83\x52\x89\xf0\x90\xe0");
     }
 
     bool isOnGameEventFlagPlayMoviePrologueA() {
-        return GameDataFunction::isPassedStoryEvent("クッパ襲来後");
+        return GameDataFunction::isPassedStoryEvent("\x83\x4e\x83\x62\x83\x70\x8f\x50\x97\x88\x8c\xe3");
     }
 
     bool isOnGameEventFlagEndTicoGuideDemo() {
-        return GameDataFunction::isPassedStoryEvent("チコガイドデモ終了");
+        return GameDataFunction::isPassedStoryEvent("\x83\x60\x83\x52\x83\x4b\x83\x43\x83\x68\x83\x66\x83\x82\x8f\x49\x97\xb9");
     }
 
     bool isOnGameEventFlagEndButlerDomeLecture() {
-        return GameDataFunction::isPassedStoryEvent("天球儀レクチャー");
+        return GameDataFunction::isPassedStoryEvent("\x93\x56\x8b\x85\x8b\x56\x83\x8c\x83\x4e\x83\x60\x83\x83\x81\x5b");
     }
 
     bool isOnGameEventFlagEndButlerGalaxyMoveLecture() {
-        return GameDataFunction::isPassedStoryEvent("ギャラクシー移動レクチャー");
+        return GameDataFunction::isPassedStoryEvent("\x83\x4d\x83\x83\x83\x89\x83\x4e\x83\x56\x81\x5b\x88\xda\x93\xae\x83\x8c\x83\x4e\x83\x60\x83\x83\x81\x5b");
     }
 
     bool isOnGameEventFlagEndButlerStarPieceLecture() {
-        return GameDataFunction::isPassedStoryEvent("スターピースレクチャー");
+        return GameDataFunction::isPassedStoryEvent("\x83\x58\x83\x5e\x81\x5b\x83\x73\x81\x5b\x83\x58\x83\x8c\x83\x4e\x83\x60\x83\x83\x81\x5b");
     }
 
     bool isOnGameEventFlagBeeMarioAtFirst() {
-        return GameDataFunction::isOnGameEventFlag("ハチマリオ初変身");
+        return GameDataFunction::isOnGameEventFlag("\x83\x6e\x83\x60\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67");
     }
 
     bool isOnGameEventFlagTeresaMarioAtFirst() {
-        return GameDataFunction::isOnGameEventFlag("テレサマリオ初変身");
+        return GameDataFunction::isOnGameEventFlag("\x83\x65\x83\x8c\x83\x54\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67");
     }
 
     bool isOnGameEventFlagHopperMarioAtFirst() {
-        return GameDataFunction::isOnGameEventFlag("ホッパーマリオ初変身");
+        return GameDataFunction::isOnGameEventFlag("\x83\x7a\x83\x62\x83\x70\x81\x5b\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67");
     }
 
     bool isOnGameEventFlagFireMarioAtFirst() {
-        return GameDataFunction::isOnGameEventFlag("ファイアマリオ初変身");
+        return GameDataFunction::isOnGameEventFlag("\x83\x74\x83\x40\x83\x43\x83\x41\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67");
     }
 
     bool isOnGameEventFlagIceMarioAtFirst() {
-        return GameDataFunction::isOnGameEventFlag("アイスマリオ初変身");
+        return GameDataFunction::isOnGameEventFlag("\x83\x41\x83\x43\x83\x58\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67");
     }
 
     bool isOnGameEventFlagFlyingMarioAtFirst() {
-        return GameDataFunction::isOnGameEventFlag("フライングマリオ初変身");
+        return GameDataFunction::isOnGameEventFlag("\x83\x74\x83\x89\x83\x43\x83\x93\x83\x4f\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67");
     }
 
     bool isOnGameEventFlagSurfingTutorialAtFirst() {
-        return GameDataFunction::isOnGameEventFlag("サーフィンチュートリアル");
+        return GameDataFunction::isOnGameEventFlag("\x83\x54\x81\x5b\x83\x74\x83\x42\x83\x93\x83\x60\x83\x85\x81\x5b\x83\x67\x83\x8a\x83\x41\x83\x8b");
     }
 
     bool isOnGameEventFlagTamakoroTutorialAtFirst() {
-        return GameDataFunction::isOnGameEventFlag("タマコロチュートリアル");
+        return GameDataFunction::isOnGameEventFlag("\x83\x5e\x83\x7d\x83\x52\x83\x8d\x83\x60\x83\x85\x81\x5b\x83\x67\x83\x8a\x83\x41\x83\x8b");
     }
 
     bool isOnGameEventFlagViewCompleteEnding() {
@@ -861,94 +861,94 @@ namespace MR {
     }
 
     void explainBeeMarioIfAtFirst() {
-        if (!GameDataFunction::isOnGameEventFlag("ハチマリオ初変身")) {
+        if (!GameDataFunction::isOnGameEventFlag("\x83\x6e\x83\x60\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67")) {
             InformationObserverFunction::explainBee();
         }
     }
 
     void explainTeresaMarioIfAtFirst() {
-        if (!GameDataFunction::isOnGameEventFlag("テレサマリオ初変身")) {
+        if (!GameDataFunction::isOnGameEventFlag("\x83\x65\x83\x8c\x83\x54\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67")) {
             InformationObserverFunction::explainTeresa();
         }
     }
 
     void explainHopperMarioIfAtFirst() {
-        if (!GameDataFunction::isOnGameEventFlag("ホッパーマリオ初変身")) {
+        if (!GameDataFunction::isOnGameEventFlag("\x83\x7a\x83\x62\x83\x70\x81\x5b\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67")) {
             InformationObserverFunction::explainHopper();
         }
     }
 
     void explainFireMarioIfAtFirst() {
-        if (!GameDataFunction::isOnGameEventFlag("ファイアマリオ初変身")) {
+        if (!GameDataFunction::isOnGameEventFlag("\x83\x74\x83\x40\x83\x43\x83\x41\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67")) {
             InformationObserverFunction::explainFire();
         }
     }
 
     void explainIceMarioIfAtFirst() {
-        if (!GameDataFunction::isOnGameEventFlag("アイスマリオ初変身")) {
+        if (!GameDataFunction::isOnGameEventFlag("\x83\x41\x83\x43\x83\x58\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67")) {
             InformationObserverFunction::explainIce();
         }
     }
 
     void explainFlyingMarioIfAtFirst() {
-        if (!GameDataFunction::isOnGameEventFlag("フライングマリオ初変身")) {
+        if (!GameDataFunction::isOnGameEventFlag("\x83\x74\x83\x89\x83\x43\x83\x93\x83\x4f\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67")) {
             InformationObserverFunction::explainFlying();
         }
     }
 
     void explainInvincibleMarioIfAtFirst() {
-        if (!GameDataFunction::isOnGameEventFlag("無敵マリオ初変身")) {
+        if (!GameDataFunction::isOnGameEventFlag("\x96\xb3\x93\x47\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67")) {
             InformationObserverFunction::explainInvincible();
         }
     }
 
     void explainLifeUpIfAtFirst() {
-        if (!GameDataFunction::isOnGameEventFlag("ライフアップキノコ解説")) {
+        if (!GameDataFunction::isOnGameEventFlag("\x83\x89\x83\x43\x83\x74\x83\x41\x83\x62\x83\x76\x83\x4c\x83\x6d\x83\x52\x89\xf0\x90\xe0")) {
             InformationObserverFunction::explainLifeUp();
         }
     }
 
     void explainOneUpIfAtFirst() {
-        if (!GameDataFunction::isOnGameEventFlag("１ＵＰキノコ解説")) {
+        if (!GameDataFunction::isOnGameEventFlag("\x82\x50\x82\x74\x82\x6f\x83\x4c\x83\x6d\x83\x52\x89\xf0\x90\xe0")) {
             InformationObserverFunction::explainOneUp();
         }
     }
 
     void onGameEventFlagPlayMoviePrologueA() {
-        GameDataFunction::followStoryEventByName("クッパ襲来後");
+        GameDataFunction::followStoryEventByName("\x83\x4e\x83\x62\x83\x70\x8f\x50\x97\x88\x8c\xe3");
     }
 
     void onGameEventFlagPlayMoviePrologueB() {
-        GameDataFunction::followStoryEventByName("ピーチ城浮上後");
+        GameDataFunction::followStoryEventByName("\x83\x73\x81\x5b\x83\x60\x8f\xe9\x95\x82\x8f\xe3\x8c\xe3");
     }
 
     void onGameEventFlagEndTicoGuideDemo() {
-        GameDataFunction::followStoryEventByName("チコガイドデモ終了");
+        GameDataFunction::followStoryEventByName("\x83\x60\x83\x52\x83\x4b\x83\x43\x83\x68\x83\x66\x83\x82\x8f\x49\x97\xb9");
     }
 
     void onGameEventFlagEnableToSpinAndStarPointer() {
-        GameDataFunction::followStoryEventByName("スピン権利");
+        GameDataFunction::followStoryEventByName("\x83\x58\x83\x73\x83\x93\x8c\xa0\x97\x98");
         MR::setPlayerSwingPermission(true);
     }
 
     void onGameEventFlagEndButlerDomeLecture() {
-        GameDataFunction::followStoryEventByName("天球儀レクチャー");
+        GameDataFunction::followStoryEventByName("\x93\x56\x8b\x85\x8b\x56\x83\x8c\x83\x4e\x83\x60\x83\x83\x81\x5b");
     }
 
     void onGameEventFlagEndButlerGalaxyMoveLecture() {
-        GameDataFunction::followStoryEventByName("ギャラクシー移動レクチャー");
+        GameDataFunction::followStoryEventByName("\x83\x4d\x83\x83\x83\x89\x83\x4e\x83\x56\x81\x5b\x88\xda\x93\xae\x83\x8c\x83\x4e\x83\x60\x83\x83\x81\x5b");
     }
 
     void onGameEventFlagEndButlerStarPieceLecture() {
-        GameDataFunction::followStoryEventByName("スターピースレクチャー");
+        GameDataFunction::followStoryEventByName("\x83\x58\x83\x5e\x81\x5b\x83\x73\x81\x5b\x83\x58\x83\x8c\x83\x4e\x83\x60\x83\x83\x81\x5b");
     }
 
     void onGameEventFlagSurfingTutorialAtFirst() {
-        GameDataFunction::onGameEventFlag("サーフィンチュートリアル");
+        GameDataFunction::onGameEventFlag("\x83\x54\x81\x5b\x83\x74\x83\x42\x83\x93\x83\x60\x83\x85\x81\x5b\x83\x67\x83\x8a\x83\x41\x83\x8b");
     }
 
     void onGameEventFlagTamakoroTutorialAtFirst() {
-        GameDataFunction::onGameEventFlag("タマコロチュートリアル");
+        GameDataFunction::onGameEventFlag("\x83\x5e\x83\x7d\x83\x52\x83\x8d\x83\x60\x83\x85\x81\x5b\x83\x67\x83\x8a\x83\x41\x83\x8b");
     }
 
     void onGameEventFlagRosettaTalkAboutTicoInTower() {
@@ -967,7 +967,7 @@ namespace MR {
     }
 
     bool isOnGameEventFlagUseAstroDome() {
-        return GameDataFunction::isPassedStoryEvent("バトラー情報Ａ");
+        return GameDataFunction::isPassedStoryEvent("\x83\x6f\x83\x67\x83\x89\x81\x5b\x8f\xee\x95\xf1\x82\x60");
     }
 
     bool isOnGameEventFlagGreenDriver() {

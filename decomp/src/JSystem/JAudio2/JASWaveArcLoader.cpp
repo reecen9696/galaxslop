@@ -74,6 +74,9 @@ void JASWaveArc::loadToAramCallback(void* this_) {
     loadToAramCallbackParams* tmp = (loadToAramCallbackParams*)this_;
     JASWaveArc* wavArc = tmp->mWavArc;
     if (JKRDvdAramRipper::loadToAram(tmp->mEntryNum, tmp->mBase, EXPAND_SWITCH_UNKNOWN0, 0, 0, nullptr) == nullptr) {
+#ifdef TARGET_PC
+        port_log("JASWaveArc: loadToAram failed (entry %d, base %#x)", (int)tmp->mEntryNum, (unsigned)tmp->mBase);
+#endif
         return;
     }
     wavArc->_5A--;
@@ -94,7 +97,7 @@ bool JASWaveArc::sendLoadCmd() {
 
     _5A++;
 
-    if (JASDvd::getThreadPointer()->sendCmdMsg(loadToAramCallback, &commandInfo, 0x10) == 0) {
+    if (JASDvd::getThreadPointer()->sendCmdMsg(loadToAramCallback, &commandInfo, sizeof(commandInfo)) == 0) {
         mHeap.free();
         return false;
     }
@@ -103,6 +106,9 @@ bool JASWaveArc::sendLoadCmd() {
 
 bool JASWaveArc::load(JASHeap* heap) {
     if (mEntryNum < 0) {
+#ifdef TARGET_PC
+        port_log("JASWaveArc::load: no file entry (%p)", (void*)this);
+#endif
         return false;
     }
     JASMutexLock mutexLock(&mMutex);
@@ -113,6 +119,9 @@ bool JASWaveArc::load(JASHeap* heap) {
         heap = JASWaveArcLoader::getRootHeap();
     }
     if (mHeap.alloc(heap, mFileLength) == false) {
+#ifdef TARGET_PC
+        port_log("JASWaveArc: ARAM alloc of %#x bytes failed (entry %d)", (unsigned)mFileLength, (int)mEntryNum);
+#endif
         return false;
     }
     return sendLoadCmd();

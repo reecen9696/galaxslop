@@ -119,7 +119,7 @@ void Trapeze::init(const JMapInfoIter& rIter) {
 
     MR::setClippingTypeSphere(this, mRopeLength);
 
-    mTrapezeModel = new PartsModel(this, "棒", "Trapeze", mPosMtx, MR::DrawBufferType_Enemy, false);
+    mTrapezeModel = new PartsModel(this, "\x96\x5f", "Trapeze", mPosMtx, MR::DrawBufferType_Enemy, false);
     mTrapezeModel->initWithoutIter();
 
     MR::initShadowFromCSV(mTrapezeModel, "Shadow");

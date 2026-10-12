@@ -90,9 +90,9 @@ void Fluff::init(const JMapInfoIter& rIter) {
 
     MR::useStageSwitchWriteA(this, rIter);
 
-    mCameraTargetMtx = new CameraTargetMtx("カメラターゲットダミー");
+    mCameraTargetMtx = new CameraTargetMtx("\x83\x4a\x83\x81\x83\x89\x83\x5e\x81\x5b\x83\x51\x83\x62\x83\x67\x83\x5f\x83\x7e\x81\x5b");
     MR::setClippingTypeSphere(this, 800.0f);
-    mModel = MR::createModelObjMapObj("わたげの葉", "FluffLeaf", nullptr);
+    mModel = MR::createModelObjMapObj("\x82\xed\x82\xbd\x82\xb0\x82\xcc\x97\x74", "FluffLeaf", nullptr);
     MR::copyTransRotateScale(this, mModel);
     mModel->initWithoutIter();
     initNerve(GET_NERVE(Fluff, FluffNrvFreeWaitOnGround));

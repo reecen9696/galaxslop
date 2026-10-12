@@ -13,6 +13,15 @@ public:
     virtual void executeOnEnd(Spine* pSpine) const;
 };
 
+#ifdef __MWERKS__
+#define NERVE_WEAK ATTRIBUTE_WEAK
+#define NERVE_DEF
+#else
+/* C++17 inline variables give header-defined nerves one definition across TUs. */
+#define NERVE_WEAK
+#define NERVE_DEF inline
+#endif
+
 #define NEW_NERVE(name, parent_class, executor_name)                                                                                                 \
     class name : public Nerve {                                                                                                                      \
     public:                                                                                                                                          \
@@ -22,7 +31,7 @@ public:
         };                                                                                                                                           \
         static name sInstance;                                                                                                                       \
     };                                                                                                                                               \
-    name name::sInstance ATTRIBUTE_WEAK;
+    NERVE_DEF name name::sInstance NERVE_WEAK;
 
 #define NEW_NERVE_ONEND(name, parent_class, executor_name, executorOnEnd_name)                                                                       \
     class name : public Nerve {                                                                                                                      \
@@ -37,7 +46,7 @@ public:
         };                                                                                                                                           \
         static name sInstance;                                                                                                                       \
     };                                                                                                                                               \
-    name name::sInstance ATTRIBUTE_WEAK;
+    NERVE_DEF name name::sInstance NERVE_WEAK;
 
 /* easy alternative to get a nerve instance (in the standard format) */
 #define GET_NERVE(cls, nerve) (&Nrv##cls::nerve::sInstance)

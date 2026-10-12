@@ -228,7 +228,7 @@ bool FireBubble::tryChaseEnd() {
 }
 
 bool FireBubble::tryReflect() {
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         TVec2f starPointerScreenVelocity(*MR::getStarPointerScreenVelocity(*MR::getStarPointerLastPointedPort(this)));
         if (::cReflectCursorSpeed < starPointerScreenVelocity.length()) {
             MR::onCalcGravity(this);

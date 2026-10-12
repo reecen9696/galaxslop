@@ -58,7 +58,7 @@ namespace {
         DemoSubPartKeeper* subpartkeeper = exec->mSubPartKeeper;
         for (int i = 0; i < subpartkeeper->mNumSubPartInfos; i++) {
             subpart = &subpartkeeper->mSubPartInfos[i];
-            if (MR::isEqualString(pMainPartName, subpart->mMainPartName) && MR::isEqualSubString(subpart->mSubPartName, "会話アニメループ")) {
+            if (MR::isEqualString(pMainPartName, subpart->mMainPartName) && MR::isEqualSubString(subpart->mSubPartName, "\x89\xef\x98\x62\x83\x41\x83\x6a\x83\x81\x83\x8b\x81\x5b\x83\x76")) {
                 return subpart->mMainPartStep;
             }
         }

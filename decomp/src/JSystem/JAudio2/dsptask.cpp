@@ -13,10 +13,10 @@ void DspHandShake(void*) {
     while (DSPCheckMailFromDSP() == 0) {
     }
 
-    OSReport("♪JDSP/Boot:: ＤＳＰからのファーストメール(%x)が届きました\n", DSPReadMailFromDSP());
-    OSReport("♪JDSP/Boot:: ＤＳＰからのセカンドメール(%x)が届きました\n", DSPCheckMailFromDSP());
+    OSReport("\x81\xf4JDSP/Boot:: \x82\x63\x82\x72\x82\x6f\x82\xa9\x82\xe7\x82\xcc\x83\x74\x83\x40\x81\x5b\x83\x58\x83\x67\x83\x81\x81\x5b\x83\x8b(%x)\x82\xaa\x93\xcd\x82\xab\x82\xdc\x82\xb5\x82\xbd\n", DSPReadMailFromDSP());
+    OSReport("\x81\xf4JDSP/Boot:: \x82\x63\x82\x72\x82\x6f\x82\xa9\x82\xe7\x82\xcc\x83\x5a\x83\x4a\x83\x93\x83\x68\x83\x81\x81\x5b\x83\x8b(%x)\x82\xaa\x93\xcd\x82\xab\x82\xdc\x82\xb5\x82\xbd\n", DSPCheckMailFromDSP());
 
-    OSReport("♪JDSP/Boot:: ＤＳＰとの接続に成功しました\n");
+    OSReport("\x81\xf4JDSP/Boot:: \x82\x63\x82\x72\x82\x6f\x82\xc6\x82\xcc\x90\xda\x91\xb1\x82\xc9\x90\xac\x8c\xf7\x82\xb5\x82\xdc\x82\xb5\x82\xbd\n");
     Dsp_Running_Start();
 }
 
@@ -249,7 +249,7 @@ static u16 AUDIO_YIELD_BUFFER[4096] ATTRIBUTE_ALIGN(32);
 
 void DspBoot(void (*pCallback)(void*)) {
     DspInitWork();
-    OSReport("Dsp をブートします\n");
+    OSReport("Dsp \x82\xf0\x83\x75\x81\x5b\x83\x67\x82\xb5\x82\xdc\x82\xb7\n");
     audiotask.priority = 0xf0;
     audiotask.iram_mmem_addr = (u16*)((u8*)jdsp + 0x80000000);
     audiotask.iram_length = sizeof(jdsp);
@@ -265,7 +265,7 @@ void DspBoot(void (*pCallback)(void*)) {
     audiotask.req_cb = pCallback;
     DSPInit();
     DSPAddPriorTask(&audiotask);
-    OSReport("Dspブートしました\n");
+    OSReport("Dsp\x83\x75\x81\x5b\x83\x67\x82\xb5\x82\xdc\x82\xb5\x82\xbd\n");
 }
 
 int DSPSendCommands2(u32* pMessages, u32 param_2, void (*pCallback)(u16)) {
@@ -276,7 +276,7 @@ int DSPSendCommands2(u32* pMessages, u32 param_2, void (*pCallback)(u16)) {
     BOOL firstWarning = TRUE;
     while (Dsp_Running_Check() == 0) {
         if (firstWarning) {
-            OSReport("Warning:まだブートしてません\n");
+            OSReport("Warning:\x82\xdc\x82\xbe\x83\x75\x81\x5b\x83\x67\x82\xb5\x82\xc4\x82\xdc\x82\xb9\x82\xf1\n");
         }
 
         firstWarning = FALSE;
@@ -284,7 +284,7 @@ int DSPSendCommands2(u32* pMessages, u32 param_2, void (*pCallback)(u16)) {
 
     interruptFlag = OSDisableInterrupts();
     if (DSPCheckMailToDSP()) {
-        OSReport("エラー::DSPがメッセージを受け取っていません\n");
+        OSReport("\x83\x47\x83\x89\x81\x5b::DSP\x82\xaa\x83\x81\x83\x62\x83\x5a\x81\x5b\x83\x57\x82\xf0\x8e\xf3\x82\xaf\x8e\xe6\x82\xc1\x82\xc4\x82\xa2\x82\xdc\x82\xb9\x82\xf1\n");
         OSRestoreInterrupts(interruptFlag);
         return -1;
     }

@@ -365,7 +365,7 @@ bool MarioActor::releaseThrowMemoSensor() {
 void MarioActor::tryReleaseWithMsg(u32 msg) {
     u32 maxIdx = _468;
     if (maxIdx == 0) {
-        if (isAnimationRun("ひろいクイック")) {
+        if (isAnimationRun("\x82\xd0\x82\xeb\x82\xa2\x83\x4e\x83\x43\x83\x62\x83\x4e")) {
             mMario->stopAnimationUpperForce();
             clearNullAnimation(0);
             offTakingFlag();
@@ -410,12 +410,12 @@ void MarioActor::tryReleaseWithMsg(u32 msg) {
 }
 
 void MarioActor::tryTornadoPull(HitSensor* pSensor) {
-    if (!isActionOk("コイン引っ張り")) {
+    if (!isActionOk("\x83\x52\x83\x43\x83\x93\x88\xf8\x82\xc1\x92\xa3\x82\xe8")) {
         return;
     }
 
     s32 type = pSensor->mType;
-    if (strcmp(pSensor->mHost->mName, "カメックビーム用カメ") == 0) {
+    if (strcmp(pSensor->mHost->mName, "\x83\x4a\x83\x81\x83\x62\x83\x4e\x83\x72\x81\x5b\x83\x80\x97\x70\x83\x4a\x83\x81") == 0) {
         type = 5555;
     }
 
@@ -474,7 +474,7 @@ void MarioActor::tryTornadoPull(HitSensor* pSensor) {
 
     case ATYPE_JET_TURTLE:
     case ATYPE_JET_TURTLE_SLOW:
-        if (isActionOk("カメ持ち") && pSensor->receiveMessage(ACTMES_IS_PULL_ENABLE, getSensor("body"))) {
+        if (isActionOk("\x83\x4a\x83\x81\x8e\x9d\x82\xbf") && pSensor->receiveMessage(ACTMES_IS_PULL_ENABLE, getSensor("body"))) {
             if ((pSensor->mPosition - mPosition).length() < 120.0f) {
                 tryGetItem(pSensor);
                 return;
@@ -486,7 +486,7 @@ void MarioActor::tryTornadoPull(HitSensor* pSensor) {
 
         break;
     case 5555:
-        if (isActionOk("カメ持ち") && pSensor->receiveMessage(ACTMES_IS_PULL_ENABLE, getSensor("body"))) {
+        if (isActionOk("\x83\x4a\x83\x81\x8e\x9d\x82\xbf") && pSensor->receiveMessage(ACTMES_IS_PULL_ENABLE, getSensor("body"))) {
             tryCoinPullOne(pSensor);
         }
 
@@ -509,5 +509,5 @@ void MarioActor::tryReleaseBombTeresa() {
         mMario->_420 = 25;
     }
 
-    changeAnimation("ハンマー投げリリース");
+    changeAnimation("\x83\x6e\x83\x93\x83\x7d\x81\x5b\x93\x8a\x82\xb0\x83\x8a\x83\x8a\x81\x5b\x83\x58");
 }

@@ -6,16 +6,22 @@
 #include "JSystem/J3DGraphBase/J3DTransform.hpp"
 #include <cstdio>
 
+#if defined(__MWERKS__) || defined(__BIG_ENDIAN__)
+#define COLOR_U32(c) (*(u32*)(c))
+#else
+#define COLOR_U32(c) ((u32((c)->r) << 24) | (u32((c)->g) << 16) | (u32((c)->b) << 8) | (c)->a)
+#endif
+
 inline void loadMatColors(const J3DGXColor* color) {
     J3DGDWriteXFCmdHdr(0x100C, 2);
-    J3DGDWrite_u32(*(u32*)color);
-    J3DGDWrite_u32(*(u32*)(color + 1));
+    J3DGDWrite_u32(COLOR_U32(color));
+    J3DGDWrite_u32(COLOR_U32(color + 1));
 }
 
 inline void loadAmbColors(const J3DGXColor* color) {
     J3DGDWriteXFCmdHdr(0x100A, 2);
-    J3DGDWrite_u32(*(u32*)color);
-    J3DGDWrite_u32(*(u32*)(color + 1));
+    J3DGDWrite_u32(COLOR_U32(color));
+    J3DGDWrite_u32(COLOR_U32(color + 1));
 }
 
 inline void loadTevColor(u32 reg, const J3DGXColorS10& color) {

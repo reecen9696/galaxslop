@@ -15,7 +15,7 @@ namespace NrvDinoPackunStateFire {
     NEW_NERVE(DinoPackunStateFireNrvCool, DinoPackunStateFire, Cool);
 };  // namespace NrvDinoPackunStateFire
 
-DinoPackunStateFire::DinoPackunStateFire(DinoPackun* pBoss) : ActorStateBase< DinoPackun >("ディノパックンの炎状態管理", pBoss) {
+DinoPackunStateFire::DinoPackunStateFire(DinoPackun* pBoss) : ActorStateBase< DinoPackun >("\x83\x66\x83\x42\x83\x6d\x83\x70\x83\x62\x83\x4e\x83\x93\x82\xcc\x89\x8a\x8f\xf3\x91\xd4\x8a\xc7\x97\x9d", pBoss) {
 }
 
 void DinoPackunStateFire::init() {

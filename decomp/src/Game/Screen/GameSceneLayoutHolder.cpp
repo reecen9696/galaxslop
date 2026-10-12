@@ -15,20 +15,20 @@
 #include "Game/Util/ObjUtil.hpp"
 
 GameSceneLayoutHolder::GameSceneLayoutHolder()
-    : NameObj("ゲームシーンのレイアウト保持"), mCameraInfo(nullptr), mInformationMessage(nullptr), mMarioMeter(nullptr), mMarioSubMeter(nullptr),
+    : NameObj("\x83\x51\x81\x5b\x83\x80\x83\x56\x81\x5b\x83\x93\x82\xcc\x83\x8c\x83\x43\x83\x41\x83\x45\x83\x67\x95\xdb\x8e\x9d"), mCameraInfo(nullptr), mInformationMessage(nullptr), mMarioMeter(nullptr), mMarioSubMeter(nullptr),
       mMissLayout(nullptr), mNoteCounter(nullptr), mYesNoLayout(nullptr), mPurpleCoinCounter(nullptr), _30(false), _31(false),
       mCounterLayoutCtrl(nullptr), mIsActiveDefaultGameLayout(true) {
     MR::joinToNameObjGroup(this, "IgnorePauseNameObj");
     MR::connectToSceneLayoutMovement(this);
 
-    mMarioMeter = new MarioMeter("マリオメーター");
+    mMarioMeter = new MarioMeter("\x83\x7d\x83\x8a\x83\x49\x83\x81\x81\x5b\x83\x5e\x81\x5b");
     mMarioMeter->initWithoutIter();
 
     mCounterLayoutCtrl = new CounterLayoutController();
     mCounterLayoutCtrl->initWithoutIter();
     mCounterLayoutCtrl->setHPMeter(mMarioMeter);
 
-    mCameraInfo = new CameraInfo("カメラ情報表示");
+    mCameraInfo = new CameraInfo("\x83\x4a\x83\x81\x83\x89\x8f\xee\x95\xf1\x95\x5c\x8e\xa6");
     mCameraInfo->initWithoutIter();
 
     mInformationMessage = new InformationMessage();
@@ -40,10 +40,10 @@ GameSceneLayoutHolder::GameSceneLayoutHolder()
     mMissLayout = new MissLayout();
     mMissLayout->initWithoutIter();
 
-    mMarioSubMeter = new MarioSubMeter("マリオサブメーター");
+    mMarioSubMeter = new MarioSubMeter("\x83\x7d\x83\x8a\x83\x49\x83\x54\x83\x75\x83\x81\x81\x5b\x83\x5e\x81\x5b");
     mMarioSubMeter->initWithoutIter();
 
-    mNoteCounter = new NoteCounter("音符カウンタ");
+    mNoteCounter = new NoteCounter("\x89\xb9\x95\x84\x83\x4a\x83\x45\x83\x93\x83\x5e");
     mNoteCounter->initWithoutIter();
     MR::hideLayout(mNoteCounter);
 
@@ -52,7 +52,7 @@ GameSceneLayoutHolder::GameSceneLayoutHolder()
 }
 
 void GameSceneLayoutHolder::createPurpleCoinCounter() {
-    mPurpleCoinCounter = new PurpleCoinCounter("パープルコインカウンタ");
+    mPurpleCoinCounter = new PurpleCoinCounter("\x83\x70\x81\x5b\x83\x76\x83\x8b\x83\x52\x83\x43\x83\x93\x83\x4a\x83\x45\x83\x93\x83\x5e");
     mPurpleCoinCounter->initWithoutIter();
 }
 

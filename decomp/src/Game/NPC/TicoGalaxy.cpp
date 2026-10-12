@@ -26,7 +26,7 @@ void TicoGalaxy::init(const JMapInfoIter& rIter) {
         MR::forwardNode(mMsgCtrl);
     }
 
-    mStarRing = new TicoStarRing("スターリングチコ");
+    mStarRing = new TicoStarRing("\x83\x58\x83\x5e\x81\x5b\x83\x8a\x83\x93\x83\x4f\x83\x60\x83\x52");
     mStarRing->initWithoutIter();
 }
 

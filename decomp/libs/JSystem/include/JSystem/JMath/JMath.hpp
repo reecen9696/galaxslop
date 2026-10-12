@@ -20,6 +20,11 @@ inline f32 JMAFastSqrt(__REGISTER const f32 input) {
     } else {
         return input;
     }
+#else
+    if (input > 0.0f) {
+        return __builtin_sqrtf(input);
+    }
+    return input;
 #endif
 }
 
@@ -52,6 +57,21 @@ inline f32 JMAHermiteInterpolation(__REGISTER f32 p1, __REGISTER f32 p2, __REGIS
     }
     // clang-format on
     return ff25;
+#else
+    f32 ff31 = p1 - p2;
+    f32 ff30 = p5 - p2;
+    f32 ff29 = ff31 / ff30;
+    f32 ff28 = ff29 * ff29;
+    f32 ff25 = ff29 + ff29;
+    f32 ff27 = ff28 - ff29;
+    ff30 = p3 - p6;
+    f32 ff26 = ff25 * ff27 - ff28;
+    ff25 = p4 * ff27 + p4;
+    ff26 = ff26 * ff30 + p3;
+    ff25 = p7 * ff27 + ff25;
+    ff25 = ff29 * p4 - ff25;
+    ff25 = ff26 - ff31 * ff25;
+    return ff25;
 #endif
 }
 
@@ -81,6 +101,8 @@ namespace JMath {
             psq_st x, 0(dest), 0, 0
             stfs y, 8(dest)
         }
+#else
+        __builtin_memcpy(dest, src, 3 * sizeof(f32));
 #endif
     }
 
@@ -95,6 +117,8 @@ namespace JMath {
             psq_st y, 8(dest), 0, 0
             psq_st z, 16(dest), 0, 0
         }
+#else
+        __builtin_memcpy(dest, src, 6 * sizeof(f32));
 #endif
     }
 
@@ -117,6 +141,8 @@ namespace JMath {
                 psq_st    f_5, 0x28(pDest), 0, 0
         }
         ;
+#else
+        __builtin_memcpy(pDest, pSrc, 12 * sizeof(f32));
 #endif
     }
 
@@ -143,6 +169,8 @@ namespace JMath {
                 psq_st    f_7, 0x38(pDest), 0, 0
         }
         ;
+#else
+        __builtin_memcpy(pDest, pSrc, 16 * sizeof(f32));
 #endif
     }
 };  // namespace JMath
@@ -264,14 +292,46 @@ namespace JMathInlineVEC {
         return sqdist;
     }
 #else
-    void PSVECCopy(const Vec*, Vec*);
-    void PSVECAdd(const Vec*, const Vec*, Vec*);
-    void PSVECSubtract(const Vec*, const Vec*, Vec*);
-    f32 PSVECDotProduct(const Vec*, const Vec*);
-    f32 PSVECSquareMag(const Vec*);
-    void PSVECNegate(const Vec*, Vec*);
-    f32 PSVECSquareDistance(const Vec*, const Vec*);
-    void PSVECMultiply(const Vec*, const Vec*, Vec*);
+    inline f32 PSVECDotProduct(const Vec* pA, const Vec* pB) {
+        return (pA->x * pB->x + pA->y * pB->y) + pA->z * pB->z;
+    }
+    inline void PSVECCopy(const Vec* src, Vec* dest) {
+        f32 x = src->x, y = src->y, z = src->z;
+        dest->x = x;
+        dest->y = y;
+        dest->z = z;
+    }
+    inline void PSVECAdd(const Vec* a, const Vec* b, Vec* dst) {
+        f32 x = a->x + b->x, y = a->y + b->y, z = a->z + b->z;
+        dst->x = x;
+        dst->y = y;
+        dst->z = z;
+    }
+    inline void PSVECSubtract(const Vec* a, const Vec* b, Vec* dst) {
+        f32 x = a->x - b->x, y = a->y - b->y, z = a->z - b->z;
+        dst->x = x;
+        dst->y = y;
+        dst->z = z;
+    }
+    inline void PSVECMultiply(const Vec* a, const Vec* b, Vec* dst) {
+        f32 x = a->x * b->x, y = a->y * b->y, z = a->z * b->z;
+        dst->x = x;
+        dst->y = y;
+        dst->z = z;
+    }
+    inline f32 PSVECSquareMag(const Vec* src) {
+        return (src->x * src->x + src->y * src->y) + src->z * src->z;
+    }
+    inline void PSVECNegate(const Vec* src, Vec* dst) {
+        f32 x = -src->x, y = -src->y, z = -src->z;
+        dst->x = x;
+        dst->y = y;
+        dst->z = z;
+    }
+    inline f32 PSVECSquareDistance(const Vec* a, const Vec* b) {
+        f32 dx = a->x - b->x, dy = a->y - b->y, dz = a->z - b->z;
+        return (dx * dx + dy * dy) + dz * dz;
+    }
 #endif
 };  // namespace JMathInlineVEC
 

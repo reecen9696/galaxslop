@@ -8,7 +8,7 @@ typedef void (*TexAttrFunc)(f32, f32);
 
 class ElectricRailMovingPoint : public LiveActor {
 public:
-    ElectricRailMovingPoint(const char* pName = "移動電撃レール点");
+    ElectricRailMovingPoint(const char* pName = "\x88\xda\x93\xae\x93\x64\x8c\x82\x83\x8c\x81\x5b\x83\x8b\x93\x5f");
 
     virtual ~ElectricRailMovingPoint();
     virtual void init(const JMapInfoIter&);

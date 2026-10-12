@@ -8,7 +8,7 @@ class TripodBossKillerGenerater : public TripodBossFixPartsBase {
 public:
     /// @brief Creates a new `TripodBossKillerGenerater`.
     /// @param pName A pointer to the null-terminated name of the object.
-    TripodBossKillerGenerater(const char* pName = "三脚ボスキラー発生源");
+    TripodBossKillerGenerater(const char* pName = "\x8e\x4f\x8b\x72\x83\x7b\x83\x58\x83\x4c\x83\x89\x81\x5b\x94\xad\x90\xb6\x8c\xb9");
 
     virtual void init(const JMapInfoIter&);
     virtual void kill();

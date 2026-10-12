@@ -262,7 +262,7 @@ void RunawayRabbit::attackSensor(HitSensor* pSender, HitSensor* pReceiver) {
     if (MR::isSensorPlayer(pReceiver)) {
         if (pSender == getSensor("Catch") && isCaughtable()) {
             mCollect->noticeCaughtRabbit(this);
-            MR::requestStartDemoMarioPuppetable(this, "捕まり", GET_NERVE(RunawayRabbit, RunawayRabbitNrvCaught),
+            MR::requestStartDemoMarioPuppetable(this, "\x95\xdf\x82\xdc\x82\xe8", GET_NERVE(RunawayRabbit, RunawayRabbitNrvCaught),
                                                 GET_NERVE(RunawayRabbit, RunawayRabbitNrvTryCaughtDemo));
         } else if (isCaught()) {
             MR::sendMsgPush(pReceiver, pSender);
@@ -474,7 +474,7 @@ void RunawayRabbit::exeCaughtEnd() {
     }
     updateBindActorMatrix();
     if (MR::isBckStopped(this)) {
-        MR::endDemo(this, "捕まり");
+        MR::endDemo(this, "\x95\xdf\x82\xdc\x82\xe8");
         setNerve(GET_NERVE(RunawayRabbit, RunawayRabbitNrvStop));
     }
 }

@@ -120,10 +120,10 @@ void HomingKiller::init(const JMapInfoIter& rIter) {
         MR::getObjectName(&objectName, rIter);
         if (MR::isEqualObjectName(rIter, "Torpedo")) {
             mType = Type_Torpedo;
-            setName("トーピード");
+            setName("\x83\x67\x81\x5b\x83\x73\x81\x5b\x83\x68");
         } else if (MR::isEqualObjectName(rIter, "MagnumKiller")) {
             mType = Type_MagnumKiller;
-            setName("マグナムキラー");
+            setName("\x83\x7d\x83\x4f\x83\x69\x83\x80\x83\x4c\x83\x89\x81\x5b");
         }
     }
 
@@ -134,9 +134,9 @@ void HomingKiller::init(const JMapInfoIter& rIter) {
     initModelManagerWithAnm(objectName, nullptr, false);
 
     if (mType == Type_Torpedo) {
-        mPropeller = MR::createPartsModelEnemyAndFix(this, "トーピードプロペラ", "TorpedoPropeller", nullptr, TVec3f(0.0f, 0.0f, 0.0f),
+        mPropeller = MR::createPartsModelEnemyAndFix(this, "\x83\x67\x81\x5b\x83\x73\x81\x5b\x83\x68\x83\x76\x83\x8d\x83\x79\x83\x89", "TorpedoPropeller", nullptr, TVec3f(0.0f, 0.0f, 0.0f),
                                                      TVec3f(0.0f, 0.0f, 0.0f), nullptr);
-        mTorpedoLight = MR::createModelObjMapObj("トーピードライト", "TorpedoLight", getBaseMtx());
+        mTorpedoLight = MR::createModelObjMapObj("\x83\x67\x81\x5b\x83\x73\x81\x5b\x83\x68\x83\x89\x83\x43\x83\x67", "TorpedoLight", getBaseMtx());
         MR::invalidateClipping(mTorpedoLight);
         mTorpedoLight->makeActorDead();
     }
@@ -560,7 +560,7 @@ bool HomingKiller::tryFreeze(const Nerve* pUnfreezeNerve) {
         return false;
     }
 
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         mFreezeTime = 0;
         mFreezePos.set(mPosition);
         mUnfreezeNerve = pUnfreezeNerve;
@@ -852,7 +852,7 @@ void HomingKiller::exeFreeze() {
         updateRotateZ(target);
     }
 
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         setNerve(GET_NERVE(HomingKiller, HomingKillerNrvFreeze));
         return;
     }
@@ -914,7 +914,7 @@ void HomingKiller::exeBreak() {
             MR::releaseSoundHandle(this, "SE_EM_KILLER_EXPLOSION");
         }
 
-        MR::startRumbleWithShakeCameraWeak(this, "強", "中", ::cCameraShakeDistance, ::cCameraShakeDistance * 2);
+        MR::startRumbleWithShakeCameraWeak(this, "\x8b\xad", "\x92\x86", ::cCameraShakeDistance, ::cCameraShakeDistance * 2);
     }
 
     if (!MR::isEffectValid(this, "Explosion")) {
@@ -943,7 +943,7 @@ void HomingKiller::exeGoToTarget() {
     }
 }
 
-HomingKillerLauncher::HomingKillerLauncher(const char* pName) : LiveActor("ホーミングキラーランチャー"), mKiller() {
+HomingKillerLauncher::HomingKillerLauncher(const char* pName) : LiveActor("\x83\x7a\x81\x5b\x83\x7e\x83\x93\x83\x4f\x83\x4c\x83\x89\x81\x5b\x83\x89\x83\x93\x83\x60\x83\x83\x81\x5b"), mKiller() {
 }
 
 void HomingKillerLauncher::init(const JMapInfoIter& rIter) {
@@ -953,7 +953,7 @@ void HomingKillerLauncher::init(const JMapInfoIter& rIter) {
     MR::invalidateClipping(this);
     initNerve(GET_NERVE(HomingKiller, HomingKillerLauncherNrvAppearKiller));
     MR::syncStageSwitchAppear(this);
-    mKiller = new HomingKiller("ホーミングキラー");
+    mKiller = new HomingKiller("\x83\x7a\x81\x5b\x83\x7e\x83\x93\x83\x4f\x83\x4c\x83\x89\x81\x5b");
     mKiller->init(rIter);
     makeActorDead();
 }

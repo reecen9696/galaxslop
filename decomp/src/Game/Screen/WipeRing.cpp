@@ -41,6 +41,26 @@ void WipeRing::init(const JMapInfoIter& rIter) {
     kill();
 }
 
+#ifdef TARGET_PC
+void WipeRing::draw() const {
+    if (MR::isDead(this)) {
+        return;
+    }
+    // Ring radius as a fraction of the largest: the "Out" animation closes
+    // from 0 (open) to its end, "In" opens from 0 (closed).
+    J3DFrameCtrl* ctrl = MR::getAnimCtrl(this, 0);
+    f32 t = ctrl->getEnd() > 0 ? ctrl->getFrame() / ctrl->getEnd() : 0.0f;
+    f32 radius = isWipeOut() ? 1.0f - t : t;
+    f32 fullyOpen = calcRadius() / calcMaxRadius();
+    f32 closed = 1.0f - MR::clamp(fullyOpen > 0.0f ? radius / fullyOpen : 1.0f, 0.0f, 1.0f);
+    port_vr_wipe(mIsCenterOnPlayer ? 1 : 2, closed, 0x000000);
+    if (port_vr_diorama()) {
+        return;
+    }
+    LayoutActor::draw();
+}
+#endif
+
 void WipeRing::exeClose() {
     updatePlayerPos();
 }

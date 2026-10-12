@@ -95,7 +95,7 @@ void RosettaPictureBook::exeWait() {
         return;
     }
 
-    MR::requestStartDemoMarioPuppetableWithoutCinemaFrame(this, "ロゼッタ絵本デモ", GET_NERVE(RosettaPictureBook, HostTypeNrvFadeOut),
+    MR::requestStartDemoMarioPuppetableWithoutCinemaFrame(this, "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x8a\x47\x96\x7b\x83\x66\x83\x82", GET_NERVE(RosettaPictureBook, HostTypeNrvFadeOut),
                                                           GET_NERVE(RosettaPictureBook, HostTypeNrvDemoWait));
 }
 
@@ -124,7 +124,7 @@ void RosettaPictureBook::exeReading() {
     }
 
     if (MR::isDead(mLayout)) {
-        MR::endDemo(this, "ロゼッタ絵本デモ");
+        MR::endDemo(this, "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x8a\x47\x96\x7b\x83\x66\x83\x82");
         setNerve(GET_NERVE(RosettaPictureBook, HostTypeNrvFadeIn));
     }
 }

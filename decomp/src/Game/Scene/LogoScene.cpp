@@ -204,10 +204,10 @@ void LogoScene::exeDeactive() {
 }
 
 void LogoScene::initLayout() {
-    mStrapLayout = MR::createSimpleLayout("ストラップ着用画面", "WiiRemoteStrap", 1);
+    mStrapLayout = MR::createSimpleLayout("\x83\x58\x83\x67\x83\x89\x83\x62\x83\x76\x92\x85\x97\x70\x89\xe6\x96\xca", "WiiRemoteStrap", 1);
     mStrapLayout->kill();
 
-    mLogoFader = new LogoFader("ロゴフェーダ");
+    mLogoFader = new LogoFader("\x83\x8d\x83\x53\x83\x74\x83\x46\x81\x5b\x83\x5f");
     mLogoFader->initWithoutIter();
     mLogoFader->setBlank();
     mLogoFader->appear();

@@ -56,7 +56,7 @@ void ChipCounter::init(const JMapInfoIter& rIter) {
     MR::startAnim(this, "ShowHide", 1);
     MR::setAnimFrameAndStop(this, _30 * 20.0f, 1);
 
-    mCollectCounter = new CollectCounter("集め数字");
+    mCollectCounter = new CollectCounter("\x8f\x57\x82\xdf\x90\x94\x8e\x9a");
     mCollectCounter->initWithoutIter();
 
     kill();
@@ -141,7 +141,7 @@ void ChipCounter::requestComplete(s32 a1) {
 
     mGroupId = a1;
 
-    MR::requestStartDemoWithoutCinemaFrame(this, "チップコンプリート", GET_NERVE(ChipCounter, ChipCounterNrvComplete),
+    MR::requestStartDemoWithoutCinemaFrame(this, "\x83\x60\x83\x62\x83\x76\x83\x52\x83\x93\x83\x76\x83\x8a\x81\x5b\x83\x67", GET_NERVE(ChipCounter, ChipCounterNrvComplete),
                                            GET_NERVE(ChipCounter, ChipCounterNrvTryDemo));
 }
 
@@ -254,7 +254,7 @@ void ChipCounter::exeCompleteOut() {
 
         mCollectCounter->kill();
 
-        MR::endDemo(this, "チップコンプリート");
+        MR::endDemo(this, "\x83\x60\x83\x62\x83\x76\x83\x52\x83\x93\x83\x76\x83\x8a\x81\x5b\x83\x67");
 
         MR::noticeEndChipCompleteDemo(mType, mGroupId);
     }

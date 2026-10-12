@@ -27,7 +27,7 @@ extern "C" {
 #ifdef __MWERKS__
 extern volatile PPCWGPipe gxfifo : 0xCC008000;
 #else
-extern volatile PPCWGPipe gxfifo;
+#include "port/gx_fifo.h"
 #endif
 extern volatile void* __piReg;
 extern volatile void* __cpReg;
@@ -39,6 +39,7 @@ extern volatile void* __memReg;
 
 /* GX fifo write helpers */
 
+#ifdef __MWERKS__
 #define GX_WRITE_U8(ub) gxfifo.u8 = (u8)(ub)
 
 #define GX_WRITE_U16(us) gxfifo.u16 = (u16)(us)
@@ -48,6 +49,17 @@ extern volatile void* __memReg;
 #define GX_WRITE_U32(ui) gxfifo.u32 = (u32)(ui)
 
 #define GX_WRITE_F32(f) gxfifo.f32 = (f32)(f);
+#else
+#define GX_WRITE_U8(ub) __PortGXFifo_u8((u8)(ub))
+
+#define GX_WRITE_U16(us) __PortGXFifo_u16((u16)(us))
+
+#define GX_WRITE_S16(us) __PortGXFifo_u16((u16)(us))
+
+#define GX_WRITE_U32(ui) __PortGXFifo_u32((u32)(ui))
+
+#define GX_WRITE_F32(f) __PortGXFifo_f32((f32)(f))
+#endif
 
 #define GX_PI_REG_WRITE_U32(a, d) *(vu32*)((vu8*)__piReg + (a)) = (u32)(d)
 
@@ -136,6 +148,9 @@ GX_DEFINE_GX_READ_COUNTER(CP)
 GX_DEFINE_GX_READ_COUNTER(PE)
 GX_DEFINE_GX_READ_COUNTER(MEM)
 
+/* Big-endian view of 4 bytes (e.g. a GXColor), as *(u32*)&x reads on the Wii. */
+#define GX_BE_U32(p) (((u32)((const u8*)(p))[0] << 24) | ((u32)((const u8*)(p))[1] << 16) | ((u32)((const u8*)(p))[2] << 8) | (u32)((const u8*)(p))[3])
+
 #ifdef __MWERKS__
 #define GX_CP_COUNTER_READ_U32(name) __GXReadCPCounterU32(name##L, name##H)
 
@@ -148,10 +163,15 @@ GX_DEFINE_GX_READ_COUNTER(MEM)
         (regOrg) = (u32)__rlwimi((int)(regOrg), (int)(newFlag), (shift), (32 - (shift) - (size)), (31 - (shift)));                                   \
     } while (0);
 #else
-#define GX_CP_COUNTER_READ_U32(name)
-#define GX_PE_COUNTER_READ_U32(name)
-#define GX_MEM_COUNTER_READ_U32(name)
-#define FAST_FLAG_SET(regOrg, newFlag, shift, size)
+/* Performance/request counters of the real GPU; the port reports them as idle. */
+#define GX_CP_COUNTER_READ_U32(name) 0u
+#define GX_PE_COUNTER_READ_U32(name) 0u
+#define GX_MEM_COUNTER_READ_U32(name) 0u
+
+#define FAST_FLAG_SET(regOrg, newFlag, shift, size)                                                                                                  \
+    do {                                                                                                                                             \
+        (regOrg) = (u32)__rlwimi((u32)(regOrg), (u32)(newFlag), (shift), (32 - (shift) - (size)), (31 - (shift)));                                   \
+    } while (0);
 #endif
 
 #ifdef __cplusplus

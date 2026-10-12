@@ -48,6 +48,12 @@ void GXFlush(void) {
     GX_WRITE_U32(0);
     GX_WRITE_U32(0);
     PPCSync();
+#ifndef __MWERKS__
+    {
+        extern void __PortGXFifoFlush(void);
+        __PortGXFifoFlush();
+    }
+#endif
 }
 
 void GXResetWriteGatherPipe(void) {
@@ -208,6 +214,18 @@ void GXPokeZMode(GXBool compare_en, GXCompare func, GXBool update_en) {
     GX_PE_REG_WRITE_U16(0, reg);
 }
 
+#ifndef __MWERKS__
+u32 __PortGXPeekARGB(u16 x, u16 y);
+u32 __PortGXPeekZ(u16 x, u16 y);
+
+void GXPeekARGB(u16 x, u16 y, u32* color) {
+    *color = __PortGXPeekARGB(x, y);
+}
+
+void GXPeekZ(u16 x, u16 y, u32* z) {
+    *z = __PortGXPeekZ(x, y);
+}
+#else
 void GXPeekARGB(u16 x, u16 y, u32* color) {
     u32 addr = (u32) OSPhysicalToUncached(0x8000000);
     SC_PE_PI_EFB_ADDR_SET_X(addr, x);
@@ -223,6 +241,7 @@ void GXPeekZ(u16 x, u16 y, u32* z)  {
     SC_PE_PI_EFB_ADDR_SET_TYPE(addr,  1);
     *z = *(u32*)addr;
 }
+#endif
 
 GXDrawSyncCallback GXSetDrawSyncCallback(GXDrawSyncCallback cb) { 
     GXDrawSyncCallback oldcb = TokenCB;

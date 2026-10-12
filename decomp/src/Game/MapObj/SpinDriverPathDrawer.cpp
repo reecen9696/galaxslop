@@ -34,7 +34,7 @@ namespace {
 };  // namespace
 
 SpinDriverPathDrawInit::SpinDriverPathDrawInit()
-    : NameObj("スピンドライバーレール描画初期化"), mOrangeTexture(), mGreenTexture(), mPinkTexture(), mMaskTexture(), mIsPathAtOpa() {
+    : NameObj("\x83\x58\x83\x73\x83\x93\x83\x68\x83\x89\x83\x43\x83\x6f\x81\x5b\x83\x8c\x81\x5b\x83\x8b\x95\x60\x89\xe6\x8f\x89\x8a\xfa\x89\xbb"), mOrangeTexture(), mGreenTexture(), mPinkTexture(), mMaskTexture(), mIsPathAtOpa() {
     MR::registerPreDrawFunction(MR::Functor(this, &SpinDriverPathDrawInit::initDraw), MR::DrawType_SpinDriverPathDrawer);
 
     mOrangeTexture = new JUTTexture(MR::loadTexFromArc("SpinDriverPath.arc", "NormalColor.bti"), 0);
@@ -44,7 +44,7 @@ SpinDriverPathDrawInit::SpinDriverPathDrawInit()
 }
 
 SpinDriverPathDrawer::SpinDriverPathDrawer(SpinDriverShootPath* pShootPath)
-    : LiveActor("パス描画"), mShootPath(pShootPath), _90(), _94(), _98(), _9C(), mPositionCount(), _A4(), _A8(), _AC(), _B0(), mColor(-1), _B8(),
+    : LiveActor("\x83\x70\x83\x58\x95\x60\x89\xe6"), mShootPath(pShootPath), _90(), _94(), _98(), _9C(), mPositionCount(), _A4(), _A8(), _AC(), _B0(), mColor(-1), _B8(),
       mFadeScale(1.0f), mMaskLength(5000.0f) {
     MR::createSceneObj(SceneObj_SpinDriverPathDrawInit);
 }
@@ -364,9 +364,9 @@ void SpinDriverPathDrawer::draw() const {
 }
 
 void SpinDriverPathDrawer::sendPoint(const TVec3f& rA1, f32 a2, f32 a3) const {
-    GXWGFifo.f32 = rA1.x;
-    GXWGFifo.f32 = rA1.y;
-    GXWGFifo.f32 = rA1.z;
-    GXWGFifo.f32 = a2;
-    GXWGFifo.f32 = a3;
+    GXCmd1f32(rA1.x);
+    GXCmd1f32(rA1.y);
+    GXCmd1f32(rA1.z);
+    GXCmd1f32(a2);
+    GXCmd1f32(a3);
 }

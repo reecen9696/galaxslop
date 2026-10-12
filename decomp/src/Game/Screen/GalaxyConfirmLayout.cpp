@@ -12,7 +12,7 @@ namespace NrvGalaxyConfirmLayout {
     NEW_NERVE(GalaxyConfirmLayoutNrvSelected, GalaxyConfirmLayout, Selected);
 };  // namespace NrvGalaxyConfirmLayout
 
-GalaxyConfirmLayout::GalaxyConfirmLayout() : LayoutActor("ギャラクシー確認レイアウト", true), mPaneCtrl(nullptr), mBackButton(nullptr) {
+GalaxyConfirmLayout::GalaxyConfirmLayout() : LayoutActor("\x83\x4d\x83\x83\x83\x89\x83\x4e\x83\x56\x81\x5b\x8a\x6d\x94\x46\x83\x8c\x83\x43\x83\x41\x83\x45\x83\x67", true), mPaneCtrl(nullptr), mBackButton(nullptr) {
 }
 
 void GalaxyConfirmLayout::init(const JMapInfoIter& rIter) {
@@ -20,7 +20,7 @@ void GalaxyConfirmLayout::init(const JMapInfoIter& rIter) {
     MR::connectToSceneLayout(this);
 
     mPaneCtrl = new ButtonPaneController(this, "StartButton", "BoxStartButton", 0, true);
-    mBackButton = new BackButton("戻るボタン", true);
+    mBackButton = new BackButton("\x96\xdf\x82\xe9\x83\x7b\x83\x5e\x83\x93", true);
     mBackButton->initWithoutIter();
 
     initNerve(GET_NERVE(GalaxyConfirmLayout, GalaxyConfirmLayoutNrvSelecting));

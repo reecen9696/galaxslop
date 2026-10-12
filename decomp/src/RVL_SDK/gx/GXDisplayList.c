@@ -2,7 +2,7 @@
 #include "revolution/gx/GXFifo.h"
 #include "revolution/gx/GXRegs.h"
 #include "revolution/os.h"
-#include <cstdio>
+#include <stdio.h>
 #include <mem.h>
 
 static GXFifoObj DisplayListFifo;

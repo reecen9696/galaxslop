@@ -3,9 +3,17 @@
 #include <locale.h>
 
 // needed here for inlining reasons
+#ifdef __MWERKS__
+#ifdef __MWERKS__
 inline int tolower(int c) {
     return ((c < 0) || (c >= 0x100)) ? c : (int)(_current_locale.ctype_cmpt_ptr->lower_map_ptr[c]);
 }
+#else
+#include <ctype.h>
+#endif
+#else
+#include <ctype.h>
+#endif
 
 HashSortTable::HashSortTable(u32 cnt) {
     mHashCodes = new u32[cnt];

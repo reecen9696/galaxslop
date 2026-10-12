@@ -1202,7 +1202,8 @@ edgeFinish: {
 }
 
 finish:
-    f32 distance = MR::sqrt(*pDist);
+    f32 distance;
+    distance = MR::sqrt(*pDist);
 
     if (distances[0] + distance < 0.0f) {
         *pFlag = 0;
@@ -1413,7 +1414,7 @@ KC_PrismData* KCollisionServer::getPrismData(u32 index) const {
 }
 
 s32 KCollisionServer::getTriangleNum() const {
-    return (reinterpret_cast< u8* >(mFile->mOctree) - reinterpret_cast< u8* >(mFile->mPrisms + 1)) / sizeof(KC_PrismData);
+    return (reinterpret_cast< u8* >(mFile->mOctree.get()) - reinterpret_cast< u8* >(mFile->mPrisms.get() + 1)) / sizeof(KC_PrismData);
 }
 
 JMapInfoIter KCollisionServer::getAttributes(u32 index) const {
@@ -1424,7 +1425,7 @@ JMapInfoIter KCollisionServer::getAttributes(u32 index) const {
 
 s32* KCollisionServer::searchBlock(s32* pShift, const u32& rX, const u32& rY, const u32& rZ) const {
     KCLFile* file = mFile;
-    u8* octree = reinterpret_cast< u8* >(file->mOctree);
+    u8* octree = reinterpret_cast< u8* >(file->mOctree.get());
     s32 blockWidthShift = *pShift = file->mBlockWidthShift;
 
     s32 xyShift = file->mBlockXYShift;

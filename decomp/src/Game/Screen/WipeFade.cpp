@@ -35,6 +35,12 @@ void WipeFade::draw() const {
         alpha = 1.0f - alpha;
     }
 
+#ifdef TARGET_PC
+    port_vr_wipe(0, alpha, (u32)mFillColor.r << 16 | (u32)mFillColor.g << 8 | mFillColor.b);
+    if (port_vr_diorama()) {
+        return;
+    }
+#endif
     GXSetColorUpdate(GX_TRUE);
     GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
 

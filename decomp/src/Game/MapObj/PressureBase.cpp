@@ -88,12 +88,12 @@ void PressureBase::init(const JMapInfoIter& rIter) {
     MR::calcGravity(this);
 
     MR::setGroupClipping(this, rIter, 32);
-    mGroup = MR::joinToGroupArray(this, rIter, "プレッシャー軍団", 32);
+    mGroup = MR::joinToGroupArray(this, rIter, "\x83\x76\x83\x8c\x83\x62\x83\x56\x83\x83\x81\x5b\x8c\x52\x92\x63", 32);
     if (mGroup != nullptr) {
         PressureBase* actor = static_cast< PressureBase* >(mGroup->getActor(0));
 
         if (this == actor) {
-            mMessenger = new PressureMessenger(mGroup, "プレッシャー同期メッセンジャー");
+            mMessenger = new PressureMessenger(mGroup, "\x83\x76\x83\x8c\x83\x62\x83\x56\x83\x83\x81\x5b\x93\xaf\x8a\xfa\x83\x81\x83\x62\x83\x5a\x83\x93\x83\x57\x83\x83\x81\x5b");
             mMessenger->initWithoutIter();
         }
     }

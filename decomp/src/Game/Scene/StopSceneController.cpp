@@ -3,12 +3,12 @@
 #include "Game/Scene/SceneFunction.hpp"
 #include "Game/Util/ObjUtil.hpp"
 
-StopSceneDelayRequest::StopSceneDelayRequest() : NameObj("シーン硬直遅延発行"), mFrame(), mDelay() {
+StopSceneDelayRequest::StopSceneDelayRequest() : NameObj("\x83\x56\x81\x5b\x83\x93\x8d\x64\x92\xbc\x92\x78\x89\x84\x94\xad\x8d\x73"), mFrame(), mDelay() {
     MR::connectToScene(this, MR::MovementType_StopSceneDelayRequest, MR::CalcAnimType_None, MR::DrawBufferType_None, MR::DrawType_None);
 }
 
 StopSceneController::StopSceneController() : NameObj("StopSceneController"), mDelayRequestArray(), mFrame() {
-    mDelayRequestArray = new NameObjGroup("シーン硬直遅延発行者の管理", 16);
+    mDelayRequestArray = new NameObjGroup("\x83\x56\x81\x5b\x83\x93\x8d\x64\x92\xbc\x92\x78\x89\x84\x94\xad\x8d\x73\x8e\xd2\x82\xcc\x8a\xc7\x97\x9d", 16);
 
     for (s32 i = 0; i < 16; i++) {
         StopSceneDelayRequest* delayRequest = new StopSceneDelayRequest();

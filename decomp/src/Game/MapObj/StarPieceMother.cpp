@@ -66,7 +66,7 @@ void StarPieceMother::init(const JMapInfoIter& rIter) {
     _90 = new f32[_94];
 
     for (u32 idx = 0; idx < _94; idx++) {
-        mStarPieceArray[idx] = new StarPiece("スターピースマザーピース");
+        mStarPieceArray[idx] = new StarPiece("\x83\x58\x83\x5e\x81\x5b\x83\x73\x81\x5b\x83\x58\x83\x7d\x83\x55\x81\x5b\x83\x73\x81\x5b\x83\x58");
         mStarPieceArray[idx]->initAndSetFloatingFromGroup(rIter);
         mStarPieceArray[idx]->makeActorDead();
 

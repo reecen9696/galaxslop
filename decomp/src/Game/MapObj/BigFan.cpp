@@ -67,7 +67,7 @@ void BigFan::init(const JMapInfoIter& rIter) {
 }
 
 void BigFan::initWindModel() {
-    mWindModel = MR::createModelObjMapObj("風モデル", "BigFanWind", getBaseMtx());
+    mWindModel = MR::createModelObjMapObj("\x95\x97\x83\x82\x83\x66\x83\x8b", "BigFanWind", getBaseMtx());
     mWindModel->initWithoutIter();
     MR::invalidateClipping(mWindModel);
     MR::startBtk(mWindModel, "BigFanWind");

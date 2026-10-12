@@ -96,7 +96,7 @@ void SpringJetWater::attackSensor(HitSensor* pSender, HitSensor* pReceiver) {
 }
 
 void SpringJetWater_DUMMY() {
-    MR::isDemoPartFirstStep("湧き水上昇");
+    MR::isDemoPartFirstStep("\x97\x4e\x82\xab\x90\x85\x8f\xe3\x8f\xb8");
 }
 
 void SpringJetWater::exeWait() {
@@ -107,7 +107,7 @@ void SpringJetWater::exeWait() {
 
     MR::startLevelSound(this, "SE_OJ_LV_SPR_JET_WATER_WAIT");
 
-    if (MR::isDemoPartFirstStep("湧き水上昇")) {
+    if (MR::isDemoPartFirstStep("\x97\x4e\x82\xab\x90\x85\x8f\xe3\x8f\xb8")) {
         MR::deleteEffect(this, "Wait");
         setNerve(GET_NERVE(SpringJetWater, HostTypeJet));
     }
@@ -123,7 +123,7 @@ void SpringJetWater::exeJet() {
 
     MR::startLevelSound(this, "SE_OJ_LV_SPR_JET_WATER_JET");
 
-    if (MR::isDemoPartLastStep("湧き水上昇")) {
+    if (MR::isDemoPartLastStep("\x97\x4e\x82\xab\x90\x85\x8f\xe3\x8f\xb8")) {
         setNerve(GET_NERVE(SpringJetWater, HostTypeEnd));
     }
 }

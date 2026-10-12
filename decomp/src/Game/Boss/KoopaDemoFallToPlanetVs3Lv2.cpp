@@ -28,11 +28,11 @@ namespace NrvKoopaDemoFallToPlanetVs3Lv2 {
     NEW_NERVE(KoopaDemoFallToPlanetVs3Lv2NrvWaitPlayer, KoopaDemoFallToPlanetVs3Lv2, WaitPlayer);
 };  // namespace NrvKoopaDemoFallToPlanetVs3Lv2
 
-KoopaDemoFallToPlanetVs3Lv2::KoopaDemoFallToPlanetVs3Lv2(Koopa* pKoopa) : ActorStateBase< Koopa >("Demo[Ｌｖ２惑星まで落下]", pKoopa) {
+KoopaDemoFallToPlanetVs3Lv2::KoopaDemoFallToPlanetVs3Lv2(Koopa* pKoopa) : ActorStateBase< Koopa >("Demo[\x82\x6b\x82\x96\x82\x51\x98\x66\x90\xaf\x82\xdc\x82\xc5\x97\x8e\x89\xba]", pKoopa) {
 }
 
 void KoopaDemoFallToPlanetVs3Lv2::init() {
-    KoopaFunction::initKoopaCamera(mHost, "惑星Ｌｖ２まで落下（後半）");
+    KoopaFunction::initKoopaCamera(mHost, "\x98\x66\x90\xaf\x82\x6b\x82\x96\x82\x51\x82\xdc\x82\xc5\x97\x8e\x89\xba\x81\x69\x8c\xe3\x94\xbc\x81\x6a");
     KoopaFunction::initKoopaAnimCamera(mHost, "DemoKoopaFall");
     initNerve(GET_NERVE(KoopaDemoFallToPlanetVs3Lv2, KoopaDemoFallToPlanetVs3Lv2NrvWaitFall));
 }
@@ -48,11 +48,11 @@ void KoopaDemoFallToPlanetVs3Lv2::appear() {
 void KoopaDemoFallToPlanetVs3Lv2::kill() {
     mIsDead = true;
 
-    KoopaFunction::endKoopaCamera(mHost, "惑星Ｌｖ２まで落下（後半）", false, -1);
+    KoopaFunction::endKoopaCamera(mHost, "\x98\x66\x90\xaf\x82\x6b\x82\x96\x82\x51\x82\xdc\x82\xc5\x97\x8e\x89\xba\x81\x69\x8c\xe3\x94\xbc\x81\x6a", false, -1);
 }
 
 void KoopaDemoFallToPlanetVs3Lv2::exeWaitFall() {
-    if (KoopaFunction::tryStartKoopaAndMarioCameraDemo(mHost, "クッパＶｓ３惑星移動（Ｌｖ１からＬｖ２）", "DemoKoopaFall", "デモ中心")) {
+    if (KoopaFunction::tryStartKoopaAndMarioCameraDemo(mHost, "\x83\x4e\x83\x62\x83\x70\x82\x75\x82\x93\x82\x52\x98\x66\x90\xaf\x88\xda\x93\xae\x81\x69\x82\x6b\x82\x96\x82\x50\x82\xa9\x82\xe7\x82\x6b\x82\x96\x82\x51\x81\x6a", "DemoKoopaFall", "\x83\x66\x83\x82\x92\x86\x90\x53")) {
         setNerve(GET_NERVE(KoopaDemoFallToPlanetVs3Lv2, KoopaDemoFallToPlanetVs3Lv2NrvDemoFall));
     }
 }
@@ -62,7 +62,7 @@ void KoopaDemoFallToPlanetVs3Lv2::exeDemoFall() {
         MR::startBrk(KoopaFunction::getKoopaPlanet(mHost), "Death");
     }
 
-    if (KoopaFunction::tryEndKoopaCameraDemo(mHost, "クッパＶｓ３惑星移動（Ｌｖ１からＬｖ２）", "DemoKoopaFall")) {
+    if (KoopaFunction::tryEndKoopaCameraDemo(mHost, "\x83\x4e\x83\x62\x83\x70\x82\x75\x82\x93\x82\x52\x98\x66\x90\xaf\x88\xda\x93\xae\x81\x69\x82\x6b\x82\x96\x82\x50\x82\xa9\x82\xe7\x82\x6b\x82\x96\x82\x51\x81\x6a", "DemoKoopaFall")) {
         MR::offSwitchB(mHost);
         MR::onSwitchA(KoopaFunction::getKoopaSwitchKeeper(mHost));
         MR::overlayWithPreviousScreen(2);
@@ -73,10 +73,10 @@ void KoopaDemoFallToPlanetVs3Lv2::exeDemoFall() {
 
 void KoopaDemoFallToPlanetVs3Lv2::exeFallToLand() {
     if (MR::isFirstStep(this)) {
-        KoopaFunction::setKoopaPos(mHost, "Ｌｖ２開始（クッパ）");
-        MR::setPlayerPosAndWait("Ｌｖ２開始（マリオ）");
+        KoopaFunction::setKoopaPos(mHost, "\x82\x6b\x82\x96\x82\x51\x8a\x4a\x8e\x6e\x81\x69\x83\x4e\x83\x62\x83\x70\x81\x6a");
+        MR::setPlayerPosAndWait("\x82\x6b\x82\x96\x82\x51\x8a\x4a\x8e\x6e\x81\x69\x83\x7d\x83\x8a\x83\x49\x81\x6a");
 
-        KoopaFunction::startKoopaCamera(mHost, "惑星Ｌｖ２まで落下（後半）");
+        KoopaFunction::startKoopaCamera(mHost, "\x98\x66\x90\xaf\x82\x6b\x82\x96\x82\x51\x82\xdc\x82\xc5\x97\x8e\x89\xba\x81\x69\x8c\xe3\x94\xbc\x81\x6a");
         MR::startAction(mHost, "JumpSoon");
 
         KoopaFunction::getKoopaPlanetShadow(mHost)->appear();

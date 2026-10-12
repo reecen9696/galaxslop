@@ -214,7 +214,7 @@ namespace NWC24MessengerSub {
     };  // namespace
 
     SendState::SendState(NWC24Messenger* pHost)
-        : NerveExecutor("送信状態"), mHost(pHost), mTask(nullptr), mWindow(nullptr), mMiniWindow(nullptr), _18(nullptr) {
+        : NerveExecutor("\x91\x97\x90\x4d\x8f\xf3\x91\xd4"), mHost(pHost), mTask(nullptr), mWindow(nullptr), mMiniWindow(nullptr), _18(nullptr) {
         initNerve(GET_NERVE_GLOBAL(SendStateNrvWait));
     }
 
@@ -274,7 +274,7 @@ namespace NWC24MessengerSub {
     }
 
     void SendState::exeWait() {
-        if (selectTask() == nullptr) {
+        if (selectTask() == 0) {
             return;
         }
 
@@ -336,7 +336,7 @@ namespace NWC24MessengerSub {
         } else {
             doneTask();
 
-            if (selectTask() != nullptr) {
+            if (selectTask() != 0) {
                 if (!mTask->mIsBG) {
                     setNerve(GET_NERVE_GLOBAL(SendStateNrvRunFG));
                 } else {

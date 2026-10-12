@@ -261,7 +261,12 @@ bool isTexNoReg(void* pDL) {
 }
 
 u16 getTexNoReg(void* pDL) {
+#if defined(__MWERKS__) || defined(__BIG_ENDIAN__)
     u32 var_r31 = *(u32*)((u8*)pDL + 1);
+#else
+    const u8* p = (const u8*)pDL + 1;
+    u32 var_r31 = (u32(p[0]) << 24) | (u32(p[1]) << 16) | (u32(p[2]) << 8) | p[3];
+#endif
     return var_r31 & 0xFFFFFF;
 }
 

@@ -259,7 +259,7 @@ void MarioActor::initIceMario() {
 
     _B4C = new IceStep*[20];
     for (u32 i = 0; i < 20; i++) {
-        _B4C[i] = new IceStep("アイス床");
+        _B4C[i] = new IceStep("\x83\x41\x83\x43\x83\x58\x8f\xb0");
         _B4C[i]->initWithoutIter();
         _B4C[i]->kill();
     }
@@ -309,7 +309,7 @@ void MarioActor::initTeresaMario() {
         return;
     }
 
-    _9A4 = new MarioParts(this, "テレサの皮", modelName, nullptr);
+    _9A4 = new MarioParts(this, "\x83\x65\x83\x8c\x83\x54\x82\xcc\x94\xe7", modelName, nullptr);
     if (gIsLuigi) {
         _9A4->_9C = "TeresaMario";
     }
@@ -756,7 +756,15 @@ void MarioActor::draw() const {
             drawWallShade(_1F0, _1FC, _208);
         }
 
+#ifdef TARGET_PC
+        // For the VR renderer's motion vectors: Mario moves on his own,
+        // not with the world around him.
+        port_gx_marker(PORT_GX_MARK_PLAYER_BEGIN);
         drawMarioModel();
+        port_gx_marker(PORT_GX_MARK_PLAYER_END);
+#else
+        drawMarioModel();
+#endif
         mMario->draw();
     }
 }

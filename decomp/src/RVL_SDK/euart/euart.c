@@ -71,7 +71,7 @@ inline int QueueLength(void) {
     return 32 - (u8)((txCnt >> 24) & 0x3F);
 }
 
-UARTError WriteUARTN(const void *buf, unsigned long len) {
+UARTError WriteUARTN(const void *buf, unsigned int len) {
     u32 cmd;
     int qLen;
     UARTError error;

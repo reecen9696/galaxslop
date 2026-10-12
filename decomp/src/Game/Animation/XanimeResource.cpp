@@ -5,6 +5,9 @@
 #include "Game/Util/StringUtil.hpp"
 #include <cstring>
 #include <revolution/types.h>
+#ifdef TARGET_PC
+#include <JSystem/J3DGraphAnimator/J3DAnimation.hpp>
+#endif
 
 static bool unknownByte;
 XanimeResourceTable::XanimeResourceTable(ResourceHolder* pArg) {
@@ -192,9 +195,21 @@ u32 XanimeResourceTable::initGroupInfo(ResourceHolder* pResourceHolder, XanimeGr
             entry->mLoop = 0.0f;
             entry->mAttribute = 0;
         } else {
+#ifdef TARGET_PC
+            // The original reads J3DAnmBase's attribute and frame count at
+            // byte offsets 4 and 6, behind a 4-byte vtable pointer.  With
+            // 64-bit pointers those bytes belong to the vtable pointer, which
+            // gave every animation group an end frame of 0: walking and
+            // running froze on their first frame.
+            const J3DAnmTransform* anm = static_cast< const J3DAnmTransform* >(entry->_20[0]);
+            entry->mAttribute = anm->getAttribute();
+            entry->mLoop = 0.0f;
+            entry->mEnd = static_cast< f32 >(anm->getFrameMax());
+#else
             entry->mAttribute = static_cast< u8* >(entry->_20[0])[4];
             entry->mLoop = 0.0f;
             entry->mEnd = static_cast< f32 >(reinterpret_cast< const s16* >(entry->_20[0])[3]);
+#endif
         }
 
         XanimeBckTable* ofsTables[1];
@@ -221,7 +236,8 @@ const XanimeGroupInfo* XanimeResourceTable::getGroupInfo(const char* pArg) const
         return nullptr;
 
     case 1:
-        s32 groupIndex = getGroupIndex(pArg);
+        s32 groupIndex;
+        groupIndex = getGroupIndex(pArg);
         if (groupIndex == -1) {
             s32 simpleIndex = getSimpleIndex(pArg);
             if (simpleIndex == -1) {

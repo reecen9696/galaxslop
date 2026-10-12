@@ -172,7 +172,7 @@ public:
         }
 
         bool checkArea(const void* ptr) const {
-            return (u8*)this + 0xc <= (u8*)ptr && (u8*)ptr < (u8*)this + (0xc + ChunkSize);
+            return mBuffer <= (u8*)ptr && (u8*)ptr < mBuffer + ChunkSize;
         }
 
         MemoryChunk* getNextChunk() {
@@ -289,14 +289,25 @@ namespace JASKernel {
     extern JASMemChunkPool< 1024, JASThreadingModel::ObjectLevelLockable >* sCommandHeap;
 };  // namespace JASKernel
 
+// A pool runs out of objects by returning null from operator new, and the
+// callers check the result (e.g. JAIStreamMgr::newStream_).  MWCC tests a
+// new-expression's pointer before constructing; standard C++ only does for a
+// non-throwing operator new, so without noexcept a full pool constructed at
+// address 0.
+#ifdef TARGET_PC
+#define JAS_POOL_NEW_NOEXCEPT noexcept
+#else
+#define JAS_POOL_NEW_NOEXCEPT
+#endif
+
 template < typename T >
 class JASPoolAllocObject {
 public:
-    static void* operator new(u32 size) {
+    static void* operator new(size_t size) JAS_POOL_NEW_NOEXCEPT {
         return memPool_.alloc(size);
     }
 
-    static void operator delete(void* addr, u32 size) {
+    static void operator delete(void* addr, size_t size) {
         memPool_.free(addr, size);
     }
 
@@ -331,11 +342,11 @@ public:
 template < typename T >
 class JASPoolAllocObject_MultiThreaded {
 public:
-    static void* operator new(u32 size) {
+    static void* operator new(size_t size) JAS_POOL_NEW_NOEXCEPT {
         return memPool_.alloc(size);
     }
 
-    static void operator delete(void* addr, u32 size) {
+    static void operator delete(void* addr, size_t size) {
         memPool_.free(addr, size);
     }
 

@@ -409,7 +409,7 @@ void StageDataHolder::initPlacementMario() {
     MR::getObjectName(&objName, iter);
     CreationFuncPtr funcPtr = NameObjFactory::getCreator(objName);
 
-    NameObj* obj = funcPtr("マリオアクター");
+    NameObj* obj = funcPtr("\x83\x7d\x83\x8a\x83\x49\x83\x41\x83\x4e\x83\x5e\x81\x5b");
     obj->init(iter);
     MR::clearCurrentPlacementZoneId();
 }

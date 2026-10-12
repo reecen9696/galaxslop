@@ -29,7 +29,7 @@ namespace MR {
 };  // namespace MR
 
 PlayerActionGuidance::PlayerActionGuidance()
-    : LayoutActor("プレイヤーアクションガイダンス", true), mSpinLayout(), mTamakoroLayout(), mCurrentLayout(), mGuidanceState(3),
+    : LayoutActor("\x83\x76\x83\x8c\x83\x43\x83\x84\x81\x5b\x83\x41\x83\x4e\x83\x56\x83\x87\x83\x93\x83\x4b\x83\x43\x83\x5f\x83\x93\x83\x58", true), mSpinLayout(), mTamakoroLayout(), mCurrentLayout(), mGuidanceState(3),
       mGuidancePrevState(3), _34(), _35(), _36(), _37() {
 }
 
@@ -72,7 +72,7 @@ void PlayerActionGuidance::createSpinLayout() {
         return;
     }
 
-    mSpinLayout = new SimpleLayout("スピンガイダンス", "SpinGuidance", 1, -1);
+    mSpinLayout = new SimpleLayout("\x83\x58\x83\x73\x83\x93\x83\x4b\x83\x43\x83\x5f\x83\x93\x83\x58", "SpinGuidance", 1, -1);
     mSpinLayout->appear();
 }
 
@@ -81,7 +81,7 @@ void PlayerActionGuidance::createTamakoroLayout() {
         return;
     }
 
-    mTamakoroLayout = new SimpleLayout("たまころガイダンス", "BallGuidance", 1, -1);
+    mTamakoroLayout = new SimpleLayout("\x82\xbd\x82\xdc\x82\xb1\x82\xeb\x83\x4b\x83\x43\x83\x5f\x83\x93\x83\x58", "BallGuidance", 1, -1);
     mTamakoroLayout->appear();
 }
 

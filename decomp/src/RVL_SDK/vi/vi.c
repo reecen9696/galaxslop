@@ -525,13 +525,13 @@ static void setScalingRegs(u16 panSizeX, u16 dispSizeX, BOOL threeD) {
     if (panSizeX < dispSizeX) {
         scale = (256 * (u32)panSizeX + (u32)dispSizeX - 1) / (u32)dispSizeX;
 
-        regs[0x25] = (u16)((((unsigned long)(scale))) | (((unsigned long)(1)) << 12));
+        regs[0x25] = (u16)((((unsigned int)(scale))) | (((unsigned int)(1)) << 12));
         changed |= (1ull << (63 - (0x25)));
 
-        regs[0x38] = (u16)((((unsigned long)(panSizeX))));
+        regs[0x38] = (u16)((((unsigned int)(panSizeX))));
         changed |= (1ull << (63 - (0x38)));
     } else {
-        regs[0x25] = (u16)((((unsigned long)(256))) | (((unsigned long)(0)) << 12));
+        regs[0x25] = (u16)((((unsigned int)(256))) | (((unsigned int)(0)) << 12));
         changed |= (1ull << (63 - (0x25)));
     }
 }
@@ -665,33 +665,33 @@ void __VIInit(VITVMode mode) {
         ;
 
     __VIRegs[1] = 0;
-    __VIRegs[3] = (u16)((((unsigned long)(tm->hlw)) << 0));
-    __VIRegs[2] = (u16)((((unsigned long)(tm->hce)) << 0) | (((unsigned long)(tm->hcs)) << 8));
-    __VIRegs[5] = (u16)((((unsigned long)(tm->hsy)) << 0) | (((unsigned long)(tm->hbe640 & ((1 << (9)) - 1))) << 7));
-    __VIRegs[4] = (u16)((((unsigned long)(tm->hbe640 >> 9)) << 0) | (((unsigned long)(tm->hbs640)) << 1));
+    __VIRegs[3] = (u16)((((unsigned int)(tm->hlw)) << 0));
+    __VIRegs[2] = (u16)((((unsigned int)(tm->hce)) << 0) | (((unsigned int)(tm->hcs)) << 8));
+    __VIRegs[5] = (u16)((((unsigned int)(tm->hsy)) << 0) | (((unsigned int)(tm->hbe640 & ((1 << (9)) - 1))) << 7));
+    __VIRegs[4] = (u16)((((unsigned int)(tm->hbe640 >> 9)) << 0) | (((unsigned int)(tm->hbs640)) << 1));
 
     if (encoderType == 0) {
-        __VIRegs[0x39] = (u16)((((unsigned long)(tm->hbeCCIR656)) << 0) | (((unsigned long)(1)) << 15));
-        __VIRegs[0x3A] = (u16)((((unsigned long)(tm->hbsCCIR656)) << 0));
+        __VIRegs[0x39] = (u16)((((unsigned int)(tm->hbeCCIR656)) << 0) | (((unsigned int)(1)) << 15));
+        __VIRegs[0x3A] = (u16)((((unsigned int)(tm->hbsCCIR656)) << 0));
     }
 
-    __VIRegs[0] = (u16)((((unsigned long)(tm->equ)) << 0) | (((unsigned long)(0)) << 4));
-    __VIRegs[7] = (u16)((((unsigned long)(tm->prbOdd + tm->acv * 2 - 2)) << 0));
-    __VIRegs[6] = (u16)((((unsigned long)(tm->psbOdd + 2)) << 0));
-    __VIRegs[9] = (u16)((((unsigned long)(tm->prbEven + tm->acv * 2 - 2)) << 0));
-    __VIRegs[8] = (u16)((((unsigned long)(tm->psbEven + 2)) << 0));
-    __VIRegs[0xB] = (u16)((((unsigned long)(tm->bs1)) << 0) | (((unsigned long)(tm->be1)) << 5));
-    __VIRegs[0xA] = (u16)((((unsigned long)(tm->bs3)) << 0) | (((unsigned long)(tm->be3)) << 5));
-    __VIRegs[0xD] = (u16)((((unsigned long)(tm->bs2)) << 0) | (((unsigned long)(tm->be2)) << 5));
-    __VIRegs[0xC] = (u16)((((unsigned long)(tm->bs4)) << 0) | (((unsigned long)(tm->be4)) << 5));
-    __VIRegs[0x24] = (u16)((((unsigned long)(40)) << 0) | (((unsigned long)(40)) << 8));
+    __VIRegs[0] = (u16)((((unsigned int)(tm->equ)) << 0) | (((unsigned int)(0)) << 4));
+    __VIRegs[7] = (u16)((((unsigned int)(tm->prbOdd + tm->acv * 2 - 2)) << 0));
+    __VIRegs[6] = (u16)((((unsigned int)(tm->psbOdd + 2)) << 0));
+    __VIRegs[9] = (u16)((((unsigned int)(tm->prbEven + tm->acv * 2 - 2)) << 0));
+    __VIRegs[8] = (u16)((((unsigned int)(tm->psbEven + 2)) << 0));
+    __VIRegs[0xB] = (u16)((((unsigned int)(tm->bs1)) << 0) | (((unsigned int)(tm->be1)) << 5));
+    __VIRegs[0xA] = (u16)((((unsigned int)(tm->bs3)) << 0) | (((unsigned int)(tm->be3)) << 5));
+    __VIRegs[0xD] = (u16)((((unsigned int)(tm->bs2)) << 0) | (((unsigned int)(tm->be2)) << 5));
+    __VIRegs[0xC] = (u16)((((unsigned int)(tm->bs4)) << 0) | (((unsigned int)(tm->be4)) << 5));
+    __VIRegs[0x24] = (u16)((((unsigned int)(40)) << 0) | (((unsigned int)(40)) << 8));
     __VIRegs[0x1B] = 1;
-    __VIRegs[0x1A] = (u16)((((unsigned long)(1)) << 0) | (((unsigned long)(1)) << 12) | (((unsigned long)(0)) << 15));
+    __VIRegs[0x1A] = (u16)((((unsigned int)(1)) << 0) | (((unsigned int)(1)) << 12) | (((unsigned int)(0)) << 15));
 
     hct = (u16)(tm->hlw + 1);
     vct = (u16)(tm->nhlines / 2 + 1);
     __VIRegs[0x19] = (u16)hct;
-    __VIRegs[0x18] = (u16)((((unsigned long)(vct)) << 0) | (((unsigned long)(1)) << 12) | (((unsigned long)(0)) << 15));
+    __VIRegs[0x18] = (u16)((((unsigned int)(vct)) << 0) | (((unsigned int)(1)) << 12) | (((unsigned int)(0)) << 15));
 
     switch (tv) {
     case VI_PAL:
@@ -707,12 +707,12 @@ void __VIInit(VITVMode mode) {
 
     if ((nonInter == VI_INTERLACE) || (nonInter == VI_NON_INTERLACE)) {
         __VIRegs[1] =
-            (u16)((((unsigned long)(1)) << 0) | (((unsigned long)(0)) << 1) | (((unsigned long)(nonInter & 1)) << 2) | (((unsigned long)(0)) << 3) |
-                  (((unsigned long)(0)) << 4) | (((unsigned long)(0)) << 6) | (((unsigned long)(tvForReg)) << 8));
+            (u16)((((unsigned int)(1)) << 0) | (((unsigned int)(0)) << 1) | (((unsigned int)(nonInter & 1)) << 2) | (((unsigned int)(0)) << 3) |
+                  (((unsigned int)(0)) << 4) | (((unsigned int)(0)) << 6) | (((unsigned int)(tvForReg)) << 8));
         __VIRegs[0x36] = 0;
     } else {
-        __VIRegs[1] = (u16)((((unsigned long)(1)) << 0) | (((unsigned long)(0)) << 1) | (((unsigned long)(1)) << 2) | (((unsigned long)(0)) << 3) |
-                            (((unsigned long)(0)) << 4) | (((unsigned long)(0)) << 6) | (((unsigned long)(tvForReg)) << 8));
+        __VIRegs[1] = (u16)((((unsigned int)(1)) << 0) | (((unsigned int)(0)) << 1) | (((unsigned int)(1)) << 2) | (((unsigned int)(0)) << 3) |
+                            (((unsigned int)(0)) << 4) | (((unsigned int)(0)) << 6) | (((unsigned int)(tvForReg)) << 8));
         __VIRegs[0x36] = 1;
     }
 }
@@ -766,20 +766,20 @@ void VIInit(void) {
     flushFlag = 0;
     flushFlag3in1 = 0;
 
-    __VIRegs[0x27] = (u16)((((unsigned long)(taps[0])) << 0) | (((unsigned long)(taps[1] & ((1 << (6)) - 1))) << 10));
-    __VIRegs[0x26] = (u16)((((unsigned long)(taps[1] >> 6)) << 0) | (((unsigned long)(taps[2])) << 4));
-    __VIRegs[0x29] = (u16)((((unsigned long)(taps[3])) << 0) | (((unsigned long)(taps[4] & ((1 << (6)) - 1))) << 10));
-    __VIRegs[0x28] = (u16)((((unsigned long)(taps[4] >> 6)) << 0) | (((unsigned long)(taps[5])) << 4));
-    __VIRegs[0x2B] = (u16)((((unsigned long)(taps[6])) << 0) | (((unsigned long)(taps[7] & ((1 << (6)) - 1))) << 10));
-    __VIRegs[0x2A] = (u16)((((unsigned long)(taps[7] >> 6)) << 0) | (((unsigned long)(taps[8])) << 4));
-    __VIRegs[0x2D] = (u16)((((unsigned long)(taps[9])) << 0) | (((unsigned long)(taps[10])) << 8));
-    __VIRegs[0x2C] = (u16)((((unsigned long)(taps[11])) << 0) | (((unsigned long)(taps[12])) << 8));
-    __VIRegs[0x2F] = (u16)((((unsigned long)(taps[13])) << 0) | (((unsigned long)(taps[14])) << 8));
-    __VIRegs[0x2E] = (u16)((((unsigned long)(taps[15])) << 0) | (((unsigned long)(taps[16])) << 8));
-    __VIRegs[0x31] = (u16)((((unsigned long)(taps[17])) << 0) | (((unsigned long)(taps[18])) << 8));
-    __VIRegs[0x30] = (u16)((((unsigned long)(taps[19])) << 0) | (((unsigned long)(taps[20])) << 8));
-    __VIRegs[0x33] = (u16)((((unsigned long)(taps[21])) << 0) | (((unsigned long)(taps[22])) << 8));
-    __VIRegs[0x32] = (u16)((((unsigned long)(taps[23])) << 0) | (((unsigned long)(taps[24])) << 8));
+    __VIRegs[0x27] = (u16)((((unsigned int)(taps[0])) << 0) | (((unsigned int)(taps[1] & ((1 << (6)) - 1))) << 10));
+    __VIRegs[0x26] = (u16)((((unsigned int)(taps[1] >> 6)) << 0) | (((unsigned int)(taps[2])) << 4));
+    __VIRegs[0x29] = (u16)((((unsigned int)(taps[3])) << 0) | (((unsigned int)(taps[4] & ((1 << (6)) - 1))) << 10));
+    __VIRegs[0x28] = (u16)((((unsigned int)(taps[4] >> 6)) << 0) | (((unsigned int)(taps[5])) << 4));
+    __VIRegs[0x2B] = (u16)((((unsigned int)(taps[6])) << 0) | (((unsigned int)(taps[7] & ((1 << (6)) - 1))) << 10));
+    __VIRegs[0x2A] = (u16)((((unsigned int)(taps[7] >> 6)) << 0) | (((unsigned int)(taps[8])) << 4));
+    __VIRegs[0x2D] = (u16)((((unsigned int)(taps[9])) << 0) | (((unsigned int)(taps[10])) << 8));
+    __VIRegs[0x2C] = (u16)((((unsigned int)(taps[11])) << 0) | (((unsigned int)(taps[12])) << 8));
+    __VIRegs[0x2F] = (u16)((((unsigned int)(taps[13])) << 0) | (((unsigned int)(taps[14])) << 8));
+    __VIRegs[0x2E] = (u16)((((unsigned int)(taps[15])) << 0) | (((unsigned int)(taps[16])) << 8));
+    __VIRegs[0x31] = (u16)((((unsigned int)(taps[17])) << 0) | (((unsigned int)(taps[18])) << 8));
+    __VIRegs[0x30] = (u16)((((unsigned int)(taps[19])) << 0) | (((unsigned int)(taps[20])) << 8));
+    __VIRegs[0x33] = (u16)((((unsigned int)(taps[21])) << 0) | (((unsigned int)(taps[22])) << 8));
+    __VIRegs[0x32] = (u16)((((unsigned int)(taps[23])) << 0) | (((unsigned int)(taps[24])) << 8));
 
     __VIRegs[0x38] = (u16)640;
     ImportAdjustingValues();
@@ -787,7 +787,7 @@ void VIInit(void) {
     dspCfg = __VIRegs[1];
     HorVer.nonInter = VIGetScanMode();
 
-    HorVer.tv = ((((unsigned long)(dspCfg)) & 0x00000300) >> 8);
+    HorVer.tv = ((((unsigned int)(dspCfg)) & 0x00000300) >> 8);
     if ((tvInBootrom == VI_EURGB60) || ((tvInBootrom == VI_PAL) && (HorVer.tv == VI_NTSC))) {
         HorVer.tv = VI_EURGB60;
     }
@@ -819,11 +819,11 @@ void VIInit(void) {
     OSInitThreadQueue(&retraceQueue);
 
     value = __VIRegs[0x18];
-    value = (((unsigned long)(value)) & ~0x00008000) | (((unsigned long)(0)) << 15);
+    value = (((unsigned int)(value)) & ~0x00008000) | (((unsigned int)(0)) << 15);
     __VIRegs[0x18] = (u16)value;
 
     value = __VIRegs[0x1A];
-    value = (((unsigned long)(value)) & ~0x00008000) | (((unsigned long)(0)) << 15);
+    value = (((unsigned int)(value)) & ~0x00008000) | (((unsigned int)(0)) << 15);
     __VIRegs[0x1A] = (u16)value;
 
     PreCB = (VIRetraceCallback)NULL;
@@ -883,7 +883,7 @@ static void setInterruptRegs(timing_s* tm) {
     regs[0x19] = (u16)hct;
     changed |= (1ull << (63 - (0x19)));
 
-    regs[0x18] = (u16)((((unsigned long)(vct))) | (((unsigned long)(1)) << 12) | (((unsigned long)(0)) << 15));
+    regs[0x18] = (u16)((((unsigned int)(vct))) | (((unsigned int)(1)) << 12) | (((unsigned int)(0)) << 15));
     changed |= (1ull << (63 - (0x18)));
 }
 
@@ -893,26 +893,26 @@ static void setPicConfig(u16 fbSizeX, VIXFBMode xfbMode, u16 panPosX, u16 panSiz
     *xof = (u8)(panPosX % 16);
     *wpl = (u8)((*xof + panSizeX + 15) / 16);
 
-    regs[0x24] = (u16)((((unsigned long)(*std))) | (((unsigned long)(*wpl)) << 8));
+    regs[0x24] = (u16)((((unsigned int)(*std))) | (((unsigned int)(*wpl)) << 8));
     changed |= (1ull << (63 - (0x24)));
 }
 
 static void setBBIntervalRegs(timing_s* tm) {
     u16 val;
 
-    val = (u16)((((unsigned long)(tm->bs1))) | (((unsigned long)(tm->be1)) << 5));
+    val = (u16)((((unsigned int)(tm->bs1))) | (((unsigned int)(tm->be1)) << 5));
     regs[0xB] = val;
     changed |= (1ull << (63 - (0x0b)));
 
-    val = (u16)((((unsigned long)(tm->bs3))) | (((unsigned long)(tm->be3)) << 5));
+    val = (u16)((((unsigned int)(tm->bs3))) | (((unsigned int)(tm->be3)) << 5));
     regs[0xA] = val;
     changed |= (1ull << (63 - (0x0a)));
 
-    val = (u16)((((unsigned long)(tm->bs2))) | (((unsigned long)(tm->be2)) << 5));
+    val = (u16)((((unsigned int)(tm->bs2))) | (((unsigned int)(tm->be2)) << 5));
     regs[0xD] = val;
     changed |= (1ull << (63 - (0x0d)));
 
-    val = (u16)((((unsigned long)(tm->bs4))) | (((unsigned long)(tm->be4)) << 5));
+    val = (u16)((((unsigned int)(tm->bs4))) | (((unsigned int)(tm->be4)) << 5));
     regs[0xC] = val;
     changed |= (1ull << (63 - (0x0c)));
 }
@@ -1132,24 +1132,24 @@ void VIConfigure(const GXRenderModeObj* rm) {
     regClksel = regs[0x36];
 
     if ((HorVer.nonInter == VI_PROGRESSIVE) || (HorVer.nonInter == VI_3D)) {
-        regDspCfg = (((unsigned long)(regDspCfg)) & ~0x00000004) | (((unsigned long)(1)) << 2);
+        regDspCfg = (((unsigned int)(regDspCfg)) & ~0x00000004) | (((unsigned int)(1)) << 2);
 
         if (HorVer.tv == VI_HD720) {
-            regClksel = (((unsigned long)(regClksel)) & ~0x00000001) | (((unsigned long)(0)));
+            regClksel = (((unsigned int)(regClksel)) & ~0x00000001) | (((unsigned int)(0)));
         } else {
-            regClksel = (((unsigned long)(regClksel)) & ~0x00000001) | (((unsigned long)(1)));
+            regClksel = (((unsigned int)(regClksel)) & ~0x00000001) | (((unsigned int)(1)));
         }
     } else {
-        regDspCfg = (((unsigned long)(regDspCfg)) & ~0x00000004) | (((unsigned long)(HorVer.nonInter & 1)) << 2);
-        regClksel = (((unsigned long)(regClksel)) & ~0x00000001) | (((unsigned long)(0)));
+        regDspCfg = (((unsigned int)(regDspCfg)) & ~0x00000004) | (((unsigned int)(HorVer.nonInter & 1)) << 2);
+        regClksel = (((unsigned int)(regClksel)) & ~0x00000001) | (((unsigned int)(0)));
     }
 
-    regDspCfg = (((unsigned long)(regDspCfg)) & ~0x00000008) | (((unsigned long)(HorVer.threeD)) << 3);
+    regDspCfg = (((unsigned int)(regDspCfg)) & ~0x00000008) | (((unsigned int)(HorVer.threeD)) << 3);
 
     if ((HorVer.tv == VI_PAL) || (HorVer.tv == VI_MPAL) || (HorVer.tv == VI_DEBUG)) {
-        regDspCfg = (((unsigned long)(regDspCfg)) & ~0x00000300) | (((unsigned long)(HorVer.tv)) << 8);
+        regDspCfg = (((unsigned int)(regDspCfg)) & ~0x00000300) | (((unsigned int)(HorVer.tv)) << 8);
     } else {
-        regDspCfg = (((unsigned long)(regDspCfg)) & ~0x00000300) | (((unsigned long)(0)) << 8);
+        regDspCfg = (((unsigned int)(regDspCfg)) & ~0x00000300) | (((unsigned int)(0)) << 8);
     }
 
     regs[1] = (u16)regDspCfg;
@@ -1310,10 +1310,10 @@ u32 VIGetScanMode(void) {
 
     enabled = OSDisableInterrupts();
 
-    if (((((unsigned long)(__VIRegs[0x36])) & 0x00000001) >> 0) == 1) {
+    if (((((unsigned int)(__VIRegs[0x36])) & 0x00000001) >> 0) == 1) {
         scanMode = VI_PROGRESSIVE;
     } else {
-        if (((((unsigned long)(__VIRegs[0x01])) & 0x00000004) >> 2) == 0) {
+        if (((((unsigned int)(__VIRegs[0x01])) & 0x00000004) >> 2) == 0) {
             scanMode = VI_INTERLACE;
         } else {
             scanMode = VI_NON_INTERLACE;
@@ -1329,7 +1329,7 @@ u32 VIGetDTVStatus(void) {
     BOOL enabled;
 
     enabled = OSDisableInterrupts();
-    dtvStatus = ((((unsigned long)(__VIRegs[0x37])) & 0x00000003) >> 0);
+    dtvStatus = ((((unsigned int)(__VIRegs[0x37])) & 0x00000003) >> 0);
     OSRestoreInterrupts(enabled);
 
     return (dtvStatus & 0x01);

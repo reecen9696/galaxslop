@@ -40,7 +40,7 @@ namespace NrvKoopaStateAttackSpin {
 };  // namespace NrvKoopaStateAttackSpin
 
 KoopaStateAttackSpin::KoopaStateAttackSpin(Koopa* pKoopa)
-    : ActorStateBase< Koopa >("State[スピン攻撃]", pKoopa), mMaxAttacks(1), mAttacks(), mMoveParam(&::sParamAttackSpin1st),
+    : ActorStateBase< Koopa >("State[\x83\x58\x83\x73\x83\x93\x8d\x55\x8c\x82]", pKoopa), mMaxAttacks(1), mAttacks(), mMoveParam(&::sParamAttackSpin1st),
       mSpinDelay(::sWaitToStartStep) {
 }
 

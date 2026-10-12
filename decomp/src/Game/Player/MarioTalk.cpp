@@ -61,7 +61,7 @@ bool MarioTalk::start() {
         stopAnimationUpper(nullptr);
     }
 
-    changeAnimationNonStop("見る");
+    changeAnimationNonStop("\x8c\xa9\x82\xe9");
 
     if (val) {
         mActor->_B90 = true;

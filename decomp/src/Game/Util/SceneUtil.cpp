@@ -152,7 +152,7 @@ namespace MR {
             return false;
         }
 
-        return NameObjFinder::find("シナリオスターター");
+        return NameObjFinder::find("\x83\x56\x83\x69\x83\x8a\x83\x49\x83\x58\x83\x5e\x81\x5b\x83\x5e\x81\x5b");
     }
 
     bool isStageSuddenDeathDodoryu() {

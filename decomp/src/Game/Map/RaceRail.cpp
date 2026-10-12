@@ -103,7 +103,7 @@ RaceRail::~RaceRail() {
 }
 
 void RaceRail::init(const JMapInfoIter& rIter) {
-    mPlayerRacer = new PlayerRacer("レース判定用レール");
+    mPlayerRacer = new PlayerRacer("\x83\x8c\x81\x5b\x83\x58\x94\xbb\x92\xe8\x97\x70\x83\x8c\x81\x5b\x83\x8b");
     mPlayerRacer->init(rIter);
     RaceManagerFunction::entryRacerPlayer(mPlayerRacer);
 }
@@ -130,20 +130,20 @@ void PlayerRacer::prepRacer(const RaceManager* pRaceManager) {
         MR::getFirstPolyOnLineToWaterSurface(&pos, nullptr, s, grav * 1000.0f);
         pos -= grav * 15.0f;
         MR::makeMtxFrontUpPos(&mtx, MR::getRailDirection(this), -grav, pos);
-        MR::startBckPlayer("SwimDrift", 1L);
+        MR::startBckPlayer("SwimDrift", 1);
         break;
     }
     case RaceID_TeresaPhantom: {
         pos = mPosition;
         MR::convertPosOnGround(&pos, grav * 1000.0f);
         MR::makeMtxFrontUpPos(&mtx, MR::getRailDirection(this), -grav, pos);
-        MR::startBckPlayer("BattleWait", 1L);
+        MR::startBckPlayer("BattleWait", 1);
         break;
     }
     case RaceID_TeresaDeathPromenade: {
         pos = mPosition;
         MR::makeMtxFrontUpPos(&mtx, MR::getRailDirection(this), -grav, pos);
-        MR::startBckPlayer("Wait", 1L);
+        MR::startBckPlayer("Wait", 1);
         MR::onFollowDemoEffect();
         break;
     }
@@ -156,21 +156,21 @@ void PlayerRacer::prepRacer(const RaceManager* pRaceManager) {
 
 void PlayerRacer::resetRacer(const RaceManager* pRaceManager) {
     MR::tryPlayerKillTakingActor();
-    MR::setPlayerPosOnGround("レース終了後位置");
+    MR::setPlayerPosOnGround("\x83\x8c\x81\x5b\x83\x58\x8f\x49\x97\xb9\x8c\xe3\x88\xca\x92\x75");
 
     switch (pRaceManager->mCurrentRace) {
     case RaceID_Penguin:
     case RaceID_TeresaPhantom:
     case RaceID_SurfingTrial:
     case RaceID_SurfingChallenge:
-        MR::startBckPlayer("Watch", 0L);
+        MR::startBckPlayer("Watch", 0);
         break;
     case RaceID_TeresaDeathPromenade:
         MR::onFollowDemoEffect();
         if (pRaceManager->mRank != 1) {
-            MR::startBckPlayer("Sad", 0L);
+            MR::startBckPlayer("Sad", 0);
         } else {
-            MR::startBckPlayer("Wait", 0L);
+            MR::startBckPlayer("Wait", 0);
         }
         break;
     }

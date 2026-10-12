@@ -57,9 +57,9 @@ void AstroDomeSky::init(const JMapInfoIter& rIter) {
     initNerve(GET_NERVE(AstroDomeSky, AstroDomeSkyNrvHide));
 
     MR::tryRegisterDemoCast(this, rIter);
-    MR::registerDemoActionNerve(this, GET_NERVE(AstroDomeSky, AstroDomeSkyNrvReturnDemoWait), "移動");
-    MR::registerDemoActionNerve(this, GET_NERVE(AstroDomeSky, AstroDomeSkyNrvDisappear), "ドーム出現");
-    MR::registerDemoCast(this, "マリオ飛び出し", rIter);
+    MR::registerDemoActionNerve(this, GET_NERVE(AstroDomeSky, AstroDomeSkyNrvReturnDemoWait), "\x88\xda\x93\xae");
+    MR::registerDemoActionNerve(this, GET_NERVE(AstroDomeSky, AstroDomeSkyNrvDisappear), "\x83\x68\x81\x5b\x83\x80\x8f\x6f\x8c\xbb");
+    MR::registerDemoCast(this, "\x83\x7d\x83\x8a\x83\x49\x94\xf2\x82\xd1\x8f\x6f\x82\xb5", rIter);
     MR::registerDemoSimpleCastAll(this);
 
     SphereSelectorFunction::registerTarget(this);

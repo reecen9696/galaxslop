@@ -22,7 +22,7 @@ namespace NrvDinoPackunBattleEgg {
     NEW_NERVE(DinoPackunBattleEggNrvDamage, DinoPackunBattleEgg, Damage);
 };  // namespace NrvDinoPackunBattleEgg
 
-DinoPackunBattleEgg::DinoPackunBattleEgg(DinoPackun* pParent) : DinoPackunAction("1回戦卵バトル", pParent) {
+DinoPackunBattleEgg::DinoPackunBattleEgg(DinoPackun* pParent) : DinoPackunAction("1\x89\xf1\x90\xed\x97\x91\x83\x6f\x83\x67\x83\x8b", pParent) {
     mStateDamage = nullptr;
     _18 = 1.0f;
 }

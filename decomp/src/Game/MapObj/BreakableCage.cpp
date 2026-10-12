@@ -49,7 +49,7 @@ void BreakableCage::init(const JMapInfoIter& rIter) {
         sensorRadius = 425.0f;
     } else if (MR::isEqualString(pName, "BreakableTrash")) {
         mCageType = CAGE_TRASH;
-        MR::joinToGroupArray(this, rIter, "ゴミ管理", 32);
+        MR::joinToGroupArray(this, rIter, "\x83\x53\x83\x7e\x8a\xc7\x97\x9d", 32);
     }
 
     f32 scaledRadius = sensorRadius * mScale.x;
@@ -200,7 +200,7 @@ void BreakableCage::initModel(const char* pName, const JMapInfoIter& rIter) {
     initModelManagerWithAnm(pName, nullptr, false);
 
     if (isTypeCage()) {
-        ModelObj* pBreakModel = MR::createModelObjMapObjStrongLight("壊れる籠壊れモデル", "BreakableCageBreak", mMtx.toMtxPtr());
+        ModelObj* pBreakModel = MR::createModelObjMapObjStrongLight("\x89\xf3\x82\xea\x82\xe9\xe2\xc4\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "BreakableCageBreak", mMtx.toMtxPtr());
         mBreakModel = pBreakModel;
         pBreakModel->initWithoutIter();
         mBreakModel->mScale.set(mScale);
@@ -268,7 +268,7 @@ bool BreakableCage::isAppearPowerStar() const {
 bool BreakableCage::tryBreak() {
     if (isNerve(GET_NERVE(BreakableCage, BreakableCageNrvWait))) {
         if (mCameraInfo != nullptr) {
-            MR::requestStartDemoWithoutCinemaFrame(this, "破壊", GET_NERVE(BreakableCage, BreakableCageNrvBreak),
+            MR::requestStartDemoWithoutCinemaFrame(this, "\x94\x6a\x89\xf3", GET_NERVE(BreakableCage, BreakableCageNrvBreak),
                                                    GET_NERVE(BreakableCage, BreakableCageNrvWaitStartDemoBreak));
         } else {
             setNerve(GET_NERVE(BreakableCage, BreakableCageNrvBreak));
@@ -390,7 +390,7 @@ void BreakableCage::exeBreak() {
 
         if (mCameraInfo != nullptr) {
             MR::endActorCamera(this, getCamInfo(), false, -1);
-            MR::endDemo(this, "破壊");
+            MR::endDemo(this, "\x94\x6a\x89\xf3");
         }
 
         kill();

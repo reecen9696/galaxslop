@@ -4,7 +4,7 @@
 
 class CameraObjParallel : public Camera {
 public:
-    CameraObjParallel(const char* pName = "オブジェ並行カメラ");
+    CameraObjParallel(const char* pName = "\x83\x49\x83\x75\x83\x57\x83\x46\x95\xc0\x8d\x73\x83\x4a\x83\x81\x83\x89");
 
     virtual void reset();
     virtual CameraTargetObj* calc();

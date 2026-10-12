@@ -103,6 +103,13 @@ public:
             psq_st u, 24(destination), 0, 0
             stfs v, 32(destination)
         }
+#else
+        Mtx33& dst = mpNrmMtxArr[1][mCurrentViewNo][idx];
+        for (int r = 0; r < 3; r++) {
+            dst[r][0] = mtx[r][0];
+            dst[r][1] = mtx[r][1];
+            dst[r][2] = mtx[r][2];
+        }
 #endif
     }
 

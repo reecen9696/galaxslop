@@ -22,7 +22,11 @@ JASTaskThread::~JASTaskThread() {
 
 void* JASTaskThread::allocCallStack(JASThreadCallback callback, const void* msg, u32 msgSize) {
     ThreadMemPool* heap;
+#if defined(__MWERKS__)
     u32 size = msgSize + 8;
+#else
+    u32 size = (offsetof(JASThreadCallStack, msg) + msgSize + 7) & ~7u;
+#endif
     JASThreadCallStack* callStack = (JASThreadCallStack*)JASKernel::getCommandHeap()->alloc(size);
     if (callStack == NULL) {
         return NULL;
@@ -36,7 +40,11 @@ void* JASTaskThread::allocCallStack(JASThreadCallback callback, const void* msg,
 
 void* JASTaskThread::allocCallStack(JASThreadCallback callback, void* msg) {
     JASThreadCallStack* callStack;
+#if defined(__MWERKS__)
     callStack = (JASThreadCallStack*)JASKernel::getCommandHeap()->alloc(12);
+#else
+    callStack = (JASThreadCallStack*)JASKernel::getCommandHeap()->alloc(offsetof(JASThreadCallStack, msg) + sizeof(void*));
+#endif
     if (callStack == NULL) {
         return NULL;
     }

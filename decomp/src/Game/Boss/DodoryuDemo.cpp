@@ -51,11 +51,11 @@ namespace {
         TPos3f mtx;
 
         pDodoryu->killAllHillPieces();
-        MR::findNamePos("ドドリュウ再セット", mtx.toMtxPtr());
+        MR::findNamePos("\x83\x68\x83\x68\x83\x8a\x83\x85\x83\x45\x8d\xc4\x83\x5a\x83\x62\x83\x67", mtx.toMtxPtr());
         pDodoryu->setMtx(mtx);
         pDodoryu->snapToGround();
 
-        MR::findNamePos("マリオ再セット", mtx.toMtxPtr());
+        MR::findNamePos("\x83\x7d\x83\x8a\x83\x49\x8d\xc4\x83\x5a\x83\x62\x83\x67", mtx.toMtxPtr());
         MR::setPlayerBaseMtx(mtx.toMtxPtr());
         MR::setPlayerStateWait();
     }
@@ -84,7 +84,7 @@ void DodoryuDemoOpening::start() {
 
 void DodoryuDemoOpening::end() {
     MR::endAnimCamera(mHost, &mActorCameraInfo, "OpeningDemo", -1, true);
-    MR::endDemo(mHost, "ドドリュウ開始デモ");
+    MR::endDemo(mHost, "\x83\x68\x83\x68\x83\x8a\x83\x85\x83\x45\x8a\x4a\x8e\x6e\x83\x66\x83\x82");
 
     TPos3f playerResetMtx;
     mHost->getPlayerResetMtx(&playerResetMtx, 0);
@@ -96,7 +96,7 @@ void DodoryuDemoOpening::end() {
 }
 
 void DodoryuDemoOpening::exeDemoWait() {
-    if (!MR::tryStartDemo(mHost, "ドドリュウ開始デモ")) {
+    if (!MR::tryStartDemo(mHost, "\x83\x68\x83\x68\x83\x8a\x83\x85\x83\x45\x8a\x4a\x8e\x6e\x83\x66\x83\x82")) {
         return;
     }
 
@@ -259,12 +259,12 @@ void DodoryuDemoAppear::start() {
 
 void DodoryuDemoAppear::end() {
     MR::endAnimCamera(mHost, &mActorCameraInfo, "AppearDemo", -1, true);
-    MR::endDemo(mHost, "ドドリュウ出現デモ");
+    MR::endDemo(mHost, "\x83\x68\x83\x68\x83\x8a\x83\x85\x83\x45\x8f\x6f\x8c\xbb\x83\x66\x83\x82");
     MR::showPlayer();
 }
 
 void DodoryuDemoAppear::exeDemoWait() {
-    if (!MR::tryStartDemo(mHost, "ドドリュウ出現デモ")) {
+    if (!MR::tryStartDemo(mHost, "\x83\x68\x83\x68\x83\x8a\x83\x85\x83\x45\x8f\x6f\x8c\xbb\x83\x66\x83\x82")) {
         return;
     }
 
@@ -319,12 +319,12 @@ void DodoryuDemoAngry::start() {
 
 void DodoryuDemoAngry::end() {
     MR::endAnimCamera(mHost, &mActorCameraInfo, "AngryDemo", -1, true);
-    MR::endDemo(mHost, "ドドリュウ怒りデモ");
+    MR::endDemo(mHost, "\x83\x68\x83\x68\x83\x8a\x83\x85\x83\x45\x93\x7b\x82\xe8\x83\x66\x83\x82");
     MR::showPlayer();
 }
 
 void DodoryuDemoAngry::exeDemoWait() {
-    if (!MR::tryStartDemo(mHost, "ドドリュウ怒りデモ")) {
+    if (!MR::tryStartDemo(mHost, "\x83\x68\x83\x68\x83\x8a\x83\x85\x83\x45\x93\x7b\x82\xe8\x83\x66\x83\x82")) {
         return;
     }
 
@@ -379,12 +379,12 @@ void DodoryuDemoDown::start() {
 
 void DodoryuDemoDown::end() {
     MR::endAnimCamera(mHost, &mActorCameraInfo, "DownDemo", -1, true);
-    MR::endDemo(mHost, "ドドリュウ死亡デモ");
+    MR::endDemo(mHost, "\x83\x68\x83\x68\x83\x8a\x83\x85\x83\x45\x8e\x80\x96\x53\x83\x66\x83\x82");
     MR::showPlayer();
 }
 
 void DodoryuDemoDown::exeDemoWait() {
-    if (!MR::tryStartDemo(mHost, "ドドリュウ死亡デモ")) {
+    if (!MR::tryStartDemo(mHost, "\x83\x68\x83\x68\x83\x8a\x83\x85\x83\x45\x8e\x80\x96\x53\x83\x66\x83\x82")) {
         return;
     }
 

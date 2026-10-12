@@ -26,7 +26,7 @@
 #include <revolution/gx/GXTev.h>
 #include <revolution/mtx.h>
 
-MarioSearchLight::MarioSearchLight(LiveActor* pActor) : PartsModel(pActor, "サーチライト", "SearchLightCone", nullptr, -1, 0), _9C(), _A0(), _A4() {
+MarioSearchLight::MarioSearchLight(LiveActor* pActor) : PartsModel(pActor, "\x83\x54\x81\x5b\x83\x60\x83\x89\x83\x43\x83\x67", "SearchLightCone", nullptr, -1, 0), _9C(), _A0(), _A4() {
 }
 
 void MarioSearchLight::init(const JMapInfoIter& rParam1) {

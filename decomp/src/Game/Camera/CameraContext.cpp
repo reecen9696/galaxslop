@@ -12,7 +12,7 @@ void CameraContext_FORCE_MATCH_SDATA2() {
 CameraContext::~CameraContext() {
 }
 
-CameraContext::CameraContext() : NameObj("カメラコンテキスト") {
+CameraContext::CameraContext() : NameObj("\x83\x4a\x83\x81\x83\x89\x83\x52\x83\x93\x83\x65\x83\x4c\x83\x58\x83\x67") {
     initParams();
 }
 

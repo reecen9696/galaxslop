@@ -131,9 +131,11 @@ namespace {
 LayoutManager::LayoutManager(const char* pLayoutName, bool useArchiveNamePrefix, u32 rootPaneAnimLayerNum, u32 textBoxBufferLength)
     : mLayoutHolder(), mLayout(), mAnimTransList(), mDrawInfo(), mIsScreenHidden(), _61(true), mIndDummyTexMap(), mPaneCount(), mPaneInfoList(),
       mGroupCtrlCount(), mGroupCtrlList(), mLayoutName() {
+    // Function scope: pLayoutName may point into fileNameWithoutExtension
+    // (the original declares these inside the if block).
+    char fileNameWithoutExtension[0x60];
+    char fileNameFromPrefix[0x80];
     if (useArchiveNamePrefix) {
-        char fileNameWithoutExtension[0x60];
-        char fileNameFromPrefix[0x80];
         MR::makeLayoutArchiveFileNameFromPrefix(fileNameFromPrefix, sizeof(fileNameFromPrefix), pLayoutName, true);
         MR::removeExtensionString(fileNameWithoutExtension, sizeof(fileNameWithoutExtension), fileNameFromPrefix);
         pLayoutName = MR::getBasename(fileNameWithoutExtension);
@@ -253,6 +255,35 @@ LayoutPaneCtrl* LayoutManager::getPaneCtrl(const char* pName) const {
     s32 index = getIndexOfPane(pName);
     return mPaneInfoList[index].mPaneCtrl;
 }
+
+#ifdef TARGET_PC
+nw4r::lyt::Pane* LayoutManager::missingPane(const char* pName) {
+    static char sLogged[64][17];
+    static s32 sLoggedCount = 0;
+    bool logged = false;
+    for (s32 i = 0; i < sLoggedCount; i++) {
+        logged = logged || strcmp(sLogged[i], pName) == 0;
+    }
+    if (!logged) {
+        port_log("layout: no pane \"%s\" in this layout, ignored", pName);
+        if (sLoggedCount < 64) {
+            strncpy(sLogged[sLoggedCount], pName, 16);
+            sLogged[sLoggedCount][16] = '\0';
+            sLoggedCount++;
+        }
+    }
+    // Built once in static storage (not on a game heap that a scene frees).
+    alignas(nw4r::lyt::Pane) static u8 sStorage[sizeof(nw4r::lyt::Pane)];
+    static nw4r::lyt::Pane* sPane = nullptr;
+    if (sPane == nullptr) {
+        static nw4r::lyt::res::Pane sRes;
+        sRes.scale.x = 1.0f;
+        sRes.scale.y = 1.0f;
+        sPane = new (sStorage) nw4r::lyt::Pane(&sRes);
+    }
+    return sPane;
+}
+#endif
 
 s32 LayoutManager::getIndexOfPane(const char* pName) const {
     u32 paneCount = mPaneCount;
@@ -502,6 +533,15 @@ void LayoutManager::initArc(const char* pArchiveName, const char* pLayoutName) {
     char layoutResName[0x80];
     snprintf(layoutResName, sizeof(layoutResName), "%s.brlyt", pLayoutName);
     void* pLayoutRes = mLayoutHolder->GetResource('blyt', layoutResName, nullptr);
+#ifdef TARGET_PC
+    if (pLayoutRes == nullptr) {
+        port_log("layout: %s not found in %s (%d layouts, %d anims, %d other)", layoutResName, pArchiveName, mLayoutHolder->mLayoutRes.mCount,
+                 mLayoutHolder->mAnimRes.mCount, mLayoutHolder->mResOther.mCount);
+        for (u32 i = 0; i < mLayoutHolder->mLayoutRes.mCount; i++) {
+            port_log("layout:   %s", mLayoutHolder->mLayoutRes.getResName(i));
+        }
+    }
+#endif
 
     mLayout = new nw4r::lyt::Layout();
     mLayout->Build(pLayoutRes, mLayoutHolder);

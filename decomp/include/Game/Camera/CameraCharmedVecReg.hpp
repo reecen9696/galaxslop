@@ -4,7 +4,7 @@
 
 class CameraCharmedVecReg : public Camera {
 public:
-    CameraCharmedVecReg(const char* pName = "ベクトルレジスタ注目カメラ");
+    CameraCharmedVecReg(const char* pName = "\x83\x78\x83\x4e\x83\x67\x83\x8b\x83\x8c\x83\x57\x83\x58\x83\x5e\x92\x8d\x96\xda\x83\x4a\x83\x81\x83\x89");
 
     virtual void reset();
     virtual CameraTargetObj* calc();

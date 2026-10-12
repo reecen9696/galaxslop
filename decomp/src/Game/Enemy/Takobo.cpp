@@ -125,7 +125,7 @@ void Takobo::init(const JMapInfoIter& rIter) {
     MR::initLightCtrl(this);
     appear();
     getSensor("attack")->invalidate();
-    mBox = new SpinningBox("スピニングボックス");
+    mBox = new SpinningBox("\x83\x58\x83\x73\x83\x6a\x83\x93\x83\x4f\x83\x7b\x83\x62\x83\x4e\x83\x58");
     mBox->mIsIceBox = true;
     mBox->initWithoutIter();
 }
@@ -162,7 +162,7 @@ void Takobo::control() {
 
     if (isNerve(GET_NERVE(Takobo, HostTypeNrvWait)) || isNerve(GET_NERVE(Takobo, HostTypeNrvMove)) || isNerve(GET_NERVE(Takobo, HostTypeNrvAttack)) ||
         isNerve(GET_NERVE(Takobo, HostTypeNrvHitReaction))) {
-        if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+        if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
             setNerve(GET_NERVE(Takobo, HostTypeNrvDpdPointed));
             return;
         }
@@ -387,7 +387,7 @@ void Takobo::exeDpdPointed() {
     }
 
     MR::startDPDFreezeLevelSound(this);
-    if (!MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (!MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         setNerve(GET_NERVE(Takobo, HostTypeNrvWait));
     } else {
         mVelocity.zero();

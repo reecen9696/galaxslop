@@ -85,11 +85,11 @@ namespace MR {
 
     void addTripodBossParts(LiveActor* pActor) {
         TripodBossAccesser::createSceneObj()->addTripodBossParts(pActor);
-        MR::joinToMovementOnOffGroup("三脚ボス部品", pActor, 256);
+        MR::joinToMovementOnOffGroup("\x8e\x4f\x8b\x72\x83\x7b\x83\x58\x95\x94\x95\x69", pActor, 256);
     }
 
     void addTripodBossPartsMovement(NameObj* pObj) {
-        MR::joinToMovementOnOffGroup("三脚ボス部品", pObj, 256);
+        MR::joinToMovementOnOffGroup("\x8e\x4f\x8b\x72\x83\x7b\x83\x58\x95\x94\x95\x69", pObj, 256);
     }
 
     bool isTripoddBossParts(const NameObj* pObj) {
@@ -109,7 +109,7 @@ namespace MR {
     }
 
     void requestMovementTripodBossParts() {
-        MR::onMovementOnOffGroup("三脚ボス部品");
+        MR::onMovementOnOffGroup("\x8e\x4f\x8b\x72\x83\x7b\x83\x58\x95\x94\x95\x69");
     }
 
     bool isCreatedTripodBoss() {

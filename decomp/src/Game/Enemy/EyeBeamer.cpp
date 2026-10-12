@@ -72,8 +72,8 @@ void EyeBeamer::init(const JMapInfoIter& rIter) {
         MR::listenStageSwitchOnA(this, MR::Functor(this, &EyeBeamer::requestStartPatrol));
 
     if (MR::tryRegisterDemoCast(this, rIter)) {
-        MR::registerDemoActionNerve(this, GET_NERVE(EyeBeamer, EyeBeamerNrvDemoTurn), "アイビーマー回転");
-        MR::registerDemoActionNerve(this, GET_NERVE(EyeBeamer, EyeBeamerNrvDemoGotoPatrol), "アイビーマー降下");
+        MR::registerDemoActionNerve(this, GET_NERVE(EyeBeamer, EyeBeamerNrvDemoTurn), "\x83\x41\x83\x43\x83\x72\x81\x5b\x83\x7d\x81\x5b\x89\xf1\x93\x5d");
+        MR::registerDemoActionNerve(this, GET_NERVE(EyeBeamer, EyeBeamerNrvDemoGotoPatrol), "\x83\x41\x83\x43\x83\x72\x81\x5b\x83\x7d\x81\x5b\x8d\x7e\x89\xba");
         setNerve(GET_NERVE(EyeBeamer, EyeBeamerNrvDemoStartWait));
     }
     MR::setGroupClipping(this, rIter, 0x20);
@@ -100,11 +100,11 @@ void EyeBeamer::initStartNerve(const JMapInfoIter& rIter) {
 
 void EyeBeamer::initModel() {
     initModelManagerWithAnm("EyeBeamer", 0, false);
-    mBeamVolumeDrawer = new VolumeModelDrawer("ビームボリューム", "EyeBeamerBeamVolume", _9C);
-    mBeamBloom = new ModelObj("ビームブルーム", "EyeBeamerBeamBloom", _9C, MR::DrawBufferType_BloomModel, -2, -2, false);
+    mBeamVolumeDrawer = new VolumeModelDrawer("\x83\x72\x81\x5b\x83\x80\x83\x7b\x83\x8a\x83\x85\x81\x5b\x83\x80", "EyeBeamerBeamVolume", _9C);
+    mBeamBloom = new ModelObj("\x83\x72\x81\x5b\x83\x80\x83\x75\x83\x8b\x81\x5b\x83\x80", "EyeBeamerBeamBloom", _9C, MR::DrawBufferType_BloomModel, -2, -2, false);
     mBeamBloom->initWithoutIter();
     MR::invalidateClipping(mBeamBloom);
-    mBeamMdl = new ModelObj("ビーム", "EyeBeamerBeam", _9C, MR::DrawBufferType_IndirectMapObj, -2, -2, false);
+    mBeamMdl = new ModelObj("\x83\x72\x81\x5b\x83\x80", "EyeBeamerBeam", _9C, MR::DrawBufferType_IndirectMapObj, -2, -2, false);
     mBeamMdl->initWithoutIter();
     MR::invalidateClipping(mBeamMdl);
     MR::startBtk(mBeamMdl, "EyeBeamerBeam");
@@ -257,7 +257,7 @@ void EyeBeamer::exeDemoTurn() {
     if (MR::isFirstStep(this))
         MR::startSound(this, "SE_OJ_EYE_BEAMER_TURN");
 
-    f32 rate = MR::calcDemoPartStepRate("アイビーマー回転");
+    f32 rate = MR::calcDemoPartStepRate("\x83\x41\x83\x43\x83\x72\x81\x5b\x83\x7d\x81\x5b\x89\xf1\x93\x5d");
     f32 easeIn = MR::getEaseInOutValue(rate, 0.0f, 1.0f, 1.0f);
     TQuat4f stack_30;
     TVec3f stack_24;
@@ -265,7 +265,7 @@ void EyeBeamer::exeDemoTurn() {
     stack_30.setRotate(stack_24, PI * easeIn);
     PSQUATMultiply((Quaternion*)&stack_30, (Quaternion*)&_CC, (Quaternion*)&_DC);
 
-    if (MR::isDemoPartLastStep("アイビーマー回転")) {
+    if (MR::isDemoPartLastStep("\x83\x41\x83\x43\x83\x72\x81\x5b\x83\x7d\x81\x5b\x89\xf1\x93\x5d")) {
         TQuat4f stack_14;
         TVec3f stack_8;
         _CC.getXDir(stack_8);
@@ -276,10 +276,10 @@ void EyeBeamer::exeDemoTurn() {
 }
 
 void EyeBeamer::exeDemoGotoPatrol() {
-    f32 rate = MR::calcDemoPartStepRate("アイビーマー降下");
+    f32 rate = MR::calcDemoPartStepRate("\x83\x41\x83\x43\x83\x72\x81\x5b\x83\x7d\x81\x5b\x8d\x7e\x89\xba");
     f32 easeInOut = MR::getEaseInOutValue(rate, 0.0f, 1.0f, 1.0f);
     MR::vecBlend(_F8, _104, &_EC, easeInOut);
-    if (MR::isDemoPartLastStep("アイビーマー降下"))
+    if (MR::isDemoPartLastStep("\x83\x41\x83\x43\x83\x72\x81\x5b\x83\x7d\x81\x5b\x8d\x7e\x89\xba"))
         setNerve(GET_NERVE(EyeBeamer, EyeBeamerNrvDemoWait));
 }
 

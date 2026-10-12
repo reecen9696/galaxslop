@@ -51,7 +51,7 @@ namespace {
 };  // namespace
 
 PlantStalk::PlantStalk()
-    : LiveActor("茎"), mNumPlantPoints(), mPlantPoints(), mRailInfo(), mStalkLength(), mGrowthPercent(),
+    : LiveActor("\x8c\x73"), mNumPlantPoints(), mPlantPoints(), mRailInfo(), mStalkLength(), mGrowthPercent(),
       mGrowSpeed(MR::getRandom(::sGrowSpeedMin, ::sGrowSpeedMax)), mGrowAccelTime(MR::getRandom(::sGrowAccelTimeMin, ::sGrowAccelTimeMax)),
       mGrownPlantPoints() {
 }

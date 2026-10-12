@@ -34,7 +34,7 @@ namespace {
 }  // namespace
 
 CoconutTreeLeaf::CoconutTreeLeaf(const CoconutTreeLeafGroup* pGroup, MtxPtr pJointMtx, const TVec3f* pWindDirection)
-    : LiveActor("ヤシの木の葉"), mGroup(pGroup), mTipPosition(0.0f), mRestTipPosition(0.0f),
+    : LiveActor("\x83\x84\x83\x56\x82\xcc\x96\xd8\x82\xcc\x97\x74"), mGroup(pGroup), mTipPosition(0.0f), mRestTipPosition(0.0f),
       mRestUp(pJointMtx[0][1], pJointMtx[1][1], pJointMtx[2][1]), mAxisX(pJointMtx[0][0], pJointMtx[1][0], pJointMtx[2][0]),
       mAxisY(pJointMtx[0][1], pJointMtx[1][1], pJointMtx[2][1]), mAxisZ(pJointMtx[0][2], pJointMtx[1][2], pJointMtx[2][2]), mJointMtx(pJointMtx),
       mWindStep(), mWindStartStep(), mWindAccel(0.0f), mWindDirection(pWindDirection) {

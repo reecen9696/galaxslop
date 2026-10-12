@@ -8,14 +8,14 @@ namespace {
     static const f32 sShadowRadius = 20.0f;
 };  //  namespace
 
-MapPartsRailGuidePoint::MapPartsRailGuidePoint(const LiveActor* pActor, const char* pName, f32 a3, bool a4) : LiveActor("レイル点") {
+MapPartsRailGuidePoint::MapPartsRailGuidePoint(const LiveActor* pActor, const char* pName, f32 a3, bool a4) : LiveActor("\x83\x8c\x83\x43\x83\x8b\x93\x5f") {
     _8C = a3;
     _90 = a4;
     initModelManagerWithAnm(pName, 0, false);
     MR::calcRailPosAtCoord(&mPosition, pActor, _8C);
 }
 
-MapPartsRailGuidePoint::MapPartsRailGuidePoint(const LiveActor* pActor, const char* pName, int a3, bool a4) : LiveActor("レイル点") {
+MapPartsRailGuidePoint::MapPartsRailGuidePoint(const LiveActor* pActor, const char* pName, int a3, bool a4) : LiveActor("\x83\x8c\x83\x43\x83\x8b\x93\x5f") {
     _90 = a4;
     _8C = 0.0f;
     initModelManagerWithAnm(pName, 0, false);

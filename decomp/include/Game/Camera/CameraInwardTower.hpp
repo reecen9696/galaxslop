@@ -4,7 +4,7 @@
 
 class CameraInwardTower : public Camera {
 public:
-    CameraInwardTower(const char* pName = "塔内部カメラ");
+    CameraInwardTower(const char* pName = "\x93\x83\x93\xe0\x95\x94\x83\x4a\x83\x81\x83\x89");
     virtual ~CameraInwardTower();
 
     virtual void reset();

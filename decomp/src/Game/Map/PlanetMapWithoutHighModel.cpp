@@ -16,7 +16,7 @@ PlanetMapWithoutHighModel::~PlanetMapWithoutHighModel() {
 void PlanetMapWithoutHighModel::init(const JMapInfoIter& rIter) {
     MapObjActor::init(rIter);
     MapObjActorInitInfo info;
-    info.setupHioNode("◆◆ハイモデル無しの惑星◆◆");
+    info.setupHioNode("\x81\x9f\x81\x9f\x83\x6e\x83\x43\x83\x82\x83\x66\x83\x8b\x96\xb3\x82\xb5\x82\xcc\x98\x66\x90\xaf\x81\x9f\x81\x9f");
     info.setupDefaultPos();
     info.setupConnectToScene();
     info.setupEffect(nullptr);

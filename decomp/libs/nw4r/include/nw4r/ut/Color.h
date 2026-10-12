@@ -23,19 +23,34 @@ namespace nw4r {
             }
 
             Color& operator=(u32 color) {
+#if defined(__MWERKS__) || defined(__BIG_ENDIAN__)
                 ToU32ref() = color;
+#else
+                r = u8(color >> 24);
+                g = u8(color >> 16);
+                b = u8(color >> 8);
+                a = u8(color);
+#endif
                 return *this;
             }
 
             Color& operator=(const GXColor& color) {
-                return operator=(*reinterpret_cast< const u32* >(&color));
+                r = color.r;
+                g = color.g;
+                b = color.b;
+                a = color.a;
+                return *this;
             }
 
             ~Color() {
             }
 
             operator u32() const {
+#if defined(__MWERKS__) || defined(__BIG_ENDIAN__)
                 return ToU32ref();
+#else
+                return (u32(r) << 24) | (u32(g) << 16) | (u32(b) << 8) | u32(a);
+#endif
             }
 
             u32& ToU32ref() {

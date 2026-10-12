@@ -217,7 +217,13 @@ f32 MarioTeresa::checkHeight() {
 }
 
 void MarioTeresa::checkAccel() {
+#ifdef TARGET_PC
+    // Keep lifting while the Quest jump button is held, as with the other
+    // flying power-ups. An edge trigger only gives Boo a short initial puff.
+    if (checkLvlA()) {
+#else
     if (checkTrgA()) {
+#endif
         if (!_44) {
             getPlayer()->_1C._4 = true;
         }
@@ -409,8 +415,8 @@ void Mario::doTeresaReflection(const TVec3f& rNormal, bool effect) {
 
 void Mario::startTeresaDisappear() {
     _418 = mActor->getConst().getTable()->mTeresaWallThroughTime;
-    playSound("テレサ消える");
-    playSound("声トルネード");
+    playSound("\x83\x65\x83\x8c\x83\x54\x8f\xc1\x82\xa6\x82\xe9");
+    playSound("\x90\xba\x83\x67\x83\x8b\x83\x6c\x81\x5b\x83\x68");
     MR::startCSSound("CS_TERESA", nullptr, 0);
     mTeresa->updateDropFlag();
     resetSleepTimer();
@@ -429,7 +435,7 @@ bool MarioTeresa::start() {
     player->_42A = 0;
     player->_430 = 0;
     getPlayer()->cancelSquatMode();
-    changeAnimation("落下", "落下");
+    changeAnimation("\x97\x8e\x89\xba", "\x97\x8e\x89\xba");
     return true;
 }
 
@@ -439,7 +445,7 @@ void MarioTeresa::checkWind() {
     BigFanFunction::calcWindInfo(&wind, mActor->_2A0, &strength);
     strength = MR::clamp(strength, 0.0f, 10.0f);
     if (strength > 0.0f) {
-        playSound("テレサ風に乗る", 50.0f * strength);
+        playSound("\x83\x65\x83\x8c\x83\x54\x95\x97\x82\xc9\x8f\xe6\x82\xe9", 50.0f * strength);
     }
 
     if (!MR::isNearZero(strength)) {
@@ -481,8 +487,8 @@ void MarioTeresa::checkWallCeilReflect() {
         }
 
         if (!_42) {
-            playSound("テレサ壁反射");
-            playSound("声壁反射");
+            playSound("\x83\x65\x83\x8c\x83\x54\x95\xc7\x94\xbd\x8e\xcb");
+            playSound("\x90\xba\x95\xc7\x94\xbd\x8e\xcb");
             mActor->changeTeresaAnimation("hit", -1);
             actor = mActor->_9A4;
             MR::emitEffectHit(actor, getPlayer()->getWallPos(), getPlayer()->getWallNorm(), "WallHit");
@@ -513,7 +519,7 @@ void MarioTeresa::procAirControl() {
         }
 
         if (isTeresaAccel()) {
-            playSound("テレサ踏ん張り");
+            playSound("\x83\x65\x83\x8c\x83\x54\x93\xa5\x82\xf1\x92\xa3\x82\xe8");
             if (getPlayer()->_1C._4) {
                 _48 = mActor->getConst().getTable()->mTeresaTrgOnPushTime1;
             } else if (_48 < 15) {
@@ -561,14 +567,14 @@ void MarioTeresa::procControl() {
         }
 
         mActor->changeTeresaAnimation("fallquicklystart", -1);
-        playSound("声壁押し");
+        playSound("\x90\xba\x95\xc7\x89\x9f\x82\xb5");
     }
 }
 
 void MarioActor::runTeresaBaseAnimation() {
-    if (!mMario->isStatusActive(MarioStatus_Wait) && !_9B8->isRun("基本")) {
-        _9B8->changeAnimation("基本");
-        _9B4 = MR::getRandom(60L, 180L);
+    if (!mMario->isStatusActive(MarioStatus_Wait) && !_9B8->isRun("\x8a\xee\x96\x7b")) {
+        _9B8->changeAnimation("\x8a\xee\x96\x7b");
+        _9B4 = MR::getRandom(60, 180);
         MR::startBtp(_9A4, "blink");
     }
 }
@@ -585,7 +591,7 @@ void MarioActor::changeTeresaAnimation(const char* pAnimation, s32 interpolation
     }
 
     if (MR::isEqualString(pAnimation, "wait") || MR::isEqualString(pAnimation, "run")) {
-        _9B4 = MR::getRandom(60L, 180L);
+        _9B4 = MR::getRandom(60, 180);
         MR::stopBtp(_9A4);
         return;
     }
@@ -638,7 +644,7 @@ void MarioActor::updateTeresaAnimation() {
             if (!MR::isBckPlaying(_9A4, "fly") && !MR::isBckPlaying(_9A4, "spin")) {
                 changeTeresaAnimation("fly", 16);
             }
-        } else if (MR::isBckPlaying(_9A4, "fly") || _9B8->isRun("基本")) {
+        } else if (MR::isBckPlaying(_9A4, "fly") || _9B8->isRun("\x8a\xee\x96\x7b")) {
             if (getLastMove().dot(getGravityVec()) >= 1.0f) {
                 changeTeresaAnimation("fall", 16);
             } else if (!mMario->mDrawStates._1C) {
@@ -652,7 +658,7 @@ void MarioActor::updateTeresaAnimation() {
             }
         }
 
-        if (_9B8->isRun("基本")) {
+        if (_9B8->isRun("\x8a\xee\x96\x7b")) {
             _9B0 = mMario->mJumpVec.length() / 10.0f;
             _9B0 = MR::clamp(_9B0, 0.0f, 1.0f);
             _9B8->changeTrackWeight(0, 1.0f - _9B0);
@@ -673,7 +679,7 @@ void MarioActor::updateTeresaAnimation() {
 
         mMario->_418--;
         if (!mMario->_418) {
-            playSound("テレサ現れる", -1);
+            playSound("\x83\x65\x83\x8c\x83\x54\x8c\xbb\x82\xea\x82\xe9", -1);
         }
     } else {
         if (_9A8 > 0.0f) {
@@ -689,7 +695,7 @@ void MarioActor::updateTeresaAnimation() {
     if (_9B4) {
         _9B4--;
         if (!_9B4) {
-            _9B4 = MR::getRandom(90L, 240L);
+            _9B4 = MR::getRandom(90, 240);
             MR::startBtp(_9A4, "blink");
         }
     }
@@ -720,9 +726,9 @@ void MarioTeresa::doTeresaReflection(const TVec3f& rNormal, bool effect) {
     _14.zero();
     if (!_42) {
         mActor->changeTeresaAnimation("hit", -1);
-        playSound("声壁反射");
+        playSound("\x90\xba\x95\xc7\x94\xbd\x8e\xcb");
         if (effect) {
-            playSound("テレサ壁反射");
+            playSound("\x83\x65\x83\x8c\x83\x54\x95\xc7\x94\xbd\x8e\xcb");
             Mario* player = getPlayer();
             MR::emitEffectHit(mActor->_9A4, getPlayer()->_25C, player->_268, "WallHit");
         }
@@ -735,12 +741,12 @@ void MarioTeresa::doTeresaReflection(const TVec3f& rNormal, bool effect) {
 }
 
 XanimeGroupInfo teresaAnimeTable[] = {
-    {{"基本"}, 1.0f, 16},
+    {{"\x8a\xee\x96\x7b"}, 1.0f, 16},
     {{""}},
 };
 
 XanimeBckTable2 teresaAnime2[] = {
-    {{"基本"}, {{"wait", 1.0f}, {"run", 0.0f}}},
+    {{"\x8a\xee\x96\x7b"}, {{"wait", 1.0f}, {"run", 0.0f}}},
     {{""}, {{"", 0.0f}, {nullptr, 0.0f}}},
 };
 
@@ -748,7 +754,7 @@ void MarioActor::initTeresaMarioAnimation() {
     _9B0 = 0.0f;
     _9BC = new XanimeResourceTable(MR::getResourceHolder(_9A4), teresaAnimeTable, nullptr, nullptr, nullptr, teresaAnime2, nullptr, nullptr, nullptr);
     _9B8 = new XanimePlayer(MR::getJ3DModel(_9A4), _9BC);
-    _9B8->setDefaultAnimation("基本");
-    _9B8->changeAnimation("基本");
+    _9B8->setDefaultAnimation("\x8a\xee\x96\x7b");
+    _9B8->changeAnimation("\x8a\xee\x96\x7b");
     _9A4->mModelManager->mXanimePlayer = _9B8;
 }

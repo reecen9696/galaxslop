@@ -42,13 +42,13 @@ void TripodBossCore::init(const JMapInfoIter& rIter) {
     MR::initCollisionParts(this, "TripodBossCore", getSensor("body"), nullptr);
     initSound(4, false);
 
-    mBreakModel = MR::createModelObjMapObjStrongLight("壊れモデル", "TripodBossCoreBreak", getBaseMtx());
+    mBreakModel = MR::createModelObjMapObjStrongLight("\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "TripodBossCoreBreak", getBaseMtx());
     mBreakModel->initWithoutIter();
     MR::invalidateClipping(mBreakModel);
     mBreakModel->makeActorDead();
     MR::addTripodBossPartsMovement(mBreakModel);
 
-    mBloomModel = MR::createModelObjBloomModel("ブルームモデル", "TripodBossCoreBloom", getBaseMtx());
+    mBloomModel = MR::createModelObjBloomModel("\x83\x75\x83\x8b\x81\x5b\x83\x80\x83\x82\x83\x66\x83\x8b", "TripodBossCoreBloom", getBaseMtx());
     mBloomModel->initWithoutIter();
     MR::invalidateClipping(mBloomModel);
     mBloomModel->makeActorDead();

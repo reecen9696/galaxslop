@@ -4,7 +4,7 @@
 #include "Game/Util.hpp"
 
 namespace {
-    const char* cDemoCameraName = "注目カメラ";
+    const char* cDemoCameraName = "\x92\x8d\x96\xda\x83\x4a\x83\x81\x83\x89";
     static const s32 sStepForStartCamera = 50;
     static const s32 sStepForEndCamera = 60;
 };  // namespace

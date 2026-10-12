@@ -14,7 +14,7 @@ void ShadowVolumeSphere_FORCE_MATCH_SDATA2() {
 ShadowVolumeSphere::~ShadowVolumeSphere() {
 }
 
-ShadowVolumeSphere::ShadowVolumeSphere() : ShadowVolumeModel("影描画[ボリューム球]"), mRadius(100.0f) {
+ShadowVolumeSphere::ShadowVolumeSphere() : ShadowVolumeModel("\x89\x65\x95\x60\x89\xe6[\x83\x7b\x83\x8a\x83\x85\x81\x5b\x83\x80\x8b\x85]"), mRadius(100.0f) {
     initVolumeModel("ShadowVolumeSphere");
 }
 

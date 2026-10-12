@@ -139,7 +139,7 @@ void BlackHole::initMapToolInfo(const JMapInfoIter& rIter) {
 
     if (MR::isEqualObjectName(rIter, "BlackHoleCube")) {
         initCubeBox();
-        setName("ブラックホール[キューブ指定]");
+        setName("\x83\x75\x83\x89\x83\x62\x83\x4e\x83\x7a\x81\x5b\x83\x8b[\x83\x4c\x83\x85\x81\x5b\x83\x75\x8e\x77\x92\xe8]");
     }
 
     if (_A4 == nullptr) {
@@ -164,7 +164,7 @@ void BlackHole::initMapToolInfo(const JMapInfoIter& rIter) {
 
 void BlackHole::initModel() {
     initModelManagerWithAnm("BlackHoleRange", nullptr, false);
-    mBlackHoleModel = MR::createModelObjMapObj("コアモデル", "BlackHole", getBaseMtx());
+    mBlackHoleModel = MR::createModelObjMapObj("\x83\x52\x83\x41\x83\x82\x83\x66\x83\x8b", "BlackHole", getBaseMtx());
     mBlackHoleModel->makeActorDead();
     updateModelScale(_9C, _9C);
 }

@@ -77,7 +77,7 @@ void HomeButtonMenuContext::initHomeButtonInfo() {
     mHomeButtonInfo->frameDelta = 1.0f;
 }
 
-HomeButtonLayout::HomeButtonLayout() : LayoutActor("HOMEボタン", false), mMenuContext(), _24(), _25() {
+HomeButtonLayout::HomeButtonLayout() : LayoutActor("HOME\x83\x7b\x83\x5e\x83\x93", false), mMenuContext(), _24(), _25() {
 }
 
 void HomeButtonLayout::init(const JMapInfoIter& rIter) {

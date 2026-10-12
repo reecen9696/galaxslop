@@ -276,7 +276,7 @@ void FishGroup::init(const JMapInfoIter& rIter) {
 
     mFish = new Fish*[mFishNum];
     for (int i = 0; i < mFishNum; i++) {
-        mFish[i] = new Fish("魚", this, fishType, canEscape);
+        mFish[i] = new Fish("\x8b\x9b", this, fishType, canEscape);
         mFish[i]->initWithoutIter();
     }
 

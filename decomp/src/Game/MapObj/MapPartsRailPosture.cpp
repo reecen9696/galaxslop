@@ -10,7 +10,7 @@ namespace NrvMapPartsRailPosture {
 MapPartsRailPosture::~MapPartsRailPosture() {
 }
 
-MapPartsRailPosture::MapPartsRailPosture(LiveActor* pHost) : MapPartsFunction(pHost, "姿勢制御") {
+MapPartsRailPosture::MapPartsRailPosture(LiveActor* pHost) : MapPartsFunction(pHost, "\x8e\x70\x90\xa8\x90\xa7\x8c\xe4") {
     mMovePosture = 0;
     _18.identity();
 }
@@ -60,7 +60,7 @@ void MapPartsRailPosture::exeMove() {
         TVec3f v9(0.0f, 1.0f, 0.0f);
         TVec3f v8(0.0f, 0.0f, 1.0f);
 
-        if (mMovePosture == 1 || isPostureTypeRailDirRailUseShadowGravity) {
+        if (mMovePosture == 1 || true /* original tests the member function address */) {
             v9.set(-shadowVector);
             v10.cross(v9, v11);
             MR::normalize(&v10);

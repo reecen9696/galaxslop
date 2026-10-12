@@ -37,7 +37,7 @@ namespace NrvPauseMenu {
 }  // namespace NrvPauseMenu
 
 PauseMenu::PauseMenu()
-    : LayoutActor("ポーズメニュー", true), _20(), _24(), _28(0.0f, 50.0f), _30(), mLuigiLetter(), _38(), mStageTitleOffset(0.0f, 39.0f),
+    : LayoutActor("\x83\x7c\x81\x5b\x83\x59\x83\x81\x83\x6a\x83\x85\x81\x5b", true), _20(), _24(), _28(0.0f, 50.0f), _30(), mLuigiLetter(), _38(), mStageTitleOffset(0.0f, 39.0f),
       mCoinNumPos(0.0f, 0.0f), mStarPieceNumPos(0.0f, 0.0f), _54(true) {
 }
 
@@ -172,6 +172,9 @@ void PauseMenu::draw() const {
 
 void PauseMenu::kill() {
     LayoutActor::kill();
+#ifdef TARGET_PC
+    port_vr_pause_menu(0);
+#endif
 
     if (_54) {
         MR::activateDefaultGameLayout();
@@ -193,6 +196,10 @@ void PauseMenu::control() {
     }
 
     mStageTitleOffset.y = 39.0f;
+#ifdef TARGET_PC
+    // The VR layer shows its settings panel while the buttons take input.
+    port_vr_pause_menu(isNerve(GET_NERVE(PauseMenu, PauseMenuNrvSelecting)));
+#endif
 }
 
 void PauseMenu::updateStarPane() {

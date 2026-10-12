@@ -8,7 +8,7 @@ bool Mario::doFlow() {
         return false;
     }
 
-    if (isAnimationRun("空中ひねり")) {
+    if (isAnimationRun("\x8b\xf3\x92\x86\x82\xd0\x82\xcb\x82\xe8")) {
         return false;
     }
 
@@ -21,7 +21,7 @@ bool MarioFlow::start() {
     _12 = 0;
     _14 = 0;
 
-    changeAnimationNonStop("中ダメージ");
+    changeAnimationNonStop("\x92\x86\x83\x5f\x83\x81\x81\x5b\x83\x57");
     startPadVib(2);
 
     getPlayer()->mMovementStates._1 = false;
@@ -50,7 +50,7 @@ bool MarioFlow::update() {
         _18 += mActor->_240 * mActor->getConst().getTable()->mGravityFlow;
 
         if (_12 == 20) {
-            changeAnimation("中ダメージ空中");
+            changeAnimation("\x92\x86\x83\x5f\x83\x81\x81\x5b\x83\x57\x8b\xf3\x92\x86");
         }
 
         if (_12 > 30 && mActor->isRequestRush()) {
@@ -62,10 +62,10 @@ bool MarioFlow::update() {
         if (getPlayer()->getMovementStates()._1) {
             getPlayer()->mMovementStates.jumping = false;
 
-            changeAnimation("中ダメージ着地");
+            changeAnimation("\x92\x86\x83\x5f\x83\x81\x81\x5b\x83\x57\x92\x85\x92\x6e");
 
-            playEffect("共通ダメージ着地");
-            playSound("吹っ飛び倒れ");
+            playEffect("\x8b\xa4\x92\xca\x83\x5f\x83\x81\x81\x5b\x83\x57\x92\x85\x92\x6e");
+            playSound("\x90\x81\x82\xc1\x94\xf2\x82\xd1\x93\x7c\x82\xea");
 
             MR::vecKillElement(_18, mActor->_240, &_18);
 
@@ -84,7 +84,7 @@ bool MarioFlow::update() {
             _18.y *= 0.95f;
             _18.z *= 0.95f;
 
-            if (!isAnimationRun("中ダメージ着地")) {
+            if (!isAnimationRun("\x92\x86\x83\x5f\x83\x81\x81\x5b\x83\x57\x92\x85\x92\x6e")) {
                 return false;
             }
 
@@ -103,8 +103,8 @@ bool MarioFlow::update() {
 }
 
 bool MarioFlow::close() {
-    stopAnimation("ダメージ");
-    stopAnimation("ダメージ着地", "基本");
+    stopAnimation("\x83\x5f\x83\x81\x81\x5b\x83\x57");
+    stopAnimation("\x83\x5f\x83\x81\x81\x5b\x83\x57\x92\x85\x92\x6e", "\x8a\xee\x96\x7b");
 
     return true;
 }

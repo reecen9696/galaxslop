@@ -79,8 +79,8 @@ void TalkStateShort::clos() {
 
 TalkStateEvent::TalkStateEvent() {
     _18 = nullptr;
-    _14 = nullptr;
-    _10 = nullptr;
+    _14 = 0;
+    _10 = 0;
     _1D = true;
 }
 
@@ -128,7 +128,7 @@ bool TalkStateEvent::talk(const TalkMessageCtrl* pArg1) {
 
     bool unknownBool = false;
 
-    if (_1C != nullptr) {
+    if (_1C != 0) {
         _1C = MR::testCorePadButtonA(0);
     } else if (MR::testCorePadButtonA(0) && !MR::testCorePadTriggerA(0)) {
         _1C = true;
@@ -288,7 +288,7 @@ TalkStateHolder::TalkStateHolder() {
     mAButton = new IconAButton(true, false);
     mAButton->initWithoutIter();
 
-    mBalloonShort = new TalkBalloonShort("会話吹き出し[合成会話]");
+    mBalloonShort = new TalkBalloonShort("\x89\xef\x98\x62\x90\x81\x82\xab\x8f\x6f\x82\xb5[\x8d\x87\x90\xac\x89\xef\x98\x62]");
     mBalloonShort->initWithoutIter();
     mBalloonShort->initInterval();
     mBalloonShort->kill();

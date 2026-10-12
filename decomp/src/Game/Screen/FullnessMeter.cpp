@@ -12,12 +12,12 @@ namespace NrvFullnessMeter {
     NEW_NERVE(FullnessMeterNrvEnd, FullnessMeter, End);
 };  // namespace NrvFullnessMeter
 
-FullnessMeter::FullnessMeter(LiveActor* pHost, s32 a2, s32 a3) : LayoutActor("満腹計", true), _20(a3), _24(a2), mHost(pHost) {
+FullnessMeter::FullnessMeter(LiveActor* pHost, s32 a2, s32 a3) : LayoutActor("\x96\x9e\x95\xa0\x8c\x76", true), _20(a3), _24(a2), mHost(pHost) {
     MR::connectToSceneTalkLayout(this);
     initLayoutManager("StarPieceTargetMeter", 1);
     MR::createAndAddPaneCtrl(this, "TargetMeter", 1);
     MR::createAndAddPaneCtrl(this, "PicFrameShine", 1);
-    mTargetCounter = MR::createSimpleLayoutTalkParts("満腹カウンター", "StarPieceTargetCounter", 1);
+    mTargetCounter = MR::createSimpleLayoutTalkParts("\x96\x9e\x95\xa0\x83\x4a\x83\x45\x83\x93\x83\x5e\x81\x5b", "StarPieceTargetCounter", 1);
     MR::setTextBoxNumberRecursive(mTargetCounter, "NumberMax", _24);
     setNumber(a3);
     initNerve(GET_NERVE(FullnessMeter, FullnessMeterNrvAppear));

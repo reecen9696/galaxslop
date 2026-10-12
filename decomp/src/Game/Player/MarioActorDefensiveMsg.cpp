@@ -146,7 +146,7 @@ bool MarioActor::tryAttackMsg(u32 msg, const HitSensor* pSensor, bool* pHandled)
     switch (msg) {
     case ACTMES_ENEMY_ATTACK_FLIP_VERYWEAK:
         if (getMovementStates()._1 && !isAnimationRun(nullptr)) {
-            changeAnimation("ノーダメージ");
+            changeAnimation("\x83\x6d\x81\x5b\x83\x5f\x83\x81\x81\x5b\x83\x57");
         }
 
         return true;
@@ -310,7 +310,7 @@ bool MarioActor::receiveMsgPush(HitSensor* pSender, HitSensor* pReceiver) {
             return false;
         }
 
-        if (strstr(pSender->mHost->mName, "ゴーストマリオ") != nullptr && (isJumping() || mMario->isHanging())) {
+        if (strstr(pSender->mHost->mName, "\x83\x53\x81\x5b\x83\x58\x83\x67\x83\x7d\x83\x8a\x83\x49") != nullptr && (isJumping() || mMario->isHanging())) {
             return false;
         }
 
@@ -436,7 +436,7 @@ bool MarioActor::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pReceiv
             stopAnimation(nullptr);
             mMario->mMovementStates._9 = false;
             mMario->mMovementStates._6 = false;
-            playSound("声壁反射", -1);
+            playSound("\x90\xba\x95\xc7\x94\xbd\x8e\xcb", -1);
             return true;
         }
 
@@ -468,7 +468,7 @@ bool MarioActor::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pReceiv
         doTrampleJump(pSender);
         mMario->startPadVib(3);
         mMario->mJumpVec -= mMario->mFrontVec * 10.0f;
-        changeAnimation("飛びすさりジャンプ");
+        changeAnimation("\x94\xf2\x82\xd1\x82\xb7\x82\xb3\x82\xe8\x83\x57\x83\x83\x83\x93\x83\x76");
         break;
     case ACTMES_REFLECT: {
         TVec3f normal;
@@ -482,8 +482,8 @@ bool MarioActor::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pReceiv
     }
 
     case ACTMES_KICK:
-        playSound("声ランニングキック", -1);
-        changeAnimation("ランニングキック");
+        playSound("\x90\xba\x83\x89\x83\x93\x83\x6a\x83\x93\x83\x4f\x83\x4c\x83\x62\x83\x4e", -1);
+        changeAnimation("\x83\x89\x83\x93\x83\x6a\x83\x93\x83\x4f\x83\x4c\x83\x62\x83\x4e");
         return true;
     case ACTMES_PASS_RING:
         if (mMario->_97C == nullptr) {
@@ -501,8 +501,8 @@ bool MarioActor::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pReceiv
 
         bool flowing = mMario->doFlow();
         if (flowing) {
-            playSound("水弾かれ", -1);
-            playSound("声噴水ジャンプ", -1);
+            playSound("\x90\x85\x92\x65\x82\xa9\x82\xea", -1);
+            playSound("\x90\xba\x95\xac\x90\x85\x83\x57\x83\x83\x83\x93\x83\x76", -1);
         }
 
         return flowing;
@@ -528,7 +528,7 @@ bool MarioActor::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pReceiv
 
         if (!mPlayerMode || mPlayerMode == PlayerMode_Invincible) {
             _B94 = 2;
-            changeAnimationUpper("ハンマー投げ回転中");
+            changeAnimationUpper("\x83\x6e\x83\x93\x83\x7d\x81\x5b\x93\x8a\x82\xb0\x89\xf1\x93\x5d\x92\x86");
             return true;
         }
 

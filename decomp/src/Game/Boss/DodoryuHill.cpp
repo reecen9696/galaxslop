@@ -18,7 +18,7 @@ namespace {
     };
 };  // namespace
 
-DodoryuHill::DodoryuHill(Dodoryu* pHost) : MogucchiHill(pHost, 50, "ドドリュウ塚"), mHost(pHost) {
+DodoryuHill::DodoryuHill(Dodoryu* pHost) : MogucchiHill(pHost, 50, "\x83\x68\x83\x68\x83\x8a\x83\x85\x83\x45\x92\xcb"), mHost(pHost) {
     setHillTable(this, ::sDodoryuHillModel, 3);
     const char* pJoint = "MogucchiHill";
     const char* pEffect = "DodoryuHill";

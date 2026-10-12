@@ -620,7 +620,7 @@ namespace MarioAccess {
             return getPlayerActor()->getMario()->mSwim->isOnWaterSurface();
         }
 
-        return getPlayerActor()->isAnimationRun("水泳ジェット");
+        return getPlayerActor()->isAnimationRun("\x90\x85\x89\x6a\x83\x57\x83\x46\x83\x62\x83\x67");
     }
 
     void calcWorldPadDir(TVec3f* pOut, f32 f1, f32 f2) {
@@ -648,7 +648,7 @@ namespace MarioAccess {
             getPlayerActor()->getMario()->mSwim->incOxygen();
         }
 
-        getPlayerActor()->playEffect("酸素回復");
+        getPlayerActor()->playEffect("\x8e\x5f\x91\x66\x89\xf1\x95\x9c");
     }
 
     void scatterStarPiece(u32 amt) {
@@ -673,7 +673,7 @@ namespace MarioAccess {
             return;
         }
 
-        if (getPlayerActor()->isAnimationRun("氷結")) {
+        if (getPlayerActor()->isAnimationRun("\x95\x58\x8c\x8b")) {
             return;
         }
 
@@ -728,7 +728,7 @@ namespace MarioAccess {
             return true;
         }
 
-        return getPlayerActor()->isAnimationRun("水泳ジェット");
+        return getPlayerActor()->isAnimationRun("\x90\x85\x89\x6a\x83\x57\x83\x46\x83\x62\x83\x67");
     }
 
     void changeItemStatus(s32 a1) {

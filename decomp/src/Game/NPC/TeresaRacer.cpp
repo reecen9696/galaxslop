@@ -74,7 +74,7 @@ void TeresaRacer::init(const JMapInfoIter& rIter) {
 
         MR::setDistanceToTalk(getMsgCtrl(), 500.0f);
         RaceManagerFunction::entryRacerOthers(this);
-        MR::initMultiActorCamera(this, rIter, &mCameraInfo, "会話");  // conversation
+        MR::initMultiActorCamera(this, rIter, &mCameraInfo, "\x89\xef\x98\x62");  // conversation
 
         mParam.setMoveAction("WaitOpen", "WaitOpen");
         mParam.setTalkAction("WaitOpenTalk", "WaitOpenTalk");
@@ -146,7 +146,7 @@ bool TeresaRacer::eventFunc(u32 state) {
 void TeresaRacer::exeWait() {
     if (MR::tryTalkNearPlayerAndStartTalkAction(this)) {
         if (mRacerId == -1) {
-            MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "会話", -1);
+            MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "\x89\xef\x98\x62", -1);
         }
         setNerve(GET_NERVE(TeresaRacer, TeresaRacerNrvPre));
     }
@@ -163,7 +163,7 @@ void TeresaRacer::exePre() {
             setNerve(GET_NERVE(TeresaRacer, TeresaRacerNrvReady));
         } else {
             if (mRacerId == -1) {
-                MR::endMultiActorCamera(this, mCameraInfo, "会話", false, -1);
+                MR::endMultiActorCamera(this, mCameraInfo, "\x89\xef\x98\x62", false, -1);
             }
             setNerve(GET_NERVE(TeresaRacer, TeresaRacerNrvWait));
         }
@@ -175,7 +175,7 @@ void TeresaRacer::exeReady() {
 
 void TeresaRacer::exePost() {
     if (!MR::isActionContinuous(this) && MR::tryTalkForceAtEndAndStartTalkAction(this)) {
-        MR::endMultiActorCamera(this, mCameraInfo, "会話", true, -1);
+        MR::endMultiActorCamera(this, mCameraInfo, "\x89\xef\x98\x62", true, -1);
         if (RaceManagerFunction::getRaceRank() == 1) {
             setNerve(GET_NERVE(TeresaRacer, TeresaRacerNrvTalk));
         } else {
@@ -288,13 +288,13 @@ void TeresaRacer::resetRacer(const RaceManager* pRaceManager) {
     if (pRaceManager->mCurrentRace == RaceID_TeresaPhantom) {
         MR::setDefaultPose(this);
     } else {
-        MR::setNPCActorPos(this, "レース終了後位置テレサ");
+        MR::setNPCActorPos(this, "\x83\x8c\x81\x5b\x83\x58\x8f\x49\x97\xb9\x8c\xe3\x88\xca\x92\x75\x83\x65\x83\x8c\x83\x54");
         setInitPose();
     }
 
     turnToPlayer(180.0f);
     setNerve(GET_NERVE(TeresaRacer, TeresaRacerNrvPost));
-    MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "会話", -1);
+    MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "\x89\xef\x98\x62", -1);
     mParam._0 = true;
     mParam._1 = true;
 }

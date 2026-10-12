@@ -135,7 +135,7 @@ void StarPieceGroup::init(const JMapInfoIter& rIter) {
     MR::declareStarPiece(this, mNumPieces);
 
     for (u32 i = 0; i < mNumPieces; i++) {
-        mPieces[i] = new StarPiece("グループスターピース");
+        mPieces[i] = new StarPiece("\x83\x4f\x83\x8b\x81\x5b\x83\x76\x83\x58\x83\x5e\x81\x5b\x83\x73\x81\x5b\x83\x58");
         if (isFlow) {
             mPieces[i]->initAndSetRailMoveFromGroup(rIter);
         } else {

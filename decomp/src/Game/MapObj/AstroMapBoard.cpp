@@ -28,8 +28,8 @@ void AstroMapBoard::init(const JMapInfoIter& rIter) {
     info.setupNoAppearRiddleSE();
     initialize(rIter, info);
     AstroDemoFunction::tryRegisterGrandStarReturnAndSimpleCast(this, rIter);
-    AstroDemoFunction::tryRegisterDemo(this, "ロゼッタトーチの炎説明デモ", rIter);
-    AstroDemoFunction::tryRegisterDemo(this, "ロゼッタトーチの炎進捗デモ", rIter);
+    AstroDemoFunction::tryRegisterDemo(this, "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x83\x67\x81\x5b\x83\x60\x82\xcc\x89\x8a\x90\xe0\x96\xbe\x83\x66\x83\x82", rIter);
+    AstroDemoFunction::tryRegisterDemo(this, "\x83\x8d\x83\x5b\x83\x62\x83\x5e\x83\x67\x81\x5b\x83\x60\x82\xcc\x89\x8a\x90\x69\x92\xbb\x83\x66\x83\x82", rIter);
 
     if (MR::isButlerMapAppear()) {
         makeActorAppeared();

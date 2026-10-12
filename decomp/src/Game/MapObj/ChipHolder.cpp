@@ -115,10 +115,10 @@ void ChipHolder::init(const JMapInfoIter& rIter) {
 
     switch (mChipType) {
     case ChipBase::Type_Blue:
-        mChipCounter = new ChipCounter("ブルーチップカウンター", mChipType);
+        mChipCounter = new ChipCounter("\x83\x75\x83\x8b\x81\x5b\x83\x60\x83\x62\x83\x76\x83\x4a\x83\x45\x83\x93\x83\x5e\x81\x5b", mChipType);
         break;
     case ChipBase::Type_Yellow:
-        mChipCounter = new ChipCounter("イエローチップカウンター", mChipType);
+        mChipCounter = new ChipCounter("\x83\x43\x83\x47\x83\x8d\x81\x5b\x83\x60\x83\x62\x83\x76\x83\x4a\x83\x45\x83\x93\x83\x5e\x81\x5b", mChipType);
         break;
     }
 

@@ -268,14 +268,14 @@ void StaffRoll::init(const JMapInfoIter& rIter) {
     mLine = new StaffRollLine*[LINE_NUM];
 
     for (s32 i = 0; i < LINE_NUM; i++) {
-        mLine[i] = new StaffRollLine("スタッフロール一行");
+        mLine[i] = new StaffRollLine("\x83\x58\x83\x5e\x83\x62\x83\x74\x83\x8d\x81\x5b\x83\x8b\x88\xea\x8d\x73");
         mLine[i]->initWithoutIter();
     }
 
     mMsg = MR::getGameMessageDirect(::cStaffRollMsgId);
     mMsgLineNum = MR::countMessageLine(mMsg);
 
-    mPicture = new StaffRollPicture("スタッフロール写真");
+    mPicture = new StaffRollPicture("\x83\x58\x83\x5e\x83\x62\x83\x74\x83\x8d\x81\x5b\x83\x8b\x8e\xca\x90\x5e");
     mPicture->initWithoutIter();
 
     initNerve(GET_NERVE(StaffRoll, StaffRollNrvPrepareDemo));

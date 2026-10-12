@@ -77,7 +77,7 @@ bool PowerStarEventKeeper::isGreen(const char* pName, s32 starID) const {
         starID = findStarID(pName);
     }
 
-    if (!isCorrectStarIdWithBBS(pName, "ゾーン不明", starID)) {
+    if (!isCorrectStarIdWithBBS(pName, "\x83\x5d\x81\x5b\x83\x93\x95\x73\x96\xbe", starID)) {
         return false;
     }
 
@@ -89,7 +89,7 @@ bool PowerStarEventKeeper::isRed(const char* pName, s32 starID) const {
         starID = findStarID(pName);
     }
 
-    if (!isCorrectStarIdWithBBS(pName, "ゾーン不明", starID)) {
+    if (!isCorrectStarIdWithBBS(pName, "\x83\x5d\x81\x5b\x83\x93\x95\x73\x96\xbe", starID)) {
         return false;
     }
 
@@ -101,7 +101,7 @@ bool PowerStarEventKeeper::isGrand(const char* pName, s32 starID) const {
         starID = findStarID(pName);
     }
 
-    if (!isCorrectStarIdWithBBS(pName, "ゾーン不明", starID)) {
+    if (!isCorrectStarIdWithBBS(pName, "\x83\x5d\x81\x5b\x83\x93\x95\x73\x96\xbe", starID)) {
         return false;
     }
 
@@ -169,7 +169,7 @@ bool PowerStarEventKeeper::isSuccess(const char* pName, s32 starNum) const {
         starNum = findStarID(pName);
     }
 
-    if (!isCorrectStarIdWithBBS(pName, "ゾーン不明", starNum)) {
+    if (!isCorrectStarIdWithBBS(pName, "\x83\x5d\x81\x5b\x83\x93\x95\x73\x96\xbe", starNum)) {
         return false;
     }
 

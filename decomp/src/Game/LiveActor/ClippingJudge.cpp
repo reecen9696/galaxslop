@@ -52,6 +52,22 @@ void ClippingJudge::calcViewingVolume(THex3f* pVolume, f32 farClip) {
     cameraMtx.setPositionFromLookAt(MR::getCameraViewMtx());
     f32 height = nearClip * static_cast< f32 >(tan(fovy * (JGeometry::TUtil< f32 >::PI() / 360.0f)));
     f32 width = aspect * height;
+#ifdef TARGET_PC
+    {
+        // In VR, cull against what the headset actually sees.
+        float vrMtx[12], tanX, tanY;
+        if (port_vr_cull_view(vrMtx, &tanX, &tanY)) {
+            nearClip = 20.0f;
+            for (int r = 0; r < 3; r++) {
+                for (int c = 0; c < 4; c++) {
+                    cameraMtx.mMtx[r][c] = vrMtx[r * 4 + c];
+                }
+            }
+            width = nearClip * tanX;
+            height = nearClip * tanY;
+        }
+    }
+#endif
 
     TVec3f front;
     cameraMtx.getZDir(front);

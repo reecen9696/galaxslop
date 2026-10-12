@@ -135,7 +135,7 @@ void CoinHolder::init(const JMapInfoIter& rIter) {
     Coin* pCoin;
 
     for (int i = 0; i < ::sCreateCoinNum; i++) {
-        pCoin = new Coin("コイン(共用)");
+        pCoin = new Coin("\x83\x52\x83\x43\x83\x93(\x8b\xa4\x97\x70)");
         pCoin->initWithoutIter();
         registerActor(pCoin);
     }

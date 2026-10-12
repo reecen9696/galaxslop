@@ -28,19 +28,19 @@ extern "C" {
 #define XF_COLOR0CNTRL_LIGHT7_SHIFT 14
 #define XF_COLOR0CNTRL_F(material_src, lightfunc, light0, light1, light2, light3, ambient_src, diffuseatten, attenenable, attenselect, light4,       \
                          light5, light6, light7)                                                                                                     \
-    ((((unsigned long)(material_src)) << XF_COLOR0CNTRL_MATERIAL_SRC_SHIFT) | (((unsigned long)(lightfunc)) << XF_COLOR0CNTRL_LIGHTFUNC_SHIFT) |     \
-     (((unsigned long)(light0)) << XF_COLOR0CNTRL_LIGHT0_SHIFT) | (((unsigned long)(light1)) << XF_COLOR0CNTRL_LIGHT1_SHIFT) |                       \
-     (((unsigned long)(light2)) << XF_COLOR0CNTRL_LIGHT2_SHIFT) | (((unsigned long)(light3)) << XF_COLOR0CNTRL_LIGHT3_SHIFT) |                       \
-     (((unsigned long)(ambient_src)) << XF_COLOR0CNTRL_AMBIENT_SRC_SHIFT) | (((unsigned long)(diffuseatten)) << XF_COLOR0CNTRL_DIFFUSEATTEN_SHIFT) | \
-     (((unsigned long)(attenenable)) << XF_COLOR0CNTRL_ATTENENABLE_SHIFT) | (((unsigned long)(attenselect)) << XF_COLOR0CNTRL_ATTENSELECT_SHIFT) |   \
-     (((unsigned long)(light4)) << XF_COLOR0CNTRL_LIGHT4_SHIFT) | (((unsigned long)(light5)) << XF_COLOR0CNTRL_LIGHT5_SHIFT) |                       \
-     (((unsigned long)(light6)) << XF_COLOR0CNTRL_LIGHT6_SHIFT) | (((unsigned long)(light7)) << XF_COLOR0CNTRL_LIGHT7_SHIFT))
+    ((((unsigned int)(material_src)) << XF_COLOR0CNTRL_MATERIAL_SRC_SHIFT) | (((unsigned int)(lightfunc)) << XF_COLOR0CNTRL_LIGHTFUNC_SHIFT) |     \
+     (((unsigned int)(light0)) << XF_COLOR0CNTRL_LIGHT0_SHIFT) | (((unsigned int)(light1)) << XF_COLOR0CNTRL_LIGHT1_SHIFT) |                       \
+     (((unsigned int)(light2)) << XF_COLOR0CNTRL_LIGHT2_SHIFT) | (((unsigned int)(light3)) << XF_COLOR0CNTRL_LIGHT3_SHIFT) |                       \
+     (((unsigned int)(ambient_src)) << XF_COLOR0CNTRL_AMBIENT_SRC_SHIFT) | (((unsigned int)(diffuseatten)) << XF_COLOR0CNTRL_DIFFUSEATTEN_SHIFT) | \
+     (((unsigned int)(attenenable)) << XF_COLOR0CNTRL_ATTENENABLE_SHIFT) | (((unsigned int)(attenselect)) << XF_COLOR0CNTRL_ATTENSELECT_SHIFT) |   \
+     (((unsigned int)(light4)) << XF_COLOR0CNTRL_LIGHT4_SHIFT) | (((unsigned int)(light5)) << XF_COLOR0CNTRL_LIGHT5_SHIFT) |                       \
+     (((unsigned int)(light6)) << XF_COLOR0CNTRL_LIGHT6_SHIFT) | (((unsigned int)(light7)) << XF_COLOR0CNTRL_LIGHT7_SHIFT))
 
 #define XF_COLOR0CNTRL_F_PS(material_src, lightfunc, light3210, ambient_src, diffuseatten, attenenable, attenselect, light7654)                      \
-    ((((unsigned long)(material_src)) << XF_COLOR0CNTRL_MATERIAL_SRC_SHIFT) | (((unsigned long)(lightfunc)) << XF_COLOR0CNTRL_LIGHTFUNC_SHIFT) |     \
-     (((unsigned long)(light3210)) << XF_COLOR0CNTRL_LIGHT0_SHIFT) | (((unsigned long)(ambient_src)) << XF_COLOR0CNTRL_AMBIENT_SRC_SHIFT) |          \
-     (((unsigned long)(diffuseatten)) << XF_COLOR0CNTRL_DIFFUSEATTEN_SHIFT) | (((unsigned long)(attenenable)) << XF_COLOR0CNTRL_ATTENENABLE_SHIFT) | \
-     (((unsigned long)(attenselect)) << XF_COLOR0CNTRL_ATTENSELECT_SHIFT) | (((unsigned long)(light7654)) << XF_COLOR0CNTRL_LIGHT4_SHIFT))
+    ((((unsigned int)(material_src)) << XF_COLOR0CNTRL_MATERIAL_SRC_SHIFT) | (((unsigned int)(lightfunc)) << XF_COLOR0CNTRL_LIGHTFUNC_SHIFT) |     \
+     (((unsigned int)(light3210)) << XF_COLOR0CNTRL_LIGHT0_SHIFT) | (((unsigned int)(ambient_src)) << XF_COLOR0CNTRL_AMBIENT_SRC_SHIFT) |          \
+     (((unsigned int)(diffuseatten)) << XF_COLOR0CNTRL_DIFFUSEATTEN_SHIFT) | (((unsigned int)(attenenable)) << XF_COLOR0CNTRL_ATTENENABLE_SHIFT) | \
+     (((unsigned int)(attenselect)) << XF_COLOR0CNTRL_ATTENSELECT_SHIFT) | (((unsigned int)(light7654)) << XF_COLOR0CNTRL_LIGHT4_SHIFT))
 
 inline static u16 __GDLightID2Index(GXLightID id) {
     u16 idx;

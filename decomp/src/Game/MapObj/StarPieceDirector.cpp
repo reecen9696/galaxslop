@@ -34,7 +34,7 @@ void MR::createStarPiece() {
     }
 
     for (int i = 0; i < max; i++) {
-        StarPiece* starPiece = new StarPiece("スターピースディレクターピース");
+        StarPiece* starPiece = new StarPiece("\x83\x58\x83\x5e\x81\x5b\x83\x73\x81\x5b\x83\x58\x83\x66\x83\x42\x83\x8c\x83\x4e\x83\x5e\x81\x5b\x83\x73\x81\x5b\x83\x58");
         starPiece->initWithoutIter();
         starPiece->makeActorDead();
         getStarPieceDirector()->registerActor(starPiece);
@@ -76,7 +76,7 @@ StarPieceDirector::StarPieceDirector(const char* pName)
     MR::connectToSceneMapObjMovement(this);
 
     for (int i = 0; i < ARRAY_SIZE(mStarPieceShooters); i++) {
-        mStarPieceShooters[i] = new StarPieceShooter(i, "発射用アクター");
+        mStarPieceShooters[i] = new StarPieceShooter(i, "\x94\xad\x8e\xcb\x97\x70\x83\x41\x83\x4e\x83\x5e\x81\x5b");
         mStarPieceShooters[i]->initWithoutIter();
     }
 
@@ -308,6 +308,15 @@ StarPiece* StarPieceDirector::getDeadStarPiece() {
 }
 
 TVec3f StarPieceDirector::calcPosCameraShoot(s32 addOrSubXDir) {
+#ifdef TARGET_PC
+    // VR: star bits leave from the pointing controller (just ahead of it,
+    // on its laser) rather than from beside the game camera, which is
+    // somewhere behind the player's head in the diorama.
+    f32 o[3], d[3];
+    if (addOrSubXDir == WPAD_CHAN0 && port_vr_pointer_ray(o, d)) {
+        return TVec3f(o[0] + d[0] * 40.0f, o[1] + d[1] * 40.0f, o[2] + d[2] * 40.0f);
+    }
+#endif
     TVec3f returnVec(MR::getCamPos());
     TVec3f camXDir(MR::getCamXdir());
     TVec3f camYDir(MR::getCamYdir());
@@ -439,12 +448,21 @@ bool StarPieceShooter::shoot() {
     TVec3f position = mPosition;
     TVec3f vec;
     TVec3f posCameraShoot = MR::getStarPieceDirector()->calcPosCameraShoot(_A0);
-    TVec3f negCameraPos = -MR::getCamPos();
+#ifdef TARGET_PC
+    // In VR the shot leaves from the controller: what may be in its way is
+    // seen from there.
+    f32 vrOrigin[3], vrDir[3];
+    bool vrShot = _A0 == WPAD_CHAN0 && port_vr_pointer_ray(vrOrigin, vrDir);
+    TVec3f shootFrom(vrShot ? posCameraShoot : MR::getCamPos());
+#else
+    TVec3f shootFrom(MR::getCamPos());
+#endif
+    TVec3f negCameraPos = -shootFrom;
 
     if (pSensor != nullptr) {
         negCameraPos.add(pSensor->mPosition);
 
-        if (MR::getFirstPolyOnLineToMap(&vec, nullptr, MR::getCamPos(), negCameraPos) && vec.squared(MR::getCamPos()) < negCameraPos.squared()) {
+        if (MR::getFirstPolyOnLineToMap(&vec, nullptr, shootFrom, negCameraPos) && vec.squared(shootFrom) < negCameraPos.squared()) {
             deadStarPiece->throwToTargetCore(vec, posCameraShoot, mGravity, _8C, true);
         } else {
             deadStarPiece->throwToTarget(pSensor, posCameraShoot, mGravity, _8C);
@@ -452,12 +470,15 @@ bool StarPieceShooter::shoot() {
     } else {
         negCameraPos.add(position);
 
-        if (MR::getFirstPolyOnLineToMap(&vec, nullptr, MR::getCamPos(), negCameraPos) && vec.squared(MR::getCamPos()) < negCameraPos.squared()) {
+        if (MR::getFirstPolyOnLineToMap(&vec, nullptr, shootFrom, negCameraPos) && vec.squared(shootFrom) < negCameraPos.squared()) {
             deadStarPiece->throwToTargetCore(vec, posCameraShoot, mGravity, _8C, true);
         } else {
             deadStarPiece->throwToTargetCore(position, posCameraShoot, mGravity, _8C, true);
         }
     }
+#ifdef TARGET_PC
+    deadStarPiece->mThrownFromVr = vrShot;
+#endif
 
     return true;
 }
@@ -548,6 +569,13 @@ void StarPieceShooter::calcShootGoalUsingPointingDepth() {
     f32 dirsquared = dir.squared();
     f32 new_8C = 400.0f;
 
+#ifdef TARGET_PC
+    TVec3f aimEnd;
+    if (MR::calcVrPointerAimEnd(&aimEnd, nullptr, _A0)) {
+        // VR: star bits fly to the end of the controller's laser, near or far.
+        starPointerWorldPos.set(aimEnd);
+    } else
+#endif
     if (16000000.0f < dirsquared) {
         TVec3f camPos(MR::getCamPos());
         TVec3f dirToPlayer(playerPos);

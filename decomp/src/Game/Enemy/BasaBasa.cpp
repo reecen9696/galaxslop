@@ -425,7 +425,7 @@ void BasaBasa::exeDPDSwoon() {
 
     MR::startDPDFreezeLevelSound(this);
 
-    if (!MR::isStarPointerPointing2POnPressButton(this, "弱", 1, 0)) {
+    if (!MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", 1, 0)) {
         setNerve(GET_NERVE(BasaBasa, BasaBasaNrvAirWait));
     }
 }
@@ -651,7 +651,7 @@ bool BasaBasa::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pReceiver
 
 void BasaBasa::initHangModel() {
     const char* modelName = mIsIceModel ? "BasaBasaIceHang" : "BasaBasaHang";
-    mHangModel = MR::createModelObjEnemy("ぶら下がりモデル", modelName, MR::getJointMtx(this, "JointRoot"));
+    mHangModel = MR::createModelObjEnemy("\x82\xd4\x82\xe7\x89\xba\x82\xaa\x82\xe8\x83\x82\x83\x66\x83\x8b", modelName, MR::getJointMtx(this, "JointRoot"));
     mHangModel->initWithoutIter();
     mHangModel->kill();
 }
@@ -689,7 +689,7 @@ bool BasaBasa::tryClippingAndResetPos() {
 }
 
 bool BasaBasa::trySetNerveDPDSwoon() {
-    if (!MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (!MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         return false;
     }
 

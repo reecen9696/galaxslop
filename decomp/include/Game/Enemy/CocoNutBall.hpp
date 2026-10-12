@@ -4,7 +4,7 @@
 
 class CocoNutBall : public LiveActor {
 public:
-    CocoNutBall(const char* pName = "ヤシの実弾");
+    CocoNutBall(const char* pName = "\x83\x84\x83\x56\x82\xcc\x8e\xc0\x92\x65");
 
     virtual void init(const JMapInfoIter& rIter);
     virtual void appear();

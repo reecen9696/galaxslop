@@ -9,6 +9,13 @@ namespace nw4r {
                 rpPtr = reinterpret_cast< T* >(static_cast< char* >(pBase) + reinterpret_cast< s32 >(rpPtr));
             }
 
+#ifndef __MWERKS__
+            template < typename T >
+            inline void ResolveOffset(Ptr32< T >& rpPtr, void* pBase) {
+                rpPtr = reinterpret_cast< T* >(static_cast< char* >(pBase) + static_cast< s32 >(rpPtr.v));
+            }
+#endif
+
         }  // namespace
 
         ResFont::ResFont() {

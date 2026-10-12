@@ -205,7 +205,7 @@ void Onimasu::calcAndSetBaseMtx() {
 
 void Onimasu::land() {
     emitEffectLand();
-    MR::startRumbleWithShakeCameraNormalWeak(this, "中", "弱", ::sCamShakeDistanceStrong, ::sCamShakeDistanceWeak);
+    MR::startRumbleWithShakeCameraNormalWeak(this, "\x92\x86", "\x8e\xe3", ::sCamShakeDistanceStrong, ::sCamShakeDistanceWeak);
 
     TVec3f railPointPos;
     MR::calcRailPointPos(&railPointPos, this, getNextPointNo());

@@ -359,7 +359,7 @@ void Petari::exeFreeze() {
 
     MR::startDPDFreezeLevelSound(this);
 
-    if (!MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (!MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         setNerve(GET_NERVE_ANON(PetariNrvWait));
     }
 }
@@ -457,7 +457,7 @@ bool Petari::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pReceiver) 
 }
 
 void Petari::initFootPrint(const JMapInfoIter& rIter) {
-    mFootPrint = new FootPrint("ペタリの足跡", 32);
+    mFootPrint = new FootPrint("\x83\x79\x83\x5e\x83\x8a\x82\xcc\x91\xab\x90\xd5", 32);
 
     ResTIMG* texture = MR::getTexFromArc("Footprint.bti", this);
     mFootPrint->setTexture(texture);
@@ -749,7 +749,7 @@ void Petari::appearStarPieceAll() {
 }
 
 bool Petari::reflectStarPointer2P() {
-    if (!MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (!MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         return false;
     }
 

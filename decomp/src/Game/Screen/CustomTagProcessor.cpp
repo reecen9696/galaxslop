@@ -386,7 +386,12 @@ void CustomTagProcessor::setArgString(const wchar_t* string, s32 index) {
             break;
         }
 
+#ifdef __MWERKS__
         *reinterpret_cast< const wchar_t** >(tag.getParamPtr(0)) = string;
+#else
+        // The tag reserves 4 bytes for the pointer; game addresses fit in 32 bits.
+        *reinterpret_cast< u32* >(tag.getParamPtr(0)) = static_cast< u32 >(reinterpret_cast< uintptr_t >(string));
+#endif
     }
 }
 
@@ -594,11 +599,20 @@ CustomTagProcessor::Operation CustomTagProcessor::exeNumberGroup(nw4r::ut::Rect*
 }
 
 CustomTagProcessor::Operation CustomTagProcessor::exeStringGroup(nw4r::ut::Rect* rect, const MessageEditorMessageTag& tag, ContextType* context) {
+#ifdef __MWERKS__
     if (!*reinterpret_cast< const u8* >(tag.getParamPtr(0))) {
         return OPERATION_DEFAULT;
     }
 
     writeString(rect, *reinterpret_cast< const wchar_t** >(tag.getParamPtr(0)), context);
+#else
+    u32 stringAddr = *reinterpret_cast< const u32* >(tag.getParamPtr(0));
+    if (stringAddr == 0) {
+        return OPERATION_DEFAULT;
+    }
+
+    writeString(rect, reinterpret_cast< const wchar_t* >(static_cast< uintptr_t >(stringAddr)), context);
+#endif
     return OPERATION_DEFAULT;
 }
 

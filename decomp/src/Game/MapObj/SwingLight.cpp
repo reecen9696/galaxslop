@@ -64,7 +64,7 @@ void LightCylinder::initLightCylinderByOwner(const JMapInfoIter& rIter) {
 void LightCylinder::initLightVolume(const char* pName) {
     char modelName[0x100];
     snprintf(modelName, sizeof(modelName), "%sLightVolume", pName ? pName : mObjectName);
-    VolumeModelDrawer* lightVolume = new VolumeModelDrawer("光", modelName, mHostMtx ? mHostMtx : getBaseMtx());
+    VolumeModelDrawer* lightVolume = new VolumeModelDrawer("\x8c\xf5", modelName, mHostMtx ? mHostMtx : getBaseMtx());
     mLightVolume = lightVolume;
     lightVolume->mColor.set(mColor);
 }

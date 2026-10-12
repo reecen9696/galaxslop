@@ -13,7 +13,7 @@ ActorAnimKeeper::ActorAnimKeeper(LiveActor* pActor) : mActor(pActor), mNumInfo(0
     if (!initAnimData()) {
         return;
     }
-    start("デフォルト");
+    start("\x83\x66\x83\x74\x83\x48\x83\x8b\x83\x67");
 }
 
 ActorAnimKeeper* ActorAnimKeeper::tryCreate(LiveActor* pActor) {

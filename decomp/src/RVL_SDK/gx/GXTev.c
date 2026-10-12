@@ -278,8 +278,26 @@ static tev_alpha_env_t TEVAOpTableST1[] =
     },
 };
 
+#ifdef TARGET_PC
+/* The preset tables are bitfield structs that CodeWarrior allocates from the
+ * most significant bit; build the register words explicitly. */
+static u32 PackTevColorEnv(const tev_color_env_t* e) {
+    return ((u32)e->rid << 24) | ((u32)e->dest << 22) | ((u32)e->shift << 20) | ((u32)e->clamp << 19) | ((u32)e->sub << 18) |
+           ((u32)e->bias << 16) | ((u32)e->sela << 12) | ((u32)e->selb << 8) | ((u32)e->selc << 4) | (u32)e->seld;
+}
+
+static u32 PackTevAlphaEnv(const tev_alpha_env_t* e) {
+    return ((u32)e->rid << 24) | ((u32)e->dest << 22) | ((u32)e->shift << 20) | ((u32)e->clamp << 19) | ((u32)e->sub << 18) |
+           ((u32)e->bias << 16) | ((u32)e->sela << 13) | ((u32)e->selb << 10) | ((u32)e->selc << 7) | ((u32)e->seld << 4) |
+           ((u32)e->swap << 2) | (u32)e->mode;
+}
+#endif
+
 void GXSetTevOp(GXTevStageID id, GXTevMode mode) {
     u32 *ctmp, *atmp, tevReg;
+#ifdef TARGET_PC
+    u32 cword, aword;
+#endif
 
     if (id == GX_TEVSTAGE0) {
         ctmp = (u32*)&TEVCOpTableST0[mode];
@@ -289,6 +307,12 @@ void GXSetTevOp(GXTevStageID id, GXTevMode mode) {
         ctmp = (u32*)&TEVCOpTableST1[mode];
         atmp = (u32*)&TEVAOpTableST1[mode];
     }
+#ifdef TARGET_PC
+    cword = PackTevColorEnv((const tev_color_env_t*)ctmp);
+    aword = PackTevAlphaEnv((const tev_alpha_env_t*)atmp);
+    ctmp = &cword;
+    atmp = &aword;
+#endif
 
     tevReg = gx->tevc[id];
     tevReg = ((*ctmp & ~0xFF000000) | (tevReg & 0xFF000000));
@@ -363,7 +387,7 @@ void GXSetTevAlphaOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale 
 
 void GXSetTevColor(GXTevRegID id, GXColor color) {
     u32 rgba, regRA, regBG;
-    rgba = *(u32*)(&color);
+    rgba = GX_BE_U32(&color);
     regRA = TEV_REGISTERL(0, 0, (0xE0 + id * 2));
     SC_TEV_REGISTERL_SET_R8(regRA, (rgba >> 24) & 0xFF);
     SC_TEV_REGISTERL_SET_A8(regRA, rgba & 0xFF);
@@ -381,8 +405,8 @@ void GXSetTevColor(GXTevRegID id, GXColor color) {
 
 void GXSetTevColorS10(GXTevRegID id, GXColorS10 color) {
     u32 sRG, sBA, regRA, regBG;
-    sRG = *(u32*)(&color);
-    sBA = *((u32*)(&color) + 1);
+    sRG = ((u32)(u16)color.r << 16) | (u16)color.g;
+    sBA = ((u32)(u16)color.b << 16) | (u16)color.a;
     regRA = TEV_REGISTERL(0, 0, (0xE0 + id * 2));
     SC_TEV_REGISTERL_SET_R(regRA, (sRG >> 16) & ((1 << TEV_REGISTERL_R_SIZE) - 1));
     SC_TEV_REGISTERL_SET_A(regRA, sBA & ((1 << TEV_REGISTERL_A_SIZE) - 1));
@@ -400,7 +424,7 @@ void GXSetTevColorS10(GXTevRegID id, GXColorS10 color) {
 
 void GXSetTevKColor(GXTevKColorID id, GXColor color) {
     u32 rgba, regRA, regBG;
-    rgba = *(u32*)(&color);
+    rgba = GX_BE_U32(&color);
     regRA = TEV_KREGISTERL(0, 0, (0xE0 + id * 2));
     SC_TEV_KREGISTERL_SET_R(regRA, (rgba >> 24) & 0xFF);
     SC_TEV_KREGISTERL_SET_A(regRA, rgba & 0xFF);

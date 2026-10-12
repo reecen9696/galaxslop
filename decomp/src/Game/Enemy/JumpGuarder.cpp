@@ -461,7 +461,7 @@ JumpGuarder::JumpGuarder(const char* pName)
 void JumpGuarder::init(const JMapInfoIter& rIter) {
     initModelManagerWithAnm("JumpGuarder", nullptr, false);
     // "Jump guarder head"
-    mHeadModel = MR::createPartsModelNoSilhouettedMapObj(this, "ジャンプガーダー頭", "JumpGuarderHead", _90);
+    mHeadModel = MR::createPartsModelNoSilhouettedMapObj(this, "\x83\x57\x83\x83\x83\x93\x83\x76\x83\x4b\x81\x5b\x83\x5f\x81\x5b\x93\xaa", "JumpGuarderHead", _90);
     MR::initLightCtrl(mHeadModel);
     MR::initDefaultPos(this, rIter);
     MR::connectToSceneEnemy(this);
@@ -519,7 +519,7 @@ void JumpGuarder::init(const JMapInfoIter& rIter) {
 }
 
 // "Baby Begoman"
-JumpGuarderBaby::JumpGuarderBaby() : BegomanBaby("ベビーベーゴマン") {
+JumpGuarderBaby::JumpGuarderBaby() : BegomanBaby("\x83\x78\x83\x72\x81\x5b\x83\x78\x81\x5b\x83\x53\x83\x7d\x83\x93") {
 }
 
 void JumpGuarder::attackSensor(HitSensor* pSender, HitSensor* pReceiver) {

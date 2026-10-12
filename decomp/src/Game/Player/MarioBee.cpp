@@ -32,7 +32,7 @@ void MarioActor::entryWallWalkMode(const TVec3f& position, const TVec3f& normal)
         TVec3f front(mMario->mHeadVec);
         mMario->setGravityVec(gravity);
         mMario->setHeadVec(-gravity);
-        mMario->setFrontVecKeepUp(front, 1UL);
+        mMario->setFrontVecKeepUp(front, 1U);
         setBlendMtxTimer(2);
         _38C = 5;
         mMario->mMovementStates._38 = false;
@@ -53,11 +53,11 @@ bool Mario::beeMarioOnAir() {
             _402--;
         }
 
-        if (isAnimationRun("ハチ壁ジャンプ") && isAnimationTerminate(nullptr)) {
+        if (isAnimationRun("\x83\x6e\x83\x60\x95\xc7\x83\x57\x83\x83\x83\x93\x83\x76") && isAnimationTerminate(nullptr)) {
             if (checkLvlA()) {
-                changeAnimation("ハチ飛行中", "落下");
+                changeAnimation("\x83\x6e\x83\x60\x94\xf2\x8d\x73\x92\x86", "\x97\x8e\x89\xba");
             } else {
-                changeAnimation("ハチ飛行中無入力", "落下");
+                changeAnimation("\x83\x6e\x83\x60\x94\xf2\x8d\x73\x92\x86\x96\xb3\x93\xfc\x97\xcd", "\x97\x8e\x89\xba");
             }
 
             changeAnimationInterpoleFrame(30);
@@ -103,7 +103,7 @@ bool Mario::beeMarioOnAir() {
             }
 
             if (checkLvlA() && _402 && _3BC > inhibitTime) {
-                playSound("ハチ飛行中");
+                playSound("\x83\x6e\x83\x60\x94\xf2\x8d\x73\x92\x86");
                 if (!MR::isNearZero(mStickPos.z)) {
                     setFrontVecKeepUp(getWorldPadDir(), mActor->getConst().getTable()->mBeeAirWalkTurnSpd);
                 }
@@ -119,19 +119,19 @@ bool Mario::beeMarioOnAir() {
 
                 if (!_402) {
                     if (previousTime) {
-                        playSound("ハチ体力切れ");
+                        playSound("\x83\x6e\x83\x60\x91\xcc\x97\xcd\x90\xd8\x82\xea");
                     }
 
                     mMovementStates._11 = false;
-                    stopAnimation("ハチ飛行中");
+                    stopAnimation("\x83\x6e\x83\x60\x94\xf2\x8d\x73\x92\x86");
                 } else {
                     if (!mMovementStates._F) {
-                        if (!isAnimationRun("ハチ壁ジャンプ") && !isAnimationRun("ハチスピン空中")) {
-                            changeAnimation("ハチ飛行中", "落下");
+                        if (!isAnimationRun("\x83\x6e\x83\x60\x95\xc7\x83\x57\x83\x83\x83\x93\x83\x76") && !isAnimationRun("\x83\x6e\x83\x60\x83\x58\x83\x73\x83\x93\x8b\xf3\x92\x86")) {
+                            changeAnimation("\x83\x6e\x83\x60\x94\xf2\x8d\x73\x92\x86", "\x97\x8e\x89\xba");
                         }
 
                         cancelSquatMode();
-                        playSound("空中ふんばり");
+                        playSound("\x8b\xf3\x92\x86\x82\xd3\x82\xf1\x82\xce\x82\xe8");
                         if (_402 < mActor->getConst().getTable()->mAirWalkTime / 2) {
                             getAnimator()->setSpeed(1.5f);
                         }
@@ -197,10 +197,10 @@ bool Mario::beeMarioOnAir() {
                     return true;
                 }
             } else {
-                if (!isAnimationRun("ハチジャンプ") && !isAnimationRun("ハチ壁ジャンプ")) {
-                    stopAnimation("ハチ飛行中");
+                if (!isAnimationRun("\x83\x6e\x83\x60\x83\x57\x83\x83\x83\x93\x83\x76") && !isAnimationRun("\x83\x6e\x83\x60\x95\xc7\x83\x57\x83\x83\x83\x93\x83\x76")) {
+                    stopAnimation("\x83\x6e\x83\x60\x94\xf2\x8d\x73\x92\x86");
                     if (!isAnimationRun(nullptr) || isAnimationTerminate(nullptr)) {
-                        changeAnimation("ハチ飛行中無入力");
+                        changeAnimation("\x83\x6e\x83\x60\x94\xf2\x8d\x73\x92\x86\x96\xb3\x93\xfc\x97\xcd");
                     }
                 }
 

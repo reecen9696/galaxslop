@@ -21,7 +21,7 @@ namespace NrvDinoPackunVs2 {
     NEW_NERVE(DinoPackunVs2NrvDownDemo, DinoPackunVs2, DownDemo);
 };  // namespace NrvDinoPackunVs2
 
-DinoPackunVs2::DinoPackunVs2(DinoPackun* pPackun) : DinoPackunSequencer("ディノパックン2戦目進行", pPackun) {
+DinoPackunVs2::DinoPackunVs2(DinoPackun* pPackun) : DinoPackunSequencer("\x83\x66\x83\x42\x83\x6d\x83\x70\x83\x62\x83\x4e\x83\x93""2\x90\xed\x96\xda\x90\x69\x8d\x73", pPackun) {
     mDemo = nullptr;
     mEgg = nullptr;
     mBattleLv1 = nullptr;

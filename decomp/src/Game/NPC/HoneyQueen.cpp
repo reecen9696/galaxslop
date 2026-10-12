@@ -76,7 +76,7 @@ void HoneyQueen::init(const JMapInfoIter& rIter) {
 
     MR::excludeCalcShadowToActorAll(this, this);
 
-    mWing = MR::createModelObjNpc("羽", "HoneyQueenWing", MR::getJointMtx(this, "Center"));
+    mWing = MR::createModelObjNpc("\x89\x48", "HoneyQueenWing", MR::getJointMtx(this, "Center"));
     mWing->makeActorAppeared();
     MR::startBck(mWing, "HoneyQueenWing");
     MR::startBtk(mWing, "HoneyQueenWing");
@@ -86,9 +86,9 @@ void HoneyQueen::init(const JMapInfoIter& rIter) {
     }
 
     if (MR::tryRegisterDemoCast(this, rIter)) {
-        MR::registerDemoActionFunctor(this, MR::Functor(this, &HoneyQueen::fadeOut), "フェードアウト");
-        MR::registerDemoActionFunctor(this, MR::Functor(this, &HoneyQueen::fadeIn), "フェードイン");
-        MR::registerDemoActionFunctor(this, MR::Functor(this, &HoneyQueen::talkEntry), "謁見");
+        MR::registerDemoActionFunctor(this, MR::Functor(this, &HoneyQueen::fadeOut), "\x83\x74\x83\x46\x81\x5b\x83\x68\x83\x41\x83\x45\x83\x67");
+        MR::registerDemoActionFunctor(this, MR::Functor(this, &HoneyQueen::fadeIn), "\x83\x74\x83\x46\x81\x5b\x83\x68\x83\x43\x83\x93");
+        MR::registerDemoActionFunctor(this, MR::Functor(this, &HoneyQueen::talkEntry), "\x89\x79\x8c\xa9");
         MR::tryRegisterDemoCast(mWing, rIter);
 
         _188 = 1;

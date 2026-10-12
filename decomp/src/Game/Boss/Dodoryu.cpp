@@ -80,7 +80,7 @@ namespace {
     // static const TVec3f sCamRegOffset = _;
     static const s32 sJumpOutStopSceneFrame = 8;
     // static const s32 sRumbleInterval = _;
-    static const char* sSpinOutCamera = "ドドリュウ吹っ飛び";
+    static const char* sSpinOutCamera = "\x83\x68\x83\x68\x83\x8a\x83\x85\x83\x45\x90\x81\x82\xc1\x94\xf2\x82\xd1";
     // static const f32 sSpinOutCameraInterpolation = _;
     // static const f32 sSpinOutCameraBlendRate = _;
     static const f32 sRumblePadNearDist = 500.0f;
@@ -264,8 +264,8 @@ void Dodoryu_DUMMY() {
 
 Dodoryu::Dodoryu(const char* pName)
     : LiveActor(pName), _BC(0.0f, 0.0f, 0.0f), _C8(), _CC(), mState(), mMoveStateHolder(), mHill(), mLeadHill(), mBank(), mRabbit(),
-      _128(0.0f, 1.0f, 0.0f), _134(1.0f, 0.0f, 0.0f), mClosedAreaObj(), _144(), _148(new CameraTargetMtx("カメラターゲットダミー")),
-      _14C(new CameraTargetMtx("カメラターゲットダミー")), _150(), _154(), mAnimScaleCtrl(new AnimScaleController(nullptr)) {
+      _128(0.0f, 1.0f, 0.0f), _134(1.0f, 0.0f, 0.0f), mClosedAreaObj(), _144(), _148(new CameraTargetMtx("\x83\x4a\x83\x81\x83\x89\x83\x5e\x81\x5b\x83\x51\x83\x62\x83\x67\x83\x5f\x83\x7e\x81\x5b")),
+      _14C(new CameraTargetMtx("\x83\x4a\x83\x81\x83\x89\x83\x5e\x81\x5b\x83\x51\x83\x62\x83\x67\x83\x5f\x83\x7e\x81\x5b")), _150(), _154(), mAnimScaleCtrl(new AnimScaleController(nullptr)) {
     mBaseMtx.identity();
 }
 
@@ -445,7 +445,7 @@ void Dodoryu::endPlayerCenterCamera() {
 
 void Dodoryu::getPlayerResetMtx(TPos3f* pMtx, u32 param2) const {
     char buf[64];
-    snprintf(buf, sizeof(buf), "マリオ再セット%d", param2 + 1);
+    snprintf(buf, sizeof(buf), "\x83\x7d\x83\x8a\x83\x49\x8d\xc4\x83\x5a\x83\x62\x83\x67%d", param2 + 1);
 
     MR::tryFindNamePos(buf, (MtxPtr)pMtx);
 }
@@ -809,7 +809,7 @@ void Dodoryu::updateCameraTarget() {
     _14C->mMatrix.setInline(m1);
 }
 
-DodoryuBank::DodoryuBank() : ModelObj("ドドリュウ盛土", "DodoryuBank", _90, MR::DrawBufferType_MapObjStrongLight, -2, -2, false) {
+DodoryuBank::DodoryuBank() : ModelObj("\x83\x68\x83\x68\x83\x8a\x83\x85\x83\x45\x90\xb7\x93\x79", "DodoryuBank", _90, MR::DrawBufferType_MapObjStrongLight, -2, -2, false) {
     _90.identity();
 }
 
@@ -830,7 +830,7 @@ void Dodoryu_FORCE_MATCH_RABBIT(LiveActor* pActor) {
 }
 
 DodoryuRabbit::DodoryuRabbit(Dodoryu* pHost, const JMapInfoIter& rIter)
-    : ModelObj("ドドリュウに追われるウサギ", "DodoryuRabbit", _94, MR::DrawBufferType_NPC, -2, -2, false), mHost(pHost), _C4(), mTalkCtrl(), _CC(300),
+    : ModelObj("\x83\x68\x83\x68\x83\x8a\x83\x85\x83\x45\x82\xc9\x92\xc7\x82\xed\x82\xea\x82\xe9\x83\x45\x83\x54\x83\x4d", "DodoryuRabbit", _94, MR::DrawBufferType_NPC, -2, -2, false), mHost(pHost), _C4(), mTalkCtrl(), _CC(300),
       _D0(), _D4(), _D8(), mIsDisplayMessage() {
     _94.identity();
 
@@ -1083,7 +1083,7 @@ bool DodoryuRabbit::tryTalk() {
     return false;
 }
 
-DodoryuLeadHill::DodoryuLeadHill(Dodoryu* pHost) : LiveActor("ドドリュウ塚先頭"), mHostBaseMtx(pHost->getBaseMtx()), _90() {
+DodoryuLeadHill::DodoryuLeadHill(Dodoryu* pHost) : LiveActor("\x83\x68\x83\x68\x83\x8a\x83\x85\x83\x45\x92\xcb\x90\xe6\x93\xaa"), mHostBaseMtx(pHost->getBaseMtx()), _90() {
     for (int i = 0; i < ARRAY_SIZE(_94); i++) {
         _94[i] = nullptr;
     }

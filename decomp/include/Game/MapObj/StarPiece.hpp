@@ -136,4 +136,9 @@ public:
         bool _6 : 1;
         bool isLaunched : 1;
     } /* 0XE8 */ mFlags;
+#ifdef TARGET_PC
+    // Shot from the VR pointing controller (StarPieceShooter::shoot), not
+    // from beside the game camera.
+    bool mThrownFromVr;
+#endif
 };

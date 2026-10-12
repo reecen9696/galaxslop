@@ -225,7 +225,7 @@ void FireBall::exeThrow() {
         MR::deleteEffect(this, "FireBall");
     }
 
-    if (MR::isGreaterStep(this, ::cReflectFrame) && MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isGreaterStep(this, ::cReflectFrame) && MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         TVec2f screenVelocity(*MR::getStarPointerScreenVelocity(*MR::getStarPointerLastPointedPort(this)));
         if (::cReflectCursorSpeed < screenVelocity.length()) {
             calcReflectVelocity();

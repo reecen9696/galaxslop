@@ -104,7 +104,7 @@ void Kabokuri::init(const JMapInfoIter& rIter) {
     mStateBindStartPointer = new WalkerStateBindStarPointer(this, mAnimeScale);
 
     // "Kabokuri kuribo"
-    mKuribo = new Kuribo("カボクリクリボー");
+    mKuribo = new Kuribo("\x83\x4a\x83\x7b\x83\x4e\x83\x8a\x83\x4e\x83\x8a\x83\x7b\x81\x5b");
 
     if (mIsFloating) {
         mKuribo->onNoGravitySupport();
@@ -114,7 +114,7 @@ void Kabokuri::init(const JMapInfoIter& rIter) {
     mKuribo->makeActorDead();
 
     // "Broken model"
-    mBreakModel = MR::createModelObjMapObjStrongLight("壊れモデル", "KabokuriBreak", getBaseMtx());
+    mBreakModel = MR::createModelObjMapObjStrongLight("\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "KabokuriBreak", getBaseMtx());
     mBreakModel->kill();
 
     MR::useStageSwitchWriteDead(this, rIter);

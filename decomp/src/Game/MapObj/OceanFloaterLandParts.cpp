@@ -51,7 +51,7 @@ void OceanFloaterLandParts::init(const JMapInfoIter& rIter) {
 
     if (MR::isEqualString("OceanFloaterTypeU", mObjectName)) {
         u32 isDone = 0;
-        mAlreadyDoneFlag = MR::setupAlreadyDoneFlag("フローター浮上", rIter, &isDone);
+        mAlreadyDoneFlag = MR::setupAlreadyDoneFlag("\x83\x74\x83\x8d\x81\x5b\x83\x5e\x81\x5b\x95\x82\x8f\xe3", rIter, &isDone);
 
         if (isDone != 0) {
             MR::moveCoordToEndPos(this);

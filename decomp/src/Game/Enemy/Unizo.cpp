@@ -152,11 +152,11 @@ Unizo::~Unizo() {
 
 void Unizo::initType(const JMapInfoIter& rIter) {
     const char* pName = mName;
-    if (MR::isEqualStringCase(pName, "ウニゾー")) {
+    if (MR::isEqualStringCase(pName, "\x83\x45\x83\x6a\x83\x5d\x81\x5b")) {
         mType = TypeSea;
-    } else if (MR::isEqualStringCase(pName, "陸ウニゾー")) {
+    } else if (MR::isEqualStringCase(pName, "\x97\xa4\x83\x45\x83\x6a\x83\x5d\x81\x5b")) {
         mType = TypeLand;
-    } else if (MR::isEqualStringCase(pName, "浅瀬ウニゾー")) {
+    } else if (MR::isEqualStringCase(pName, "\x90\xf3\x90\xa3\x83\x45\x83\x6a\x83\x5d\x81\x5b")) {
         mType = TypeShoal;
     }
 }
@@ -166,20 +166,20 @@ void Unizo::init(const JMapInfoIter& rIter) {
 
     if (mType == TypeSea) {
         initModelManagerWithAnm("Unizo", nullptr, false);
-        mBreakModel = new ModelObj("ウニゾー壊れモデル", "UnizoBreak", nullptr, MR::DrawBufferType_Enemy, -2, -2, false);
+        mBreakModel = new ModelObj("\x83\x45\x83\x6a\x83\x5d\x81\x5b\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "UnizoBreak", nullptr, MR::DrawBufferType_Enemy, -2, -2, false);
         mBreakModel->initWithoutIter();
         mBreakModel->makeActorDead();
     } else if (mType == TypeLand) {
         mRollHeight = ::sRollHeightLand;
         mGravityRate = ::sGravityRateLand;
         initModelManagerWithAnm("UnizoLand", nullptr, false);
-        mBreakModel = new ModelObj("陸ウニゾー壊れモデル", "UnizoLandBreak", nullptr, MR::DrawBufferType_Enemy, -2, -2, false);
+        mBreakModel = new ModelObj("\x97\xa4\x83\x45\x83\x6a\x83\x5d\x81\x5b\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "UnizoLandBreak", nullptr, MR::DrawBufferType_Enemy, -2, -2, false);
         mBreakModel->initWithoutIter();
         mBreakModel->makeActorDead();
         MR::initFur(this);
     } else if (mType == TypeShoal) {
         initModelManagerWithAnm("UnizoShoal", nullptr, false);
-        mBreakModel = new ModelObj("浅瀬ウニゾー壊れモデル", "UnizoShoalBreak", nullptr, MR::DrawBufferType_Enemy, -2, -2, false);
+        mBreakModel = new ModelObj("\x90\xf3\x90\xa3\x83\x45\x83\x6a\x83\x5d\x81\x5b\x89\xf3\x82\xea\x83\x82\x83\x66\x83\x8b", "UnizoShoalBreak", nullptr, MR::DrawBufferType_Enemy, -2, -2, false);
         mBreakModel->initWithoutIter();
         mBreakModel->makeActorDead();
     }
@@ -205,7 +205,7 @@ void Unizo::init(const JMapInfoIter& rIter) {
     initNerve(GET_NERVE(Unizo, UnizoNrvWait));
     MR::onCalcGravity(this);
     MR::startBtp(this, "Blink");
-    mBlinkFrame = MR::getRandom(100L, 200L);
+    mBlinkFrame = MR::getRandom(100, 200);
     MR::addToAttributeGroupSearchTurtle(this);
     MR::declareStarPiece(this, ::sStarPieceNum);
     mAnimScaleController = new AnimScaleController(nullptr);

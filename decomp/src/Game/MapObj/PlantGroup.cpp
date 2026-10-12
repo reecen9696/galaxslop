@@ -110,7 +110,7 @@ void PlantGroup::init(const JMapInfoIter& rIter) {
     }
 
     MR::tryRegisterDemoCast(this, rIter);
-    mHintTimer = MR::getRandom(3L, 10L) * 10;
+    mHintTimer = MR::getRandom(3, 10) * 10;
 }
 
 void PlantGroup::makeActorAppeared() {
@@ -134,11 +134,11 @@ void PlantGroup::initMember(s32 itemCount, const JMapInfoIter&) {
 
     for (s32 i = 0; i < mMemberCount; i++) {
         if (mPlantType == 1) {
-            mMembers[i] = new PlantMember("花", "Flower", false, nullptr);
+            mMembers[i] = new PlantMember("\x89\xd4", "Flower", false, nullptr);
         } else if (mPlantType == 2) {
-            mMembers[i] = new PlantMember("青い花", "FlowerBlue", false, nullptr);
+            mMembers[i] = new PlantMember("\x90\xc2\x82\xa2\x89\xd4", "FlowerBlue", false, nullptr);
         } else {
-            mMembers[i] = new PlantMember("草", "CutBush", true, nullptr);
+            mMembers[i] = new PlantMember("\x91\x90", "CutBush", true, nullptr);
         }
 
         mMembers[i]->initWithoutIter();
@@ -152,14 +152,14 @@ void PlantGroup::initMember(s32 itemCount, const JMapInfoIter&) {
     }
 
     for (s32 i = 0; i < mMemberCount; i++) {
-        s32 index = MR::getRandom(0L, i + 1);
+        s32 index = MR::getRandom(0, i + 1);
         bool hasItem = mMembers[i]->mHasItem;
         mMembers[i]->mHasItem = mMembers[index]->mHasItem;
         mMembers[index]->mHasItem = hasItem;
     }
 
     initHitSensor(1);
-    MR::addHitSensorMapObj(this, "境界球", 16, 100.0f, TVec3f(gZeroVec));
+    MR::addHitSensorMapObj(this, "\x8b\xab\x8a\x45\x8b\x85", 16, 100.0f, TVec3f(gZeroVec));
 }
 
 #pragma push
@@ -179,10 +179,12 @@ s32 PlantGroup::placeOnCollisionFormCircle(TVec3f* pCenter, const TVec3f& rGravi
         offset.scale(radius);
         TVec3f start(mPosition);
         start += offset;
-        const TVec3f* pUp = &(rGravity * 100.0f);
+        TVec3f up = rGravity * 100.0f;
+        const TVec3f* pUp = &up;
         start -= *pUp;
 
-        const TVec3f* pRay = &(rGravity * ::sCheckLineLength);
+        TVec3f ray = rGravity * ::sCheckLineLength;
+        const TVec3f* pRay = &ray;
 
         if (MR::getFirstPolyOnLineToMap(&mMembers[i]->mPosition, nullptr, start, *pRay)) {
             *pCenter += mMembers[i]->mPosition;
@@ -268,7 +270,7 @@ void PlantGroup::initAfterPlacement() {
     placeOnCollisionFormCircle(&center, gravity, axisX, axisY);
     f32 radius = calcBoundingSphereRadius(center);
     f32 scale = mScale.y;
-    HitSensor* sensor = getSensor("境界球");
+    HitSensor* sensor = getSensor("\x8b\xab\x8a\x45\x8b\x85");
     sensor->mRadius = ::sSize + radius * scale;
     MR::setStarPointerTargetRadius3d(this, ::sSize + radius * scale);
     MR::setClippingTypeSphere(this, ::sSize + radius * scale);

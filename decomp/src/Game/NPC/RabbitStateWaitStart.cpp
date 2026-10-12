@@ -33,7 +33,7 @@ namespace NrvRabbitStateWaitStart {
 };  // namespace NrvRabbitStateWaitStart
 
 RabbitStateWaitStart::RabbitStateWaitStart(LiveActor* pHost, TVec3f* mHostFrontVec, TalkMessageCtrl* pTalkCtrl)
-    : ActorStateBase("うさぎ会話待ち状態", pHost), mTalkActionName("Wait"), mHostFrontVec(mHostFrontVec), mTalkCtrl(pTalkCtrl), _1C(), _1D(true) {
+    : ActorStateBase("\x82\xa4\x82\xb3\x82\xac\x89\xef\x98\x62\x91\xd2\x82\xbf\x8f\xf3\x91\xd4", pHost), mTalkActionName("Wait"), mHostFrontVec(mHostFrontVec), mTalkCtrl(pTalkCtrl), _1C(), _1D(true) {
 }
 
 void RabbitStateWaitStart::setTalkActionName(const char* pName) {
@@ -150,7 +150,7 @@ bool RabbitStateWaitStart::tryPointing() {
         return false;
     }
 
-    if (MR::isStarPointerPointing2POnPressButton(mHost, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(mHost, "\x8e\xe3", true, false)) {
         setNerve(GET_NERVE(RabbitStateWaitStart, RabbitStateWaitStartNrvPointing));
 
         return true;

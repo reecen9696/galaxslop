@@ -4,7 +4,7 @@
 
 class CameraTripodPlanet : public Camera {
 public:
-    CameraTripodPlanet(const char* pName = "三脚惑星カメラ");
+    CameraTripodPlanet(const char* pName = "\x8e\x4f\x8b\x72\x98\x66\x90\xaf\x83\x4a\x83\x81\x83\x89");
 
     virtual void reset();
     virtual CameraTargetObj* calc();

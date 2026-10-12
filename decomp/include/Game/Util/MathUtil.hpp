@@ -677,8 +677,17 @@ namespace MR {
     }
 
 #else
-    f32 frsqrte(f32);
-    f32 fastSqrtf(f32);
+    inline f32 frsqrte(f32 x) {
+        return __builtin_sqrtf(x);
+    }
+
+    inline f32 fastSqrtf(f32 x) {
+        if (x > 0.0f) {
+            return __builtin_sqrtf(x);
+        }
+
+        return x;
+    }
 #endif
 
     template < typename T >

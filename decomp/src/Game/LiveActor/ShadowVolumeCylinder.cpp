@@ -11,7 +11,7 @@ namespace {
 ShadowVolumeCylinder::~ShadowVolumeCylinder() {
 }
 
-ShadowVolumeCylinder::ShadowVolumeCylinder() : ShadowVolumeModel("影描画[ボリューム円柱]") {
+ShadowVolumeCylinder::ShadowVolumeCylinder() : ShadowVolumeModel("\x89\x65\x95\x60\x89\xe6[\x83\x7b\x83\x8a\x83\x85\x81\x5b\x83\x80\x89\x7e\x92\x8c]") {
     mRadius = 100.0f;
     initVolumeModel("ShadowVolumeCylinder");
 }

@@ -7,16 +7,16 @@ class JKRFile;
 
 class JKRAramArchive : public JKRArchive {
 public:
-    JKRAramArchive(long, EMountDirection);
+    JKRAramArchive(int, EMountDirection);
     virtual ~JKRAramArchive();
 
     virtual u32 getExpandedResSize(const void*) const;
-    virtual void* fetchResource(SDIFileEntry*, unsigned long*);
-    virtual void* fetchResource(void*, unsigned long, SDIFileEntry*, unsigned long*);
+    virtual void* fetchResource(SDIFileEntry*, unsigned int*);
+    virtual void* fetchResource(void*, unsigned int, SDIFileEntry*, unsigned int*);
 
-    bool open(long);
-    static u32 fetchResource_subroutine(unsigned long, unsigned long, unsigned char*, unsigned long, int);
-    static u32 fetchResource_subroutine(unsigned long, unsigned long, JKRHeap*, int, unsigned char**);
+    bool open(int);
+    static u32 fetchResource_subroutine(unsigned int, unsigned int, unsigned char*, unsigned int, int);
+    static u32 fetchResource_subroutine(unsigned int, unsigned int, JKRHeap*, int, unsigned char**);
 
     JKRAramBlock* mBlock;
     JKRFile* mDvdFile;

@@ -57,5 +57,5 @@ CircleCoinGroup::~CircleCoinGroup() {
 }
 
 const char* CircleCoinGroup::getCoinName() const {
-    return mIsPurpleCoinGroup ? "パープルコイン(円形配置)" : "コイン(円形配置)";
+    return mIsPurpleCoinGroup ? "\x83\x70\x81\x5b\x83\x76\x83\x8b\x83\x52\x83\x43\x83\x93(\x89\x7e\x8c\x60\x94\x7a\x92\x75)" : "\x83\x52\x83\x43\x83\x93(\x89\x7e\x8c\x60\x94\x7a\x92\x75)";
 }

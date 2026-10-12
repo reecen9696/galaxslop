@@ -40,26 +40,26 @@ void BegomanLauncher::init(const JMapInfoIter& rIter) {
     MR::getObjectName(&pObjectName, rIter);
     mBegomanArray = new BegomanBase*[mBegomanCount];
     if (MR::isEqualString(pObjectName, "TogeBegomanLauncher")) {
-        setName("トゲベーゴマンランチャー");
+        setName("\x83\x67\x83\x51\x83\x78\x81\x5b\x83\x53\x83\x7d\x83\x93\x83\x89\x83\x93\x83\x60\x83\x83\x81\x5b");
         for (s32 i = 0; i < mBegomanCount; i++) {
-            mBegomanArray[i] = new BegomanSpike("トゲベーゴマン");
+            mBegomanArray[i] = new BegomanSpike("\x83\x67\x83\x51\x83\x78\x81\x5b\x83\x53\x83\x7d\x83\x93");
             mBegomanArray[i]->mPosition.set(mPosition);
             mBegomanArray[i]->init(rIter);
             mBegomanArray[i]->makeActorDead();
         }
     } else if (MR::isEqualString(pObjectName, "BegomanBabyLauncher")) {
-        setName("ベビーベーゴマンランチャー");
+        setName("\x83\x78\x83\x72\x81\x5b\x83\x78\x81\x5b\x83\x53\x83\x7d\x83\x93\x83\x89\x83\x93\x83\x60\x83\x83\x81\x5b");
         mLaunchType = 2;
         MR::declareCoin(this, mBegomanCount);
         for (s32 i = 0; i < mBegomanCount; i++) {
-            mBegomanArray[i] = new BegomanBaby(this, "ランチャーベビー");
+            mBegomanArray[i] = new BegomanBaby(this, "\x83\x89\x83\x93\x83\x60\x83\x83\x81\x5b\x83\x78\x83\x72\x81\x5b");
             mBegomanArray[i]->mPosition.set(mPosition);
             mBegomanArray[i]->init(rIter);
             mBegomanArray[i]->makeActorDead();
         }
     } else {
         for (s32 i = 0; i < mBegomanCount; i++) {
-            mBegomanArray[i] = new BegomanSpring("バネベーゴマン");
+            mBegomanArray[i] = new BegomanSpring("\x83\x6f\x83\x6c\x83\x78\x81\x5b\x83\x53\x83\x7d\x83\x93");
             mBegomanArray[i]->mPosition.set(mPosition);
             mBegomanArray[i]->init(rIter);
             mBegomanArray[i]->makeActorDead();

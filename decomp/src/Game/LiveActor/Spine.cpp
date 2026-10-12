@@ -11,7 +11,18 @@ void Spine::update() {
     changeNerve();
 }
 
+#ifdef TARGET_PC
+extern "C" int port_trace_nerves;
+int port_trace_nerves = 0;
+#endif
+
 void Spine::setNerve(const Nerve* pNerve) {
+#ifdef TARGET_PC
+    if (port_trace_nerves > 0) {
+        port_trace_nerves--;
+        port_log("nerve: exec %p -> %p", (void*)mExecutor, (const void*)pNerve);
+    }
+#endif
     if (mStep >= 0) {
         mCurrNerve->executeOnEnd(this);
     }

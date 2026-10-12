@@ -115,13 +115,13 @@ bool KoopaJrShipCannonShell::receiveMsgPlayerAttack(u32 msg, HitSensor* pSender,
         if (isNerve(GET_NERVE(KoopaJrShipCannonShell, HostTypeDown)))
             return false;
 
-        MR::tryRumblePad(this, "中", WPAD_CHAN0);
+        MR::tryRumblePad(this, "\x92\x86", WPAD_CHAN0);
         setNerve(GET_NERVE(KoopaJrShipCannonShell, HostTypeDown));
         return true;
     }
 
     if (MR::isMsgPlayerHipDrop(msg)) {
-        MR::tryRumblePad(this, "中", WPAD_CHAN0);
+        MR::tryRumblePad(this, "\x92\x86", WPAD_CHAN0);
         setNerve(GET_NERVE(KoopaJrShipCannonShell, HostTypeHipDropDown));
         return true;
     }
@@ -188,7 +188,7 @@ bool KoopaJrShipCannonShell::tryFreeze() {
     if (!_B8)
         return false;
 
-    if (!MR::isStarPointerPointing2POnPressButton(this, "弱", true, false))
+    if (!MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false))
         return false;
 
     _9C.set(mPosition);
@@ -205,7 +205,7 @@ bool KoopaJrShipCannonShell::isStateEnableExplosion() const {
 }
 
 void KoopaJrShipCannonShell::explosion() {
-    MR::startRumbleWithShakeCameraWeak(this, "強", "中", ::sCameraShakeDistance, ::sCameraShakeDistance * 2);
+    MR::startRumbleWithShakeCameraWeak(this, "\x8b\xad", "\x92\x86", ::sCameraShakeDistance, ::sCameraShakeDistance * 2);
     MR::emitEffect(this, "Explosion");
     MR::startSound(this, "SE_EM_KILLER_EXPLOSION");
     kill();
@@ -213,7 +213,7 @@ void KoopaJrShipCannonShell::explosion() {
 
 void KoopaJrShipCannonShell::misfire() {
     MR::shakeCameraWeak();
-    MR::tryRumblePad(this, "弱", WPAD_CHAN0);
+    MR::tryRumblePad(this, "\x8e\xe3", WPAD_CHAN0);
     MR::emitEffect(this, "MisFire");
     MR::startSound(this, "SE_EM_KILLER_MISS_FIRE");
     kill();
@@ -278,7 +278,7 @@ void KoopaJrShipCannonShell::exeFreeze() {
     vec14.scale(scale);
     editPosition()->add(_9C, vec14);
 
-    if (MR::isStarPointerPointing2POnPressButton(this, "弱", true, false)) {
+    if (MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false)) {
         setNerve(GET_NERVE(KoopaJrShipCannonShell, HostTypeFreeze));
         return;
     }
@@ -294,7 +294,7 @@ void KoopaJrShipCannonShell::exeFreeze() {
 namespace CannonShellUtil {
     void registerKoopaJrShipCannonShell(CannonShellHolder* pHolder, int shellNum) {
         for (s32 i = 0; i < shellNum; i++) {
-            KoopaJrShipCannonShell* pShell = new KoopaJrShipCannonShell("砲弾");
+            KoopaJrShipCannonShell* pShell = new KoopaJrShipCannonShell("\x96\x43\x92\x65");
             pShell->initWithoutIter();
             pShell->makeActorDead();
             pHolder->registerCannonShell(pShell);

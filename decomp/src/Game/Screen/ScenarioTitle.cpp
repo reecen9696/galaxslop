@@ -10,7 +10,7 @@ namespace {
     NEW_NERVE(ScenarioTitleEnd, ScenarioTitle, End);
 };  // namespace
 
-ScenarioTitle::ScenarioTitle() : LayoutActor("シナリオ名表示", true) {
+ScenarioTitle::ScenarioTitle() : LayoutActor("\x83\x56\x83\x69\x83\x8a\x83\x49\x96\xbc\x95\x5c\x8e\xa6", true) {
 }
 
 void ScenarioTitle::init(const JMapInfoIter& rInfo) {

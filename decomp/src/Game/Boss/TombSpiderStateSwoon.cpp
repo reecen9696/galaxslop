@@ -14,7 +14,7 @@ namespace NrvTombSpiderStateSwoon {
     NEW_NERVE(TombSpiderStateSwoonNrvEnd, TombSpiderStateSwoon, End);
 };  // namespace NrvTombSpiderStateSwoon
 
-TombSpiderStateSwoon::TombSpiderStateSwoon(TombSpider* pParent) : ActorStateBase< TombSpider >("State[気絶]", pParent) {
+TombSpiderStateSwoon::TombSpiderStateSwoon(TombSpider* pParent) : ActorStateBase< TombSpider >("State[\x8b\x43\x90\xe2]", pParent) {
 }
 
 void TombSpiderStateSwoon::init() {

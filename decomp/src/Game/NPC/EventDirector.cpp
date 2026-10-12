@@ -8,13 +8,13 @@
 #include "Game/Scene/SceneObjHolder.hpp"
 
 EventDirector::EventDirector()
-    : NameObj("イベント指揮"), mPowerStarEventKeeper(), mStageStateKeeper(), mPowerStarHolder(), mCometEventKeeper(), mTimeAttackEventKeeper() {
+    : NameObj("\x83\x43\x83\x78\x83\x93\x83\x67\x8e\x77\x8a\xf6"), mPowerStarEventKeeper(), mStageStateKeeper(), mPowerStarHolder(), mCometEventKeeper(), mTimeAttackEventKeeper() {
 }
 
 void EventDirector::init(const JMapInfoIter& rIter) {
     mPowerStarEventKeeper = new PowerStarEventKeeper();
     mStageStateKeeper = new StageStateKeeper();
-    mPowerStarHolder = new PowerStarHolder("パワースター保持");
+    mPowerStarHolder = new PowerStarHolder("\x83\x70\x83\x8f\x81\x5b\x83\x58\x83\x5e\x81\x5b\x95\xdb\x8e\x9d");
     mPowerStarHolder->initWithoutIter();
     mCometEventKeeper = new CometEventKeeper();
     mCometEventKeeper->init();
@@ -23,7 +23,7 @@ void EventDirector::init(const JMapInfoIter& rIter) {
 }
 
 void MR::declareEventPowerStar(const char* pParam1, s32 param2, bool param3) {
-    EventFunction::getPowerStarEventKeeper()->declareStar(pParam1, "ゾーン無し", param2, param3);
+    EventFunction::getPowerStarEventKeeper()->declareStar(pParam1, "\x83\x5d\x81\x5b\x83\x93\x96\xb3\x82\xb5", param2, param3);
 }
 
 PowerStarEventKeeper* EventFunction::getPowerStarEventKeeper() {

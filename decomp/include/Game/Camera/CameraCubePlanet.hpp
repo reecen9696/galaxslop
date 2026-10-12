@@ -4,7 +4,7 @@
 
 class CameraCubePlanet : public Camera {
 public:
-    CameraCubePlanet(const char* pName = "キューブ惑星カメラ");
+    CameraCubePlanet(const char* pName = "\x83\x4c\x83\x85\x81\x5b\x83\x75\x98\x66\x90\xaf\x83\x4a\x83\x81\x83\x89");
 
     virtual void reset();
     virtual CameraTargetObj* calc();

@@ -366,7 +366,7 @@ void CocoNutBall::freeze() {
 }
 
 bool CocoNutBall::isFreezable() {
-    return !MR::isHiddenModel(this) && MR::isStarPointerPointing2POnPressButton(this, "弱", true, false);
+    return !MR::isHiddenModel(this) && MR::isStarPointerPointing2POnPressButton(this, "\x8e\xe3", true, false);
 }
 
 void CocoNutBall::processApproachToPlayer() {

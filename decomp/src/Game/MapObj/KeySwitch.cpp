@@ -5,7 +5,7 @@
 #include <JSystem/JMath/JMath.hpp>
 
 namespace {
-    static const char* const cDemoName = "カギ出現";
+    static const char* const cDemoName = "\x83\x4a\x83\x4d\x8f\x6f\x8c\xbb";
 };  // namespace
 
 namespace NrvKeySwitch {

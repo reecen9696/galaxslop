@@ -7,13 +7,13 @@
 #include <JSystem/J3DGraphAnimator/J3DModelData.hpp>
 
 ShadowVolumeFlatModel::ShadowVolumeFlatModel(const char* pModelName)
-    : ShadowVolumeModel("板状シャドウボリューム描画"), mBaseMtx(), mRootDrawMtxIndex(-1), mDropDrawMtxIndex(-1) {
+    : ShadowVolumeModel("\x94\xc2\x8f\xf3\x83\x56\x83\x83\x83\x68\x83\x45\x83\x7b\x83\x8a\x83\x85\x81\x5b\x83\x80\x95\x60\x89\xe6"), mBaseMtx(), mRootDrawMtxIndex(-1), mDropDrawMtxIndex(-1) {
     initVolumeModel(pModelName);
     initJointDrawMtxResister();
 }
 
 ShadowVolumeFlatModel::ShadowVolumeFlatModel()
-    : ShadowVolumeModel("板状シャドウボリューム描画"), mBaseMtx(), mRootDrawMtxIndex(-1), mDropDrawMtxIndex(-1) {
+    : ShadowVolumeModel("\x94\xc2\x8f\xf3\x83\x56\x83\x83\x83\x68\x83\x45\x83\x7b\x83\x8a\x83\x85\x81\x5b\x83\x80\x95\x60\x89\xe6"), mBaseMtx(), mRootDrawMtxIndex(-1), mDropDrawMtxIndex(-1) {
 }
 
 void ShadowVolumeFlatModel::setBaseMatrixPtr(MtxPtr pMtx) {

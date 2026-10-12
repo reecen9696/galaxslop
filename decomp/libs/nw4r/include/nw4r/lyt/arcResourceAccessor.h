@@ -24,11 +24,7 @@ namespace nw4r {
         };
 
         namespace detail {
-            #ifdef __MWERKS__
             typedef ut::LinkList<FontRefLink, offsetof(FontRefLink, mLink)>  FontRefList;
-            #else
-            typedef ut::LinkList<FontRefLink, 0> FontRefList;
-            #endif
         };
 
         class ArcResourceAccessor : public ResourceAccessor {

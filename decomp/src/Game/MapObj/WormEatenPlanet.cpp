@@ -51,7 +51,7 @@ void WormEatenPlanet::init(const JMapInfoIter& rIter) {
     MR::listenStageSwitchOnA(this, MR::Functor(this, &WormEatenPlanet::startSecondDemo));
     MR::listenStageSwitchOnB(this, MR::Functor(this, &WormEatenPlanet::startThirdDemo));
 
-    mCaterpillar = new GreenCaterpillarBig("虫食い惑星オオムイムイ");
+    mCaterpillar = new GreenCaterpillarBig("\x92\x8e\x90\x48\x82\xa2\x98\x66\x90\xaf\x83\x49\x83\x49\x83\x80\x83\x43\x83\x80\x83\x43");
     mCaterpillar->init(rIter);
 
     initWormEatenHill();
@@ -60,9 +60,9 @@ void WormEatenPlanet::init(const JMapInfoIter& rIter) {
 
     if (MR::tryRegisterDemoCast(this, rIter)) {
         MR::tryRegisterDemoCast(mCaterpillar, rIter);
-        MR::registerDemoActionNerve(this, GET_NERVE(WormEatenPlanet, WormEatenPlanetNrvSecondWait), "オオムイムイ出現１回目");
-        MR::registerDemoActionNerve(this, GET_NERVE(WormEatenPlanet, WormEatenPlanetNrvThirdWait), "オオムイムイ出現２回目");
-        MR::registerDemoActionNerve(this, GET_NERVE(WormEatenPlanet, WormEatenPlanetNrvFourthWait), "オオムイムイ出現３回目");
+        MR::registerDemoActionNerve(this, GET_NERVE(WormEatenPlanet, WormEatenPlanetNrvSecondWait), "\x83\x49\x83\x49\x83\x80\x83\x43\x83\x80\x83\x43\x8f\x6f\x8c\xbb\x82\x50\x89\xf1\x96\xda");
+        MR::registerDemoActionNerve(this, GET_NERVE(WormEatenPlanet, WormEatenPlanetNrvThirdWait), "\x83\x49\x83\x49\x83\x80\x83\x43\x83\x80\x83\x43\x8f\x6f\x8c\xbb\x82\x51\x89\xf1\x96\xda");
+        MR::registerDemoActionNerve(this, GET_NERVE(WormEatenPlanet, WormEatenPlanetNrvFourthWait), "\x83\x49\x83\x49\x83\x80\x83\x43\x83\x80\x83\x43\x8f\x6f\x8c\xbb\x82\x52\x89\xf1\x96\xda");
     }
 
     initNerve(GET_NERVE(WormEatenPlanet, WormEatenPlanetNrvFirstWait));
@@ -138,7 +138,7 @@ void WormEatenPlanet::initWormEatenHill() {
         snprintf(jointName, sizeof(jointName), "ConnectParts%c", i + 'A');
         MtxPtr jointMtx = MR::getJointMtx(this, jointName);
 
-        mWormEatenHill[i] = new PartsModel(this, "食い破り塚", "WormEatenHill", jointMtx, -1, false);
+        mWormEatenHill[i] = new PartsModel(this, "\x90\x48\x82\xa2\x94\x6a\x82\xe8\x92\xcb", "WormEatenHill", jointMtx, -1, false);
         mWormEatenHill[i]->initWithoutIter();
         mWormEatenHill[i]->makeActorDead();
     }
@@ -160,9 +160,9 @@ bool WormEatenPlanet::tryGenerateWormEatenHill() {
 }
 
 void WormEatenPlanet::startSecondDemo() {
-    MR::requestStartTimeKeepDemo(this, "ムイムイ出現", nullptr, nullptr, "オオムイムイ出現２回目");
+    MR::requestStartTimeKeepDemo(this, "\x83\x80\x83\x43\x83\x80\x83\x43\x8f\x6f\x8c\xbb", nullptr, nullptr, "\x83\x49\x83\x49\x83\x80\x83\x43\x83\x80\x83\x43\x8f\x6f\x8c\xbb\x82\x51\x89\xf1\x96\xda");
 }
 
 void WormEatenPlanet::startThirdDemo() {
-    MR::requestStartTimeKeepDemo(this, "ムイムイ出現", nullptr, nullptr, "オオムイムイ出現３回目");
+    MR::requestStartTimeKeepDemo(this, "\x83\x80\x83\x43\x83\x80\x83\x43\x8f\x6f\x8c\xbb", nullptr, nullptr, "\x83\x49\x83\x49\x83\x80\x83\x43\x83\x80\x83\x43\x8f\x6f\x8c\xbb\x82\x52\x89\xf1\x96\xda");
 }

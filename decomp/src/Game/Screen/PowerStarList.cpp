@@ -204,7 +204,7 @@ namespace NrvPowerStarList {
 };  // namespace NrvPowerStarList
 
 PowerStarList::PowerStarList()
-    : LayoutActor("全パワースターリスト", true), mArrowUpButtonCtrl(), mArrowDownButtonCtrl(), mCaptureButtonCtrl(), mSysInfoWindow(), mPageNo(),
+    : LayoutActor("\x91\x53\x83\x70\x83\x8f\x81\x5b\x83\x58\x83\x5e\x81\x5b\x83\x8a\x83\x58\x83\x67", true), mArrowUpButtonCtrl(), mArrowDownButtonCtrl(), mCaptureButtonCtrl(), mSysInfoWindow(), mPageNo(),
       mMailMessageLength(), mMailMessage() {
     mSeparatorArray = new Separator[4]();
 }
@@ -228,7 +228,7 @@ void PowerStarList::init(const JMapInfoIter& rIter) {
         MR::setFollowTypeAdd(this, pPaneName);
     }
 
-    MR::createAdaptorAndConnectToWiiMessageBoard("全パワースターリスト(伝言板用描画)", MR::Functor(this, &PowerStarList::drawForMessageBoardCapture));
+    MR::createAdaptorAndConnectToWiiMessageBoard("\x91\x53\x83\x70\x83\x8f\x81\x5b\x83\x58\x83\x5e\x81\x5b\x83\x8a\x83\x58\x83\x67(\x93\x60\x8c\xbe\x94\xc2\x97\x70\x95\x60\x89\xe6)", MR::Functor(this, &PowerStarList::drawForMessageBoardCapture));
 
     mArrowUpButtonCtrl = createButtonController("ArrowUpButton", "BoxButton1_00");
     mArrowDownButtonCtrl = createButtonController("ArrowDownButton", "BoxButton1_01");
@@ -856,7 +856,7 @@ void PowerStarList::exeCaptureSend() {
         const wchar_t* pMessage = MR::getGameMessageDirect(::cMailMessageID);
         ReplaceTagFunction::ReplaceArgs(mMailMessage, mMailMessageLength, pMessage, pUserName);
 
-        MR::SendMailObj sendMailObj = MR::SendMailObj("スターリスト");
+        MR::SendMailObj sendMailObj = MR::SendMailObj("\x83\x58\x83\x5e\x81\x5b\x83\x8a\x83\x58\x83\x67");
 
         sendMailObj.setMessageDirect(mMailMessage);
         sendMailObj.setSenderID("WiiMessageTitle");
@@ -866,8 +866,8 @@ void PowerStarList::exeCaptureSend() {
         sendMailObj.send();
     }
 
-    if (MR::isMailSent("スターリスト")) {
-        MR::termMail("スターリスト");
+    if (MR::isMailSent("\x83\x58\x83\x5e\x81\x5b\x83\x8a\x83\x58\x83\x67")) {
+        MR::termMail("\x83\x58\x83\x5e\x81\x5b\x83\x8a\x83\x58\x83\x67");
         setNerve(GET_NERVE(PowerStarList, PowerStarListNrvWait));
     }
 }

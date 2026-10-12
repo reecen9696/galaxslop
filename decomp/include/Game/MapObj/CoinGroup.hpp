@@ -16,7 +16,7 @@ public:
     virtual void placementCoin() {
     }
     virtual const char* getCoinName() const {
-        return "コイン(グループ配置)";
+        return "\x83\x52\x83\x43\x83\x93(\x83\x4f\x83\x8b\x81\x5b\x83\x76\x94\x7a\x92\x75)";
     }
 
     void killCoinAll();

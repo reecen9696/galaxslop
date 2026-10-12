@@ -8,6 +8,9 @@ public:
     GalaxyCometScreenFilter();
 
     void setCometType(const char*);
+#ifdef TARGET_PC
+    virtual void draw() const;
+#endif
 
     /* 0x20 */ bool _20;
 };

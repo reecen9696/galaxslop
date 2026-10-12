@@ -81,7 +81,7 @@ void SurprisedGalaxy::exeExit() {
         MR::closeSystemWipeWhiteFade();
         MR::stopStageBGM(90);
         MR::stopSubBGM(90);
-        MR::tryStartDemo(this, "ギャラクシー移動");
+        MR::tryStartDemo(this, "\x83\x4d\x83\x83\x83\x89\x83\x4e\x83\x56\x81\x5b\x88\xda\x93\xae");
     }
 
     if (MR::isSystemWipeActive()) {
@@ -89,7 +89,7 @@ void SurprisedGalaxy::exeExit() {
     }
 
     MR::onGameEventFlagGalaxyOpen(mGalaxyName);
-    MR::endDemo(this, "ギャラクシー移動");
+    MR::endDemo(this, "\x83\x4d\x83\x83\x83\x89\x83\x4e\x83\x56\x81\x5b\x88\xda\x93\xae");
     MR::permitTrigSE();
     MR::requestStartScenarioSelect(mGalaxyName);
 }

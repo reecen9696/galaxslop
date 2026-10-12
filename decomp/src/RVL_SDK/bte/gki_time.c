@@ -41,11 +41,11 @@
  * macros
  */
 
-#define GKI_NO_NEW_TMRS_STARTED	0x7fffffffl
+#define GKI_NO_NEW_TMRS_STARTED	0x7fffffff
 
-#define GKI_UNUSED_LIST_ENTRY	0x80000000l
+#define GKI_UNUSED_LIST_ENTRY	0x80000000
 
-#define GKI_MAX_INT32			0x7fffffffl // ...ok, i guess
+#define GKI_MAX_INT32			0x7fffffff // ...ok, i guess
 
 /*******************************************************************************
  * functions

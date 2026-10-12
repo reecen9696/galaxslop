@@ -53,7 +53,7 @@ namespace {
 };  // namespace
 
 const char* BenefitItemObj_FORCE_MATCH() {
-    return "影クリップ判定";
+    return "\x89\x65\x83\x4e\x83\x8a\x83\x62\x83\x76\x94\xbb\x92\xe8";
 }
 
 void ShadowClipActor::endClipped() {
@@ -431,7 +431,7 @@ void BenefitItemObj::appearThrowUpQuestionBox() {
 }
 
 void BenefitItemObj::control() {
-    if (_E6 && MR::tryStartDemoWithoutCinemaFrame(this, "出現")) {
+    if (_E6 && MR::tryStartDemoWithoutCinemaFrame(this, "\x8f\x6f\x8c\xbb")) {
         _E6 = 0;
 
         MR::startActorCameraTargetSelf(this, mCameraInfo, -1);
@@ -457,7 +457,7 @@ void BenefitItemObj::control() {
             _E4 = 0;
 
             MR::endActorCamera(this, mCameraInfo, false, -1);
-            MR::endDemo(this, "出現");
+            MR::endDemo(this, "\x8f\x6f\x8c\xbb");
 
             MR::validateClipping(this);
         }

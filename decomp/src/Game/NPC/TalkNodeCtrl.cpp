@@ -319,7 +319,7 @@ void TalkNodeCtrl::initNodeRecursive(TalkMessageCtrl* pMsgCtrl, const JMapInfoIt
 
     if (mMessageInfo.isCameraEvent()) {
         pCameraInf->mCameraSetID = mMessageInfo.mCameraSetID;
-        MR::initMultiActorCamera(pMsgCtrl->mHostActor, rIter, &pCameraInf, "会話");
+        MR::initMultiActorCamera(pMsgCtrl->mHostActor, rIter, &pCameraInf, "\x89\xef\x98\x62");
     }
 
     TalkNode* nodeEvent = getCurrentNodeEvent();

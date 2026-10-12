@@ -70,7 +70,7 @@ void Coin::init(const JMapInfoIter& rIter) {
     initShadow(rIter);
 
     if (mIsNeedBubble) {
-        mAirBubble = MR::createPartsModelNoSilhouettedMapObj(this, "アワ", "AirBubble", nullptr);
+        mAirBubble = MR::createPartsModelNoSilhouettedMapObj(this, "\x83\x41\x83\x8f", "AirBubble", nullptr);
         mAirBubble->initFixedPosition(TVec3f(0.0f, 70.0f, 0.0f), TVec3f(0.0f, 0.0f, 0.0f), nullptr);
         mAirBubble->makeActorDead();
         MR::registerDemoSimpleCastAll(mAirBubble);

@@ -10,32 +10,32 @@ namespace {
     static const s32 sMaxKameckBeamTurtle = 16;
 };  // namespace
 
-KameckBeamHolder::KameckBeamHolder() : DeriveActorGroup< KameckBeam >("カメックビーム管理", ::sMaxKameckBeam) {
+KameckBeamHolder::KameckBeamHolder() : DeriveActorGroup< KameckBeam >("\x83\x4a\x83\x81\x83\x62\x83\x4e\x83\x72\x81\x5b\x83\x80\x8a\xc7\x97\x9d", ::sMaxKameckBeam) {
     KameckBeam* pBeam;
 
     for (s32 i = 0; i < ::sMaxKameckBeam; i++) {
-        pBeam = new KameckBeam("カメックビーム");
+        pBeam = new KameckBeam("\x83\x4a\x83\x81\x83\x62\x83\x4e\x83\x72\x81\x5b\x83\x80");
         pBeam->initWithoutIter();
         registerActor(pBeam);
     }
 }
 
-KameckFireBallHolder::KameckFireBallHolder() : DeriveActorGroup< KameckFireBall >("カメック火の玉管理", ::sMaxKameckFireBall) {
+KameckFireBallHolder::KameckFireBallHolder() : DeriveActorGroup< KameckFireBall >("\x83\x4a\x83\x81\x83\x62\x83\x4e\x89\xce\x82\xcc\x8b\xca\x8a\xc7\x97\x9d", ::sMaxKameckFireBall) {
     KameckFireBall* pFireBall;
 
     for (s32 i = 0; i < ::sMaxKameckFireBall; i++) {
-        pFireBall = new KameckFireBall("カメックビーム用炎");
+        pFireBall = new KameckFireBall("\x83\x4a\x83\x81\x83\x62\x83\x4e\x83\x72\x81\x5b\x83\x80\x97\x70\x89\x8a");
         pFireBall->initWithoutIter();
         pFireBall->makeActorDead();
         registerActor(pFireBall);
     }
 }
 
-KameckBeamTurtleHolder::KameckBeamTurtleHolder() : DeriveActorGroup< KameckTurtle >("カメックビーム用カメ管理", ::sMaxKameckBeamTurtle) {
+KameckBeamTurtleHolder::KameckBeamTurtleHolder() : DeriveActorGroup< KameckTurtle >("\x83\x4a\x83\x81\x83\x62\x83\x4e\x83\x72\x81\x5b\x83\x80\x97\x70\x83\x4a\x83\x81\x8a\xc7\x97\x9d", ::sMaxKameckBeamTurtle) {
     KameckTurtle* pTurtle;
 
     for (s32 i = 0; i < ::sMaxKameckBeamTurtle; i++) {
-        pTurtle = new KameckTurtle("カメックビーム用カメ");
+        pTurtle = new KameckTurtle("\x83\x4a\x83\x81\x83\x62\x83\x4e\x83\x72\x81\x5b\x83\x80\x97\x70\x83\x4a\x83\x81");
         pTurtle->initWithoutIter();
         pTurtle->makeActorDead();
         registerActor(pTurtle);

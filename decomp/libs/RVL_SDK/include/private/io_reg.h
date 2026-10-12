@@ -14,21 +14,21 @@
 #define EXI_0CPR_EXTINT_MASK	    0x00000800
 
 typedef struct {
-    unsigned long tcint : 1;
-    unsigned long tcintmsk : 1;
-    unsigned long comerr : 1;
-    unsigned long rdstint : 1;
-    unsigned long rdstintmsk : 1;
-    unsigned long pad2 : 4;
-    unsigned long outlngth : 7;
-    unsigned long pad1 : 1;
-    unsigned long inlngth : 7;
-    unsigned long pad0 : 5;
-    unsigned long channel : 2;
-    unsigned long tstart : 1;
+    unsigned int tcint : 1;
+    unsigned int tcintmsk : 1;
+    unsigned int comerr : 1;
+    unsigned int rdstint : 1;
+    unsigned int rdstintmsk : 1;
+    unsigned int pad2 : 4;
+    unsigned int outlngth : 7;
+    unsigned int pad1 : 1;
+    unsigned int inlngth : 7;
+    unsigned int pad0 : 5;
+    unsigned int channel : 2;
+    unsigned int tstart : 1;
 } si_comcsr_t;
 
 typedef union {
-    unsigned long val;
+    unsigned int val;
     si_comcsr_t f;
 } si_comcsr_u;

@@ -98,15 +98,15 @@ void MarioAnimator::init() {
 
     mXanimePlayer = new XanimePlayer(MR::getJ3DModel(mActor), mResourceTable);
 
-    changeDefault("基本");
-    change("基本");
+    changeDefault("\x8a\xee\x96\x7b");
+    change("\x8a\xee\x96\x7b");
 
     mXanimePlayer->getCore()->enableJointTransform(MR::getJ3DModelData(mActor));
 
     mActor->mModelManager->mXanimePlayer = mXanimePlayer;
     mXanimePlayerUpper = new XanimePlayer(MR::getJ3DModel(mActor), mResourceTable, mXanimePlayer);
-    changeDefaultUpper("基本");
-    mXanimePlayerUpper->changeAnimation("基本");
+    changeDefaultUpper("\x8a\xee\x96\x7b");
+    mXanimePlayerUpper->changeAnimation("\x8a\xee\x96\x7b");
     mXanimePlayerUpper->mCore->shareJointTransform(mXanimePlayer->mCore);
     PSMTXCopy(MR::tmpMtxRotYRad(PI), _DC.toMtxPtr());
 }
@@ -164,12 +164,12 @@ bool MarioAnimator::isLandingAnimationRun() const {
         return false;
     }
 
-    if (isAnimationRun("着地") || isAnimationRun("着地B") || isAnimationRun("着地C") || isAnimationRun("着地ターン") ||
-        isAnimationRun("着地幅とび")) {
+    if (isAnimationRun("\x92\x85\x92\x6e") || isAnimationRun("\x92\x85\x92\x6e""B") || isAnimationRun("\x92\x85\x92\x6e""C") || isAnimationRun("\x92\x85\x92\x6e\x83\x5e\x81\x5b\x83\x93") ||
+        isAnimationRun("\x92\x85\x92\x6e\x95\x9d\x82\xc6\x82\xd1")) {
         return true;
     }
 
-    if (isAnimationRun("すべり着地")) {
+    if (isAnimationRun("\x82\xb7\x82\xd7\x82\xe8\x92\x85\x92\x6e")) {
         return true;
     }
 
@@ -177,15 +177,15 @@ bool MarioAnimator::isLandingAnimationRun() const {
         return true;
     }
 
-    if (isAnimationRun("ハード着地")) {
+    if (isAnimationRun("\x83\x6e\x81\x5b\x83\x68\x92\x85\x92\x6e")) {
         return true;
     }
 
-    if (isAnimationRun("逆着地")) {
+    if (isAnimationRun("\x8b\x74\x92\x85\x92\x6e")) {
         return true;
     }
 
-    if (isAnimationRun("ショート着地")) {
+    if (isAnimationRun("\x83\x56\x83\x87\x81\x5b\x83\x67\x92\x85\x92\x6e")) {
         return true;
     }
 
@@ -197,12 +197,12 @@ bool MarioAnimator::isLandingAnimationRun() const {
 }
 
 bool MarioAnimator::isCancelableAnimationRun() const {
-    if (isAnimationRun("着地") || isAnimationRun("着地B") || isAnimationRun("着地C") || isAnimationRun("着地ターン") ||
-        isAnimationRun("着地幅とび")) {
+    if (isAnimationRun("\x92\x85\x92\x6e") || isAnimationRun("\x92\x85\x92\x6e""B") || isAnimationRun("\x92\x85\x92\x6e""C") || isAnimationRun("\x92\x85\x92\x6e\x83\x5e\x81\x5b\x83\x93") ||
+        isAnimationRun("\x92\x85\x92\x6e\x95\x9d\x82\xc6\x82\xd1")) {
         return true;
     }
 
-    if (isAnimationRun("すべり着地")) {
+    if (isAnimationRun("\x82\xb7\x82\xd7\x82\xe8\x92\x85\x92\x6e")) {
         return true;
     }
 
@@ -215,24 +215,24 @@ bool MarioAnimator::isCancelableAnimationRun() const {
 
 bool MarioAnimator::isWalkOrWaitingMotion() const {
     if (isAnimationStop()) {
-        if (isAnimationRun("基本") || isAnimationRun("テニス基本")) {
+        if (isAnimationRun("\x8a\xee\x96\x7b") || isAnimationRun("\x83\x65\x83\x6a\x83\x58\x8a\xee\x96\x7b")) {
             return true;
         }
     }
 
-    if (isAnimationRun("坂前後ウエイト")) {
+    if (isAnimationRun("\x8d\xe2\x91\x4f\x8c\xe3\x83\x45\x83\x47\x83\x43\x83\x67")) {
         return true;
     }
 
-    if (isAnimationRun("坂左右ウエイト")) {
+    if (isAnimationRun("\x8d\xe2\x8d\xb6\x89\x45\x83\x45\x83\x47\x83\x43\x83\x67")) {
         return true;
     }
 
-    if (isAnimationRun("カリカリ限界")) {
+    if (isAnimationRun("\x83\x4a\x83\x8a\x83\x4a\x83\x8a\x8c\xc0\x8a\x45")) {
         return true;
     }
 
-    if (isAnimationRun("飛び込み準備")) {
+    if (isAnimationRun("\x94\xf2\x82\xd1\x8d\x9e\x82\xdd\x8f\x80\x94\xf5")) {
         return true;
     }
 
@@ -273,7 +273,7 @@ void MarioAnimator::update() {
     player = getPlayer();
     player->_71D = prevWalkState;
 
-    if (isWalkOrWaitingMotion() || isAnimationRun("しゃがみ基本")) {
+    if (isWalkOrWaitingMotion() || isAnimationRun("\x82\xb5\x82\xe1\x82\xaa\x82\xdd\x8a\xee\x96\x7b")) {
         player = getPlayer();
         _14 = walkStateTable[player->mTargetWalkSpeedIndex];
     } else {
@@ -294,11 +294,11 @@ void MarioAnimator::update() {
                 if (player->mMovementStates._B) {
                     getPlayer()->mMovementStates.jumping = false;
                     getPlayer()->mMovementStates._B = false;
-                    stopAnimation(nullptr, "基本");
+                    stopAnimation(nullptr, "\x8a\xee\x96\x7b");
                 }
 
                 if (isAnimationStop()) {
-                    changeAnimation("崖ふんばり");
+                    changeAnimation("\x8a\x52\x82\xd3\x82\xf1\x82\xce\x82\xe8");
                 }
             }
         }
@@ -306,14 +306,14 @@ void MarioAnimator::update() {
         goto afterBrake;
     }
 
-    if (isAnimationRun("崖ふんばり")) {
+    if (isAnimationRun("\x8a\x52\x82\xd3\x82\xf1\x82\xce\x82\xe8")) {
         player = getPlayer();
         if (!player->mMovementStates._1) {
-            stopAnimation("崖ふんばり", "落下");
+            stopAnimation("\x8a\x52\x82\xd3\x82\xf1\x82\xce\x82\xe8", "\x97\x8e\x89\xba");
             player = getPlayer();
             player->_414 = 15;
         } else {
-            stopAnimation("崖ふんばり");
+            stopAnimation("\x8a\x52\x82\xd3\x82\xf1\x82\xce\x82\xe8");
         }
     }
 
@@ -368,7 +368,7 @@ squatWalk:
             player->startBas(nullptr, false, 0.0f, 0.0f);
             break;
         default: {
-            if (!isAnimationRun("幅とび")) {
+            if (!isAnimationRun("\x95\x9d\x82\xc6\x82\xd1")) {
                 player = getPlayer();
                 player->startBas("SquatWalk", false, 0.0f, 79.0f);
             } else {
@@ -411,12 +411,12 @@ notSquat:
         goto afterBrake;
     }
 
-    if (isAnimationRun("氷上慣性走行")) {
+    if (isAnimationRun("\x95\x58\x8f\xe3\x8a\xb5\x90\xab\x91\x96\x8d\x73")) {
         stopAnimation(nullptr);
         goto doBrake;
     }
 
-    if (isAnimationRun("壁押し", 0)) {
+    if (isAnimationRun("\x95\xc7\x89\x9f\x82\xb5", 0)) {
         player = getPlayer();
         player->decideWalkSpeed();
         player = getPlayer();
@@ -431,8 +431,8 @@ notSquat:
         goto doBrake;
     }
 
-    if (!isAnimationRun("ハード着地")) {
-        if (isAnimationRun("がんばり走り")) {
+    if (!isAnimationRun("\x83\x6e\x81\x5b\x83\x68\x92\x85\x92\x6e")) {
+        if (isAnimationRun("\x82\xaa\x82\xf1\x82\xce\x82\xe8\x91\x96\x82\xe8")) {
             player = getPlayer();
             if (player->_8F0 < 1.0f) {
                 stopAnimation(nullptr);
@@ -447,17 +447,17 @@ doBrake:
     player->updateBrakeAnimation();
 
 afterBrake:
-    if (isAnimationRun("基本") || isAnimationRun("がんばり走り")) {
+    if (isAnimationRun("\x8a\xee\x96\x7b") || isAnimationRun("\x82\xaa\x82\xf1\x82\xce\x82\xe8\x91\x96\x82\xe8")) {
         setTilt();
     } else {
         resetTilt();
     }
 
-    if (isAnimationRun("スライダー尻")) {
+    if (isAnimationRun("\x83\x58\x83\x89\x83\x43\x83\x5f\x81\x5b\x90\x4b")) {
         setHipSliderTilt();
     }
 
-    if (isAnimationRun("坂すべり下向きあおむけ", 3)) {
+    if (isAnimationRun("\x8d\xe2\x82\xb7\x82\xd7\x82\xe8\x89\xba\x8c\xfc\x82\xab\x82\xa0\x82\xa8\x82\xde\x82\xaf", 3)) {
         setHipSlipTilt();
     }
 
@@ -805,16 +805,16 @@ void MarioAnimator::setWalkMode() {
         static_cast< u8 >(getPlayer()->checkStickFrontBack()) == 2) {
         if (!isStatusActiveID(MarioStatus_Magic) && !isStatusActiveID(MarioStatus_Skate)) {
             if (getPlayer()->mMovementStates._35) {
-                change("ブレーキ滑り床");
+                change("\x83\x75\x83\x8c\x81\x5b\x83\x4c\x8a\x8a\x82\xe8\x8f\xb0");
             } else {
-                change("ブレーキ");
+                change("\x83\x75\x83\x8c\x81\x5b\x83\x4c");
             }
         }
-    } else if (isAnimationRun("ブレーキ")) {
+    } else if (isAnimationRun("\x83\x75\x83\x8c\x81\x5b\x83\x4c")) {
         getPlayer()->doBrakingAnimation();
         getPlayer()->mTargetWalkSpeedIndex = 0;
     } else {
-        mXanimePlayer->stopAnimation("ブレーキ滑り床");
+        mXanimePlayer->stopAnimation("\x83\x75\x83\x8c\x81\x5b\x83\x4c\x8a\x8a\x82\xe8\x8f\xb0");
     }
 
     if (getPlayer()->mMovementStates._4 && !getPlayer()->mMovementStates._23) {
@@ -1095,7 +1095,7 @@ bool MarioAnimator::isMirrorAnimation() {
         camDir = -camDir;
     }
 
-    if (isAnimationRun("壁すべり") || isAnimationRun("壁くっつき")) {
+    if (isAnimationRun("\x95\xc7\x82\xb7\x82\xd7\x82\xe8") || isAnimationRun("\x95\xc7\x82\xad\x82\xc1\x82\xc2\x82\xab")) {
         if (!_10C) {
             const TVec3f& wallNorm = getPlayer()->getWallNorm();
             f32 wallDot = camDir.dot(wallNorm);
@@ -1113,7 +1113,7 @@ bool MarioAnimator::isMirrorAnimation() {
 
     // Check if walling (player mMovementStates._37 bit check)
     if (getPlayer()->mMovementStates._37) {
-        if (isAnimationRun("ブレーキ") || isAnimationRun("ターンブレーキ") || isAnimationRun("ターンジャンプ")) {
+        if (isAnimationRun("\x83\x75\x83\x8c\x81\x5b\x83\x4c") || isAnimationRun("\x83\x5e\x81\x5b\x83\x93\x83\x75\x83\x8c\x81\x5b\x83\x4c") || isAnimationRun("\x83\x5e\x81\x5b\x83\x93\x83\x57\x83\x83\x83\x93\x83\x76")) {
             if (!_10C) {
                 f32 frontDot = camDir.dot(getPlayer()->mFrontVec);
                 if (frontDot > 0.0f) {
@@ -1131,7 +1131,7 @@ bool MarioAnimator::isMirrorAnimation() {
 
     // Clear cache flag
     _10C = false;
-    if (isAnimationRun("左空パンチ")) {
+    if (isAnimationRun("\x8d\xb6\x8b\xf3\x83\x70\x83\x93\x83\x60")) {
         return true;
     }
 
@@ -1178,7 +1178,7 @@ void MarioAnimator::changePickupAnimation(const HitSensor* pSensor) {
     switch (type) {
     case ACTMES_STAR_PIECE_GIFT_MAX:
         mActor->_494 = mActor->_49C;
-        changeAnimation("カブ抜き");
+        changeAnimation("\x83\x4a\x83\x75\x94\xb2\x82\xab");
         mActor->changeNullAnimation("PullOut", -2);
         getPlayer()->stopWalk();
         break;
@@ -1187,16 +1187,16 @@ void MarioAnimator::changePickupAnimation(const HitSensor* pSensor) {
         mActor->_494 = mActor->_498;
         if (!getPlayer()->isSwimming()) {
             if (mActor->_424 == pSensor) {
-                changeAnimationUpper("ひろいクイック");
-                playEffect("ひろいクイック");
+                changeAnimationUpper("\x82\xd0\x82\xeb\x82\xa2\x83\x4e\x83\x43\x83\x62\x83\x4e");
+                playEffect("\x82\xd0\x82\xeb\x82\xa2\x83\x4e\x83\x43\x83\x62\x83\x4e");
                 mActor->clearNullAnimation(-3);
                 startPadVib(2);
             } else if (getPlayer()->mMovementStates.jumping && !getPlayer()->mMovementStates._B) {
-                changeAnimation("ひろい空中");
+                changeAnimation("\x82\xd0\x82\xeb\x82\xa2\x8b\xf3\x92\x86");
                 mActor->clearNullAnimation(-3);
                 getPlayer()->stopWalk();
             } else {
-                changeAnimation("ひろい");
+                changeAnimation("\x82\xd0\x82\xeb\x82\xa2");
                 mActor->changeNullAnimation("CarryStart", -2);
                 getPlayer()->stopWalk();
             }
@@ -1227,7 +1227,7 @@ void MarioAnimator::updateTakingAnimation(const HitSensor* pSensor) {
     switch (type) {
     case ACTMES_STAR_PIECE_GIFT_MAX:
         stopAnimation(nullptr);
-        changeAnimationUpper("カブウエイト");
+        changeAnimationUpper("\x83\x4a\x83\x75\x83\x45\x83\x47\x83\x43\x83\x67");
         mActor->clearNullAnimation(0);
         mActor->offTakingFlag();
         break;
@@ -1235,13 +1235,13 @@ void MarioAnimator::updateTakingAnimation(const HitSensor* pSensor) {
     case ACTMES_STAR_PIECE_GIFT_1:
         if (!getPlayer()->isSwimming()) {
             s32 shouldChange = 1;
-            if (isAnimationRun("ひろいクイック")) {
+            if (isAnimationRun("\x82\xd0\x82\xeb\x82\xa2\x83\x4e\x83\x43\x83\x62\x83\x4e")) {
                 shouldChange = isAnimationTerminateUpper(nullptr);
             }
 
             if (shouldChange) {
-                if (!isAnimationRun("ひろい空中") && mActor->isStopNullAnimation()) {
-                    changeAnimationUpper("ひろいウエイト");
+                if (!isAnimationRun("\x82\xd0\x82\xeb\x82\xa2\x8b\xf3\x92\x86") && mActor->isStopNullAnimation()) {
+                    changeAnimationUpper("\x82\xd0\x82\xeb\x82\xa2\x83\x45\x83\x47\x83\x43\x83\x67");
                     startPadVib(2);
                     mActor->clearNullAnimation(0);
                     mActor->offTakingFlag();
@@ -1260,19 +1260,19 @@ void MarioAnimator::changeThrowAnimation(const HitSensor* pSensor) {
     switch (type) {
     case ACTMES_STAR_PIECE_GIFT_MAX:
         stopAnimationUpper(nullptr);
-        changeAnimation("両手投げ");
-        startPadVib("マリオ[亀投げ]");
+        changeAnimation("\x97\xbc\x8e\xe8\x93\x8a\x82\xb0");
+        startPadVib("\x83\x7d\x83\x8a\x83\x49[\x8b\x54\x93\x8a\x82\xb0]");
         break;
     case ACTMES_STAR_PIECE_GIFT:
     case ACTMES_STAR_PIECE_GIFT_1:
         stopAnimationUpper(nullptr);
         if (getPlayer()->isSwimming()) {
-            changeAnimation("水泳亀投げ", "水泳基本");
+            changeAnimation("\x90\x85\x89\x6a\x8b\x54\x93\x8a\x82\xb0", "\x90\x85\x89\x6a\x8a\xee\x96\x7b");
         } else {
-            changeAnimation("投げ");
+            changeAnimation("\x93\x8a\x82\xb0");
         }
 
-        startPadVib("マリオ[亀投げ]");
+        startPadVib("\x83\x7d\x83\x8a\x83\x49[\x8b\x54\x93\x8a\x82\xb0]");
         break;
     }
 }
@@ -1293,12 +1293,12 @@ void MarioAnimator::waterToGround() {
     switch (state) {
     case ACTMES_STAR_PIECE_GIFT:
     case ACTMES_STAR_PIECE_GIFT_1:
-        changeAnimationUpper("ひろいウエイト");
+        changeAnimationUpper("\x82\xd0\x82\xeb\x82\xa2\x83\x45\x83\x47\x83\x43\x83\x67");
         mActor->clearNullAnimation(0);
         MR::deleteEffect(swimSensor->mHost, "SwimBubble");
         break;
     case ACTMES_STAR_PIECE_GIFT_MAX:
-        changeAnimationUpper("カブウエイト");
+        changeAnimationUpper("\x83\x4a\x83\x75\x83\x45\x83\x47\x83\x43\x83\x67");
         mActor->clearNullAnimation(0);
         break;
     }

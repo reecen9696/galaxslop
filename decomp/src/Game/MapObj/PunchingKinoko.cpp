@@ -34,7 +34,7 @@ void PunchingKinoko::init(const JMapInfoIter& rIter) {
     MR::calcGravity(this);
     _9C.set(mPosition);
 
-    mGroundChecker = new GroundChecker("頭コリジョン", 70.0f, 0.0f);
+    mGroundChecker = new GroundChecker("\x93\xaa\x83\x52\x83\x8a\x83\x57\x83\x87\x83\x93", 70.0f, 0.0f);
     MR::calcPositionUpOffset(&mGroundChecker->mPosition, this, 130.0f);
     MR::resetPosition(mGroundChecker);
     MR::onCalcGravity(mGroundChecker);
@@ -68,12 +68,12 @@ void PunchingKinoko::initSensor() {
 
 void PunchingKinoko::initShadow() {
     MR::initShadowController(this, 3);
-    MR::addShadowVolumeSphere(this, "体", 10.0f);
-    MR::onCalcShadowOneTime(this, "体");
-    MR::addShadowVolumeSphere(this, "頭", 70.0f);
-    MR::setShadowDropPositionPtr(this, "頭", &mGroundChecker->mPosition);
-    MR::setShadowDropDirectionPtr(this, "頭", &mGroundChecker->mGravity);
-    MR::addShadowVolumeLine(this, "つた", this, "体", 10.0f, this, "頭", 10.0f);
+    MR::addShadowVolumeSphere(this, "\x91\xcc", 10.0f);
+    MR::onCalcShadowOneTime(this, "\x91\xcc");
+    MR::addShadowVolumeSphere(this, "\x93\xaa", 70.0f);
+    MR::setShadowDropPositionPtr(this, "\x93\xaa", &mGroundChecker->mPosition);
+    MR::setShadowDropDirectionPtr(this, "\x93\xaa", &mGroundChecker->mGravity);
+    MR::addShadowVolumeLine(this, "\x82\xc2\x82\xbd", this, "\x91\xcc", 10.0f, this, "\x93\xaa", 10.0f);
 }
 
 void PunchingKinoko::initCamera(const JMapInfoIter& rIter) {
@@ -461,9 +461,9 @@ void PunchingKinoko::exeCrushed() {
     if (MR::isFirstStep(this)) {
         MR::startBrk(this, "Press");
 
-        if (MR::isShadowProjected(this, "頭")) {
-            MR::getShadowProjectionNormal(this, "頭", &_A8);
-            MR::getShadowProjectionPos(this, "頭", &mGroundChecker->mPosition);
+        if (MR::isShadowProjected(this, "\x93\xaa")) {
+            MR::getShadowProjectionNormal(this, "\x93\xaa", &_A8);
+            MR::getShadowProjectionPos(this, "\x93\xaa", &mGroundChecker->mPosition);
             mGroundChecker->mPosition.add(_A8 * 20.0f);
         } else {
             _A8.set(mGravity);
@@ -503,9 +503,9 @@ void PunchingKinoko::exeCrushedEnd() {
 }
 
 void PunchingKinoko::addVelocityKeepHeight() {
-    if (MR::isShadowProjected(this, "頭")) {
+    if (MR::isShadowProjected(this, "\x93\xaa")) {
         TVec3f stack_8;
-        MR::getShadowProjectionPos(this, "頭", &stack_8);
+        MR::getShadowProjectionPos(this, "\x93\xaa", &stack_8);
         MR::addVelocityKeepHeight(mGroundChecker, stack_8, 130.0f, 0.5f, 60.0f);
     }
 }

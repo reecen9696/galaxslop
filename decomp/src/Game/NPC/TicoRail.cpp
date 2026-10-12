@@ -64,8 +64,8 @@ void TicoRail::init(const JMapInfoIter& rIter) {
     MR::startBrk(this, "ColorChange");
     MR::setBrkFrameAndStop(this, color);
     AstroDemoFunction::tryRegisterGrandStarReturnAndSimpleCast(this, rIter);
-    AstroDemoFunction::tryRegisterDemo(this, "バトラーグリーンドライバ説明", rIter);
-    s32 rand = MR::getRandom(0l, 2l);
+    AstroDemoFunction::tryRegisterDemo(this, "\x83\x6f\x83\x67\x83\x89\x81\x5b\x83\x4f\x83\x8a\x81\x5b\x83\x93\x83\x68\x83\x89\x83\x43\x83\x6f\x90\xe0\x96\xbe", rIter);
+    s32 rand = MR::getRandom(0, 2);
 
     if (rand == 0) {
         initNerve(GET_NERVE(TicoRail, TicoRailNrvWait));
@@ -107,7 +107,7 @@ void TicoRail::exeLookAround() {
     MR::rotateVecDegree(&_8C, up, rotate);
 
     if (MR::isStep(this, 160)) {
-        if (MR::getRandom(0l, 2l) != 0) {
+        if (MR::getRandom(0, 2) != 0) {
             setNerve(GET_NERVE(TicoRail, TicoRailNrvMoveSign));
         } else {
             setNerve(GET_NERVE(TicoRail, TicoRailNrvMoveSignAndTurn));
@@ -184,7 +184,7 @@ void TicoRail::exeTalk() {
         MR::startBck(this, "Talk");
     }
 
-    if (!MR::isBckPlaying(this, "Reaction") && MR::getRandom(0l, 60l) == 0) {
+    if (!MR::isBckPlaying(this, "Reaction") && MR::getRandom(0, 60) == 0) {
         MR::startBckWithInterpole(this, "Reaction", 5);
     }
 
@@ -234,7 +234,7 @@ bool TicoRail::isGreaterEqualStepAndRandom(s32 step) const {
         return true;
     }
 
-    return MR::isGreaterEqualStep(this, step) && MR::getRandom(0l, 300l) == 0;
+    return MR::isGreaterEqualStep(this, step) && MR::getRandom(0, 300) == 0;
 }
 
 void TicoRail::kill() {
@@ -288,7 +288,7 @@ bool TicoRail::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pReceiver
         return false;
     }
 
-    if (MR::getRandom(0, 2l) == 0) {
+    if (MR::getRandom(0, 2) == 0) {
         return false;
     }
 

@@ -37,7 +37,7 @@ namespace {
 };  // namespace
 
 StarPointerCommandStream::StarPointerCommandStream(const TVec2f* pScreenPos)
-    : LayoutActor("スターポインタ指示線", true), _20(false), mOffScreenTime(), _28(), mScreenPos(pScreenPos), mWorldPos(), mPadChannel(-1), mColor() {
+    : LayoutActor("\x83\x58\x83\x5e\x81\x5b\x83\x7c\x83\x43\x83\x93\x83\x5e\x8e\x77\x8e\xa6\x90\xfc", true), _20(false), mOffScreenTime(), _28(), mScreenPos(pScreenPos), mWorldPos(), mPadChannel(-1), mColor() {
 }
 
 void StarPointerCommandStream::start(const TVec3f* pPos, bool b) {

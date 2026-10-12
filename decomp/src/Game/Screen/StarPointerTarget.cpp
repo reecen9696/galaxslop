@@ -34,6 +34,26 @@ bool StarPointerTarget::calcScreenPosition(TVec2f* pScreenPos) const {
 bool StarPointerTarget::isPointing(const TVec2f& rPointerPos, f32 zMargin, f32 radiusMargin) const {
     TVec3f worldPos, viewPos;
     calcPosition(&worldPos);
+#ifdef TARGET_PC
+    {
+        // In the VR diorama the player aims a ray from the controller, which
+        // does not start at the game camera: the target is pointed at when
+        // the ray passes within its radius, widened by the cursor's margin
+        // (screen pixels of the game camera, taken as an angle).
+        f32 o[3], d[3];
+        if (port_vr_pointer_ray(o, d)) {
+            TVec3f rel(worldPos.x - o[0], worldPos.y - o[1], worldPos.z - o[2]);
+            f32 along = rel.x * d[0] + rel.y * d[1] + rel.z * d[2];
+            if (along <= 0.0f) {
+                return false;
+            }
+            TVec3f off(rel.x - d[0] * along, rel.y - d[1] * along, rel.z - d[2] * along);
+            f32 pixelsPerRadian = (MR::getScreenHeight() * 0.5f) / MR::tan(MR::getFovy() * PI_180 * 0.5f);
+            f32 allowed = mRadius3d + along * (radiusMargin / pixelsPerRadian);
+            return off.squared() < allowed * allowed;
+        }
+    }
+#endif
     PSMTXMultVec(MR::getStarPointerViewMtx(), &worldPos, &viewPos);
 
     if (-viewPos.z <= 0.0f) {

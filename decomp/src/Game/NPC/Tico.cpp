@@ -164,17 +164,17 @@ void Tico::init(const JMapInfoIter& rIter) {
             makeActorDead();
         }
 
-        if (MR::isDemoCast(this, "チコガイドデモ")) {
+        if (MR::isDemoCast(this, "\x83\x60\x83\x52\x83\x4b\x83\x43\x83\x68\x83\x66\x83\x82")) {
             if (clr == -1) {
                 _15C = 5;
             } else {
                 _15C = 6;
             }
         } else {
-            if (MR::isDemoCast(this, "青チコ変身")) {
+            if (MR::isDemoCast(this, "\x90\xc2\x83\x60\x83\x52\x95\xcf\x90\x67")) {
                 _15C = 1;
             } else {
-                if (MR::isDemoCast(this, "赤いスター")) {
+                if (MR::isDemoCast(this, "\x90\xd4\x82\xa2\x83\x58\x83\x5e\x81\x5b")) {
                     _15C = 9;
                     MR::useStageSwitchWriteA(this, rIter);
                     MR::useStageSwitchWriteB(this, rIter);
@@ -307,7 +307,7 @@ void Tico::exeReaction() {
 void Tico::exeDelight() {
     if (MR::isFirstStep(this)) {
         MR::startAction(this, _13C);
-        MR::resetAndForwardNode(_174, MR::getRandom(0l, 5l));
+        MR::resetAndForwardNode(_174, MR::getRandom(0, 5));
     }
 
     MR::tryTalkForce(_174);
@@ -377,14 +377,14 @@ void Tico::exeBlue0() {
 
     if (MR::tryTalkNearPlayerAtEndAndStartTalkAction(this)) {
         setNerve(GET_NERVE(Tico, TicoNrvBlue1));
-        MR::startTimeKeepDemo(this, "青チコ変身", nullptr);
+        MR::startTimeKeepDemo(this, "\x90\xc2\x83\x60\x83\x52\x95\xcf\x90\x67", nullptr);
     }
 }
 
 void Tico::exeBlue1() {
     if (MR::isFirstStep(this)) {
         MR::startAction(this, "Fly");
-        MR::setRailCoordSpeed(this, (MR::getRailTotalLength(this) / MR::getDemoPartTotalStep("青チコ変身[移動]")));
+        MR::setRailCoordSpeed(this, (MR::getRailTotalLength(this) / MR::getDemoPartTotalStep("\x90\xc2\x83\x60\x83\x52\x95\xcf\x90\x67[\x88\xda\x93\xae]")));
     }
 
     MR::moveCoordAndFollowTrans(this);
@@ -395,7 +395,7 @@ void Tico::exeBlue1() {
 }
 
 void Tico::exeRed0() {
-    if (MR::tryStartTimeKeepDemoMarioPuppetable(this, "赤いスター", "赤いスター[開始]")) {
+    if (MR::tryStartTimeKeepDemoMarioPuppetable(this, "\x90\xd4\x82\xa2\x83\x58\x83\x5e\x81\x5b", "\x90\xd4\x82\xa2\x83\x58\x83\x5e\x81\x5b[\x8a\x4a\x8e\x6e]")) {
         setNerve(GET_NERVE(Tico, TicoNrvWait));
     }
 }
@@ -418,7 +418,7 @@ void Tico::exeRed2() {
     }
 
     if (mDemoStarter.update()) {
-        MR::tryStartTimeKeepDemoMarioPuppetable(this, "赤いスター", "赤いスター[開始]");
+        MR::tryStartTimeKeepDemoMarioPuppetable(this, "\x90\xd4\x82\xa2\x83\x58\x83\x5e\x81\x5b", "\x90\xd4\x82\xa2\x83\x58\x83\x5e\x81\x5b[\x8a\x4a\x8e\x6e]");
         setNerve(GET_NERVE(Tico, TicoNrvWait));
     }
 }

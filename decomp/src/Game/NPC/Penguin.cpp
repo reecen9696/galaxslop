@@ -40,12 +40,12 @@ namespace NrvPenguin {
 
 RemovableTurtle::RemovableTurtle(LiveActor* pHost, bool isGolden) {
     if (isGolden) {
-        mShellModel = new TurtlePartsModel(pHost, "ペンギン用ゴールデンコウラ", "KouraShine", nullptr,
+        mShellModel = new TurtlePartsModel(pHost, "\x83\x79\x83\x93\x83\x4d\x83\x93\x97\x70\x83\x53\x81\x5b\x83\x8b\x83\x66\x83\x93\x83\x52\x83\x45\x83\x89", "KouraShine", nullptr,
                                            MR::DrawBufferType_NoSilhouettedMapObjStrongLight, false);
-        mJetTurtle = new GoldenTurtle("ゴールデン甲羅");
+        mJetTurtle = new GoldenTurtle("\x83\x53\x81\x5b\x83\x8b\x83\x66\x83\x93\x8d\x62\x97\x85");
     } else {
-        mShellModel = new PartsModel(pHost, "ペンギン用コウラ", "Koura", nullptr, MR::DrawBufferType_NoSilhouettedMapObjStrongLight, false);
-        mJetTurtle = new JetTurtle("ジェット亀さん");
+        mShellModel = new PartsModel(pHost, "\x83\x79\x83\x93\x83\x4d\x83\x93\x97\x70\x83\x52\x83\x45\x83\x89", "Koura", nullptr, MR::DrawBufferType_NoSilhouettedMapObjStrongLight, false);
+        mJetTurtle = new JetTurtle("\x83\x57\x83\x46\x83\x62\x83\x67\x8b\x54\x82\xb3\x82\xf1");
     }
 
     mShellModel->_99 = true;

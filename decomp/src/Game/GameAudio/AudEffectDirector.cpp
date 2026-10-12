@@ -19,7 +19,7 @@ namespace {
     };
 };  // namespace
 
-AudEffectDirector::AudEffectDirector() : NameObj("オーディオエフェクトディレクター"), _C(0), _10(0), _14(0) {
+AudEffectDirector::AudEffectDirector() : NameObj("\x83\x49\x81\x5b\x83\x66\x83\x42\x83\x49\x83\x47\x83\x74\x83\x46\x83\x4e\x83\x67\x83\x66\x83\x42\x83\x8c\x83\x4e\x83\x5e\x81\x5b"), _C(0), _10(0), _14(0) {
 }
 
 void AudEffectDirector::init(const JMapInfoIter& rIter) {

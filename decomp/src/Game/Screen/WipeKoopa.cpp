@@ -13,7 +13,7 @@ namespace {
     NEW_NERVE(WipeKoopaNrvClose, WipeKoopa, Close);
 };  // namespace
 
-WipeKoopa::WipeKoopa() : WipeLayoutBase("クッパ"), mFrame(::sAnimFrame) {
+WipeKoopa::WipeKoopa() : WipeLayoutBase("\x83\x4e\x83\x62\x83\x70"), mFrame(::sAnimFrame) {
 }
 
 void WipeKoopa::init(const JMapInfoIter& rIter) {

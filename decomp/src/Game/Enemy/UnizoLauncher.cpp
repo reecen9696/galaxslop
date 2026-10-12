@@ -32,7 +32,7 @@ void UnizoLauncher::init(const JMapInfoIter& rIter) {
     MR::setGroupClipping(this, rIter, 16);
 
     for (s32 i = 0; i < mUnizoNum; i++) {
-        mUnizos[i] = new Unizo("陸ウニゾー");
+        mUnizos[i] = new Unizo("\x97\xa4\x83\x45\x83\x6a\x83\x5d\x81\x5b");
         mUnizos[i]->init(rIter);
         mUnizos[i]->makeActorDead();
         MR::setGroupClipping(mUnizos[i], rIter, 16);

@@ -23,7 +23,7 @@ namespace NrvPoltaBattleLv1 {
     NEW_NERVE(PoltaBattleLv1NrvDamageCore, PoltaBattleLv1, DamageCore);
 };  // namespace NrvPoltaBattleLv1
 
-PoltaBattleLv1::PoltaBattleLv1(Polta* pPolta) : PoltaActionBase("ポルタ1戦目", pPolta), mPoltaHealth(3), _24(0) {
+PoltaBattleLv1::PoltaBattleLv1(Polta* pPolta) : PoltaActionBase("\x83\x7c\x83\x8b\x83\x5e""1\x90\xed\x96\xda", pPolta), mPoltaHealth(3), _24(0) {
     initNerve(GET_NERVE(PoltaBattleLv1, PoltaBattleLv1NrvWait));
     mStateStagger = new PoltaStateStagger(pPolta);
     mStateGroundRockAttack = new PoltaStateGroundRockAttack(pPolta);

@@ -51,7 +51,7 @@ void AstroMapObj::init(const JMapInfoIter& rIter) {  // Pain
     MR::getObjectName(&_CC, rIter);
     MapObjActorInitInfo mapObjInitInfo = MapObjActorInitInfo();
     _D8 = AstroMapObjFunction::getDomeIdFromArg0(rIter);
-    mapObjInitInfo.setupHioNode("地形オブジェ");
+    mapObjInitInfo.setupHioNode("\x92\x6e\x8c\x60\x83\x49\x83\x75\x83\x57\x83\x46");
     mapObjInitInfo.setupDefaultPos();
     mapObjInitInfo.setupModelName(AstroMapObjFunction::getModelName(_CC, _D8));
     mapObjInitInfo.setupConnectToScene();
@@ -237,13 +237,13 @@ bool AstroMapObj::isEndRevival() const {
 }
 
 bool AstroMapObj::isPlayMachineSE() const {
-    if (MR::isDemoActive("ロゼッタ状況説明デモ") && MR::isDemoPartActive("状況説明[絵本表示]")) {
+    if (MR::isDemoActive("\x83\x8d\x83\x5b\x83\x62\x83\x5e\x8f\xf3\x8b\xb5\x90\xe0\x96\xbe\x83\x66\x83\x82") && MR::isDemoPartActive("\x8f\xf3\x8b\xb5\x90\xe0\x96\xbe[\x8a\x47\x96\x7b\x95\x5c\x8e\xa6]")) {
         return false;
     }
-    if (MR::isDemoActive("グランドスター帰還[２回目以降]")) {
+    if (MR::isDemoActive("\x83\x4f\x83\x89\x83\x93\x83\x68\x83\x58\x83\x5e\x81\x5b\x8b\x41\x8a\xd2[\x82\x51\x89\xf1\x96\xda\x88\xc8\x8d\x7e]")) {
         return false;
     }
-    return MR::isDemoActive("パワースター帰還") == 0;
+    return MR::isDemoActive("\x83\x70\x83\x8f\x81\x5b\x83\x58\x83\x5e\x81\x5b\x8b\x41\x8a\xd2") == 0;
 }
 
 AstroSimpleObj::AstroSimpleObj(const char* pName) : SimpleMapObjFarMax(pName) {

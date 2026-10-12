@@ -25,9 +25,12 @@
 #include <JSystem/JGeometry/TMatrix.hpp>
 #include <JSystem/JGeometry/TVec.hpp>
 #include <revolution/mtx.h>
+#ifdef TARGET_PC
+#include "port/port.h"
+#endif
 
 TalkMessageCtrl::TalkMessageCtrl(LiveActor* pHost, const TVec3f& rArg2, MtxPtr pArg3)
-    : NameObj("会話制御"), mHostActor(pHost), mNodeCtrl(), mZoneID(-1), _1C(0.0f, 0.0f, 0.0f), mMsgBalloonFollowOffs(rArg2), mTalkDistance(240.0f),
+    : NameObj("\x89\xef\x98\x62\x90\xa7\x8c\xe4"), mHostActor(pHost), mNodeCtrl(), mZoneID(-1), _1C(0.0f, 0.0f, 0.0f), mMsgBalloonFollowOffs(rArg2), mTalkDistance(240.0f),
       _3C(), mIsOnReadNodeAuto(true), mAlreadyDoneFlags(), mIsStartOnlyFront(), mCameraInfo(), mBranchFunc(), mEventFunc(), mAnimeFunc(), mKillFunc(),
       mMtx(pArg3), mIsOnRootNodeAuto(), _18(), mTagArg(nullptr, CustomTagArg::Type_Uninitialized) {
     mTagArg.mArgType = CustomTagArg::Type_Uninitialized;
@@ -62,7 +65,7 @@ void TalkMessageCtrl::startCamera(s32 a1) {
     } else if (inf->isCameraEvent()) {
         if (inf->mCameraSetID) {
             mCameraInfo->mCameraSetID = inf->mCameraSetID;
-            MR::startMultiActorCameraNoTarget(mHostActor, mCameraInfo, "会話", a1);
+            MR::startMultiActorCameraNoTarget(mHostActor, mCameraInfo, "\x89\xef\x98\x62", a1);
         }
     }
 }
@@ -106,7 +109,7 @@ bool TalkMessageCtrl::rootNodeEve() {
             return true;
         }
 
-        if (mEventFunc->operator()(nodeEvent->mUnknown) == nullptr) {
+        if (mEventFunc->operator()(nodeEvent->mUnknown) == 0) {
             return false;
         }
     } else if (groupID == 4) {
@@ -114,7 +117,7 @@ bool TalkMessageCtrl::rootNodeEve() {
             return true;
         }
 
-        if (mAnimeFunc->operator()(nodeEvent->mUnknown) == nullptr) {
+        if (mAnimeFunc->operator()(nodeEvent->mUnknown) == 0) {
             return false;
         }
     } else if (groupID == 3) {
@@ -125,7 +128,7 @@ bool TalkMessageCtrl::rootNodeEve() {
     } else if (groupID == 6) {
         MR::onSwitchB(mHostActor);
     } else if (groupID == 7) {
-        if (mKillFunc->operator()(nodeEvent->mUnknown) == nullptr) {
+        if (mKillFunc->operator()(nodeEvent->mUnknown) == 0) {
             return false;
         }
     }
@@ -161,7 +164,23 @@ void TalkMessageCtrl::rootNodePre(bool arg) {
 
         bool cond = false;
 
-        switch (branch->mIndex) {
+        u16 branchType = branch->mIndex;
+#ifdef TARGET_PC
+        // The decomp uses Korean branch IDs. EU/US discs put observatory flags
+        // at 11, demo activity at 12 and read-message flags at 13.
+        const PortDisc* disc = port_dvd_disc();
+        if (disc != nullptr && (disc->id[3] == 'P' || disc->id[3] == 'E')) {
+            if (branchType == 11) {
+                branchType = 14;
+            } else if (branchType == 12) {
+                branchType = 11;
+            } else if (branchType == 13) {
+                branchType = 12;
+            }
+        }
+#endif
+
+        switch (branchType) {
         case 0:
             return;
         case 1:

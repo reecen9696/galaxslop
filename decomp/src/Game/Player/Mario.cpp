@@ -1068,7 +1068,7 @@ void Mario::fixFrontVecByGravity() {
     }
 
     TVec3f front = _344.cross(up);
-    if (MR::normalizeOrZero(&front) == nullptr) {
+    if (MR::normalizeOrZero(&front) == 0) {
         setFrontVec(front);
         _22C = mFrontVec;
         f32 _328mag = _328.length();
@@ -1226,7 +1226,7 @@ void Mario::setFrontVecKeepSide(const TVec3f& rFront) {
     }
 
     headVec.cross(mFrontVec, mSideVec);
-    if (MR::normalizeOrZero(&headVec) != nullptr) {
+    if (MR::normalizeOrZero(&headVec) != 0) {
         const TVec3f* gravity = getGravityVec();
         TVec3f up = -(*gravity);
         mHeadVec = up;
@@ -1547,9 +1547,9 @@ void Mario::initAfterConst() {
     _814 = mPosition;
     PSMTXIdentity(_7E4);
     PSMTXIdentity(_824);
-    _720 = getAnimationStringPointer("ヒップドロップ開始");
-    _724 = getAnimationStringPointer("ヒップドロップ");
-    _728 = getAnimationStringPointer("ヒップドロップ着地");
+    _720 = getAnimationStringPointer("\x83\x71\x83\x62\x83\x76\x83\x68\x83\x8d\x83\x62\x83\x76\x8a\x4a\x8e\x6e");
+    _724 = getAnimationStringPointer("\x83\x71\x83\x62\x83\x76\x83\x68\x83\x8d\x83\x62\x83\x76");
+    _728 = getAnimationStringPointer("\x83\x71\x83\x62\x83\x76\x83\x68\x83\x8d\x83\x62\x83\x76\x92\x85\x92\x6e");
 }
 
 void Mario::writeBackPhyisicalVector() {
@@ -1917,7 +1917,7 @@ void Mario::actionMain() {
             }
         }
 
-        if (isStickOn() && isAnimationRun("水泳陸うちあげ")) {
+        if (isStickOn() && isAnimationRun("\x90\x85\x89\x6a\x97\xa4\x82\xa4\x82\xbf\x82\xa0\x82\xb0")) {
             stopAnimation(nullptr);
         }
 
@@ -1947,8 +1947,8 @@ void Mario::updateGroundInfo() {
             _3C6 = 0;
         }
 
-        if (b1 && mMovementStates._1 && isDefaultAnimationRun("落下")) {
-            changeAnimation(nullptr, "基本");
+        if (b1 && mMovementStates._1 && isDefaultAnimationRun("\x97\x8e\x89\xba")) {
+            changeAnimation(nullptr, "\x8a\xee\x96\x7b");
         }
 
         if (!isStatusActive(MarioStatus_13)) {
@@ -2006,12 +2006,12 @@ bool Mario::postureCtrl(MtxPtr) {
         }
     }
 
-    if (isAnimationRun("坂すべり上向きうつぶせ", 2)) {
+    if (isAnimationRun("\x8d\xe2\x82\xb7\x82\xd7\x82\xe8\x8f\xe3\x8c\xfc\x82\xab\x82\xa4\x82\xc2\x82\xd4\x82\xb9", 2)) {
         vec2 = _368;
     }
 
     if (isStatusActive(MarioStatus_Wait)) {
-        if (isAnimationRun("特殊ウエイト1A")) {
+        if (isAnimationRun("\x93\xc1\x8e\xea\x83\x45\x83\x47\x83\x43\x83\x67""1A")) {
             if (getAnimator()->getFrame() > 290.0f) {
                 blend = 1.0f;
             } else if (getAnimator()->getFrame() > 260.0f) {
@@ -2026,8 +2026,8 @@ bool Mario::postureCtrl(MtxPtr) {
         }
     }
 
-    if (!isSwimming() && (isAnimationRun("水泳ジェット") || isAnimationRun("水泳スピン移動") || isAnimationRun("リングダッシュ") ||
-                          isAnimationRun("水泳スピンジャンプ"))) {
+    if (!isSwimming() && (isAnimationRun("\x90\x85\x89\x6a\x83\x57\x83\x46\x83\x62\x83\x67") || isAnimationRun("\x90\x85\x89\x6a\x83\x58\x83\x73\x83\x93\x88\xda\x93\xae") || isAnimationRun("\x83\x8a\x83\x93\x83\x4f\x83\x5f\x83\x62\x83\x56\x83\x85") ||
+                          isAnimationRun("\x90\x85\x89\x6a\x83\x58\x83\x73\x83\x93\x83\x57\x83\x83\x83\x93\x83\x76"))) {
         MR::vecBlendSphere(mHeadVec, mJumpVec, &vec2, 0.1f);
 
         if (MR::normalizeOrZero(&vec2)) {
@@ -2080,7 +2080,7 @@ void Mario::createAngleMtx(MtxPtr pMtx, bool a2) {
 
     HitSensor* sensor = mActor->_470;
 
-    if (isAnimationRun("投げ")) {
+    if (isAnimationRun("\x93\x8a\x82\xb0")) {
         sensor = mActor->_474;
     }
 
@@ -2170,7 +2170,7 @@ void Mario::updateLookOfs() {
     }
 
     if (_97C == nullptr) {
-        if (isAnimationRun("壁押し")) {
+        if (isAnimationRun("\x95\xc7\x89\x9f\x82\xb5")) {
             TVec3f vec2;
             MR::vecKillElement(_4E8 - mPosition, mHeadVec, &vec2);
             f32 len = vec2.length();
@@ -2236,7 +2236,7 @@ const TVec3f* Mario::getGravityVec() const {
                 return &mAirGravityVec;
             }
 
-            if (isAnimationRun("ハード着地")) {
+            if (isAnimationRun("\x83\x6e\x81\x5b\x83\x68\x92\x85\x92\x6e")) {
                 return &mAirGravityVec;
             }
 
@@ -2284,7 +2284,7 @@ const TVec3f* Mario::getGravityVec() const {
 }
 
 void Mario::touchWater() {
-    if (mActor->isActionOk("水解除") && mMorphResetTimer == 0) {
+    if (mActor->isActionOk("\x90\x85\x89\xf0\x8f\x9c") && mMorphResetTimer == 0) {
         mMorphResetTimer = 10;
     }
 }
