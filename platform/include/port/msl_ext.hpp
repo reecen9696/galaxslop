@@ -1,6 +1,8 @@
 // Non-standard helpers and pre-C++17 functional adaptors that the game code
 // expects from Metrowerks' MSL C++ library.  libc++ in C++20 mode no longer
-// declares the adaptors, so defining them here does not collide with it.
+// declares the adaptors, so defining them here does not collide with it;
+// libstdc++ still declares most of them, so there only MSL's own extras and
+// binders are defined (with _GLIBCXX_USE_DEPRECATED=0, see CMakeLists.txt).
 #pragma once
 
 #include <algorithm>
@@ -33,6 +35,7 @@ namespace std {
         return first;
     }
 
+#ifndef __GLIBCXX__  // libstdc++ still declares these in C++20; libc++ does not
     // ---- C++98 adaptor base classes ---------------------------------------
     template < class Arg, class Result >
     struct unary_function {
@@ -47,6 +50,7 @@ namespace std {
         typedef Result result_type;
     };
 
+#endif
     // ---- binders ------------------------------------------------------------
     template < class Func >
     class binder1st : public unary_function< typename Func::second_argument_type, typename Func::result_type > {
@@ -82,6 +86,7 @@ namespace std {
         return binder2nd< Func, typename Func::second_argument_type >(f, typename Func::second_argument_type(v));
     }
 
+#ifndef __GLIBCXX__  // libstdc++ still declares these in C++20; libc++ does not
     // ---- member function adaptors ---------------------------------------------
     template < class Return, class Type >
     class mem_fun_t : public unary_function< Type*, Return > {
@@ -158,6 +163,7 @@ namespace std {
     inline mem_fun1_ref_t< Result, Type, Arg > mem_fun_ref(Result (Type::*p)(Arg)) { return mem_fun1_ref_t< Result, Type, Arg >(p); }
 
     // MSL spelling of mem_fun.
+#endif
     template < class Result, class Type >
     inline mem_fun_t< Result, Type > mem_func(Result (Type::*p)()) { return mem_fun_t< Result, Type >(p); }
     template < class Result, class Type >
@@ -167,6 +173,7 @@ namespace std {
     template < class Result, class Type, class Arg >
     inline const_mem_fun1_t< Result, Type, Arg > mem_func(Result (Type::*p)(Arg) const) { return const_mem_fun1_t< Result, Type, Arg >(p); }
 
+#ifndef __GLIBCXX__  // libstdc++ still declares these in C++20; libc++ does not
     // ---- negators / function pointers ------------------------------------------
     template < class Predicate >
     class unary_negate : public unary_function< typename Predicate::argument_type, bool > {
@@ -213,4 +220,5 @@ namespace std {
         return pointer_to_binary_function< Arg1, Arg2, Result >(p);
     }
 
+#endif
 }  // namespace std
