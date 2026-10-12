@@ -72,23 +72,24 @@ renders in Chromium; one human has seen it.
 
 ### P0-11 Aurora GX spike (critical path, 3-week timebox)
 - lane: A
-- status: open
-- owner:
+- status: done
+- owner: A (solo)
 - blocked_by: P0-02
 - touches: platform/src/gx (replace), platform/include, CMakeLists.txt, tools/cook (read; note any swap that must stop)
 - flags:
 - what: Per D-014. Add `extern/aurora` (MIT, pinned), link `aurora::gx` (+ `vi`, `mtx` as needed) in place of GalaxyQuest's `gx/` and Petari's `src/RVL_SDK/gx`; Aurora's `include/dolphin/gx.h` family replaces the SDK headers for GX only. Keep GalaxyQuest's `os`/`dvd`/`nand`/`audio`/`input`. Native first (Dawn on Metal): title screen, then Good Egg. Then Emscripten with emdawnwebgpu (read `webcompiled`'s build for the approach; it is GPL-3, copy nothing). Answer the five spike questions in D-014 and log them with numbers. Go/no-go at 3 weeks: go = Good Egg renders correctly natively and the web build draws the title screen; no-go = resume P0-10.
 - done when: go/no-go logged in D-014's revisit line and here, with frame time at 720p.
 - log:
+  - 2026-10-12: no-go before starting, on evidence (D-017): Aurora's GX is a high-level API with a different GXSetArray, no Emscripten support in-tree (webcompiled is GPL-3), and GalaxyQuest's pipeline works at the hardware-FIFO level with a small Backend interface. P0-10 is the path.
 
-### P0-10 GX renderer: ES 3.0 / WebGL2 rework (fallback)
+### P0-10 GX renderer: ES 3.0 / WebGL2 rework (critical path)
 - lane: A
-- status: open
-- owner:
-- blocked_by: P0-11 (only on no-go)
+- status: in_progress
+- owner: A (solo)
+- blocked_by: P0-11 (no-go: done)
 - touches: platform/src/gx
 - flags:
-- what: Fallback if P0-11 fails its timebox. Per D-008. GalaxyQuest's renderer is GLES 3.2 and will not run on WebGL2 or macOS GL. In order: (1) the four SSBOs -> data textures: `rows` and `st` as RGBA32F, `recs` as RGBA32UI, uploaded with `glTexSubImage2D` per FIFO flush; `gl_shadergen.cpp` emits `texelFetch` helpers in place of `buffer` block indexing. (2) `vtxRec[u_firstOrdinal + gl_VertexID]` -> a `uint` vertex attribute via `glVertexAttribIPointer`. (3) `glVertexAttribFormat/Binding/BindVertexBuffer` -> `glVertexAttribPointer` per batch. (4) `#version 320 es` -> `300 es`; `#version 330 core`/`410 core` for native; `layout(binding=N)` on samplers -> `glUniform1i` after link. (5) `glProgramBinary` cache -> cache generated GLSL keyed by TEV hash; warm at load; `KHR_parallel_shader_compile` when present. (6) The shared-context compile thread stays behind `#ifdef` for native; web uses (5). (7) Remove EGL and QCOM foveation. Keep `PETARI_DLCHECK` working. Use GalaxyQuest's own `PETARI_PERFLOG` to compare batch counts before and after.
+- what: Per D-008 and D-017. Native target is GL 4.1 core on macOS (`#version 410 core`), browser target is `#version 300 es`; one source, a version/precision prelude chosen at runtime. GalaxyQuest's renderer is GLES 3.2 and will not run on WebGL2 or macOS GL. In order: (1) the four SSBOs -> data textures: `rows` and `st` as RGBA32F, `recs` as RGBA32UI, uploaded with `glTexSubImage2D` per FIFO flush; `gl_shadergen.cpp` emits `texelFetch` helpers in place of `buffer` block indexing. (2) `vtxRec[u_firstOrdinal + gl_VertexID]` -> a `uint` vertex attribute via `glVertexAttribIPointer`. (3) `glVertexAttribFormat/Binding/BindVertexBuffer` -> `glVertexAttribPointer` per batch. (4) `#version 320 es` -> `300 es`; `#version 330 core`/`410 core` for native; `layout(binding=N)` on samplers -> `glUniform1i` after link. (5) `glProgramBinary` cache -> cache generated GLSL keyed by TEV hash; warm at load; `KHR_parallel_shader_compile` when present. (6) The shared-context compile thread stays behind `#ifdef` for native; web uses (5). (7) Remove EGL and QCOM foveation. Keep `PETARI_DLCHECK` working. Use GalaxyQuest's own `PETARI_PERFLOG` to compare batch counts before and after.
 - done when: with P0-04's native build, title screen and Good Egg match Dolphin screenshots side by side (human), `PETARI_DLCHECK=1` is clean for 600 frames, and the renderer compiles with no symbol outside ES 3.0 / GL 3.3 core (grep the source for `GL_SHADER_STORAGE`, `glVertexAttribFormat`, `glProgramBinary`, `egl`).
 - log:
 

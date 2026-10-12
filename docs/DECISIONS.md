@@ -219,3 +219,30 @@ front end treats as physical. Neither is worth it for a dev build when
 the shipping target is the browser.
 Revisit: if Rosetta is removed from macOS, or if dev builds get slow
 enough to matter (Linux VM or the web build are the alternatives).
+
+## D-017 (2026-10-12, lane A): Aurora no-go before the spike; P0-10 (GalaxyQuest renderer on GL 4.1 / WebGL2) is the GX path. Supersedes D-014
+What: drop Aurora as the GX layer. Keep GalaxyQuest's whole GX pipeline
+(Petari's real SDK GX writes a hardware FIFO; `gpu_cp.cpp` emulates the
+command processor; `gx_recorder.cpp` batches; a backend draws) and port
+its GL backend to GL 4.1 core (macOS desktop) and OpenGL ES 3.0 / WebGL2
+(browser) from one source, per the D-008 recipe.
+Why, from reading Aurora at `aa0ca71` and GalaxyQuest's gx/ after
+vendoring (neither was visible when D-014 was written):
+- Aurora is a high-level GX API. Its `GXSetArray` takes `size` and `le`
+  arguments the SDK's does not, so every game/JSystem call site would need
+  patching, and Petari's SDK GX (which GalaxyQuest compiles, with fixes)
+  would be replaced wholesale.
+- GalaxyQuest's renderer works below that, on the hardware command stream,
+  and is the one proven across all 44 galaxies. Its TARGET_PC hooks
+  (HUD/sky/player markers, camera records, EFB-copy handling) talk to the
+  recorder; Aurora would orphan them.
+- Aurora has no Emscripten support in-tree. The only browser port
+  (webcompiled) is GPL-3; we would redo it from scratch.
+- The renderer's backend interface is small (`gpu::Backend`: draw, BP/XF/CP
+  writes, EFB copy, TLUT, peek), so the porting surface is two files
+  (`gl_renderer.cpp`, `gl_shadergen.cpp`, ~3,000 lines), not a pipeline.
+Native windowing comes from SDL3 built from source (the Mac build is
+x86_64, D-016, and Homebrew's libraries are arm64).
+Revisit: if WebGL2 frame time misses budget at P0-08, a WebGPU backend
+behind the same `gpu::Backend` interface is the next step (P5-03), not
+Aurora.
