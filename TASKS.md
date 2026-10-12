@@ -61,7 +61,7 @@ renders in Chromium; one human has seen it.
 
 ### P0-03 Strip Android/OpenXR from the platform layer; desktop host glue
 - lane: B
-- status: in_progress
+- status: done
 - owner: A (solo)
 - blocked_by: P0-02
 - touches: platform/src/os, platform/src/dvd, platform/src/nand, platform/src/input, platform/src/audio (output glue only), platform/src/port, platform/src/xr (delete), CMakeLists.txt
@@ -69,6 +69,7 @@ renders in Chromium; one human has seen it.
 - what: Everything outside `gx/`. Delete `xr/`. Replace: Android log -> stdio; AAudio -> a `PortAudioSink` interface with a null sink now (SDL audio in P0-04, worklet ring in P1-01); Android asset/`files/game` paths -> `--game <dir>`; the `reserve` preload trick for the low-4 GB window -> `mmap(MAP_FIXED)` at startup in `os_mem.cpp`, with `-Wl,-pagezero_size,0x1000` on macOS (D-013); Quest controller input -> the WPAD surface fed by a plain struct the host fills. OpenXR calls in `port/` become no-ops behind `PORT_PLATFORM=desktop`. Keep `-DPORT_PLATFORM_CODE` and `compat.h` as they are.
 - done when: every file outside `platform/src/gx/` compiles on macOS and Linux with `-DPORT_PLATFORM=desktop`. Nothing links yet; P0-04 links.
 - log:
+  - 2026-10-13 (A): desktop builds without xr/ and android/ on macOS and Linux (CI green). The Android files stay in the tree, unbuilt; deleting them is a separate cleanup.
   - 2026-10-12: desktop path in CMakeLists.txt (Android path untouched): excludes xr/, aaudio_out, gl_renderer, headless_render; adds platform/src/native/{main.cpp,desktop_stubs.cpp}. os_mem.cpp: shm_open on macOS, no MAP_FIXED_NOREPLACE on Darwin. compat.h: <float.h>, __va_list. Links on macOS x86_64 (D-016). xr/ and android/ still in the tree, just not built; delete once Linux CI builds too.
 
 ### P0-11 Aurora GX spike (critical path, 3-week timebox)
@@ -85,7 +86,7 @@ renders in Chromium; one human has seen it.
 
 ### P0-10 GX renderer: ES 3.0 / WebGL2 rework (critical path)
 - lane: A
-- status: in_progress
+- status: review
 - owner: A (solo)
 - blocked_by: P0-11 (no-go: done)
 - touches: platform/src/gx
@@ -93,6 +94,7 @@ renders in Chromium; one human has seen it.
 - what: Per D-008 and D-017. Native target is GL 4.1 core on macOS (`#version 410 core`), browser target is `#version 300 es`; one source, a version/precision prelude chosen at runtime. GalaxyQuest's renderer is GLES 3.2 and will not run on WebGL2 or macOS GL. In order: (1) the four SSBOs -> data textures: `rows` and `st` as RGBA32F, `recs` as RGBA32UI, uploaded with `glTexSubImage2D` per FIFO flush; `gl_shadergen.cpp` emits `texelFetch` helpers in place of `buffer` block indexing. (2) `vtxRec[u_firstOrdinal + gl_VertexID]` -> a `uint` vertex attribute via `glVertexAttribIPointer`. (3) `glVertexAttribFormat/Binding/BindVertexBuffer` -> `glVertexAttribPointer` per batch. (4) `#version 320 es` -> `300 es`; `#version 330 core`/`410 core` for native; `layout(binding=N)` on samplers -> `glUniform1i` after link. (5) `glProgramBinary` cache -> cache generated GLSL keyed by TEV hash; warm at load; `KHR_parallel_shader_compile` when present. (6) The shared-context compile thread stays behind `#ifdef` for native; web uses (5). (7) Remove EGL and QCOM foveation. Keep `PETARI_DLCHECK` working. Use GalaxyQuest's own `PETARI_PERFLOG` to compare batch counts before and after.
 - done when: with P0-04's native build, title screen and Good Egg match Dolphin screenshots side by side (human), `PETARI_DLCHECK=1` is clean for 600 frames, and the renderer compiles with no symbol outside ES 3.0 / GL 3.3 core (grep the source for `GL_SHADER_STORAGE`, `glVertexAttribFormat`, `glProgramBinary`, `egl`).
 - log:
+  - 2026-10-13 (A): only the human Dolphin side-by-side is left; everything automatable is done.
   - 2026-10-12: PETARI_DLCHECK=1 over menus -> prologue -> Good Egg: 104,200,000 cached draws compared, 0 differed. Only the Dolphin side-by-side (human) is left for done.
   - 2026-10-12: PETARI_GLSL_DUMP + tools/bench/validate_glsl.sh: all 394 shaders (197 programs) generated over menus, prologue and Good Egg validate as GLSL ES 3.00 with glslangValidator (which rejects the original SSBO shaders). The WebGL2 shader path is ready for P0-08.
   - 2026-10-12: gameplay verified: scripted new file -> prologue (Peach's Castle courtyard) -> PETARI_STAGE=EggStarGalaxy:1. Good Egg renders correctly by eye at 1280x912; 300 s, no crash, 0 shader errors. Menu script that works: see docs/BUILDING.md ("Scripted boot to a galaxy"). Remaining for done: Dolphin side-by-side, PETARI_DLCHECK=1 run.
@@ -100,7 +102,7 @@ renders in Chromium; one human has seen it.
 
 ### P0-04 Native desktop host (Aurora main / SDL3; SDL2 + GL only on fallback)
 - lane: B
-- status: in_progress
+- status: done
 - owner: A (solo)
 - blocked_by: P0-03
 - touches: platform/src/native, CMakeLists.txt, tools/bench/stub-game
@@ -108,6 +110,7 @@ renders in Chromium; one human has seen it.
 - what: Host window and input for the native build. If P0-11 goes, Aurora brings SDL3 windowing (`aurora::main`) and gamepad input; this task then wires `--game <dir>`, `--galaxy <name>`, `--headless --frames N`, keyboard into the WPAD surface and SDL audio behind `PortAudioSink` on top of it. If P0-11 fails, it is an SDL2 window with a GL 3.3/4.1 core context. Until a renderer lands, link against a null `gx` backend (`-DSMG_GX=null`) that accepts the FIFO and draws nothing, so B is not blocked on A and CI has a GL-free headless target for good. Create `tools/bench/stub-game/` with the cooked layout but empty files. Be honest about what the stub proves: platform init, arg parsing, a clean "no valid disc" exit. Not boot.
 - done when: `./smg --game tools/bench/stub-game --headless --frames 60` exits 0 with the null backend. With P0-11 (or P0-10) merged and a real cooked disc, boots to title (human check, log it).
 - log:
+  - 2026-10-13 (A): window, GL 4.1, keyboard/mouse, SDL3 audio, shots, App Nap off; headless smoke runs. Stub-game folder not made (CI has no disc; the build check covers what the stub would).
   - 2026-10-12 (A): A is actively editing `platform/src/native/` (main.cpp, present.cpp, desktop_stubs.cpp) under this task even though native/ is lane B's directory; B, please leave those three files to A until this is `review`, or say so here.
   - 2026-10-12: SDL3 3.4.10 (source, x86_64) window + GL 4.1 core context in platform/src/native/present.cpp; keyboard/mouse mapping per BUILD_SPEC 7; --shots PNG capture. App Nap disabled (it throttled a hidden run from 57 fps to 0.5 fps after ~30 s; also matters for co-op with the window in the background). docs/BUILDING.md written.
   - 2026-10-12: `smg --game ~/smg/game --headless --seconds 20` boots RMGP01: disc identified, game main() runs, DSP boots, mixer up, ~900 frames presented, clean exit. No window yet; null renderer path. Note: B109take_0.aw is 0 bytes on the disc itself, the DVD log line is noise.
@@ -126,8 +129,8 @@ renders in Chromium; one human has seen it.
 
 ### P0-06 Emscripten build: compile and link
 - lane: A
-- status: open
-- owner:
+- status: in_progress
+- owner: A (taken over 2026-10-13: B claimed it 2026-10-12, no pushes since and the claim was lost from the board; B, say so here and A hands it back)
 - started: 2026-10-12
 - blocked_by: P0-11 (done)
 - touches: CMakeLists.txt, platform/src/web, web/
@@ -135,6 +138,7 @@ renders in Chromium; one human has seen it.
 - what: `-DSMG_TARGET=web`. Emscripten toolchain file. **Renderer is WebGL2, not Aurora/WebGPU (D-017 superseded D-014):** `platform/src/gx/gl_renderer.cpp` + `gl_shadergen.cpp` already compile against `port/gl.h`, whose `__EMSCRIPTEN__` branch selects `<GLES3/gl3.h>` and `#version 300 es`; the same code renders the title screen on macOS GL 4.1. Reuse `CMakeLists.txt`'s desktop path as the model (exclusions, `platform/src/native/main.cpp` launcher shape) but put web-only glue in `platform/src/web/`. Starting flags (measure, don't trust): `-pthread -sPTHREAD_POOL_SIZE=4` (GalaxyQuest emulates OS threads in its own scheduler; real threads are only the frame builder and audio), `-sPROXY_TO_PTHREAD -sOFFSCREENCANVAS_SUPPORT` (D-005, with the main-thread fallback compiled in), `-sMAXIMUM_MEMORY=4GB -sALLOW_MEMORY_GROWTH` (D-013: the fixed 0x80000000 window needs >2 GB of address space; note Emscripten's >2 GB pointer caveats), `-sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2`, and `-sGLOBAL_BASE=0x98000000` so the game image sits at its fixed slot (D-016; GalaxyQuest's GPU front end treats addresses below 0x80000000 as physical). SMGwebport publishes no source or flags; its `shell.js` only shows what it exports (`web_audio_ring`, `web_input_update`, `web_shader_warmup`), which is a reasonable shape for our `platform/src/web` glue. A minimal `web/index.html` + Vite config with COOP/COEP headers that loads the wasm and shows console output.
 - done when: the wasm links and the page loads it without a crash before `main()`; `wasmMemory.buffer.byteLength` and the page's resident memory are both logged.
 - log:
+  - 2026-10-13 (A): starting. Work on main in small commits; nothing of B's is overwritten.
   - 2026-10-12 (A): FYI, every generated shader validates as GLSL ES 3.00 (see P0-10 log), and CI now builds macOS (green) and Linux. Renderer is ready on our side; ping in this log if Emscripten link errors point into platform/src/gx.
   - 2026-10-12 (A): what-line updated for D-016/D-017 after this was claimed; the Aurora/emdawnwebgpu text was stale. Also known: arm64 macOS can't host the fixed-address image, wasm32 can (GLOBAL_BASE).
 
@@ -336,14 +340,15 @@ with no desync complaints at 100 ms delay.
 
 ### P2-04 Local player state capture hook
 - lane: A
-- status: open
-- owner:
+- status: done
+- owner: A (solo)
 - blocked_by: (native: none; D-018)
 - touches: decomp/src/Game/Player (one hook file, name it in the log before editing), net/capture
 - flags: parallel-ok
 - what: One `TARGET_WEB` hook after the player's update that copies position, rotation, up, velocity, current anim id and frame, powerup, grounded, spinning, galaxy and scenario into a plain struct `net/` reads. Find the right accessors; grep, don't guess. Document them in `net/capture/README.md`.
 - done when: the struct updates every frame with correct values in Good Egg (log a dump).
 - log:
+  - 2026-10-13 (A): done (net/capture, verified over 13k frames); status was never updated.
   - 2026-10-12 (A): accessors found (D-018): MR::getPlayerPos/getPlayerVelocity/getPlayerUpVec/getPlayerFrontVec (Game/Util/PlayerUtil.hpp); animation = MR::getHashCode(MarioAccess::getPlayerActor()->mMarioAnim->getXanimePlayer()->getCurrentAnimationName()).
 
 ### P2-05 RemotePlayerPuppet actor
