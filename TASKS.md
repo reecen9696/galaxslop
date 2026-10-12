@@ -90,7 +90,7 @@ renders in Chromium; one human has seen it.
 - done when: with P0-04's native build, title screen and Good Egg match Dolphin screenshots side by side (human), `PETARI_DLCHECK=1` is clean for 600 frames, and the renderer compiles with no symbol outside ES 3.0 / GL 3.3 core (grep the source for `GL_SHADER_STORAGE`, `glVertexAttribFormat`, `glProgramBinary`, `egl`).
 - log:
 
-### P0-04 Native desktop backend (SDL2 + OpenGL 3.3/4.1 core)
+### P0-04 Native desktop host (Aurora main / SDL3; SDL2 + GL only on fallback)
 - lane: B
 - status: open
 - owner:
