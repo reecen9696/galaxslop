@@ -44,6 +44,7 @@ renders in Chromium; one human has seen it.
 - what: Create the directory layout in README. Root CMake that includes per-directory CMakeLists. `.gitignore` with every game-data extension from AGENTS.md section 2 plus `game/`, `build/`, `node_modules/`. Empty vitest and doctest setups that run and pass. GitHub Actions workflow that runs both on PR. `THIRD_PARTY_NOTICES.md`.
 - done when: CI is green on an empty repo.
 - log:
+  - 2026-10-12 (A): .github/workflows/build.yml compiles+links `smg` on macOS (x86_64, checks the 0x98000000 base) and Linux, and py_compiles the cooker, on every push/PR. Linux desktop GL added to port/gl.h. Still open here: doctest/vitest scaffolds (do with the first unit-testable code: net/ encoder, server/).
   - 2026-10-12: layout, `.gitignore`, notices, docs and board are in (repo `reecen9696/galaxslop`). Remaining: root CMake, per-dir CMakeLists, doctest/vitest scaffolds, CI workflow. Do CMake after P0-02 lands so it globs real sources. Note `.gitignore` game-data dirs are anchored (`/game/`); unanchored `game/` matched `decomp/src/Game` on case-insensitive filesystems.
 
 ### P0-02 Vendor the GalaxyQuest snapshot (decomp + platform + cook)

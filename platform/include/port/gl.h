@@ -3,6 +3,7 @@
 //   Android  OpenGL ES 3.2 (GalaxyQuest's original target)
 //   Web      OpenGL ES 3.0 = WebGL2 (Emscripten)
 //   macOS    OpenGL 4.1 core
+//   Linux    OpenGL 4.1 core (Mesa or vendor libGL)
 //
 // The renderer uses only what all three share: ES 3.0 plus integer textures
 // and uniform blocks, no shader storage buffers, no separate vertex attribute
@@ -22,7 +23,11 @@
 #include <OpenGL/gl3.h>
 #define PORT_GL_ES 0
 #else
-#error "port/gl.h: no OpenGL configuration for this platform yet"
+// Desktop Linux: Mesa / vendor libGL, core profile 4.1 like macOS.
+#define GL_GLEXT_PROTOTYPES 1
+#include <GL/gl.h>
+#include <GL/glext.h>
+#define PORT_GL_ES 0
 #endif
 
 namespace gpu {
