@@ -309,7 +309,7 @@ with no desync complaints at 100 ms delay.
 
 ### P2-02 Relay server (local Node)
 - lane: B
-- status: in_progress
+- status: review
 - owner: A (lane B task; B is on P0-06, hand back any time)
 - blocked_by:
 - touches: server/
@@ -317,6 +317,7 @@ with no desync complaints at 100 ms delay.
 - what: WebSocket server. Rooms by code. Hello/Welcome/Joined/Left. Relay PlayerState. Ping/Pong. Rate limit. Vitest with 5 fake clients. `npm run dev`.
 - done when: soak test (5 clients, 30 Hz, 10 min) drops nothing.
 - log:
+  - 2026-10-13 (A): server/ done: protocol.ts, relay.ts (transport-free), main.ts (ws). vitest: room create/join (case-insensitive), joined/left notices, state relayed to others only with sender id, unknown/full room and protocol errors, ping/pong, 15 s silence drop, rate limit, and a 5-client 30 Hz soak with zero loss. CI job added. 10-min soak not run yet.
   - 2026-10-13 (A): claimed while B works on P0-06, to get two native clients seeing each other.
 
 ### P2-03 NetClient and SAB ring
