@@ -11,6 +11,7 @@
 // boots the game exactly like the Android headless tool.
 //
 //   smg --game <cooked dir> [--save <dir>] [--headless] [--seconds N]
+//       [--shots <dir>] [--shot-every <ms>] [--scale N]
 #include <errno.h>
 #include <signal.h>
 #include <spawn.h>
@@ -28,6 +29,7 @@
 #include "port/input.h"
 #include "port/input_script.h"
 #include "port/port.h"
+#include "present.h"
 
 #ifdef __APPLE__
 #include <mach-o/dyld.h>
@@ -88,17 +90,22 @@ static void reexecWithoutAslr(char** argv) {
 
 static void usage(const char* argv0) {
     fprintf(stderr,
-            "usage: %s --game <cooked dir> [--save <dir>] [--headless] [--seconds N]\n"
-            "  --game     folder written by tools/cook/cook.py\n"
-            "  --save     NAND save folder (default: <game>/../save)\n"
-            "  --headless no window; run N seconds (default 60) and exit 0\n",
+            "usage: %s --game <cooked dir> [--save <dir>] [--headless] [--seconds N] [--shots <dir>] [--shot-every <ms>] [--scale N]\n"
+            "  --game       folder written by tools/cook/cook.py\n"
+            "  --save       NAND save folder (default: <game>/../save)\n"
+            "  --headless   hidden window; run N seconds (default 60) and exit 0\n"
+            "  --seconds    stop after N seconds (default: 60 headless, never windowed)\n"
+            "  --shots      write <dir>/frame_NNN.png every --shot-every ms (default 2000)\n"
+            "  --scale      EFB size as a multiple of 640x456 (default 2)\n"
+            "keys: WASD stick, Space A, K B, J/Shift/left click spin, Ctrl Z, C C, Enter +, Backspace -,\n"
+            "      1/2, arrows D-pad, H Home, mouse pointer, right click B, F12 quit\n",
             argv0);
 }
 
 int main(int argc, char** argv) {
-    std::string game, save;
+    std::string game, save, shots;
     bool headless = false;
-    int seconds = 60;
+    int seconds = -1, shotEvery = 2000, scale = 2;
     for (int i = 1; i < argc; i++) {
         std::string a = argv[i];
         if (a == "--game" && i + 1 < argc) {
@@ -109,6 +116,12 @@ int main(int argc, char** argv) {
             headless = true;
         } else if (a == "--seconds" && i + 1 < argc) {
             seconds = atoi(argv[++i]);
+        } else if (a == "--shots" && i + 1 < argc) {
+            shots = argv[++i];
+        } else if (a == "--shot-every" && i + 1 < argc) {
+            shotEvery = atoi(argv[++i]);
+        } else if (a == "--scale" && i + 1 < argc) {
+            scale = atoi(argv[++i]);
         } else {
             usage(argv[0]);
             return 2;
@@ -120,6 +133,9 @@ int main(int argc, char** argv) {
     }
     if (save.empty()) {
         save = game + "/../save";
+    }
+    if (seconds < 0) {
+        seconds = headless ? 60 : 0;  // 0: until the window closes
     }
     mkdir(save.c_str(), 0755);
 
@@ -166,23 +182,46 @@ int main(int argc, char** argv) {
     snprintf(startText, sizeof(startText), "%lld", start);
     setenv("PETARI_T0_MS", startText, 1);
     fprintf(stderr, "smg: image at %p, window %p+%zx reserved; booting %s\n", (void*)imageAddr(), win, kWindowSize, game.c_str());
+    if (!desktop_present_init(headless, scale)) {
+        fprintf(stderr, "smg: no window / GL 4.1 context\n");
+        return 1;
+    }
     port_boot(game.c_str(), save.c_str());
 
-    // The game runs on its emulated OS threads; this thread feeds input.
-    // TODO(P0-04): a window (Aurora's SDL3 main) when not headless.
-    (void)headless;
+    // The game runs on its emulated OS threads; this thread presents frames
+    // and feeds input (the keyboard, or PETARI_INPUT's script).
+    if (!shots.empty()) {
+        mkdir(shots.c_str(), 0755);
+    }
+    long long nextShot = start + shotEvery;
+    int shotIndex = 0;
     for (;;) {
         long long now = nowMs();
-        if (now - start >= (long long)seconds * 1000) {
+        if (seconds > 0 && now - start >= (long long)seconds * 1000) {
             break;
         }
-        memset(&pad, 0, sizeof(pad));
-        pad.connected = 1;
-        pad.pointerDist = 2.0f;
-        portApplyInputScript(events, eventCount, (int)(now - start), &pad);
+        bool scripted = eventCount > 0 || headless;
+        if (scripted) {
+            memset(&pad, 0, sizeof(pad));
+            pad.connected = 1;
+            pad.pointerDist = 2.0f;
+            portApplyInputScript(events, eventCount, (int)(now - start), &pad);
+        }
+        if (!desktop_present_frame(&pad, !scripted)) {
+            break;
+        }
         port_input_set(0, &pad);
-        usleep(5000);
+        if (!shots.empty() && now >= nextShot) {
+            nextShot += shotEvery;
+            char path[1024];
+            snprintf(path, sizeof(path), "%s/frame_%03d.png", shots.c_str(), shotIndex++);
+            unsigned long long n = desktop_present_shot(path);
+            fprintf(stderr, "smg: %.1f s %s (game frame %llu)\n", (now - start) / 1000.0, n ? path : "no frame yet", n);
+        }
+        if (headless) {
+            usleep(5000);
+        }
     }
-    fprintf(stderr, "smg: %d s elapsed, exiting\n", seconds);
+    fprintf(stderr, "smg: %.0f s elapsed, exiting\n", (nowMs() - start) / 1000.0);
     _exit(0);
 }

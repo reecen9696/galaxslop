@@ -1,7 +1,9 @@
-// GLES 3.2 replay of recorded GX frames.
+// Replay of recorded GX frames through OpenGL (ES 3.2, WebGL2 or GL 4.1).
 #include "gl_renderer.h"
 
+#ifdef PORT_GL_ANDROID
 #include <EGL/egl.h>
+#endif
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -102,7 +104,9 @@ GLuint linkProgram(GLuint vs, GLuint fs) {
     GLuint p = glCreateProgram();
     glAttachShader(p, vs);
     glAttachShader(p, fs);
+#ifdef PORT_GL_ANDROID
     glProgramParameteri(p, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, GL_TRUE);
+#endif
     glLinkProgram(p);
     GLint ok = 0;
     glGetProgramiv(p, GL_LINK_STATUS, &ok);
@@ -113,8 +117,86 @@ GLuint linkProgram(GLuint vs, GLuint fs) {
         glDeleteProgram(p);
         return 0;
     }
+    // Texture units and the uniform block slot (no layout(binding) before
+    // GLSL ES 3.10 / GLSL 4.20).
+    GLint prevProg = 0;
+    glGetIntegerv(GL_CURRENT_PROGRAM, &prevProg);
+    glUseProgram(p);
+    char name[16];
+    for (int i = 0; i < 8; i++) {
+        snprintf(name, sizeof(name), "s_tex%d", i);
+        GLint loc = glGetUniformLocation(p, name);
+        if (loc >= 0) glUniform1i(loc, i);
+    }
+    static const struct { const char* name; int unit; } kUnits[] = {
+        {"t_rows", kUnitRows}, {"t_recs", kUnitRecs}, {"t_st", kUnitStates}, {"t_vtxRec", kUnitVtxRec}, {"s_color", 0}, {"s_depth", 1}};
+    for (const auto& u : kUnits) {
+        GLint loc = glGetUniformLocation(p, u.name);
+        if (loc >= 0) glUniform1i(loc, u.unit);
+    }
+    GLuint eyeBlock = glGetUniformBlockIndex(p, "EyeBlock");
+    if (eyeBlock != GL_INVALID_INDEX) glUniformBlockBinding(p, eyeBlock, 2);
+    glUseProgram((GLuint)prevProg);
     return p;
 }
+
+// Storage for a texture (glTexStorage2D needs ES 3.0 but GL 4.2; macOS has 4.1).
+void texAlloc(GLenum internalFormat, int w, int h) {
+    GLenum format = GL_RGBA, type = GL_UNSIGNED_BYTE;
+    if (internalFormat == GL_DEPTH24_STENCIL8) {
+        format = GL_DEPTH_STENCIL;
+        type = GL_UNSIGNED_INT_24_8;
+    }
+    glTexImage2D(GL_TEXTURE_2D, 0, (GLint)internalFormat, w, h, 0, format, type, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+}
+
+// Tells a tiler it need not write these attachments back (ES 3.0 and WebGL2;
+// GL 4.1 lacks it and doesn't need it).
+void invalidateFramebuffer(GLsizei n, const GLenum* attachments) {
+#if PORT_GL_ES
+    glInvalidateFramebuffer(GL_FRAMEBUFFER, n, attachments);
+#else
+    (void)n;
+    (void)attachments;
+#endif
+}
+
+// A data texture (port/gl.h): `count` elements of `comps` 32-bit words,
+// kDataTexWidth per row.  Grows (never shrinks) to fit.
+struct DataTex {
+    GLuint tex = 0;
+    int rows = 0;
+    void upload(GLenum unit, bool isFloat, int comps, const void* data, size_t count) {
+        int needRows = (int)((count + kDataTexWidth - 1) / kDataTexWidth);
+        if (needRows < 1) needRows = 1;
+        GLenum internal = isFloat ? GL_RGBA32F : GL_R32UI;
+        GLenum format = isFloat ? GL_RGBA : GL_RED_INTEGER;
+        GLenum type = isFloat ? GL_FLOAT : GL_UNSIGNED_INT;
+        glActiveTexture(unit);
+        if (!tex) {
+            glGenTextures(1, &tex);
+        }
+        glBindTexture(GL_TEXTURE_2D, tex);
+        if (needRows > rows) {
+            rows = needRows + needRows / 4;
+            glTexImage2D(GL_TEXTURE_2D, 0, (GLint)internal, kDataTexWidth, rows, 0, format, type, nullptr);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+        }
+        size_t full = count / kDataTexWidth, rest = count % kDataTexWidth;
+        const uint8_t* bytes = (const uint8_t*)data;
+        if (full) {
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, kDataTexWidth, (GLsizei)full, format, type, bytes);
+        }
+        if (rest) {
+            glTexSubImage2D(GL_TEXTURE_2D, 0, 0, (GLint)full, (GLsizei)rest, 1, format, type,
+                            bytes + full * kDataTexWidth * (size_t)comps * 4);
+        }
+        (void)comps;
+    }
+};
 
 // Uniform/vertex data uploaded once per prepared frame.
 struct ByteBuffer {
@@ -318,8 +400,9 @@ struct Renderer::Impl {
     // GPU finished drawing from frames ago: refilling buffers still in use
     // made the driver wait for the GPU (up to 15 ms per frame at 120 Hz).
     struct FrameBuffers {
-        GLuint buf[6] = {};    // vbo, recVbo, ibo, rowBuf, recBuf, stateBuf
+        GLuint buf[6] = {};    // vbo, (unused), ibo, (unused x3): see tex
         size_t cap[6] = {};    // bytes allocated
+        DataTex tex[4];        // vtxRec, rows, recs, states (data textures)
     };
     FrameBuffers frameBufs[3];
     int frameBufNext = 0;
@@ -376,8 +459,7 @@ struct Renderer::Impl {
 // ---------------------------------------------------------------------------
 // Setup
 // ---------------------------------------------------------------------------
-static const char* kCopyVs = R"(#version 320 es
-precision highp float;
+static const char* kCopyVsBody = R"(
 uniform vec4 u_rect;  // src rect in target UV: x0, y0, x1, y1
 out vec2 v_uv;
 void main() {
@@ -389,10 +471,9 @@ void main() {
 }
 )";
 
-static const char* kCopyFs = R"(#version 320 es
-precision highp float;
-layout(binding = 0) uniform sampler2D s_color;
-layout(binding = 1) uniform sampler2D s_depth;
+static const char* kCopyFsBody = R"(
+uniform sampler2D s_color;
+uniform sampler2D s_depth;
 uniform int u_mode;
 in vec2 v_uv;
 out vec4 o;
@@ -427,12 +508,12 @@ void Renderer::Impl::init() {
         glBufferData(GL_UNIFORM_BUFFER, sizeof(EyeBlock), nullptr, GL_DYNAMIC_DRAW);
     }
 
-    GLint attribs = 0, vsBlocks = 0, fsBlocks = 0, blockSize = 0;
+    GLint attribs = 0, vsUnits = 0, maxTex = 0;
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &attribs);
-    glGetIntegerv(GL_MAX_VERTEX_SHADER_STORAGE_BLOCKS, &vsBlocks);
-    glGetIntegerv(GL_MAX_FRAGMENT_SHADER_STORAGE_BLOCKS, &fsBlocks);
-    glGetIntegerv(GL_MAX_SHADER_STORAGE_BLOCK_SIZE, &blockSize);
-    port_log("gl: %d vertex attribs, %d/%d storage blocks (vs/fs), %d MB max block", attribs, vsBlocks, fsBlocks, blockSize >> 20);
+    glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &vsUnits);
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTex);
+    port_log("gl: %s, %s; %d vertex attribs, %d vertex texture units, %d max texture size", (const char*)glGetString(GL_VERSION),
+             (const char*)glGetString(GL_RENDERER), attribs, vsUnits, maxTex);
     GLint numExt = 0, numBinFmt = 0;
     glGetIntegerv(GL_NUM_EXTENSIONS, &numExt);
     glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &numBinFmt);
@@ -445,11 +526,12 @@ void Renderer::Impl::init() {
         }
     }
     port_log("gl: %d program binary formats; extensions: %s", numBinFmt, exts.c_str());
-    if (vsBlocks < 4 || fsBlocks < 1) {
-        port_log("gl: this GPU lacks the vertex attributes or storage blocks the renderer needs");
+    if (attribs < 16 || vsUnits < 4) {
+        port_log("gl: this GPU lacks the vertex attributes or vertex texture units the renderer needs");
     }
 
-    GLuint vs = compileShader(GL_VERTEX_SHADER, kCopyVs), fs = compileShader(GL_FRAGMENT_SHADER, kCopyFs);
+    GLuint vs = compileShader(GL_VERTEX_SHADER, std::string(glslPrelude()) + kCopyVsBody);
+    GLuint fs = compileShader(GL_FRAGMENT_SHADER, std::string(glslPrelude()) + kCopyFsBody);
     copyProgram = linkProgram(vs, fs);
     glDeleteShader(vs);
     glDeleteShader(fs);
@@ -466,6 +548,11 @@ void Renderer::Impl::init() {
 static const u32 kCacheMagic = 0x32434750;  // "PGC2"
 
 void Renderer::Impl::loadShaderCache() {
+#ifndef PORT_GL_ANDROID
+    // No usable program binaries in WebGL2 or Apple's GL: no disk cache
+    // (P1-06 caches generated sources instead).
+    return;
+#endif
     if (sShaderCachePath.empty()) {
         return;
     }
@@ -515,6 +602,11 @@ void Renderer::Impl::loadShaderCache() {
 }
 
 void Renderer::Impl::storeBinary(const ShaderUid& uid, GLuint prog) {
+#ifndef PORT_GL_ANDROID
+    (void)uid;
+    (void)prog;
+    return;
+#else
     if (!cacheOut || !prog) {
         return;
     }
@@ -534,9 +626,15 @@ void Renderer::Impl::storeBinary(const ShaderUid& uid, GLuint prog) {
     fwrite(&uid, sizeof(uid), 1, cacheOut);
     fwrite(bin.data(), 1, (size_t)got, cacheOut);
     fflush(cacheOut);
+#endif
 }
 
 void Renderer::Impl::startCompiler() {
+#ifndef PORT_GL_ANDROID
+    // Programs are compiled on the render thread (no shared EGL context).
+    staleUids.clear();
+    return;
+#else
     EGLDisplay dpy = eglGetCurrentDisplay();
     EGLContext share = eglGetCurrentContext();
     EGLint cfgId = 0, n = 0;
@@ -583,6 +681,7 @@ void Renderer::Impl::startCompiler() {
         compileCv.notify_one();
     }
     staleUids.clear();
+#endif
 }
 
 GLuint Renderer::Impl::program(const ShaderUid& uid, bool sync) {
@@ -670,17 +769,7 @@ GLuint Renderer::Impl::vao(u32 flags) {
     GLuint v;
     glGenVertexArrays(1, &v);
     glBindVertexArray(v);
-    u32 off = 0;
-    auto attr = [&](GLuint loc, GLint size, GLenum type, bool normalized, bool integer, u32 bytes) {
-        glEnableVertexAttribArray(loc);
-        if (integer) {
-            glVertexAttribIFormat(loc, size, type, off);
-        } else {
-            glVertexAttribFormat(loc, size, type, normalized, off);
-        }
-        glVertexAttribBinding(loc, 0);
-        off += bytes;
-    };
+    auto attr = [&](GLuint loc, GLint, GLenum, bool, bool, u32) { glEnableVertexAttribArray(loc); };
     attr(0, 3, GL_FLOAT, false, false, 12);
     if (flags & VF_POSMTX) attr(1, 1, GL_UNSIGNED_INT, false, true, 4);
     if (flags & VF_NRM) attr(2, 3, GL_FLOAT, false, false, 12);
@@ -697,6 +786,33 @@ GLuint Renderer::Impl::vao(u32 flags) {
     glBindVertexArray(0);
     vaos[flags] = v;
     return v;
+}
+
+// Points the VAO's attributes at a batch's vertices (`base` bytes into the
+// bound GL_ARRAY_BUFFER); stands in for glBindVertexBuffer.
+void setVertexBase(u32 flags, uintptr_t base, GLsizei stride) {
+    uintptr_t off = base;
+    auto attr = [&](GLuint loc, GLint size, GLenum type, bool normalized, bool integer, u32 bytes) {
+        if (integer) {
+            glVertexAttribIPointer(loc, size, type, stride, (const void*)off);
+        } else {
+            glVertexAttribPointer(loc, size, type, normalized ? GL_TRUE : GL_FALSE, stride, (const void*)off);
+        }
+        off += bytes;
+    };
+    attr(0, 3, GL_FLOAT, false, false, 12);
+    if (flags & VF_POSMTX) attr(1, 1, GL_UNSIGNED_INT, false, true, 4);
+    if (flags & VF_NRM) attr(2, 3, GL_FLOAT, false, false, 12);
+    if (flags & VF_NBT) {
+        attr(3, 3, GL_FLOAT, false, false, 12);
+        attr(4, 3, GL_FLOAT, false, false, 12);
+    }
+    if (flags & VF_CLR0) attr(5, 4, GL_UNSIGNED_BYTE, true, false, 4);
+    if (flags & VF_CLR1) attr(6, 4, GL_UNSIGNED_BYTE, true, false, 4);
+    for (int i = 0; i < 8; i++) {
+        if (flags & (VF_TEX0 << i)) attr(7 + i, 2, GL_FLOAT, false, false, 8);
+    }
+    if (flags & VF_TEXMTX) attr(15, 2, GL_UNSIGNED_INT, false, true, 8);
 }
 
 GLuint Renderer::Impl::sampler(u32 mode0, u32 mode1, u32 levels) {
@@ -751,7 +867,7 @@ CopyTex& Renderer::Impl::copyTex(u64 key, int w, int h) {
     if (!c.tex) {
         glGenTextures(1, &c.tex);
         glBindTexture(GL_TEXTURE_2D, c.tex);
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, w, h);
+        texAlloc(GL_RGBA8, w, h);
         glGenFramebuffers(1, &c.fbo);
         glBindFramebuffer(GL_FRAMEBUFFER, c.fbo);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, c.tex, 0);
@@ -1488,17 +1604,19 @@ void Renderer::Impl::upload(Prepared& p, bool syncPrograms) {
         }
     };
     put(0, GL_ARRAY_BUFFER, f.verts.data(), f.verts.size() * 4);
-    put(1, GL_SHADER_STORAGE_BUFFER, p.vtxRec.data(), p.vtxRec.size() * 4);
     put(2, GL_ELEMENT_ARRAY_BUFFER, p.indices.data(), p.indices.size() * 4);
-    put(3, GL_SHADER_STORAGE_BUFFER, p.rows.data(), p.rows.size() * 4);
-    put(4, GL_SHADER_STORAGE_BUFFER, p.recs.data(), p.recs.size() * 4);
-    put(5, GL_SHADER_STORAGE_BUFFER, p.states.data(), p.states.size() * 4);
+    // The arrays the shaders index go to data textures (port/gl.h).
+    fb.tex[0].upload(GL_TEXTURE0 + kUnitVtxRec, false, 1, p.vtxRec.data(), p.vtxRec.size());
+    fb.tex[1].upload(GL_TEXTURE0 + kUnitRows, true, 4, p.rows.data(), p.rows.size() / 4);
+    fb.tex[2].upload(GL_TEXTURE0 + kUnitRecs, false, 1, p.recs.data(), p.recs.size());
+    fb.tex[3].upload(GL_TEXTURE0 + kUnitStates, true, 4, p.states.data(), p.states.size() / 4);
+    glActiveTexture(GL_TEXTURE0);
     vbo = fb.buf[0];
-    recVbo = fb.buf[1];
     ibo = fb.buf[2];
-    rowBuf = fb.buf[3];
-    recBuf = fb.buf[4];
-    stateBuf = fb.buf[5];
+    recVbo = fb.tex[0].tex;
+    rowBuf = fb.tex[1].tex;
+    recBuf = fb.tex[2].tex;
+    stateBuf = fb.tex[3].tex;
 
     // New textures.
     for (auto& img : f.textures) {
@@ -1694,7 +1812,7 @@ void Renderer::Impl::doCopy(const Item& it, EfbTarget& src, Renderer& r, bool vr
         }
         glBindFramebuffer(GL_FRAMEBUFFER, dst.fbo);
         const GLenum color[1] = {GL_COLOR_ATTACHMENT0};
-        glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, color);  // the copy covers it
+        invalidateFramebuffer(1, color);  // the copy covers it
         glViewport(0, 0, dw, dh);
         glDisable(GL_SCISSOR_TEST);
         glDisable(GL_BLEND);
@@ -1964,10 +2082,14 @@ void Renderer::Impl::execute(EfbTarget& efb, const EyeView* eye, EfbTarget* hud,
         }
     };
     glBindBufferBase(GL_UNIFORM_BUFFER, 2, eyeUbo);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, rowBuf);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, recBuf);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, stateBuf);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, recVbo);
+    const struct { int unit; GLuint tex; } dataTex[] = {{kUnitRows, rowBuf}, {kUnitRecs, recBuf}, {kUnitStates, stateBuf}, {kUnitVtxRec, recVbo}};
+    for (const auto& d : dataTex) {
+        glActiveTexture(GL_TEXTURE0 + d.unit);
+        glBindTexture(GL_TEXTURE_2D, d.tex);
+        glBindSampler(d.unit, 0);
+    }
+    glActiveTexture(GL_TEXTURE0);
+    gs.forget();
 
     int stopAfter = gDebugStopAfterDraws;
     for (const Item& it : items) {
@@ -2101,7 +2223,8 @@ void Renderer::Impl::execute(EfbTarget& efb, const EyeView* eye, EfbTarget* hud,
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
             lastVao = v;
         }
-        glBindVertexBuffer(0, vbo, (GLintptr)it.firstWord * 4, (GLsizei)(vtxWords(it.flags) * 4));
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        setVertexBase(it.flags, (uintptr_t)it.firstWord * 4, (GLsizei)(vtxWords(it.flags) * 4));
         glDrawElements(it.prim, (GLsizei)it.idxCount, GL_UNSIGNED_INT, (const void*)((uintptr_t)it.idxOffset * 4));
     }
     glBindVertexArray(0);
@@ -2117,10 +2240,10 @@ void Renderer::Impl::execute(EfbTarget& efb, const EyeView* eye, EfbTarget* hud,
     // tiler need not write them back to memory.
     const GLenum depthOnly[2] = {GL_DEPTH_ATTACHMENT, GL_STENCIL_ATTACHMENT};
     glBindFramebuffer(GL_FRAMEBUFFER, efb.fbo);
-    glInvalidateFramebuffer(GL_FRAMEBUFFER, 2, depthOnly);
+    invalidateFramebuffer(2, depthOnly);
     if (hudMode == HudMode::Target) {
         glBindFramebuffer(GL_FRAMEBUFFER, hud->fbo);
-        glInvalidateFramebuffer(GL_FRAMEBUFFER, 2, depthOnly);
+        invalidateFramebuffer(2, depthOnly);
     }
 }
 
@@ -2143,13 +2266,13 @@ EfbTarget Renderer::createTarget(int width, int height) {
     t.height = height;
     glGenTextures(1, &t.color);
     glBindTexture(GL_TEXTURE_2D, t.color);
-    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
+    texAlloc(GL_RGBA8, width, height);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // Depth with stencil: the stencil tags the player's pixels for SpaceWarp.
     glGenTextures(1, &t.depth);
     glBindTexture(GL_TEXTURE_2D, t.depth);
-    glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, width, height);
+    texAlloc(GL_DEPTH24_STENCIL8, width, height);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glGenFramebuffers(1, &t.fbo);
@@ -2169,7 +2292,7 @@ EfbTarget Renderer::createDepthTarget(int width, int height) {
     t.height = height;
     glGenTextures(1, &t.depth);
     glBindTexture(GL_TEXTURE_2D, t.depth);
-    glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, width, height);
+    texAlloc(GL_DEPTH24_STENCIL8, width, height);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -2185,6 +2308,10 @@ EfbTarget Renderer::createDepthTarget(int width, int height) {
 }
 
 bool Renderer::setFoveation(EfbTarget& t, float focalX, float focalY, float gain, float foveaArea) {
+#ifndef PORT_GL_ANDROID
+    (void)t, (void)focalX, (void)focalY, (void)gain, (void)foveaArea;
+    return false;
+#else
     typedef void (*FoveationParams)(GLuint, GLuint, GLuint, GLfloat, GLfloat, GLfloat, GLfloat, GLfloat);
     static FoveationParams params = (FoveationParams)eglGetProcAddress("glTextureFoveationParametersQCOM");
     if (!params || !t.color) {
@@ -2196,6 +2323,7 @@ bool Renderer::setFoveation(EfbTarget& t, float focalX, float focalY, float gain
     glTexParameteri(GL_TEXTURE_2D, kFeatureBits, kEnableBits);
     params(t.color, 0, 0, focalX, focalY, gain, gain, foveaArea);
     return glGetError() == GL_NO_ERROR;
+#endif
 }
 
 void Renderer::destroyTarget(EfbTarget& t) {

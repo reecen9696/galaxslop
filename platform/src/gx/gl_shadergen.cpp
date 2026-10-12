@@ -1,12 +1,15 @@
-// GLSL ES 3.2 generation for the GX pipeline.
+// GLSL generation for the GX pipeline: GLSL ES 3.00 (WebGL2) or GLSL 4.10
+// (macOS), see port/gl.h.
 #include "gl_shadergen.h"
 
+#include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "gpu.h"
 #include "gx_record.h"
+#include "port/gl.h"
 
 namespace gpu {
 
@@ -24,11 +27,22 @@ struct Out {
     }
 };
 
+// The per-frame arrays (matrix rows, draw records, pixel state, the draw
+// record of each vertex) are data textures read with texelFetch; GalaxyQuest
+// kept them in shader storage buffers, which ES 3.0 and GL 4.1 lack.  The
+// generator still writes `rows[i]` etc. and toDataTextures() rewrites those
+// into the accessors below.  The EyeBlock is bound to slot 2 after linking.
 const char* kUniformBlocks = R"(
-layout(std430, binding = 0) readonly buffer RowBuf { vec4 rows[]; };
-layout(std430, binding = 1) readonly buffer RecBuf { uint recs[]; };
-layout(std430, binding = 2) readonly buffer StateBuf { vec4 st[]; };
-layout(std140, binding = 2) uniform EyeBlock {
+uniform sampler2D t_rows;
+uniform usampler2D t_recs;
+uniform sampler2D t_st;
+uniform usampler2D t_vtxRec;
+ivec2 dtc(uint i) { return ivec2(int(i & 2047u), int(i >> 11u)); }
+vec4 rowsAt(uint i) { return texelFetch(t_rows, dtc(i), 0); }
+uint recsAt(uint i) { return texelFetch(t_recs, dtc(i), 0).r; }
+vec4 stAt(uint i) { return texelFetch(t_st, dtc(i), 0); }
+uint vtxRecAt(uint i) { return texelFetch(t_vtxRec, dtc(i), 0).r; }
+layout(std140) uniform EyeBlock {
     vec4 vrView[4];
     vec4 vrProj[4];
     ivec4 vrFlags;
@@ -39,6 +53,43 @@ layout(std140, binding = 2) uniform EyeBlock {
     vec4 vrStereo2;
 };
 )";
+
+// Rewrites `name[expr]` into `nameAt(expr)` for the data-texture arrays.
+std::string toDataTextures(const std::string& src) {
+    static const char* kNames[] = {"rows", "recs", "st", "vtxRec"};
+    std::string out;
+    out.reserve(src.size() + src.size() / 8);
+    size_t i = 0;
+    while (i < src.size()) {
+        bool matched = false;
+        bool boundary = i == 0 || !(isalnum((unsigned char)src[i - 1]) || src[i - 1] == '_');
+        if (boundary) {
+            for (const char* n : kNames) {
+                size_t len = strlen(n);
+                if (src.compare(i, len, n) == 0 && i + len < src.size() && src[i + len] == '[') {
+                    out.append(n);
+                    out.append("At(");
+                    int depth = 1;
+                    size_t j = i + len + 1;
+                    for (; j < src.size() && depth; j++) {
+                        char c = src[j];
+                        if (c == '[') depth++;
+                        if (c == ']' && --depth == 0) break;
+                        out += c;
+                    }
+                    out += ')';
+                    i = j + 1;
+                    matched = true;
+                    break;
+                }
+            }
+        }
+        if (!matched) {
+            out += src[i++];
+        }
+    }
+    return out;
+}
 
 }  // namespace
 
@@ -92,7 +143,7 @@ ShaderUid makeShaderUid(const uint32_t* bp, const uint32_t* xf, uint32_t vtxFlag
 // ---------------------------------------------------------------------------
 std::string genVertexShader(const ShaderUid& u) {
     Out o;
-    o.w("#version 320 es\nprecision highp float;\nprecision highp int;\n");
+    o.s += glslPrelude();
     o.s += kUniformBlocks;
     uint32_t f = u.vtxFlags;
     o.w("layout(location = 0) in vec3 a_pos;\n");
@@ -107,7 +158,6 @@ std::string genVertexShader(const ShaderUid& u) {
     if (f & VF_TEXMTX) o.w("layout(location = 15) in uvec2 a_texmtx;\n");
     // Draw record of this vertex: indices are relative to the batch's first
     // vertex, so gl_VertexID + the batch's first ordinal indexes vtxRec[].
-    o.w("layout(std430, binding = 3) readonly buffer VtxRecBuf { uint vtxRec[]; };\n");
     o.w("uniform uint u_firstOrdinal;\n");
     o.w("flat out uint v_pix;\n");
     o.w("out vec4 v_clr0;\nout vec4 v_clr1;\n");
@@ -330,7 +380,7 @@ std::string genVertexShader(const ShaderUid& u) {
         o.w("    v_tex%u = t;\n  }\n", i);
     }
     o.w("}\n");
-    return o.s;
+    return toDataTextures(o.s);
 }
 
 // ---------------------------------------------------------------------------
@@ -432,10 +482,10 @@ const char* alphaTest(uint32_t func, const char* ref) {
 
 std::string genFragmentShader(const ShaderUid& u) {
     Out o;
-    o.w("#version 320 es\nprecision highp float;\nprecision highp int;\n");
+    o.s += glslPrelude();
     o.s += kUniformBlocks;
     for (int i = 0; i < 8; i++) {
-        o.w("layout(binding = %d) uniform sampler2D s_tex%d;\n", i, i);
+        o.w("uniform sampler2D s_tex%d;\n", i);
     }
     o.w("flat in uint v_pix;\n");
     o.w("in vec4 v_clr0;\nin vec4 v_clr1;\n");
@@ -674,7 +724,7 @@ std::string genFragmentShader(const ShaderUid& u) {
         }
     }
     o.w("}\n");
-    return o.s;
+    return toDataTextures(o.s);
 }
 
 }  // namespace gpu

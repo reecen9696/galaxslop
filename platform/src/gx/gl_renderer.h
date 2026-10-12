@@ -1,10 +1,10 @@
-// Render-thread half of the renderer: turns recorded frames into GLES 3.2
-// draws.  A frame is prepared once (uploads, programs, per-draw state) and
+// Render-thread half of the renderer: turns recorded frames into GL draws
+// (ES 3.2 on Android, WebGL2 in the browser, GL 4.1 on macOS; port/gl.h).  A frame is prepared once (uploads, programs, per-draw state) and
 // can then be executed any number of times: per eye, per display refresh,
 // or once for a flat view.
 #pragma once
 
-#include <GLES3/gl32.h>
+#include "port/gl.h"
 
 #include <memory>
 

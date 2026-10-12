@@ -32,8 +32,3 @@ void port_speaker_push(const int16_t*, int) {}
 
 }  // extern "C"
 
-// The GL renderer (gl_renderer.cpp, not built on desktop yet) owns the GL
-// name and frees it here; with the null backend there is nothing to free.
-// TODO(P0-11): the desktop renderer provides this.
-#include "../gx/gx_record.h"
-gpu::TexImage::~TexImage() {}

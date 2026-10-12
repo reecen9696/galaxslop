@@ -124,8 +124,26 @@ if(NOT ANDROID)
   # Desktop: one executable linked at the game's fixed slot (see
   # platform/src/native/main.cpp).  The Android launcher, the OpenXR layer,
   # AAudio and the EGL renderers stay out; native/ replaces them.
-  list(FILTER PLATFORM_SRCS EXCLUDE REGEX "/platform/src/xr/|/audio/aaudio_out\\.cpp$|/gx/headless_render\\.cpp$|/gx/gl_renderer\\.cpp$")
+  list(FILTER PLATFORM_SRCS EXCLUDE REGEX "/platform/src/xr/|/audio/aaudio_out\\.cpp$|/gx/headless_render\\.cpp$")
+
+  # SDL3 for the window, GL context and input, built from source: the Mac
+  # build is x86_64 (D-016) and Homebrew's libraries are arm64.  Same release
+  # Aurora pins.
+  include(FetchContent)
+  set(SDL_SHARED OFF CACHE BOOL "" FORCE)
+  set(SDL_STATIC ON CACHE BOOL "" FORCE)
+  set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
+  set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
+  FetchContent_Declare(SDL3
+    URL https://github.com/libsdl-org/SDL/releases/download/release-3.4.10/SDL3-3.4.10.tar.gz
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
+  FetchContent_MakeAvailable(SDL3)
+
   add_executable(smg $<TARGET_OBJECTS:decomp> ${PLATFORM_SRCS})
+  target_link_libraries(smg PRIVATE SDL3::SDL3-static)
+  if(APPLE)
+    target_link_libraries(smg PRIVATE "-framework OpenGL")
+  endif()
   target_include_directories(smg PRIVATE ${DECOMP_INCLUDES})
   target_compile_definitions(smg PRIVATE ${PORT_DEFS} PORT_PLATFORM_CODE=1)
   target_compile_options(smg PRIVATE ${PORT_COMMON_FLAGS} $<$<COMPILE_LANGUAGE:CXX>:${PORT_CXX_FLAGS}> $<$<COMPILE_LANGUAGE:C>:${PORT_C_FLAGS}>)
