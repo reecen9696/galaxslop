@@ -83,5 +83,6 @@ int main(int argc, char** argv) {
     }
     fprintf(stderr, "smg-web: %d s elapsed, exiting\n", seconds);
     fflush(stderr);
-    _exit(0);
+    emscripten_force_exit(0);  // _exit() from the proxied main thread leaves Node running
+    return 0;
 }
