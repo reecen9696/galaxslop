@@ -468,6 +468,13 @@ namespace {
                 } else {
                     msg = static_cast< u32 >(reinterpret_cast< uintptr_t >(received));
                 }
+#ifdef TARGET_PC
+                static const bool sTickLog = getenv("PETARI_TICKLOG") != nullptr;
+                static u32 sTickN = 0;
+                if (sTickLog && (++sTickN % 120) == 0) {
+                    OSReport("ticklog: msg %u nextCount %u count %u vi %u\n", msg, nextCount, count, VIGetRetraceCount());
+                }
+#endif
             } while ((s32)(msg - nextCount) < 0);
             nextCount = msg + count;
         }

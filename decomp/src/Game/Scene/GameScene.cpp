@@ -31,6 +31,7 @@
 #include "Game/Camera/CameraDirector.hpp"
 #ifdef TARGET_PC
 #include "net/capture/player_capture.h"
+#include "net/puppet/remote_player_puppet.hpp"
 #include "Game/Camera/CameraHolder.hpp"
 #include "Game/Camera/CameraManEvent.hpp"
 #include "Game/Camera/CameraManGame.hpp"
@@ -305,8 +306,11 @@ void GameScene::update() {
     }
     {
         // Co-op: the local player's state for the netcode (net/capture, P2-04).
-        if (MR::isExistMario() && isNerve(GET_NERVE(GameScene, GameSceneAction))) {
+        // Not on the title / file-select stage, whose planet has a Mario of
+        // its own: creating a puppet while that scene loads broke the title.
+        if (MR::isExistMario() && isNerve(GET_NERVE(GameScene, GameSceneAction)) && !MR::isStageFileSelect()) {
             port_net_capture_player();
+            port_net_puppets_update(this);
         }
     }
     {

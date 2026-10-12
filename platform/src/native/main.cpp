@@ -43,6 +43,8 @@ extern "C" void port_mem_set_reserved_window(uintptr_t base, size_t size);
 extern "C" void port_boot(const char* dataRoot, const char* saveRoot);
 extern "C" void port_input_set(int chan, const PortPadState* pad);
 extern "C" int port_log_to_stderr;
+extern "C" void port_debug_dump_threads(void);
+extern "C" int port_trace_nerves;
 
 static const uintptr_t kWindowBase = 0x80000000u;
 static const size_t kWindowSize = 0x60010000u;  // up to 0xE0010000 (locked cache)
@@ -168,6 +170,9 @@ int main(int argc, char** argv) {
     port_mem_set_reserved_window(kWindowBase, kWindowSize);
     void* win = (void*)kWindowBase;
     port_log_to_stderr = 1;
+    if (envSet("PETARI_NERVES")) {
+        port_trace_nerves = atoi(envSet("PETARI_NERVES"));  // log that many state-machine transitions
+    }
 
     static PortInputEvent events[1024];
     int eventCount = envSet("PETARI_INPUT") ? portParseInputScript(envSet("PETARI_INPUT"), events, 1024) : 0;
@@ -221,6 +226,9 @@ int main(int argc, char** argv) {
         if (headless) {
             usleep(5000);
         }
+    }
+    if (envSet("PETARI_THREADS")) {
+        port_debug_dump_threads();  // every emulated OS thread and where it waits
     }
     fprintf(stderr, "smg: %.0f s elapsed, exiting\n", (nowMs() - start) / 1000.0);
     _exit(0);

@@ -176,6 +176,12 @@ if(NOT ANDROID)
     # sign-extended 32-bit absolute addresses.
     target_link_options(smg PRIVATE -no-pie -Wl,-Ttext-segment=0x98000000 -Wl,--no-relax)
   endif()
+  # Debugging aid: -DSMG_ZINIT=decomp|smg zero-initialises every local
+  # variable in that target (clang -ftrivial-auto-var-init=zero), to find
+  # reads of uninitialised locals by changing their garbage.
+  if(SMG_ZINIT AND TARGET ${SMG_ZINIT})
+    target_compile_options(${SMG_ZINIT} PRIVATE -ftrivial-auto-var-init=zero)
+  endif()
   return()
 endif()
 
