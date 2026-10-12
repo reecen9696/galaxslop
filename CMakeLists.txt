@@ -133,6 +133,7 @@ file(GLOB_RECURSE PLATFORM_SRCS CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/platform/src/*.c
   ${CMAKE_SOURCE_DIR}/platform/src/*.cpp
   ${CMAKE_SOURCE_DIR}/net/*.cpp)
+list(FILTER PLATFORM_SRCS EXCLUDE REGEX "/net/tests/")
 
 if(NOT ANDROID)
   # Desktop: one executable linked at the game's fixed slot (see
@@ -152,6 +153,19 @@ if(NOT ANDROID)
     URL https://github.com/libsdl-org/SDL/releases/download/release-3.4.10/SDL3-3.4.10.tar.gz
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
   FetchContent_MakeAvailable(SDL3)
+
+  # Unit tests for code with no game dependency (net/proto).  doctest (MIT).
+  FetchContent_Declare(doctest
+    URL https://github.com/doctest/doctest/archive/refs/tags/v2.4.11.tar.gz
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
+  FetchContent_GetProperties(doctest)
+  if(NOT doctest_POPULATED)
+    FetchContent_Populate(doctest)
+  endif()
+  add_executable(net_tests net/tests/player_state_test.cpp net/proto/player_state.cpp)
+  target_include_directories(net_tests PRIVATE ${CMAKE_SOURCE_DIR} ${doctest_SOURCE_DIR})
+  enable_testing()
+  add_test(NAME net_tests COMMAND net_tests)
 
   add_executable(smg $<TARGET_OBJECTS:decomp> ${PLATFORM_SRCS})
   target_link_libraries(smg PRIVATE SDL3::SDL3-static)

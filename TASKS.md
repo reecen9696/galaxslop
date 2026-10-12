@@ -297,7 +297,7 @@ with no desync complaints at 100 ms delay.
 
 ### P2-01 PlayerState encoder/decoder
 - lane: B
-- status: in_progress
+- status: review
 - owner: A (lane B task; B is on P0-06, hand back any time)
 - blocked_by: P0-09
 - touches: net/state
@@ -305,6 +305,7 @@ with no desync complaints at 100 ms delay.
 - what: Encode/decode per NETCODE.md. f16 helpers. Unit tests with round-trip and fuzz. No game dependency; pure C++.
 - done when: tests pass.
 - log:
+  - 2026-10-13 (A): net/proto/player_state.{h,cpp} + net/tests (doctest, `net_tests` target, CI step): half floats, encode/forward/decode round trip, malformed input, matrix<->quaternion, 10k-message fuzz; 5 cases, 1,841 assertions pass. Wire: 54 bytes client->server, 55 forwarded; galaxy as u32 stage hash instead of u16 id (no table to keep); NETCODE.md updated.
   - 2026-10-13 (A): claimed while B works on P0-06, to get two native clients seeing each other.
 
 ### P2-02 Relay server (local Node)

@@ -34,28 +34,27 @@ unless marked f16.
 
 ### PlayerState (0x10)
 
-Client sends at 30 Hz. Server prepends `u8 player_id` and forwards to all
-others in the room.
+Client sends at 30 Hz. Server prepends `u8 player_id` after the type byte
+and forwards to all others in the room. Implemented in
+`net/proto/player_state.{h,cpp}` (P2-01), tested in `net/tests`.
 
 ```
+u8   type           0x10
 u8   player_id      (server-added on forward)
-u32  tick           client frame counter
+u32  tick           client capture frame counter
 f32  pos[3]
-f16  rot[4]         quaternion xyzw
+f16  rot[4]         orientation quaternion xyzw, from Mario's base matrix
 f16  up[3]          gravity up vector
 f16  vel[3]
-u32  anim_hash      MR::getHashCode(current animation name); the
-                    receiver calls XanimePlayer::changeAnimationByHash (D-018)
-u8   anim_weight[4] track blend weights x255; the locomotion group mixes
-                    stand/walk/run/dash this way (D-018)
+u32  anim_hash      MR::getHashCode(current animation name); the receiver
+                    calls XanimePlayer::changeAnimationByHash (D-018)
+u8   anim_weight[4] track blend weights x255 (locomotion group, D-018)
 f16  anim_frame
-u16  flags          bit0 character, bit1 grounded, bit2 spinning,
-                    bit3 visible, bits4-7 powerup, bit8 on_launch_star,
-                    bit9 in_cutscene
-u16  galaxy_id
-u8   scenario_id
+u16  flags          bit0 luigi, bit1 grounded, bit2 hidden, bit3 in_cutscene
+u32  stage_hash     MR::getHashCode(stage name): same galaxy check
+u8   scenario
 ```
-58 bytes with the forwarded id.
+54 bytes from the client, 55 forwarded.
 
 ### ProgressEvent kinds
 
