@@ -175,6 +175,15 @@ if(NOT ANDROID)
     # --no-relax: 0x98000000 is above 2 GiB, so ld must not rewrite GOT loads into
     # sign-extended 32-bit absolute addresses.
     target_link_options(smg PRIVATE -no-pie -Wl,-Ttext-segment=0x98000000 -Wl,--no-relax)
+    # gcc's crtbegin.o/crtend.o are small-code-model objects that cannot
+    # address an image above 2 GiB (R_X86_64_32S against .tm_clone_table).
+    # glibc runs .init_array itself and the port has no C++ exceptions, so
+    # link with glibc's crt1/crti/crtn only.
+    execute_process(COMMAND ${CMAKE_C_COMPILER} -print-file-name=crt1.o OUTPUT_VARIABLE SMG_CRT1 OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(COMMAND ${CMAKE_C_COMPILER} -print-file-name=crti.o OUTPUT_VARIABLE SMG_CRTI OUTPUT_STRIP_TRAILING_WHITESPACE)
+    execute_process(COMMAND ${CMAKE_C_COMPILER} -print-file-name=crtn.o OUTPUT_VARIABLE SMG_CRTN OUTPUT_STRIP_TRAILING_WHITESPACE)
+    target_link_options(smg PRIVATE -nostartfiles ${SMG_CRT1} ${SMG_CRTI})
+    target_link_libraries(smg PRIVATE ${SMG_CRTN})
   endif()
   # Debugging aid: -DSMG_ZINIT=decomp|smg zero-initialises every local
   # variable in that target (clang -ftrivial-auto-var-init=zero), to find
