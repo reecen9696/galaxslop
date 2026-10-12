@@ -55,9 +55,11 @@ report, 2026-10-12):
 
 | Route | Verdict |
 |---|---|
-| Petari -> WASM with a GX translation layer | Chosen. GalaxyQuest proved the platform layer on Android/GLES 3.2; SMGwebport (a closed-source GalaxyQuest build) proved it compiles and runs under Emscripten. The renderer needs an ES 3.0 rework first (D-008); nothing else about the route is in doubt. |
+| Petari -> WASM with a GX layer | Chosen. This is how every browser multiplayer port of a Nintendo game is built (sm64js, sm64coopdx web ports, sm64-coop-web): decomp + Emscripten + user-supplied ROM + a relay. GalaxyQuest proved the Wii replacement layer on Petari; SMGwebport (closed) proved it runs under Emscripten. GX layer: Aurora on WebGPU first (D-014; used by AstroCore, Metaforce, WiiCompiled; shown in-browser by `webcompiled`), GalaxyQuest's renderer reworked for WebGL2 as fallback (D-008). |
+| Static recompilation (WiiCompiled) | Generic translator, per-game runtime; recompiles on the user's machine (30 min, 20 GB); opaque to modding. Petari is 100% source, strictly better. Its Aurora integration is the precedent we borrow. (D-015) |
+| Dolphin compiled to WASM (`wasm-dolphin`) | Serious prototype, but Wii runs software-rasterised with no Wii Remote; Melee at best ~68-100% speed. Not 60 fps SMG. (D-015) |
 | Port AstroCore (Luma's Workshop PC port) | Not released. Human-only code policy. Watch, don't wait. |
-| Dolphin compiled to WASM | Early demos only, software rasteriser, desktop Chrome only. Can't give 5 independent players. |
+| Cloud-stream Dolphin + smg-online to browsers | Works today, no port work, GPU-box cost and 30-80 ms. Not the project; the right playtest baseline (P0-00). |
 | noclip.website | Renderer only, no game logic. Use as a GX reference. |
 
 Netcode: every working SMG and Sunshine online mod uses "independent worlds

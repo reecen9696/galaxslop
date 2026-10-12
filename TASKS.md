@@ -23,6 +23,17 @@ Phase gates are in `docs/BUILD_SPEC.md` section 6.
 Gate: `--headless --frames 600` exits 0 on native and web; title screen
 renders in Chromium; one human has seen it.
 
+### P0-00 Play the existing mod first
+- lane: shared
+- status: open
+- owner:
+- blocked_by:
+- touches: docs/PLAYTEST.md
+- flags: human, solo, parallel-ok
+- what: Before building any netcode, both humans play smg-online (FimeV1) in Dolphin for an evening: USA disc, the Python relay, 2-3 players. It is the exact model we are copying (puppets, shared progress log, star bits synced). Write down what feels good, what snaps, what is missing, how the save sharing behaves, and what you would change. That list reorders Phase 2-4. Optional: if you want to know what "SMG in a browser tab" feels like at 50 ms latency, stream one Dolphin from a GPU box with neko (D-015).
+- done when: a dated section in `docs/PLAYTEST.md` with the notes.
+- log:
+
 ### P0-01 Repo init and scaffolding
 - lane: shared
 - status: open
@@ -57,14 +68,25 @@ renders in Chromium; one human has seen it.
 - done when: every file outside `platform/src/gx/` compiles on macOS and Linux with `-DPORT_PLATFORM=desktop`. Nothing links yet; P0-04 links.
 - log:
 
-### P0-10 GX renderer: ES 3.0 / WebGL2 rework (critical path)
+### P0-11 Aurora GX spike (critical path, 3-week timebox)
 - lane: A
 - status: open
 - owner:
 - blocked_by: P0-02
+- touches: platform/src/gx (replace), platform/include, CMakeLists.txt, tools/cook (read; note any swap that must stop)
+- flags:
+- what: Per D-014. Add `extern/aurora` (MIT, pinned), link `aurora::gx` (+ `vi`, `mtx` as needed) in place of GalaxyQuest's `gx/` and Petari's `src/RVL_SDK/gx`; Aurora's `include/dolphin/gx.h` family replaces the SDK headers for GX only. Keep GalaxyQuest's `os`/`dvd`/`nand`/`audio`/`input`. Native first (Dawn on Metal): title screen, then Good Egg. Then Emscripten with emdawnwebgpu (read `webcompiled`'s build for the approach; it is GPL-3, copy nothing). Answer the five spike questions in D-014 and log them with numbers. Go/no-go at 3 weeks: go = Good Egg renders correctly natively and the web build draws the title screen; no-go = resume P0-10.
+- done when: go/no-go logged in D-014's revisit line and here, with frame time at 720p.
+- log:
+
+### P0-10 GX renderer: ES 3.0 / WebGL2 rework (fallback)
+- lane: A
+- status: open
+- owner:
+- blocked_by: P0-11 (only on no-go)
 - touches: platform/src/gx
 - flags:
-- what: Per D-008. GalaxyQuest's renderer is GLES 3.2 and will not run on WebGL2 or macOS GL. In order: (1) the four SSBOs -> data textures: `rows` and `st` as RGBA32F, `recs` as RGBA32UI, uploaded with `glTexSubImage2D` per FIFO flush; `gl_shadergen.cpp` emits `texelFetch` helpers in place of `buffer` block indexing. (2) `vtxRec[u_firstOrdinal + gl_VertexID]` -> a `uint` vertex attribute via `glVertexAttribIPointer`. (3) `glVertexAttribFormat/Binding/BindVertexBuffer` -> `glVertexAttribPointer` per batch. (4) `#version 320 es` -> `300 es`; `#version 330 core`/`410 core` for native; `layout(binding=N)` on samplers -> `glUniform1i` after link. (5) `glProgramBinary` cache -> cache generated GLSL keyed by TEV hash; warm at load; `KHR_parallel_shader_compile` when present. (6) The shared-context compile thread stays behind `#ifdef` for native; web uses (5). (7) Remove EGL and QCOM foveation. Keep `PETARI_DLCHECK` working. Use GalaxyQuest's own `PETARI_PERFLOG` to compare batch counts before and after.
+- what: Fallback if P0-11 fails its timebox. Per D-008. GalaxyQuest's renderer is GLES 3.2 and will not run on WebGL2 or macOS GL. In order: (1) the four SSBOs -> data textures: `rows` and `st` as RGBA32F, `recs` as RGBA32UI, uploaded with `glTexSubImage2D` per FIFO flush; `gl_shadergen.cpp` emits `texelFetch` helpers in place of `buffer` block indexing. (2) `vtxRec[u_firstOrdinal + gl_VertexID]` -> a `uint` vertex attribute via `glVertexAttribIPointer`. (3) `glVertexAttribFormat/Binding/BindVertexBuffer` -> `glVertexAttribPointer` per batch. (4) `#version 320 es` -> `300 es`; `#version 330 core`/`410 core` for native; `layout(binding=N)` on samplers -> `glUniform1i` after link. (5) `glProgramBinary` cache -> cache generated GLSL keyed by TEV hash; warm at load; `KHR_parallel_shader_compile` when present. (6) The shared-context compile thread stays behind `#ifdef` for native; web uses (5). (7) Remove EGL and QCOM foveation. Keep `PETARI_DLCHECK` working. Use GalaxyQuest's own `PETARI_PERFLOG` to compare batch counts before and after.
 - done when: with P0-04's native build, title screen and Good Egg match Dolphin screenshots side by side (human), `PETARI_DLCHECK=1` is clean for 600 frames, and the renderer compiles with no symbol outside ES 3.0 / GL 3.3 core (grep the source for `GL_SHADER_STORAGE`, `glVertexAttribFormat`, `glProgramBinary`, `egl`).
 - log:
 
@@ -75,7 +97,7 @@ renders in Chromium; one human has seen it.
 - blocked_by: P0-03
 - touches: platform/src/native, CMakeLists.txt, tools/bench/stub-game
 - flags:
-- what: SDL2 window, GL 3.3 core (4.1 on macOS; no ANGLE), keyboard into the WPAD surface, SDL audio behind `PortAudioSink`, `--game <dir>`, `--galaxy <name>`, `--headless --frames N`. Until P0-10 lands, link against a null `gx` backend (`-DSMG_GX=null`) that accepts the FIFO and draws nothing, so B is not blocked on A and CI has a GL-free headless target for good. Create `tools/bench/stub-game/` with the cooked layout but empty files. Be honest about what the stub proves: platform init, arg parsing, a clean "no valid disc" exit. Not boot.
+- what: Host window and input for the native build. If P0-11 goes, Aurora brings SDL3 windowing (`aurora::main`) and gamepad input; this task then wires `--game <dir>`, `--galaxy <name>`, `--headless --frames N`, keyboard into the WPAD surface and SDL audio behind `PortAudioSink` on top of it. If P0-11 fails, it is an SDL2 window with a GL 3.3/4.1 core context. Until a renderer lands, link against a null `gx` backend (`-DSMG_GX=null`) that accepts the FIFO and draws nothing, so B is not blocked on A and CI has a GL-free headless target for good. Create `tools/bench/stub-game/` with the cooked layout but empty files. Be honest about what the stub proves: platform init, arg parsing, a clean "no valid disc" exit. Not boot.
 - done when: `./smg --game tools/bench/stub-game --headless --frames 60` exits 0 with the null backend. With P0-10 merged and a real cooked disc, boots to title (human check, log it).
 - log:
 
@@ -94,10 +116,10 @@ renders in Chromium; one human has seen it.
 - lane: A
 - status: open
 - owner:
-- blocked_by: P0-04, P0-10
+- blocked_by: P0-04, P0-11
 - touches: CMakeLists.txt, platform/src/web, web/
 - flags:
-- what: `-DSMG_TARGET=web`. Emscripten toolchain file. Starting flags (measure, don't trust): `-pthread -sPTHREAD_POOL_SIZE=4` (GalaxyQuest emulates OS threads in its own scheduler; real threads are only the frame builder and audio), `-sPROXY_TO_PTHREAD -sOFFSCREENCANVAS_SUPPORT` (D-005, with the main-thread fallback compiled in), `-sMAXIMUM_MEMORY=4GB -sALLOW_MEMORY_GROWTH` (D-013: the fixed 0x80000000 window needs >2 GB of address space; note Emscripten's >2 GB pointer caveats), `-sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2`. No `-sFULL_ES3` unless something needs client-side arrays. SMGwebport publishes no source or flags; its `shell.js` only shows what it exports (`web_audio_ring`, `web_input_update`, `web_shader_warmup`), which is a reasonable shape for our `platform/src/web` glue. A minimal `web/index.html` + Vite config with COOP/COEP headers that loads the wasm and shows console output.
+- what: `-DSMG_TARGET=web`. Emscripten toolchain file; emdawnwebgpu port for Aurora (D-014; `webcompiled` pins Emscripten 6.0.12 and uses JSPI instead of SharedArrayBuffer, which we may not need since GalaxyQuest's OS layer schedules its own threads; decide in P0-09). Starting flags (measure, don't trust): `-pthread -sPTHREAD_POOL_SIZE=4` (GalaxyQuest emulates OS threads in its own scheduler; real threads are only the frame builder and audio), `-sPROXY_TO_PTHREAD -sOFFSCREENCANVAS_SUPPORT` (D-005, with the main-thread fallback compiled in), `-sMAXIMUM_MEMORY=4GB -sALLOW_MEMORY_GROWTH` (D-013: the fixed 0x80000000 window needs >2 GB of address space; note Emscripten's >2 GB pointer caveats), `-sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2`. No `-sFULL_ES3` unless something needs client-side arrays. SMGwebport publishes no source or flags; its `shell.js` only shows what it exports (`web_audio_ring`, `web_input_update`, `web_shader_warmup`), which is a reasonable shape for our `platform/src/web` glue. A minimal `web/index.html` + Vite config with COOP/COEP headers that loads the wasm and shows console output.
 - done when: the wasm links and the page loads it without a crash before `main()`; `wasmMemory.buffer.byteLength` and the page's resident memory are both logged.
 - log:
 
@@ -116,10 +138,10 @@ renders in Chromium; one human has seen it.
 - lane: A
 - status: open
 - owner:
-- blocked_by: P0-06, P0-07, P0-10
+- blocked_by: P0-06, P0-07, P0-11
 - touches: platform/src/gx, platform/src/web, web/
 - flags: human
-- what: Get P0-10's renderer running through WebGL2 on the OffscreenCanvas. Expected leftovers: `glBlitFramebuffer` restrictions, texture format/`texStorage` edge cases, `KHR_parallel_shader_compile` fallback, `glFinish` on the game thread. Keyboard input only. Audio off. Log frame time p50/p95 at 720p on the reference machine; that number decides D-008's revisit.
+- what: Get the P0-11 renderer (Aurora on WebGPU; or P0-10's WebGL2 path on no-go) drawing on the canvas in Chromium. Keyboard input only. Audio off. Log frame time p50/p95 at 720p on the reference machine.
 - done when: title screen renders in Chromium from an OPFS-loaded cooked disc. Screenshot in the PR. Human confirms.
 - log:
 

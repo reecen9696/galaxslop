@@ -148,3 +148,53 @@ using `tools/find_ptr_casts.py` as the audit. On native macOS the low 4 GB
 is PAGEZERO by default; link with `-Wl,-pagezero_size,0x1000`.
 Why: a spike changes one thing at a time. Copy the working layout first.
 Revisit: P0-09.
+
+## D-014 (2026-10-12, lane A): Aurora on WebGPU is the primary GX layer; the GalaxyQuest WebGL2 rework is the fallback. Amends D-008
+What: Phase 0 integrates encounter/aurora (MIT) as the GX implementation
+in place of GalaxyQuest's `platform/src/gx/`, rendering through WebGPU in
+the browser (emdawnwebgpu) and Dawn (Metal/Vulkan/D3D12) natively. The
+rest of GalaxyQuest stays: decomp `TARGET_PC` fixes, `os`, `dvd`, `nand`,
+`audio`, `input`, and the cooker. P0-11 is a 3-week timeboxed spike with a
+go/no-go; on no-go, P0-10 (data-texture rework of GalaxyQuest's renderer
+for WebGL2) resumes.
+Why: Aurora is the GX layer AstroCore (the human Petari PC port),
+Metaforce, Dusklight and WiiCompiled (Mario Kart Wii) all use; it is
+maintained by the decomp-toolkit author. `webcompiled` has already run
+WiiCompiled + Aurora in Chrome via Emscripten + emdawnwebgpu at ~60 fps
+in races, so "Aurora in a browser" is demonstrated, not hoped. Aurora's
+command processor has a per-array little-endian flag ("endianness is
+baked into the shader"), so cooked LE vertex data is a supported input,
+and its `include/dolphin/` headers stand in for the SDK. It also ships a
+THP decoder, DVD via nod (reads ISO/RVZ directly) and CARD. Natively it
+sidesteps macOS's GL 4.1 ceiling entirely. Against it: WebGPU-only in the
+browser (Chrome/Edge first; Firefox and Safari ship WebGPU but are less
+proven for this), Dawn is a heavy dependency, and `webcompiled`'s own
+Emscripten glue is GPL-3 (read for approach, never copy; Aurora itself is
+MIT).
+Spike questions P0-11 must answer: do J3D's baked hardware display lists
+pass through Aurora's `process()` unchanged (they should; MKWii's do), does
+the cooker need to stop swapping anything Aurora wants big-endian, does
+`GXCopyTex`/EFB-copy coverage match what SMG uses, frame time at 720p on
+the reference machine, and whether JSPI is needed (GalaxyQuest's OS layer
+schedules threads itself, so probably not).
+Revisit: P0-11 go/no-go, logged with numbers.
+
+## D-015 (2026-10-12, shared): Routes considered and rejected, with evidence
+Emulator in the browser: `wasm-dolphin` (Dolphin via Emscripten, PPC->WASM
+JIT) runs Wii discs only on its software rasteriser with no Wii Remote
+input; Melee reaches ~68-100% speed on a desktop, nothing near SMG at
+60 fps. `gecko`/CubeDeck is interpreter-only. Rejected for performance.
+Static recompilation: WiiCompiled's translator is generic but every game
+needs its own runtime manifest; setup recompiles the disc on the user's
+machine (~30 min, 20 GB, 1.2 GB toolchain) and the output is opaque to
+modding. Petari is 100% source, which is strictly better for puppets and
+hooks. Rejected, but its Aurora integration is the precedent for D-014.
+Wait for AstroCore: no release date, human-only policy, mod API
+undisclosed. Watch, don't wait.
+Cloud streaming (Dolphin + smg-online on a GPU box, WebRTC to each browser
+via neko/selkies): works today, zero port work, costs a GPU VPS per
+session and adds 30-80 ms. Not the project, but the right way to playtest
+the netcode model before the port exists (P0-00).
+Netcode: every browser SM64 multiplayer port uses either a WebSocket relay
+(sm64-coop-web, sm64js) or PeerJS/WebRTC P2P (sh1ftmaker's coopdx web).
+D-003's relay stands.

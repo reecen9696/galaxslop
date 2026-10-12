@@ -23,7 +23,7 @@ lane's directories unless a task in `TASKS.md` explicitly says otherwise.
 | shared | both, by task | `decomp/`, `platform/include/`, `CMakeLists.txt`, `docs/`, `TASKS.md`, `AGENTS.md`, `skills/` |
 
 Paths follow GalaxyQuest's `platform/src/<subsystem>/` layout (D-007).
-Lane A's Phase 0 is the renderer rework (P0-10); lane B's is the host, OS,
+Lane A's Phase 0 is the GX layer (P0-11, fallback P0-10); lane B's is the host, OS,
 disc and cooker side. They don't share files until the link step.
 
 `decomp/` is shared because both lanes need `TARGET_PC` hooks in game

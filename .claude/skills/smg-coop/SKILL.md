@@ -28,7 +28,8 @@ log.
 | Piece | Source | How we use it |
 |---|---|---|
 | Game code | Petari via GalaxyQuest `decomp/` (has `TARGET_PC` fixes) | Vendored as one snapshot with `platform/` and `tools/cook/` at GalaxyQuest `d8a039c` (D-007). Diff against `petari-base` tag to see port changes. Until P0-02 lands, `decomp/` is raw Petari. |
-| GX -> GL renderer | GalaxyQuest `platform/src/gx/` | Keep the FIFO recorder, display-list cache, batching and shader gen. It is GLES 3.2 (SSBOs, attrib binding API, program binaries, shared-context compiles); none of that exists in WebGL2 or macOS GL. P0-10 reworks it to ES 3.0 (D-008). Not "mostly build-system work". |
+| GX layer (primary) | encounter/aurora (MIT) | Link `aurora::gx` in place of the SDK's GX and GalaxyQuest's `gx/`. WebGPU in the browser via emdawnwebgpu, Dawn natively. Same layer AstroCore, Metaforce and WiiCompiled use; `webcompiled` runs it in Chrome at 60 fps. Has a per-array little-endian flag for cooked data. P0-11 is the spike (D-014). |
+| GX layer (fallback) | GalaxyQuest `platform/src/gx/` | Only if P0-11 fails its timebox. It is GLES 3.2 (SSBOs, attrib binding API, program binaries); P0-10 reworks it to ES 3.0 / WebGL2 (D-008). |
 | DSP audio mixer | GalaxyQuest `platform/src/audio/` | Keep. Output buffer goes to an AudioWorklet instead of AAudio. |
 | Asset cooker | GalaxyQuest `tools/cook/cook.py` | Desktop tool and oracle. The browser runs a TypeScript port in workers (D-009) that must match it byte for byte. Input is an extracted folder; it does not read ISOs. |
 | Emscripten precedent | SMGwebport | Proof it runs in a browser, nothing more: build output only, no source, no license, no flags. Its `shell.js` shows an export surface (`web_audio_ring`, `web_input_update`, `web_shader_warmup`) and that it works without OffscreenCanvas. Do not copy or link its data. |
