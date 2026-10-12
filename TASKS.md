@@ -60,14 +60,15 @@ renders in Chromium; one human has seen it.
 
 ### P0-03 Strip Android/OpenXR from the platform layer; desktop host glue
 - lane: B
-- status: open
-- owner:
+- status: in_progress
+- owner: A (solo)
 - blocked_by: P0-02
 - touches: platform/src/os, platform/src/dvd, platform/src/nand, platform/src/input, platform/src/audio (output glue only), platform/src/port, platform/src/xr (delete), CMakeLists.txt
 - flags:
 - what: Everything outside `gx/`. Delete `xr/`. Replace: Android log -> stdio; AAudio -> a `PortAudioSink` interface with a null sink now (SDL audio in P0-04, worklet ring in P1-01); Android asset/`files/game` paths -> `--game <dir>`; the `reserve` preload trick for the low-4 GB window -> `mmap(MAP_FIXED)` at startup in `os_mem.cpp`, with `-Wl,-pagezero_size,0x1000` on macOS (D-013); Quest controller input -> the WPAD surface fed by a plain struct the host fills. OpenXR calls in `port/` become no-ops behind `PORT_PLATFORM=desktop`. Keep `-DPORT_PLATFORM_CODE` and `compat.h` as they are.
 - done when: every file outside `platform/src/gx/` compiles on macOS and Linux with `-DPORT_PLATFORM=desktop`. Nothing links yet; P0-04 links.
 - log:
+  - 2026-10-12: desktop path in CMakeLists.txt (Android path untouched): excludes xr/, aaudio_out, gl_renderer, headless_render; adds platform/src/native/{main.cpp,desktop_stubs.cpp}. os_mem.cpp: shm_open on macOS, no MAP_FIXED_NOREPLACE on Darwin. compat.h: <float.h>, __va_list. Links on macOS x86_64 (D-016). xr/ and android/ still in the tree, just not built; delete once Linux CI builds too.
 
 ### P0-11 Aurora GX spike (critical path, 3-week timebox)
 - lane: A
@@ -93,14 +94,15 @@ renders in Chromium; one human has seen it.
 
 ### P0-04 Native desktop host (Aurora main / SDL3; SDL2 + GL only on fallback)
 - lane: B
-- status: open
-- owner:
+- status: in_progress
+- owner: A (solo)
 - blocked_by: P0-03
 - touches: platform/src/native, CMakeLists.txt, tools/bench/stub-game
 - flags:
 - what: Host window and input for the native build. If P0-11 goes, Aurora brings SDL3 windowing (`aurora::main`) and gamepad input; this task then wires `--game <dir>`, `--galaxy <name>`, `--headless --frames N`, keyboard into the WPAD surface and SDL audio behind `PortAudioSink` on top of it. If P0-11 fails, it is an SDL2 window with a GL 3.3/4.1 core context. Until a renderer lands, link against a null `gx` backend (`-DSMG_GX=null`) that accepts the FIFO and draws nothing, so B is not blocked on A and CI has a GL-free headless target for good. Create `tools/bench/stub-game/` with the cooked layout but empty files. Be honest about what the stub proves: platform init, arg parsing, a clean "no valid disc" exit. Not boot.
 - done when: `./smg --game tools/bench/stub-game --headless --frames 60` exits 0 with the null backend. With P0-11 (or P0-10) merged and a real cooked disc, boots to title (human check, log it).
 - log:
+  - 2026-10-12: `smg --game ~/smg/game --headless --seconds 20` boots RMGP01: disc identified, game main() runs, DSP boots, mixer up, ~900 frames presented, clean exit. No window yet; null renderer path. Note: B109take_0.aw is 0 bytes on the disc itself, the DVD log line is noise.
 
 ### P0-05 Cook tool: desktop path
 - lane: B

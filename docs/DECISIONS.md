@@ -198,3 +198,24 @@ the netcode model before the port exists (P0-00).
 Netcode: every browser SM64 multiplayer port uses either a WebSocket relay
 (sm64-coop-web, sm64js) or PeerJS/WebRTC P2P (sh1ftmaker's coopdx web).
 D-003's relay stands.
+
+## D-016 (2026-10-12, lane B): Desktop macOS builds are x86_64 under Rosetta; the game image sits at 0x98000000 everywhere
+What: the game keeps pointers in u32 fields, and GalaxyQuest's GPU front
+end treats addresses below 0x80000000 as physical, so the game's image
+(code and static data) must load at its fixed slot 0x98000000 next to
+MEM1/MEM2. Per target:
+- Linux: `-no-pie -Wl,-Ttext-segment=0x98000000`.
+- macOS: arm64 cannot do it. Executables must be PIE (`-no_pie` and
+  `-image_base` are ignored) and the kernel kills any arm64 binary whose
+  `__PAGEZERO` is under 4 GiB (exit 137, tested). x86_64 still allows
+  both, so the Mac build is x86_64, linked `-pagezero_size 0x10000
+  -no_pie -image_base 0x98000000`, and runs under Rosetta. Verified: image
+  at 0x98000000, game boots.
+- Web: wasm32 pointers are 32-bit anyway; `-sGLOBAL_BASE=0x98000000` puts
+  static data in the same slot (P0-06).
+Why not a native arm64 Mac build: it would need a custom Mach-O loader
+mapping the game at a fixed address, or relocating everything the GPU
+front end treats as physical. Neither is worth it for a dev build when
+the shipping target is the browser.
+Revisit: if Rosetta is removed from macOS, or if dev builds get slow
+enough to matter (Linux VM or the web build are the alternatives).

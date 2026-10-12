@@ -1,4 +1,13 @@
 cmake_minimum_required(VERSION 3.24)
+
+# The game keeps pointers in u32 fields, so its image must sit at a fixed base
+# below 4 GiB (0x98000000).  arm64 macOS refuses that (PIE is mandatory and the
+# kernel kills a __PAGEZERO under 4 GiB), x86_64 macOS allows it, so the
+# desktop build on a Mac is x86_64 and runs under Rosetta (D-016).
+if(APPLE AND NOT CMAKE_OSX_ARCHITECTURES)
+  set(CMAKE_OSX_ARCHITECTURES x86_64 CACHE STRING "" FORCE)
+endif()
+
 project(GalaxyQuest C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -110,6 +119,25 @@ target_compile_options(decomp PRIVATE ${PORT_COMMON_FLAGS} $<$<COMPILE_LANGUAGE:
 file(GLOB_RECURSE PLATFORM_SRCS CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/platform/src/*.c
   ${CMAKE_SOURCE_DIR}/platform/src/*.cpp)
+
+if(NOT ANDROID)
+  # Desktop: one executable linked at the game's fixed slot (see
+  # platform/src/native/main.cpp).  The Android launcher, the OpenXR layer,
+  # AAudio and the EGL renderers stay out; native/ replaces them.
+  list(FILTER PLATFORM_SRCS EXCLUDE REGEX "/platform/src/xr/|/audio/aaudio_out\\.cpp$|/gx/headless_render\\.cpp$|/gx/gl_renderer\\.cpp$")
+  add_executable(smg $<TARGET_OBJECTS:decomp> ${PLATFORM_SRCS})
+  target_include_directories(smg PRIVATE ${DECOMP_INCLUDES})
+  target_compile_definitions(smg PRIVATE ${PORT_DEFS} PORT_PLATFORM_CODE=1)
+  target_compile_options(smg PRIVATE ${PORT_COMMON_FLAGS} $<$<COMPILE_LANGUAGE:CXX>:${PORT_CXX_FLAGS}> $<$<COMPILE_LANGUAGE:C>:${PORT_C_FLAGS}>)
+  if(APPLE)
+    # x86_64, not position independent: a 64 KiB __PAGEZERO instead of 4 GiB
+    # and the image at 0x98000000.
+    target_link_options(smg PRIVATE -Wl,-pagezero_size,0x10000 -Wl,-no_pie -Wl,-image_base,0x98000000)
+  else()
+    target_link_options(smg PRIVATE -no-pie -Wl,-Ttext-segment=0x98000000 -Wl,--error-limit=0)
+  endif()
+  return()
+endif()
 
 add_library(game SHARED $<TARGET_OBJECTS:decomp> ${PLATFORM_SRCS})
 target_include_directories(game PRIVATE ${DECOMP_INCLUDES})

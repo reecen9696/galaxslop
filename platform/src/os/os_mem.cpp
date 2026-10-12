@@ -30,6 +30,23 @@ static int makeSharedFd(const char* name, size_t size) {
     }
     return fd;
 }
+#elif defined(__APPLE__)
+#include <fcntl.h>
+// No memfd on macOS: a POSIX shared memory object, unlinked at once, gives the
+// same anonymous shared pages for the cached/uncached mirrors to alias.
+static int makeSharedFd(const char* name, size_t size) {
+    char shmName[64];
+    snprintf(shmName, sizeof(shmName), "/smg-%d-%s", (int)getpid(), name);
+    int fd = shm_open(shmName, O_RDWR | O_CREAT | O_EXCL, 0600);
+    if (fd < 0) {
+        port_fatal("shm_open(%s) failed: %s", shmName, strerror(errno));
+    }
+    shm_unlink(shmName);
+    if (ftruncate(fd, (off_t)size) != 0) {
+        port_fatal("ftruncate(%zu) failed: %s", size, strerror(errno));
+    }
+    return fd;
+}
 #endif
 
 // Address window reserved (PROT_NONE) by the launcher before anything else
@@ -43,7 +60,14 @@ extern "C" void port_mem_set_reserved_window(uintptr_t base, size_t size) {
 
 static void* mapAt(uintptr_t addr, size_t size, int fd) {
     bool inWindow = addr >= sWindowBase && addr + size <= sWindowEnd;
-    int flags = (fd >= 0 ? MAP_SHARED : (MAP_PRIVATE | MAP_ANONYMOUS)) | (inWindow ? MAP_FIXED : MAP_FIXED_NOREPLACE);
+#ifdef __APPLE__
+    // Darwin has no MAP_FIXED_NOREPLACE; outside the window the address is a
+    // hint, honoured when the range is free (checked below).
+    int noReplace = 0;
+#else
+    int noReplace = MAP_FIXED_NOREPLACE;
+#endif
+    int flags = (fd >= 0 ? MAP_SHARED : (MAP_PRIVATE | MAP_ANONYMOUS)) | (inWindow ? MAP_FIXED : noReplace);
     void* p = mmap((void*)addr, size, PROT_READ | PROT_WRITE, flags, fd, 0);
     if (p == MAP_FAILED) {
         port_fatal("mmap at 0x%08lx (+0x%zx) failed: %s", (unsigned long)addr, size, strerror(errno));
