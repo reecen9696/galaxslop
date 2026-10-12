@@ -56,26 +56,36 @@ docs/
   BUILD_SPEC.md        full technical spec and phased plan
   NETCODE.md           multiplayer protocol
   DECISIONS.md         architecture decision log (append-only)
-decomp/                Petari sources + TARGET_PC fixes (from GalaxyQuest)
-platform/              the Wii replacement layer (C++)
-  gx/                  GX -> WebGL2
-  audio/               DSP mixer -> AudioWorklet
-  input/               WPAD -> Gamepad API / mouse
-  fs/                  DVD/NAND -> OPFS / IndexedDB
-  os/                  threads, timers, memory layout
+  REVIEW_2026-10-12.md the review that produced D-007..D-013
+decomp/                Petari sources + TARGET_PC fixes (GalaxyQuest snapshot)
+platform/              the Wii replacement layer (C++), GalaxyQuest layout
+  include/
+  src/
+    gx/                GX FIFO -> WebGL2 / GL 3.3 (after the ES 3.0 rework)
+    audio/             DSP mixer -> AudioWorklet / SDL
+    input/             WPAD <- Gamepad API / mouse / keyboard
+    dvd/  nand/        disc reads <- OPFS, saves -> IndexedDB
+    os/                emulated OS threads, timers, memory window
+    sdk/  port/        THP decoder, misc SDK, port glue
+    native/            SDL2 desktop host
+    web/               Emscripten host glue
 net/                   client-side netcode (C++ + JS bridge)
-server/                relay server (TypeScript, WebSocket)
+server/                relay server (TypeScript, WebSocket, container)
 web/                   the web shell: file import, lobby, canvas, HUD overlay
 tools/
-  cook/                disc -> cooked asset layout (Python + WASM port)
+  cook/                extracted disc -> cooked layout (Python, the oracle)
+  cook-ts/             the same cooker in TypeScript for the browser
   bench/               performance and smoke-test scripts
 game/                  YOUR cooked disc. gitignored. never commit.
 ```
 
+State on 2026-10-12: docs and board exist; `decomp/` holds raw Petari until
+P0-02 swaps in the GalaxyQuest snapshot; `platform/` is empty dirs.
+
 ## Getting started (either agent)
 
 1. Clone. Read `AGENTS.md`, then `skills/smg-coop/SKILL.md`, then
-   `docs/BUILD_SPEC.md`.
+   `docs/BUILD_SPEC.md`, then `docs/REVIEW_2026-10-12.md` once.
 2. Open `TASKS.md`. Pick an unclaimed task in the earliest open phase that
    matches your lane (Claude: lane A, Gemini: lane B, unless the board says
    otherwise). Claim it by editing the `owner` and `status` fields and
@@ -88,7 +98,8 @@ game/                  YOUR cooked disc. gitignored. never commit.
 ## Prerequisites
 
 - Emscripten SDK (emsdk) 3.1.60+ with pthreads support
-- CMake 3.24+, Ninja
+- Clang with C++20; CMake 3.24+, Ninja
+- SDL2 (native build)
 - Node 20+ (web shell, relay server, tests)
 - Python 3.10+ (cook tool)
 - Dolphin (to extract the disc) - only needed once, by a human

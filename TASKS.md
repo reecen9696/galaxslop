@@ -33,38 +33,50 @@ renders in Chromium; one human has seen it.
 - what: Create the directory layout in README. Root CMake that includes per-directory CMakeLists. `.gitignore` with every game-data extension from AGENTS.md section 2 plus `game/`, `build/`, `node_modules/`. Empty vitest and doctest setups that run and pass. GitHub Actions workflow that runs both on PR. `THIRD_PARTY_NOTICES.md`.
 - done when: CI is green on an empty repo.
 - log:
+  - 2026-10-12: layout, `.gitignore`, notices, docs and board are in (repo `reecen9696/galaxslop`). Remaining: root CMake, per-dir CMakeLists, doctest/vitest scaffolds, CI workflow. Do CMake after P0-02 lands so it globs real sources. Note `.gitignore` game-data dirs are anchored (`/game/`); unanchored `game/` matched `decomp/src/Game` on case-insensitive filesystems.
 
-### P0-02 Vendor decomp from GalaxyQuest
+### P0-02 Vendor the GalaxyQuest snapshot (decomp + platform + cook)
 - lane: B
 - status: open
 - owner:
-- blocked_by: P0-01
-- touches: decomp/, docs/DECISIONS.md
+- blocked_by:
+- touches: decomp/, platform/, tools/cook/, docs/DECISIONS.md, THIRD_PARTY_NOTICES.md, AGENTS.md (lane paths)
 - flags:
-- what: Copy GalaxyQuest's `decomp/` at a pinned commit into `decomp/`. Tag the commit `petari-base`. Fill in D-001 with the hash. Confirm `git diff petari-base -- decomp` is empty. Write `decomp/README.md` saying what this is and that Petari's own build tooling is unused.
-- done when: `decomp/` is in, tagged, documented.
+- what: Per D-007. Clone bigmak94/GalaxyQuest at `d8a039c96f89c188fc44cdb7382ab9a4cf9ce92e`. (1) Replace the contents of `decomp/` with its `decomp/` in one commit; do not rewrite our history. (2) Copy its `platform/` (keep its `platform/src/<subsystem>/` + `platform/include/` layout; delete our empty `platform/<x>/.gitkeep` dirs) and `tools/cook/`. (3) Find the Petari commit it started from: `git -C galaxyquest rev-parse 'petari-base:decomp'` gives a tree hash; search our history for a Petari commit whose root tree matches (`git log --format='%H %T'` before the move commit). Move our `petari-base` tag there (`git tag -f`, `git push -f origin petari-base`, the one allowed force). If no exact match, pick the closest by `git diff --stat` and say so in the log. (4) Confirm `decomp/src/Game/System/*.bcsv` are gone (D-011); if the snapshot still has them, delete them. (5) Fill D-007's Petari hash. (6) Keep GalaxyQuest's file-level attribution; add the snapshot hash to THIRD_PARTY_NOTICES. CAS and Inter are `xr/`-only and leave with P0-03.
+- done when: `git diff petari-base -- decomp` shows only GalaxyQuest's port changes; `platform/` and `tools/cook/` present; D-007 filled.
 - log:
 
-### P0-03 Vendor GalaxyQuest platform layer, strip OpenXR
+### P0-03 Strip Android/OpenXR from the platform layer; desktop host glue
+- lane: B
+- status: open
+- owner:
+- blocked_by: P0-02
+- touches: platform/src/os, platform/src/dvd, platform/src/nand, platform/src/input, platform/src/audio (output glue only), platform/src/port, platform/src/xr (delete), CMakeLists.txt
+- flags:
+- what: Everything outside `gx/`. Delete `xr/`. Replace: Android log -> stdio; AAudio -> a `PortAudioSink` interface with a null sink now (SDL audio in P0-04, worklet ring in P1-01); Android asset/`files/game` paths -> `--game <dir>`; the `reserve` preload trick for the low-4 GB window -> `mmap(MAP_FIXED)` at startup in `os_mem.cpp`, with `-Wl,-pagezero_size,0x1000` on macOS (D-013); Quest controller input -> the WPAD surface fed by a plain struct the host fills. OpenXR calls in `port/` become no-ops behind `PORT_PLATFORM=desktop`. Keep `-DPORT_PLATFORM_CODE` and `compat.h` as they are.
+- done when: every file outside `platform/src/gx/` compiles on macOS and Linux with `-DPORT_PLATFORM=desktop`. Nothing links yet; P0-04 links.
+- log:
+
+### P0-10 GX renderer: ES 3.0 / WebGL2 rework (critical path)
 - lane: A
 - status: open
 - owner:
 - blocked_by: P0-02
-- touches: platform/gx, platform/audio, platform/os, platform/fs, platform/input
+- touches: platform/src/gx
 - flags:
-- what: Copy GalaxyQuest `platform/` into our per-subsystem layout. Delete `xr/`. Replace every OpenXR and Android call with a TODO stub that compiles. Record the source commit in DECISIONS. Keep file-level attribution.
-- done when: `platform/` compiles as a static library in the native target with stubs.
+- what: Per D-008. GalaxyQuest's renderer is GLES 3.2 and will not run on WebGL2 or macOS GL. In order: (1) the four SSBOs -> data textures: `rows` and `st` as RGBA32F, `recs` as RGBA32UI, uploaded with `glTexSubImage2D` per FIFO flush; `gl_shadergen.cpp` emits `texelFetch` helpers in place of `buffer` block indexing. (2) `vtxRec[u_firstOrdinal + gl_VertexID]` -> a `uint` vertex attribute via `glVertexAttribIPointer`. (3) `glVertexAttribFormat/Binding/BindVertexBuffer` -> `glVertexAttribPointer` per batch. (4) `#version 320 es` -> `300 es`; `#version 330 core`/`410 core` for native; `layout(binding=N)` on samplers -> `glUniform1i` after link. (5) `glProgramBinary` cache -> cache generated GLSL keyed by TEV hash; warm at load; `KHR_parallel_shader_compile` when present. (6) The shared-context compile thread stays behind `#ifdef` for native; web uses (5). (7) Remove EGL and QCOM foveation. Keep `PETARI_DLCHECK` working. Use GalaxyQuest's own `PETARI_PERFLOG` to compare batch counts before and after.
+- done when: with P0-04's native build, title screen and Good Egg match Dolphin screenshots side by side (human), `PETARI_DLCHECK=1` is clean for 600 frames, and the renderer compiles with no symbol outside ES 3.0 / GL 3.3 core (grep the source for `GL_SHADER_STORAGE`, `glVertexAttribFormat`, `glProgramBinary`, `egl`).
 - log:
 
-### P0-04 Native desktop backend (SDL2 + OpenGL)
-- lane: A
+### P0-04 Native desktop backend (SDL2 + OpenGL 3.3/4.1 core)
+- lane: B
 - status: open
 - owner:
 - blocked_by: P0-03
-- touches: platform/native, CMakeLists.txt, tools/bench/stub-game
+- touches: platform/src/native, CMakeLists.txt, tools/bench/stub-game
 - flags:
-- what: SDL2 window, GL 3.3 core context (or GLES3 via ANGLE on macOS), keyboard input into the WPAD surface, `--game <dir>`, `--galaxy <name>`, `--headless --frames N`. Create `tools/bench/stub-game/` with the cooked layout but empty files so headless boot can be tested without a disc.
-- done when: `./smg --game tools/bench/stub-game --headless --frames 60` exits 0 (boot + early-out is fine). Native build boots to title with a real cooked disc (human check, log it).
+- what: SDL2 window, GL 3.3 core (4.1 on macOS; no ANGLE), keyboard into the WPAD surface, SDL audio behind `PortAudioSink`, `--game <dir>`, `--galaxy <name>`, `--headless --frames N`. Until P0-10 lands, link against a null `gx` backend (`-DSMG_GX=null`) that accepts the FIFO and draws nothing, so B is not blocked on A and CI has a GL-free headless target for good. Create `tools/bench/stub-game/` with the cooked layout but empty files. Be honest about what the stub proves: platform init, arg parsing, a clean "no valid disc" exit. Not boot.
+- done when: `./smg --game tools/bench/stub-game --headless --frames 60` exits 0 with the null backend. With P0-10 merged and a real cooked disc, boots to title (human check, log it).
 - log:
 
 ### P0-05 Cook tool: desktop path
@@ -74,19 +86,19 @@ renders in Chromium; one human has seen it.
 - blocked_by: P0-02
 - touches: tools/cook
 - flags: human
-- what: Copy GalaxyQuest `tools/cook/`. Make sure `cook.py extracted game` works on EUR. Document region handling in `tools/cook/README.md`. Add `--verify` that checks a cooked folder's manifest.
-- done when: a human cooks their disc and the manifest verifies.
+- what: `tools/cook/` arrives with P0-02. Make sure `cook.py extracted game` works on EUR and USA. It accepts an extracted folder only (`sys/fst.bin`, `sys/main.dol`, `files/`; Dolphin's `DATA/` subfolder is handled). Region tables live in `dol_data.py`; document them in `tools/cook/README.md`. `validate.py` exists; wire it as `cook.py --verify <out>` and make it write `<out>/manifest.json` (path, size, sha1 per file) so the browser can check an import without re-reading everything. The `native/` hot-path dir: note what it accelerates; it is a hint for D-009's TS port, not something to ship.
+- done when: a human cooks their disc, `--verify` passes, `manifest.json` written.
 - log:
 
 ### P0-06 Emscripten build: compile and link
 - lane: A
 - status: open
 - owner:
-- blocked_by: P0-04
-- touches: CMakeLists.txt, platform/web, web/
+- blocked_by: P0-04, P0-10
+- touches: CMakeLists.txt, platform/src/web, web/
 - flags:
-- what: `-DSMG_TARGET=web`. Emscripten toolchain file. Flags: `-pthread`, `-sPROXY_TO_PTHREAD`, `-sOFFSCREENCANVAS_SUPPORT`, `-sINITIAL_MEMORY=268435456`, `-sALLOW_MEMORY_GROWTH`, `-sUSE_WEBGL2`, `-sFULL_ES3`. Read SMGwebport's `shell.js` for the flags they needed. A minimal `web/index.html` + Vite config with COOP/COEP headers that loads the wasm and shows console output.
-- done when: the wasm links and the page loads it without a crash before `main()`.
+- what: `-DSMG_TARGET=web`. Emscripten toolchain file. Starting flags (measure, don't trust): `-pthread -sPTHREAD_POOL_SIZE=4` (GalaxyQuest emulates OS threads in its own scheduler; real threads are only the frame builder and audio), `-sPROXY_TO_PTHREAD -sOFFSCREENCANVAS_SUPPORT` (D-005, with the main-thread fallback compiled in), `-sMAXIMUM_MEMORY=4GB -sALLOW_MEMORY_GROWTH` (D-013: the fixed 0x80000000 window needs >2 GB of address space; note Emscripten's >2 GB pointer caveats), `-sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2`. No `-sFULL_ES3` unless something needs client-side arrays. SMGwebport publishes no source or flags; its `shell.js` only shows what it exports (`web_audio_ring`, `web_input_update`, `web_shader_warmup`), which is a reasonable shape for our `platform/src/web` glue. A minimal `web/index.html` + Vite config with COOP/COEP headers that loads the wasm and shows console output.
+- done when: the wasm links and the page loads it without a crash before `main()`; `wasmMemory.buffer.byteLength` and the page's resident memory are both logged.
 - log:
 
 ### P0-07 OPFS disc reader (minimal)
@@ -94,9 +106,9 @@ renders in Chromium; one human has seen it.
 - status: open
 - owner:
 - blocked_by: P0-03, P0-06
-- touches: platform/fs, web/src/fs
+- touches: platform/src/dvd, platform/src/web, web/src/fs
 - flags:
-- what: DVD layer backed by `FileSystemSyncAccessHandle` on the game worker. Main-thread helper that copies a user-picked folder into OPFS `/smg/game/` (no cooking yet; assume pre-cooked on desktop). Handle cache. Manifest check on open.
+- what: GalaxyQuest's `dvd/` layer backed by `FileSystemSyncAccessHandle` on the game thread (sync handles are worker-only; this is why D-005 defaults to a pthread). Main-thread helper that copies a user-picked, already-cooked folder (`showDirectoryPicker()`) into OPFS `/smg/game/`. Handle cache; the game opens archives repeatedly. Check `manifest.json` from P0-05 on open. Loads `sys/GalaxyID.bcsv`, `sys/StoryEvent.bcsv`, `sys/ErrorMessageArchive.arc` from the cooked folder as GalaxyQuest does (D-011).
 - done when: the game worker can open and read every file in the manifest from OPFS.
 - log:
 
@@ -104,10 +116,10 @@ renders in Chromium; one human has seen it.
 - lane: A
 - status: open
 - owner:
-- blocked_by: P0-06, P0-07
-- touches: platform/gx, platform/web, web/
+- blocked_by: P0-06, P0-07, P0-10
+- touches: platform/src/gx, platform/src/web, web/
 - flags: human
-- what: Get the GX layer rendering through WebGL2 on the OffscreenCanvas. Fix whatever breaks between GLES3 and WebGL2 (readbacks, texture formats, sync objects). Keyboard input only. Audio off.
+- what: Get P0-10's renderer running through WebGL2 on the OffscreenCanvas. Expected leftovers: `glBlitFramebuffer` restrictions, texture format/`texStorage` edge cases, `KHR_parallel_shader_compile` fallback, `glFinish` on the game thread. Keyboard input only. Audio off. Log frame time p50/p95 at 720p on the reference machine; that number decides D-008's revisit.
 - done when: title screen renders in Chromium from an OPFS-loaded cooked disc. Screenshot in the PR. Human confirms.
 - log:
 
@@ -118,8 +130,8 @@ renders in Chromium; one human has seen it.
 - blocked_by: P0-04, P0-08
 - touches: docs/DECISIONS.md, TASKS.md
 - flags: human
-- what: Run the gate. Decide D-005 (pthread + offscreen vs main thread) with evidence. Write a `log` summary of what's flaky. Open any P1 tasks that Phase 0 revealed.
-- done when: gate passes and D-005 is final.
+- what: Run the gate. Decide D-005 (pthread + offscreen vs main thread) and D-013 (fixed window vs relocated arenas, with resident-memory numbers) with evidence. Record P0-08's frame time against D-008's 2 ms threshold. Write a `log` summary of what's flaky. Open any P1 tasks that Phase 0 revealed.
+- done when: gate passes and D-005, D-013 are final.
 - log:
 
 ---
@@ -140,15 +152,15 @@ Chromium, with sound, on a gamepad, at 60 fps on the reference machine.
 - done when: title music and SFX play without crackle for 10 min.
 - log:
 
-### P1-02 In-browser cooker (Pyodide)
+### P1-02 In-browser cooker (TypeScript, Web Workers)
 - lane: B
 - status: open
 - owner:
 - blocked_by: P0-05, P0-07
-- touches: web/src/import, tools/cook
+- touches: tools/cook-ts (new, published to web/ as a package), web/src/import
 - flags: parallel-ok
-- what: Run `cook.py` under Pyodide in a worker. Input: a picked ISO/RVZ/WBFS or an extracted folder (File System Access API). RVZ needs decompression; if Pyodide can't, require extracted or ISO for Phase 1 and say so on screen. Output straight to OPFS. Progress events to the UI. `navigator.storage.persist()` before writing. Movies off by default.
-- done when: an EUR ISO imports in under 10 min on the reference machine and the manifest verifies.
+- what: Per D-009. Port `tools/cook/*.py` module by module (`rarc_swap`, `bcsv`, `bmg`, `j3d`, `kcl`, `collision`, `lyt`, `jpa`, `jaudio`, `thp`, `dol_data`) to TypeScript on `DataView`. Input: a Dolphin-extracted folder via `showDirectoryPicker()`; no disc images (see P5-01). A pool of workers, one file per job, writing straight to OPFS with sync access handles; `manifest.json` last. Progress events to the UI. `navigator.storage.persist()` before writing. Movies off by default. Tests: (a) vitest with small synthetic fixtures per format, (b) `tools/cook/compare.py` that diffs a cook.py output tree against a TS output tree byte for byte; a human runs (b) once per release on a real disc and pastes the result in the log.
+- done when: an EUR extracted disc imports in under 10 min on the reference machine, `compare.py` reports zero differences, manifest verifies.
 - log:
 
 ### P1-03 Import screen UI
@@ -158,7 +170,7 @@ Chromium, with sound, on a gamepad, at 60 fps on the reference machine.
 - blocked_by: P1-02
 - touches: web/src/screens/import
 - flags:
-- what: Pick file or folder, show requirements, run cooker, progress bar, errors in plain words, "movies on/off" toggle, storage quota display. Re-import and delete options in settings.
+- what: Folder picker (extracted disc), with the Dolphin extract steps shown on screen (right-click game, Properties, Filesystem, Extract Entire Disc), requirements check (Chromium, cross-origin isolated, OPFS quota), run cooker, progress bar, errors in plain words, "movies on/off" toggle, storage quota display. Re-import and delete options in settings.
 - done when: a non-technical person can import without reading docs.
 - log:
 
@@ -191,7 +203,7 @@ Chromium, with sound, on a gamepad, at 60 fps on the reference machine.
 - blocked_by: P0-09
 - touches: platform/gx, web/src/shaders, tools/bench
 - flags: parallel-ok
-- what: Key TEV configs by hash. Serialise generated GLSL. Persist to OPFS. Ship a seed file built by a `tools/bench/shader-tour.ts` script that visits every galaxy headless (human runs it once with a real disc; the seed contains no game data, only our GLSL).
+- what: Key TEV configs by hash. Serialise generated GLSL (WebGL2 has no program binaries; the cache is source + a compiled-program map in memory). Compile with `KHR_parallel_shader_compile` and poll `COMPLETION_STATUS_KHR`; never block the frame on a link. Persist to OPFS. Ship a seed file built by a `tools/bench/shader-tour.ts` script that visits every galaxy headless (human runs it once with a real disc; the seed contains no game data, only our GLSL). The seed is invalid whenever `gl_shadergen.cpp` changes; version it.
 - done when: second load of Good Egg has no shader hitch over 50 ms.
 - log:
 
@@ -297,7 +309,7 @@ with no desync complaints at 100 ms delay.
 - blocked_by: P2-03, P2-04
 - touches: net/puppet, decomp/src/Game/Scene (spawn hook only; name the file in the log)
 - flags:
-- what: `LiveActor` subclass with Mario and Luigi model loading (copy an NPC's pattern), animation player, Hermite interpolation at now-100ms, freeze/hide rules, tint by palette, galaxy/scenario gating. Spawn on scene enter for every known remote; despawn on scene exit. Heap budget measured and logged.
+- what: `LiveActor` subclass with Mario and Luigi model loading (copy an NPC's pattern), animation player, Hermite interpolation at now-100ms, freeze/hide rules, tint by palette, galaxy/scenario gating. Spawn on scene enter for every known remote; despawn on scene exit. Heap budget measured and logged. For scale: smg-online draws up to 16 remote Marios inside real Wii memory, so 4 puppets fitting is expected, not a risk.
 - done when: a second tab's Mario is visible and moves smoothly in Good Egg.
 - log:
 
@@ -341,6 +353,17 @@ with no desync complaints at 100 ms delay.
 Gate: 5 players, 2 hours, no one loses a star, late joiner sees the right
 observatory state.
 
+### P3-00 Co-op save policy
+- lane: shared
+- status: open
+- owner:
+- blocked_by: P2-08
+- touches: docs/DECISIONS.md, platform/src/nand (read only), decomp/src/Game/System (read only)
+- flags: solo
+- what: Turn D-012 from proposal into decision. Read how the save layer picks a NAND file and slot. Decide: per-room save namespace, one shared "co-op" save, or merge into the chosen slot with an explicit warning. Write the D entry with the file paths involved. No code.
+- done when: D-012 is superseded by a decision entry and P3-02 knows which file to hook.
+- log:
+
 ### P3-01 Progress log on the server
 - lane: B
 - status: open
@@ -356,7 +379,7 @@ observatory state.
 - lane: A
 - status: open
 - owner:
-- blocked_by: P2-08, P3-01
+- blocked_by: P2-08, P3-00, P3-01
 - touches: decomp/src/Game/System (save data hooks; name files in log), net/progress
 - flags:
 - what: Hook the star-get commit path to emit StarGet. On incoming StarGet not in local save, set the bit. Toast via bridge. Never clear. Verify the save writes.
@@ -385,15 +408,15 @@ observatory state.
 - done when: pressing it lands you next to the host.
 - log:
 
-### P3-05 Deploy relay to Cloudflare
+### P3-05 Deploy the relay
 - lane: B
 - status: open
 - owner:
 - blocked_by: P3-01
 - touches: server/
 - flags:
-- what: Durable Object per room. Wrangler config. Env for allowed origins. Keep the Node path working for local dev. Document deploy in `server/README.md`.
-- done when: a room works on the deployed URL.
+- what: Per D-010. Dockerfile for the Node relay. Deploy to Fly.io or Railway (or any VPS) with TLS. Env for allowed origins and port. Health endpoint. Same code as local dev. Document deploy in `server/README.md` with the monthly cost.
+- done when: a room works on the deployed `wss://` URL.
 - log:
 
 ### P3-06 Playtest: 5 players, 2 hours
@@ -431,14 +454,15 @@ Starter list, unordered: switches, launch stars (fired), coins (collected), 1-up
 
 ## Phase 5: Polish (optional)
 
-### P5-01 Rust/WASM cooker
+### P5-01 Disc image import (ISO/RVZ/WBFS)
 - lane: B
 - status: open
 - owner:
 - blocked_by: P1-10
-- touches: tools/cook-rs, web/src/import
+- touches: tools/cook-ts, web/src/import
 - flags: parallel-ok
-- what: Only if P1-02 fails the 10 min budget. Port the hot path.
+- what: Read Wii disc images in the browser so users can skip Dolphin. Wii partitions are AES-128-CBC encrypted per 32 KB cluster; the user must supply their own common key (from their Dolphin install; never shipped, never fetched). RVZ adds zstd/LZMA block decompression; WBFS is a sector map. Parse partition table, decrypt, walk the FST, feed the P1-02 cooker. Explain the key requirement on screen in plain words. Scope the RVZ part last.
+- done when: an ISO imports without Dolphin; RVZ if time allows.
 - log:
 
 ### P5-02 Safari support
@@ -458,7 +482,7 @@ Starter list, unordered: switches, launch stars (fired), coins (collected), 1-up
 - blocked_by: P3-06
 - touches: platform/gx-webgpu (new)
 - flags:
-- what: Time-boxed 2 weeks. Bench against WebGL2. Decide in DECISIONS.
+- what: Time-boxed 2 weeks. GalaxyQuest's per-draw-state-in-storage-buffers design maps directly onto WebGPU storage buffers, so this is mostly a WGSL emitter in `gl_shadergen.cpp` plus a command encoder in place of `gl_renderer.cpp`. Bench against the data-texture WebGL2 path (D-008). Pull forward if P0-08 shows the data-texture fetches cost more than ~2 ms. Decide in DECISIONS.
 - log:
 
 ### P5-04 Mobile touch controls

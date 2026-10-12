@@ -27,11 +27,11 @@ log.
 
 | Piece | Source | How we use it |
 |---|---|---|
-| Game code | Petari via GalaxyQuest `decomp/` (has `TARGET_PC` fixes) | Vendored. Diff against `petari-base` tag to see port changes. |
-| GX -> GLES renderer | GalaxyQuest `platform/` | Port GLES3 calls to WebGL2. Same API family; mostly build-system work plus texture/readback gaps. |
-| DSP audio mixer | GalaxyQuest `platform/` | Keep. Output buffer goes to an AudioWorklet instead of AAudio. |
-| Asset cooker | GalaxyQuest `tools/cook/cook.py` | Port to run in-browser (Pyodide for Phase 1, then a JS/WASM rewrite). Reads `sys/main.dol` too. |
-| Emscripten flags, COI service worker | SMGwebport | Read their `shell.js` and `index.html`. Do not copy their `.data` files. |
+| Game code | Petari via GalaxyQuest `decomp/` (has `TARGET_PC` fixes) | Vendored as one snapshot with `platform/` and `tools/cook/` at GalaxyQuest `d8a039c` (D-007). Diff against `petari-base` tag to see port changes. Until P0-02 lands, `decomp/` is raw Petari. |
+| GX -> GL renderer | GalaxyQuest `platform/src/gx/` | Keep the FIFO recorder, display-list cache, batching and shader gen. It is GLES 3.2 (SSBOs, attrib binding API, program binaries, shared-context compiles); none of that exists in WebGL2 or macOS GL. P0-10 reworks it to ES 3.0 (D-008). Not "mostly build-system work". |
+| DSP audio mixer | GalaxyQuest `platform/src/audio/` | Keep. Output buffer goes to an AudioWorklet instead of AAudio. |
+| Asset cooker | GalaxyQuest `tools/cook/cook.py` | Desktop tool and oracle. The browser runs a TypeScript port in workers (D-009) that must match it byte for byte. Input is an extracted folder; it does not read ISOs. |
+| Emscripten precedent | SMGwebport | Proof it runs in a browser, nothing more: build output only, no source, no license, no flags. Its `shell.js` shows an export surface (`web_audio_ring`, `web_input_update`, `web_shader_warmup`) and that it works without OffscreenCanvas. Do not copy or link its data. |
 | Netcode model | smg-online, sm64coopdx | Design only. Headpenguin's code is unlicensed. |
 | GX shader reference | noclip.website `src/gx/` | Reference for TEV accuracy when our output looks wrong. Check license before copying. |
 
@@ -60,9 +60,10 @@ cd server && npm run dev   # ws://localhost:8787
 
 `--headless --frames N` runs the game loop N frames with no window and
 exits 0 if nothing crashed. It is the smoke test. Every PR runs it in CI
-against a synthetic stub game folder (`tools/bench/stub-game/`), which has
-the file layout but no real assets, so it only proves boot, not rendering.
-Real rendering tests need a human with a cooked disc.
+against a synthetic stub game folder (`tools/bench/stub-game/`) with the
+null renderer (`-DSMG_GX=null`). The stub has the file layout but no real
+assets, so this proves platform init and a clean exit on a bad disc. It
+does not prove boot. Only a human with a cooked disc proves boot.
 
 ## 4. Game data
 
@@ -74,14 +75,21 @@ python tools/cook/cook.py extracted game --with-movies   # ~3.3 GB
 python tools/cook/cook.py extracted game                 # ~1 GB, movies black
 ```
 
-In the browser the same cooking runs client-side (Phase 1 task P1-02) and
-the result lands in OPFS under `/smg/game/`. The web shell shows an import
-screen if OPFS is empty.
+`cook.py` takes an extracted folder only (`sys/fst.bin`, `sys/main.dol`,
+`files/`). It byte-swaps formats to little-endian; textures stay in GX
+formats and the renderer decodes them at load. It also pulls
+`GalaxyID.bcsv`, `StoryEvent.bcsv` and `ErrorMessageArchive.arc` out of the
+user's `main.dol` into `<game>/sys/`; those three never live in git (D-011).
 
-Tested disc: RMGP01 (EUR). Petari's matching target is RMGK01 (KOR). The
-GalaxyQuest cooker reads a few tables from `main.dol` so region
-differences mostly wash out, but if something region-specific breaks, check
-the dol offsets in `tools/cook/dol_tables.py` first.
+In the browser a TypeScript port of the same cooker runs in Web Workers
+(P1-02, D-009) on a folder the user picks, and the result lands in OPFS
+under `/smg/game/`. Disc images (ISO/RVZ) are Phase 5: Wii partitions are
+encrypted and need the user's own common key. The web shell shows an
+import screen if OPFS is empty.
+
+Tested discs: RMGP01 (EUR) and RMGE01 (USA) by GalaxyQuest. JP and KOR are
+untested. The cooker reads a few tables from `main.dol`; if something
+region-specific breaks, check `tools/cook/dol_data.py` first.
 
 ## 5. Single-player assumptions you will hit
 
@@ -100,9 +108,9 @@ Things that assume one player, and what we do about them:
 | Gravity | Computed for the one player's position | Puppets copy their up-vector from the network, don't compute it. |
 | Star get / demo sequences | Freezes the world, plays a cutscene for the one player | Local only. When a remote player gets a star, show a toast, don't freeze. |
 | Stage/scene transition | Tears down everything, including anything we spawned | Puppets re-spawn on scene enter from the current net state. Net module survives transitions (lives outside the scene heap). |
-| Save data | One NAND file, written by the one player | Shared progress events are merged into the local save on receipt. Server keeps the canonical log. |
+| Save data | One NAND file, written by the one player | Shared progress events are merged into a co-op save on receipt, never into solo slots (D-012, decided in P3-00). Server keeps the canonical log. |
 | HUD counters | Read from the one player | Leave it. Remote counts go in the web overlay, not the in-game HUD. |
-| Heap layout | Fixed-size heaps, Wii memory map | Puppets allocate from the scene heap like NPCs. Budget for 4 puppets' models. Measure. |
+| Heap layout | Fixed-size heaps, Wii memory map | Puppets allocate from the scene heap like NPCs. smg-online fits 16 remote Marios in real Wii memory, so 4 should fit. Measure anyway. |
 
 Where to look in `decomp/`: `src/Game/Player/` (Mario), `src/Game/Camera/`,
 `src/Game/Scene/`, `src/Game/System/` (game data, save), `src/Game/LiveActor/`
@@ -138,25 +146,41 @@ verified in the spec. Grep before you assume.
   `coi-serviceworker.js` there. If `SharedArrayBuffer is not defined`,
   this is why.
 - **Main-thread blocking**: the game loop can't block the browser main
-  thread. Run the game on a worker (`-sPROXY_TO_PTHREAD`) and use
-  OffscreenCanvas for WebGL2. Safari OffscreenCanvas + WebGL2 support is
-  recent; don't target Safari until Phase 5.
-- **GX readback**: GX features that read the framebuffer back (lens flare,
-  some screen effects) don't work in GalaxyQuest's renderer either. Stub
-  them. Don't spend a week on the sun's lens flare.
+  thread, and OPFS sync reads only work on a worker. Run the game on a
+  pthread (`-sPROXY_TO_PTHREAD`) with OffscreenCanvas for WebGL2 (D-005).
+  SMGwebport runs without OffscreenCanvas, so the main-thread fallback is
+  known to work if the offscreen path fights you. Safari is Phase 5.
+- **GLES 3.2 in the renderer**: `#version 320 es`, four SSBOs for per-draw
+  state, `glVertexAttribFormat`, `glProgramBinary`, shared-context compile
+  thread. WebGL2 (ES 3.0) and macOS GL (4.1) have none of them. P0-10 moves
+  per-draw state into data textures (`texelFetch`), the per-vertex record
+  index into an integer attribute, and the shader cache to GLSL source.
+  Don't try to build the unmodified renderer on a Mac or in a browser.
+- **GX readback**: `GXPeekARGB`/`GXPeekZ` are unsupported in GalaxyQuest's
+  renderer too. Stub them. The sun's lens flare never appears. Don't spend
+  a week on it.
 - **Endianness**: cooked data is little-endian. If you read raw disc
   formats anywhere outside the cooker, you're doing it wrong.
-- **Texture formats**: GX texture formats (CMPR, RGB5A3, I8, IA4 etc.) are
-  decoded at cook time to RGBA8 or BC1/BC3. WebGL2 BC1 needs
-  `WEBGL_compressed_texture_s3tc`; check it exists, fall back to RGBA8.
+- **Texture formats**: the cooker does not decode textures. GX formats
+  (CMPR, RGB5A3, I8, IA4...) reach the renderer byte-swapped and are
+  decoded to RGBA8 at load (`TexImage`). No S3TC extension needed. THP
+  video decodes to I8 planes and TEV does the YUV->RGB.
 - **Shader compile stalls**: GX TEV configs compile to many shader
-  variants. First visit to a galaxy will hitch. Pre-seed a shader cache
-  (SMGwebport ships `shader-seed.bin`). Phase 1 task.
+  variants. First visit to a galaxy will hitch. WebGL2 has no program
+  binaries: cache GLSL source keyed by TEV hash, compile with
+  `KHR_parallel_shader_compile`, ship our own seed (P1-06). SMGwebport's
+  seed is for a different shader generator; useless to us.
 - **OPFS quota**: 3.3 GB is over the default quota on some browsers.
   Ask for persistent storage (`navigator.storage.persist()`). Ship without
   movies by default (1 GB).
-- **Memory**: the Wii has 88 MB. Emscripten heap should be 256 MB
-  (`-sINITIAL_MEMORY`) with growth on. Puppet models add to this. Measure.
+- **Memory**: the Wii has 88 MB. GalaxyQuest maps MEM1/MEM2 at
+  0x80000000/0x90000000 (D-013), so the wasm memory object is >2.5 GB on
+  paper: `-sMAXIMUM_MEMORY=4GB`, growth on. Pages are committed lazily;
+  judge by the tab's resident memory, not `buffer.byteLength`. Puppet
+  models add to this. Measure.
+- **Threads**: GalaxyQuest emulates OS threads in its own scheduler. The
+  game is single-threaded; real threads are the frame builder and audio.
+  `PTHREAD_POOL_SIZE` is small. Don't map OSThread onto pthreads.
 - **Audio**: AudioWorklet needs a user gesture to start. The import/lobby
   screen click is that gesture. Keep the AudioContext alive across scene
   changes.

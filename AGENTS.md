@@ -18,9 +18,13 @@ lane's directories unless a task in `TASKS.md` explicitly says otherwise.
 
 | Lane | Default driver | Owns |
 |---|---|---|
-| A | Claude | `platform/gx/`, `platform/audio/`, `web/`, `tools/bench/` |
-| B | Gemini | `platform/fs/`, `platform/input/`, `platform/os/`, `net/`, `server/`, `tools/cook/` |
-| shared | both, by task | `decomp/`, `CMakeLists.txt`, `docs/`, `TASKS.md`, `AGENTS.md`, `skills/` |
+| A | Claude | `platform/src/gx/`, `platform/src/audio/`, `platform/src/web/`, `web/`, `tools/bench/` |
+| B | Gemini | `platform/src/os/`, `platform/src/dvd/`, `platform/src/nand/`, `platform/src/input/`, `platform/src/sdk/`, `platform/src/port/`, `platform/src/native/`, `net/`, `server/`, `tools/cook/`, `tools/cook-ts/` |
+| shared | both, by task | `decomp/`, `platform/include/`, `CMakeLists.txt`, `docs/`, `TASKS.md`, `AGENTS.md`, `skills/` |
+
+Paths follow GalaxyQuest's `platform/src/<subsystem>/` layout (D-007).
+Lane A's Phase 0 is the renderer rework (P0-10); lane B's is the host, OS,
+disc and cooker side. They don't share files until the link step.
 
 `decomp/` is shared because both lanes need `TARGET_PC` hooks in game
 code. Rule: a task in `decomp/` names the exact files it touches. Two open
@@ -78,8 +82,9 @@ The other agent may pick it up.
 
 ## 2. Code rules
 
-- Language: C++17 for `platform/`, `net/` and `decomp/` changes. TypeScript
-  for `web/` and `server/`. Python 3.10+ for `tools/`.
+- Language: C++20 (GalaxyQuest's baseline) for `platform/`, `net/` and
+  `decomp/` changes. TypeScript for `web/`, `server/` and `tools/cook-ts/`.
+  Python 3.10+ for the rest of `tools/`.
 - Every change to `decomp/` is wrapped in `#ifdef TARGET_PC` or
   `#ifdef TARGET_WEB`. The original Wii code path must still compile in
   spirit. Keep the diff against Petari minimal and greppable.
@@ -134,8 +139,8 @@ spec is wrong, say so in a `DECISIONS.md` proposal and stop.
 
 1. Check the task's `log` and `DECISIONS.md`.
 2. Check `docs/BUILD_SPEC.md` section 9 (known problems).
-3. Check GalaxyQuest's `docs/TECHNICAL.md` and the SMGwebport repo for how
-   they solved it.
+3. Check GalaxyQuest's `docs/TECHNICAL.md` for how they solved it.
+   (SMGwebport has no source; don't go looking.)
 4. Write a `log` entry with what you tried. Set `status: blocked`. Move to
    another task. Don't burn hours on one wall.
 

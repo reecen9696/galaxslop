@@ -55,7 +55,7 @@ report, 2026-10-12):
 
 | Route | Verdict |
 |---|---|
-| Petari -> WASM with a GX translation layer | Chosen. GalaxyQuest proved the platform layer; SMGwebport proved it compiles with Emscripten. |
+| Petari -> WASM with a GX translation layer | Chosen. GalaxyQuest proved the platform layer on Android/GLES 3.2; SMGwebport (a closed-source GalaxyQuest build) proved it compiles and runs under Emscripten. The renderer needs an ES 3.0 rework first (D-008); nothing else about the route is in doubt. |
 | Port AstroCore (Luma's Workshop PC port) | Not released. Human-only code policy. Watch, don't wait. |
 | Dolphin compiled to WASM | Early demos only, software rasteriser, desktop Chrome only. Can't give 5 independent players. |
 | noclip.website | Renderer only, no game logic. Use as a GX reference. |
@@ -94,49 +94,80 @@ save/restore every frame; snapshotting an 88 MB Wii heap is not that.
  +----------------------------------------------------------------+
                                   | wss
  +--------------------------------v-------------------------------+
- |  server/ (TypeScript, Node or Cloudflare Worker + Durable Obj)  |
+ |  server/ (TypeScript, Node + ws, deployed as a container)       |
  |   rooms, relay PlayerState, progress log, join-in-progress      |
  +----------------------------------------------------------------+
 ```
 
 ### 5.1 decomp/
 
-Vendored from GalaxyQuest's `decomp/` at a pinned commit (record it in
-`DECISIONS.md` D-001). This is Petari plus the `TARGET_PC` little-endian
-and 64-bit fixes. We add `TARGET_WEB` where the web differs from the Quest
-(it rarely should; the platform layer absorbs differences). Tag the vendored
-base as `petari-base` so `git diff petari-base -- decomp` shows our changes.
+Vendored from GalaxyQuest at commit `d8a039c` together with `platform/` and
+`tools/cook/` (D-007; the three were built against each other and are taken
+as one snapshot). This is Petari plus the `TARGET_PC` little-endian and
+64-bit fixes and some VR hooks. We add `TARGET_WEB` where the web differs
+from the Quest (it rarely should; the platform layer absorbs differences).
+The `petari-base` tag marks the Petari commit GalaxyQuest started from, so
+`git diff petari-base -- decomp` shows all port changes, theirs and ours.
+
+Current state (2026-10-12): `decomp/` holds raw Petari `8c5307d` with full
+upstream history; P0-02 swaps in the snapshot. Keeping Petari's history in
+this repo is deliberate: a later rebase onto upstream is a merge, not a
+re-vendor.
 
 Petari's own build (`configure.py`, `orig/`, `config/`) stays untouched and
 unused. Our CMake picks up `decomp/src` and `decomp/include` directly.
+GalaxyQuest's CMake is the starting point: it globs `Game`, `JSystem`,
+`nw4r` and six RVL_SDK modules (`gx gd mem arc tpl aralt`, minus `GXFifo.c`
+and `GXPerf.c`), compiles as C++20/C11 with `-fshort-wchar -fsigned-char
+-fno-strict-aliasing -fwrapv -fms-extensions`, no exceptions, no RTTI, and
+force-includes `platform/include/port/compat.h`. Keep those flags.
 
 ### 5.2 platform/
 
-One subdirectory per Wii subsystem, each with its own `CMakeLists.txt`.
+GalaxyQuest's layout, kept as is so its fixes can be pulled later:
+`platform/src/<subsystem>/` with `platform/include/`. Subsystems: `os`,
+`dvd`, `nand`, `input`, `sdk` (THP decoder and other SDK bits), `gx`,
+`audio`, `port`, plus ours: `native` (SDL2 host) and `web` (Emscripten
+glue). `xr` is deleted. One `CMakeLists.txt` per subsystem.
 
-- `gx/`: GX command stream -> WebGL2. Start from GalaxyQuest's GLES3
-  renderer. Differences: no `glReadPixels` into a texture mid-frame (stub
-  lens flare and any EFB copies that feed back into rendering; EFB copies
-  to a texture used *later* are fine via framebuffer-to-texture), no
-  `GL_TEXTURE_2D_ARRAY` tricks that need GLES3.1, compressed texture
-  extension detection. Shader variant cache: serialise compiled TEV
-  shader sources keyed by TEV config hash, ship a seed, warm on load.
+- `gx/`: GX command stream -> WebGL2. GalaxyQuest records the GX FIFO per
+  frame, decodes and caches display lists, batches draws that share state
+  (~200 batches a frame), and generates GLSL for TEV, Z textures and EFB
+  copies. Keep all of that. What has to change (D-008, task P0-10): it is
+  written against GLES 3.2. Per-draw state lives in four shader storage
+  buffers indexed from `gl_VertexID`; it uses the separate vertex attrib
+  binding API, `glProgramBinary` for its disk cache, and a compile thread on
+  a shared EGL context. WebGL2 is ES 3.0 and macOS GL is 4.1; neither has
+  any of those. Replace SSBOs with data textures and `texelFetch`, the
+  per-vertex record index with an integer attribute, the binding API with
+  `glVertexAttribPointer`, the binary cache with a GLSL source cache plus
+  `KHR_parallel_shader_compile`. Already stubbed upstream and staying
+  stubbed: `GXPeekARGB`/`GXPeekZ` readback (the sun's lens flare). EFB
+  copies to textures used later are fine. Shader variant cache: serialise
+  generated GLSL keyed by TEV config hash, ship a seed, warm on load.
 - `audio/`: GalaxyQuest's DSP mixer. Output 48 kHz stereo float into a
   ring buffer in a SharedArrayBuffer; an AudioWorklet drains it. Resample
   if the AudioContext isn't 48 kHz.
 - `input/`: WPAD surface. Reads a ring buffer the main thread fills from
   Gamepad API + mouse. Mapping in section 7.
-- `fs/`: DVD reads become synchronous reads from OPFS via
+- `dvd/` and `nand/`: DVD reads become synchronous reads from OPFS via
   `FileSystemSyncAccessHandle` (worker-only API; this is one reason the
-  game runs on a worker). NAND saves go to IndexedDB through an async
-  bridge; the game's save path is already async-shaped (it polls).
-- `os/`: threads (pthreads), timers (`emscripten_get_now`), the console
-  memory layout GalaxyQuest sets up (MEM1/MEM2 arenas inside the WASM heap),
-  and the main loop driven by `emscripten_set_main_loop` or a manual
-  `requestAnimationFrame` proxy.
-- `native/`: a desktop SDL2 + OpenGL backend so you can build and debug
-  without a browser. Same `gx/` and `audio/` code, different window and
-  input glue. This is where most iteration happens.
+  game runs on a worker). GalaxyQuest's `dvd/` already handles region
+  detection from the FST and loads the DOL tables (`GalaxyID.bcsv`,
+  `StoryEvent.bcsv`, `ErrorMessageArchive.arc`) from the cooked `sys/`
+  folder; keep that. NAND saves go to IndexedDB through an async bridge;
+  the game's save path is already async-shaped (it polls).
+- `os/`: GalaxyQuest emulates OS threads, alarms and interrupts in its own
+  scheduler; the game is effectively single-threaded. Real threads are the
+  frame builder and audio. Timers via `emscripten_get_now`. Memory layout
+  per D-013: MEM1 at 0x80000000, MEM2 at 0x90000000 inside the wasm heap
+  to start with. Main loop driven by `emscripten_set_main_loop` or a
+  manual `requestAnimationFrame` proxy.
+- `native/`: a desktop SDL2 + OpenGL 3.3/4.1 core backend so you can build
+  and debug without a browser. Same `gx/` and `audio/` code, different
+  window and input glue. This is where most iteration happens. On macOS the
+  low 4 GB is PAGEZERO; link with `-Wl,-pagezero_size,0x1000` for the
+  fixed memory window.
 
 ### 5.3 net/
 
@@ -157,8 +188,10 @@ survives stage transitions.
 
 ### 5.4 server/
 
-TypeScript. Phase 2 runs on Node locally. Phase 3 moves to a Cloudflare
-Worker with a Durable Object per room (free tier is enough for 5 players).
+TypeScript, Node + `ws`. Phase 2 runs it locally. Phase 3 deploys the same
+code as a container (Fly.io, Railway or a VPS) behind TLS (D-010; Cloudflare
+Durable Objects were dropped: 5 players at 30 Hz is ~1.1M messages per
+2-hour session, far past the free tier, and would need a second code path).
 Protocol in `docs/NETCODE.md`.
 
 - Rooms: 6-char code. Max 5 players. Host is whoever created it; host only
@@ -173,8 +206,9 @@ Protocol in `docs/NETCODE.md`.
 
 Vite + TypeScript. Minimal framework (Preact or plain). Screens:
 
-1. Import: pick disc image or extracted folder. Run cooker. Progress bar.
-   Request persistent storage. Store to OPFS.
+1. Import: pick a Dolphin-extracted folder (disc images are Phase 5, P5-01;
+   Wii images are encrypted and need the user's common key). Run cooker in
+   workers. Progress bar. Request persistent storage. Store to OPFS.
 2. Lobby: name, character (Mario/Luigi), colour tint for puppets, create
    or join room by code. Or "play solo".
 3. Game: canvas, overlay with player list, net status, toasts, pause menu
@@ -185,10 +219,13 @@ where the design work goes.
 
 ### 5.6 tools/
 
-- `cook/`: GalaxyQuest's `cook.py` (Python) for desktop use, and a port of
-  it that runs in the browser. Phase 1 uses Pyodide to run the Python
-  unchanged (slow but correct). Phase 5 rewrites the hot path in Rust/WASM
-  if import time matters.
+- `cook/`: GalaxyQuest's `cook.py` and its ~13 format modules (Python,
+  stdlib only, byte-swaps RARC/J3D/KCL/BCSV/layout/font/message/particle/
+  JAudio to little-endian; textures stay in GX formats and are decoded at
+  load by the renderer). Desktop tool and the oracle.
+- `cook-ts/`: the TypeScript port that runs in Web Workers in the browser
+  (D-009). Must produce byte-identical output to `cook.py`;
+  `tools/cook/compare.py` checks. No Pyodide, no Rust.
 - `bench/`: `--headless` runner scripts, the synthetic stub game folder for
   CI, a frame-time capture script, and a baseline file CI compares to.
 
@@ -201,20 +238,24 @@ tasks until the gate passes. Task IDs are in `TASKS.md`.
 
 Goal: prove the toolchain end to end.
 
-- Vendor decomp from GalaxyQuest. Build GalaxyQuest's native path with
-  the OpenXR layer removed, as a flat desktop app (SDL2 window, keyboard).
+- Vendor the GalaxyQuest snapshot (decomp + platform + cook). Strip
+  Android/OpenXR. Two parallel tracks: lane B builds the desktop host
+  (SDL2, memory window, null renderer) while lane A reworks the renderer
+  to ES 3.0 (the critical path; D-008).
 - Get the native build to boot to the title screen with a cooked disc.
 - Build the same with Emscripten. Boot to the title screen in Chromium
   with the cooked folder loaded from OPFS. Audio may be silent, input may
   be keyboard only.
 
 Gate: `--headless --frames 600` exits 0 on native and web. Title screen
-renders in a browser. One human has seen it.
+renders in a browser. One human has seen it. D-005 and D-013 decided with
+numbers.
 
 ### Phase 1: Single-player in the browser (4-8 weeks)
 
-- In-browser cooker (Pyodide). Import screen. OPFS storage. Persistent
-  storage request.
+- In-browser cooker (TypeScript in workers, byte-identical to `cook.py`).
+  Import screen for an extracted folder. OPFS storage. Persistent storage
+  request.
 - Audio through AudioWorklet.
 - Gamepad + mouse input with the mapping in section 7.
 - Saves to IndexedDB.
@@ -240,12 +281,14 @@ internet, with no desync complaints at 100 ms interpolation delay.
 
 ### Phase 3: Shared progress (3-6 weeks)
 
+- Decide where co-op progress is saved (D-012, P3-00) before any merge
+  code is written.
 - Progress event log on the server. Join-in-progress gets the full log.
-- Star-get merge into local save. Toast on remote star-get.
+- Star-get merge into the co-op save. Toast on remote star-get.
 - Story flag and galaxy unlock merge. Comet Observatory state.
 - "Follow host" warp: a button that takes you to the host's galaxy and
   scenario.
-- Cloudflare deploy of the relay.
+- Deploy the relay as a container.
 - 5-player test.
 
 Gate: 5 players, 2 hours, no one loses a star, late joiner sees the
@@ -262,10 +305,12 @@ play testing.
 
 ### Phase 5: Polish (optional, open-ended)
 
-- Rust/WASM cooker for fast import.
+- Disc image import (ISO/RVZ/WBFS) with the user's own common key.
 - Safari support (OffscreenCanvas + WebGL2 checks).
 - Mobile touch controls.
-- Aurora/WebGPU renderer spike, compared against WebGL2 on the bench.
+- WebGPU renderer spike, compared against WebGL2 on the bench. GalaxyQuest's
+  storage-buffer design maps onto WebGPU directly; pull forward if the
+  WebGL2 data-texture path costs more than ~2 ms a frame.
 - Local 2-player on one machine (two puppets? No: two real players. This
   is where single-player assumptions bite. Scope carefully.)
 
@@ -294,8 +339,11 @@ Apple M1), Chromium stable, 1280x720 canvas.
 
 - 60 fps sustained in Good Egg, Honeyhive, and the Observatory with 4
   puppets visible. Frame time p95 under 16 ms.
-- WASM heap under 384 MB.
-- Import (cook) under 10 min for a 4.4 GB ISO without movies, Phase 1.
+- Resident (private) memory of the tab under 512 MB. Not "heap size": with
+  D-013's fixed window the wasm memory object is >2.5 GB on paper while
+  most pages are never touched. Measure with the browser task manager.
+- Import (cook) under 10 min for an extracted EUR disc without movies,
+  Phase 1.
 - Cold load to title screen under 15 s with a warm shader cache.
 - Net: under 10 KB/s per client at 5 players.
 
@@ -328,15 +376,31 @@ still in progress. GalaxyQuest reports all 44 galaxies load, so the code is
 good enough. Expect edge-case crashes in rarely visited places. Log, don't
 block.
 
-**Region.** GalaxyQuest tested EUR only. Petari targets KOR. If someone has
-a US or JP disc and something breaks, it is probably a dol table offset in
-the cooker. Add the region to `dol_tables.py` and move on.
+**Region.** GalaxyQuest tested EUR and USA; JP and KOR are untested. Petari
+matches all four, which doesn't matter for a port: we compile the C++. If a
+JP or KOR disc breaks, it is probably a DOL table offset in the cooker. Add
+the region to `tools/cook/dol_data.py` and move on.
+
+**GLES 3.2 in the renderer.** See D-008 and P0-10. The GalaxyQuest renderer
+uses SSBOs, the vertex attrib binding API, program binaries and a shared
+EGL context for compiles. WebGL2 and macOS GL have none of them. This is
+Phase 0's real work; everything else in Phase 0 is plumbing.
+
+**Memory map in wasm32.** See D-013. GalaxyQuest's fixed 0x80000000 window
+exists to keep `u32` pointer casts valid on 64-bit; wasm32 pointers are
+already 32-bit, so the window is a convenience, not a need. Start with it
+(`-sMAXIMUM_MEMORY=4GB`), measure resident memory, relocate later if it
+hurts. Emscripten has >2 GB pointer caveats (`CAN_ADDRESS_2GB`); if
+something odd happens above 0x80000000 in JS glue, that is where to look.
+
+**Wii disc images are encrypted.** Partitions are AES-128-CBC with the Wii
+common key. Reading an ISO/RVZ in the browser needs the user's key from
+their own Dolphin install. Phase 1 takes an extracted folder instead.
 
 **Puppet memory.** Each puppet loads a Mario or Luigi model into the scene
-heap. The game already loads one. Four more may not fit in the Wii-sized
-heap. We are not on a Wii; raise the arena size in `platform/os/` and
-measure. If the game's own allocator fights, put puppet models in a
-separate heap the game doesn't manage.
+heap. smg-online shows up to 16 remote Marios inside real Wii memory, so 4
+puppets should fit. Still measure; if the game's own allocator fights, put
+puppet models in a separate heap the game doesn't manage.
 
 **Animation sync.** `PlayerState` carries an animation id and frame. The
 animation set for Mario is large and some animations are blended. Phase 2
@@ -346,8 +410,13 @@ accepts visible snapping between animations. Phase 5 can add blend state.
 
 - Unit: doctest for `platform/` and `net/` (encoders, interpolators, ring
   buffers, OPFS stubs). vitest for `server/` and `web/`.
-- Smoke: `--headless --frames 600` on the stub folder in CI. Exit 0 or the
-  PR fails.
+- Smoke: `--headless --frames 600` on the stub folder in CI with the null
+  renderer. Exit 0 or the PR fails. Be clear what it proves: platform init
+  and a clean exit on an invalid disc, not that the game boots. Only a
+  human with a cooked disc proves boot.
+- Cooker: `compare.py` diffs the TS cooker against `cook.py` byte for byte.
+  Synthetic per-format fixtures in vitest; the real-disc comparison is a
+  human step logged per release.
 - Integration (human): a checklist in `docs/PLAYTEST.md` per phase gate.
   Someone with a cooked disc runs it and pastes results into the task log.
 - Net soak: `server/test/soak.ts` spins 5 fake clients at 30 Hz for an
@@ -355,8 +424,9 @@ accepts visible snapping between animations. Phase 5 can add blend state.
 
 ## 11. Decision log seed
 
-These are pre-made. Record them as D-001 to D-006 in `docs/DECISIONS.md`
-when the repo is initialised, with the vendored commit hashes filled in.
+These were pre-made as D-001 to D-006. The review of 2026-10-12
+(`docs/REVIEW_2026-10-12.md`) amended or superseded four of them with
+D-007 to D-013; `DECISIONS.md` is authoritative, this list is history.
 
 - D-001: Vendor decomp from GalaxyQuest at commit `<hash>`, not from
   Petari directly. Reason: `TARGET_PC` fixes already done.
@@ -374,8 +444,10 @@ when the repo is initialised, with the vendored commit hashes filled in.
 - Petari: https://github.com/SMGCommunity/Petari (CC0)
 - GalaxyQuest: https://github.com/bigmak94/GalaxyQuest (Unlicense). Read
   `docs/TECHNICAL.md` and `docs/CONTROLS.md`.
-- SMGwebport: https://github.com/T4ctica1YT/SMGwebport (Emscripten flags
-  only; do not use its data)
+- SMGwebport: https://github.com/T4ctica1YT/SMGwebport (build output only:
+  wasm, loader, packed game data; no source, no license, no flags. Its
+  `shell.js` shows a workable export surface and that it runs without
+  OffscreenCanvas. Do not use or link its data.)
 - smg-online: https://github.com/FimeV1/smg-online (design reference)
 - sm64coopdx: https://github.com/coop-deluxe/sm64coopdx (sync model
   reference)
