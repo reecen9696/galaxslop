@@ -747,6 +747,26 @@ GLuint Renderer::Impl::buildProgram(const ShaderUid& uid) {
             port_log("glsrc: %s", body.substr(i, 900).c_str());
         }
     }
+    // PETARI_GLSL_DUMP=<dir>: write each program's sources as WebGL2 (GLSL ES
+    // 3.00) would get them, for offline validation (glslangValidator) of the
+    // browser path from a desktop run.
+    if (const char* dumpDir = debugEnv("PETARI_GLSL_DUMP")) {
+        static std::atomic<int> dumped{0};
+        int n = dumped++;
+        const char* es = "#version 300 es\nprecision highp float;\nprecision highp int;\n"
+                         "precision highp sampler2D;\nprecision highp usampler2D;\n";
+        std::string prelude = glslPrelude();
+        for (int stage = 0; stage < 2; stage++) {
+            std::string src = stage ? fsrc : vsrc;
+            if (src.compare(0, prelude.size(), prelude) == 0) src = es + src.substr(prelude.size());
+            char path[1024];
+            snprintf(path, sizeof(path), "%s/p%04d.%s", dumpDir, n, stage ? "frag" : "vert");
+            if (FILE* out = fopen(path, "wb")) {
+                fwrite(src.data(), 1, src.size(), out);
+                fclose(out);
+            }
+        }
+    }
     GLuint vs = compileShader(GL_VERTEX_SHADER, vsrc);
     GLuint fs = compileShader(GL_FRAGMENT_SHADER, fsrc);
     if (vs && fs) {
