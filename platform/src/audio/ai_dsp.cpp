@@ -47,6 +47,7 @@ static u16 sMixerLevel = 0x4000;
 extern "C" u32 port_dsp_varam_base(void) { return sVaramBase; }
 
 static void queueMail(u32 a, u32 b) {
+    PortHostAllocScope hostAlloc;  // never a game-heap safe point under sMailMutex
     std::lock_guard<std::mutex> lk(sMailMutex);
     sMailFromDsp.push_back(a);
     sMailFromDsp.push_back(b);
@@ -83,7 +84,6 @@ static struct {
 } sFrame;
 
 static void executePacket() {
-    port_debug_where("dsp packet");
     const std::vector<u32>& p = sPacket;
     u32 w0 = p.empty() ? 0 : p[0];
     u32 cmd = w0 >> 24;
@@ -119,7 +119,6 @@ static void executePacket() {
         break;
     }
     port_irq_raise(PORT_IRQ_DSP);
-    port_debug_where("dsp packet done");
 }
 
 static void dspIrq() {
@@ -169,16 +168,14 @@ u32 DSPReadMailFromDSP(void) {
 }
 
 void DSPSendMailToDSP(u32 mail) {
-    port_debug_where("DSPSendMailToDSP");
+    PortHostAllocScope hostAlloc;  // sPacket and the mixer allocate from the host heap
     if (sWaitingCount) {
         sPacket.clear();
         sPacketExpected = mail == 0 ? 1 : mail;
         sWaitingCount = false;
         return;
     }
-    port_debug_where("DSPSendMailToDSP push");
     sPacket.push_back(mail);
-    port_debug_where("DSPSendMailToDSP pushed");
     if (sPacket.size() >= sPacketExpected) {
         sWaitingCount = true;
         executePacket();

@@ -405,6 +405,12 @@ static void dvdIrq() {
 static void submit(DVDCommandBlock* b, u32 entry) {
     b->state = kStateBusy;
     b->transferredSize = 0;
+    // The queue grows from the host heap.  From the game heap the allocation
+    // can take the JKRHeap lock, a safe point that may switch game threads
+    // while sQueueMutex is held; the next thread to ask DVDGetDriveStatus
+    // (JAudio's stream thread, every sub-frame) then waits on this mutex
+    // for good while holding the CPU.
+    PortHostAllocScope hostAlloc;
     std::lock_guard<std::mutex> lk(sQueueMutex);
     sPending.push_back({b, entry});
     sQueueCv.notify_one();
