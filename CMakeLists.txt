@@ -52,6 +52,7 @@ list(APPEND SDK_SRCS ${DECOMP}/src/RVL_SDK/os/OSMutex.c ${DECOMP}/src/RVL_SDK/os
 list(APPEND SDK_SRCS ${DECOMP}/src/RVL_SDK/thp/THPAudio.c)
 
 set(DECOMP_INCLUDES
+  ${CMAKE_SOURCE_DIR}
   ${CMAKE_SOURCE_DIR}/platform/include
   ${DECOMP}/include
   ${DECOMP}/libs/JSystem/include
@@ -130,7 +131,8 @@ target_compile_options(decomp PRIVATE ${PORT_COMMON_FLAGS} $<$<COMPILE_LANGUAGE:
 # ---------------------------------------------------------------------------
 file(GLOB_RECURSE PLATFORM_SRCS CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/platform/src/*.c
-  ${CMAKE_SOURCE_DIR}/platform/src/*.cpp)
+  ${CMAKE_SOURCE_DIR}/platform/src/*.cpp
+  ${CMAKE_SOURCE_DIR}/net/*.cpp)
 
 if(NOT ANDROID)
   # Desktop: one executable linked at the game's fixed slot (see
@@ -170,7 +172,9 @@ if(NOT ANDROID)
       COMMAND sh -c "otool -l \"$1\" | grep -A3 'segname __TEXT$' | grep -Eq 'vmaddr +0x0*98000000$' || { echo 'smg: __TEXT is not at 0x98000000; the game would crash (D-016)'; otool -l \"$1\" | grep -A3 'segname __TEXT$'; exit 1; }" _ $<TARGET_FILE:smg>
       VERBATIM)
   else()
-    target_link_options(smg PRIVATE -no-pie -Wl,-Ttext-segment=0x98000000)
+    # --no-relax: 0x98000000 is above 2 GiB, so ld must not rewrite GOT loads into
+    # sign-extended 32-bit absolute addresses.
+    target_link_options(smg PRIVATE -no-pie -Wl,-Ttext-segment=0x98000000 -Wl,--no-relax)
   endif()
   return()
 endif()

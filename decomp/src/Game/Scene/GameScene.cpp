@@ -30,6 +30,7 @@
 #include "Game/System/GameSequenceFunction.hpp"
 #include "Game/Camera/CameraDirector.hpp"
 #ifdef TARGET_PC
+#include "net/capture/player_capture.h"
 #include "Game/Camera/CameraHolder.hpp"
 #include "Game/Camera/CameraManEvent.hpp"
 #include "Game/Camera/CameraManGame.hpp"
@@ -300,6 +301,12 @@ void GameScene::update() {
                     p++;
                 }
             }
+        }
+    }
+    {
+        // Co-op: the local player's state for the netcode (net/capture, P2-04).
+        if (MR::isExistMario() && isNerve(GET_NERVE(GameScene, GameSceneAction))) {
+            port_net_capture_player();
         }
     }
     {
