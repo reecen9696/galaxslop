@@ -93,6 +93,10 @@ set(PORT_COMMON_FLAGS
   -Wno-invalid-source-encoding
   -Wno-unused-value
   -Wno-return-type
+  # Decompiled functions sometimes fall off the end without returning (the
+  # original compiler did not care).  Clang treats that as unreachable code:
+  # harmless-looking garbage on x86, a hard trap on WebAssembly.
+  -fno-strict-return
   -Wno-switch
   -Wno-parentheses
   -Wno-dangling-else
@@ -119,6 +123,10 @@ set(PORT_COMMON_FLAGS
   -include ${CMAKE_SOURCE_DIR}/platform/include/port/compat.h
 )
 set(PORT_CXX_FLAGS -fno-exceptions -fno-rtti)
+if(EMSCRIPTEN)
+  # Shared-memory threads: every object must be built with atomics.
+  list(APPEND PORT_COMMON_FLAGS -pthread)
+endif()
 set(PORT_C_FLAGS)
 
 add_library(decomp OBJECT ${GAME_SRCS} ${JSYSTEM_SRCS} ${NW4R_SRCS} ${SDK_SRCS})
@@ -135,11 +143,38 @@ file(GLOB_RECURSE PLATFORM_SRCS CONFIGURE_DEPENDS
   ${CMAKE_SOURCE_DIR}/net/*.cpp)
 list(FILTER PLATFORM_SRCS EXCLUDE REGEX "/net/tests/")
 
+if(EMSCRIPTEN)
+  # Web (P0-06, D-019): one wasm32 memory with the console layout.  The game
+  # image goes to its 0x98000000 slot via GLOBAL_BASE; MEM1/MEM2 are plain
+  # memory below it, grown at boot (os_mem.cpp).  SMG_WEB_NODE=ON builds the
+  # Node bring-up (host file system, no window); the browser build is P0-08.
+  option(SMG_WEB_NODE "Node bring-up build (NODERAWFS, no window)" ON)
+  list(FILTER PLATFORM_SRCS EXCLUDE REGEX "/platform/src/xr/|/gx/headless_render\\.cpp$|/platform/src/native/|/audio/audio_out\\.cpp$")
+  list(APPEND PLATFORM_SRCS ${CMAKE_SOURCE_DIR}/platform/src/native/desktop_stubs.cpp)
+  file(GLOB WEB_SRCS CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/platform/src/web/*.cpp)
+  add_executable(smg $<TARGET_OBJECTS:decomp> ${PLATFORM_SRCS} ${WEB_SRCS})
+  target_include_directories(smg PRIVATE ${DECOMP_INCLUDES})
+  target_compile_definitions(smg PRIVATE ${PORT_DEFS} PORT_PLATFORM_CODE=1)
+  target_compile_options(smg PRIVATE ${PORT_COMMON_FLAGS} $<$<COMPILE_LANGUAGE:CXX>:${PORT_CXX_FLAGS}> $<$<COMPILE_LANGUAGE:C>:${PORT_C_FLAGS}>)
+  math(EXPR SMG_GLOBAL_BASE "0x98000000" OUTPUT_FORMAT DECIMAL)
+  target_link_options(smg PRIVATE
+    -pthread -sPTHREAD_POOL_SIZE=40 -sPROXY_TO_PTHREAD
+    -sGLOBAL_BASE=${SMG_GLOBAL_BASE} -sINITIAL_MEMORY=2600MB -sALLOW_MEMORY_GROWTH -sMAXIMUM_MEMORY=4GB
+    -sSTACK_SIZE=4MB -sDEFAULT_PTHREAD_STACK_SIZE=2MB
+    -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2
+    --profiling-funcs)  # function names in traps and profiles
+  if(SMG_WEB_NODE)
+    target_link_options(smg PRIVATE -sNODERAWFS=1 -sENVIRONMENT=node -sEXIT_RUNTIME=1
+      --pre-js ${CMAKE_SOURCE_DIR}/platform/src/web/node_env.js)
+  endif()
+  return()
+endif()
+
 if(NOT ANDROID)
   # Desktop: one executable linked at the game's fixed slot (see
   # platform/src/native/main.cpp).  The Android launcher, the OpenXR layer,
   # AAudio and the EGL renderers stay out; native/ replaces them.
-  list(FILTER PLATFORM_SRCS EXCLUDE REGEX "/platform/src/xr/|/gx/headless_render\\.cpp$")
+  list(FILTER PLATFORM_SRCS EXCLUDE REGEX "/platform/src/xr/|/gx/headless_render\\.cpp$|/platform/src/web/")
 
   # SDL3 for the window, GL context and input, built from source: the Mac
   # build is x86_64 (D-016) and Homebrew's libraries are arm64.  Same release

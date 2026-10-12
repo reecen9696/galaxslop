@@ -270,3 +270,24 @@ for the race ghosts; GalaxyQuest already made that code run on PC.
 Waiting for the web build would idle lane A for no technical reason.
 Revisit: if puppet animation blending looks wrong, the ghost's weight
 tracks (`setAnimationWeight`, flag 0x0010's special cases) are the model.
+
+## D-019 (2026-10-13, lane A): Browser memory map: one wasm32 memory, Wii addresses as-is, no uncached mirrors. Settles D-013
+What: the web build keeps the console layout inside a single wasm32 linear
+memory: `-sGLOBAL_BASE=0x98000000` puts the game image (static data) in its
+D-016 slot; MEM1 at 0x80000000 and MEM2 at 0x90000000 are plain ranges of
+that memory (no mmap); host malloc starts after the image and grows upward
+(it can never return MEM1/MEM2 addresses, which lie below it); memory is
+grown to 0xE0010000 at boot (`-sMAXIMUM_MEMORY=4GB`), the locked cache at
+0xE0000000 included. The uncached mirrors (0xC0000000/0xD0000000), which
+the native builds alias onto MEM1/MEM2 with shared mmaps, are not mapped:
+nothing in the game, JSystem or nw4r uses uncached addresses for RAM (the
+only users are SDK GX's hardware registers, which the platform layer
+emulates). The low pool (thread stacks) comes from malloc.
+Why: wasm32 has no mmap aliasing and no fixed placement, but its pointers
+are 32-bit, so the addresses themselves need no translation at all.
+Verified in Node with emcc 6.0.12: static data at 0x98000250, memory grown
+to 3,584 MB, writes at 0x80000000 / 0x90000000 / 0xE0000000, malloc at
+0x98010948. Browsers reserve wasm memory lazily, so untouched pages cost
+no RAM; D-013's budget is resident memory, measured at P0-09.
+Revisit: if a browser refuses a 3.5 GB memory, move the arenas lower; the
+GX/renderer assumptions about >= 0x80000000 would need the same change.

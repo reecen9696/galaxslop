@@ -200,6 +200,17 @@ void port_host_sleep_ns(int64_t ns);
 // would simply preempt it).
 void port_irq_poll(void);
 
+// SDK internals that some decompiled C files call without a prototype
+// (-Wno-implicit-function-declaration makes them "int f()").  The mismatch
+// with their void definitions is harmless on PowerPC and x86 but turns the
+// call into a trap in WebAssembly, so declare them properly everywhere.
+void __GXSetDirtyState(void);
+void __GXSendFlushPrim(void);
+void __GXCleanGPFifo(void);
+void __GXInitRevisionBits(void);
+void GXResetWriteGatherPipe(void);
+void DCFlushRange(void* addr, uint32_t nBytes);
+
 // Logging / fatal errors from the port layer.
 void port_log(const char* fmt, ...) __attribute__((format(printf, 1, 2)));
 void port_fatal(const char* fmt, ...) __attribute__((format(printf, 1, 2), noreturn));

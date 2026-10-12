@@ -30,6 +30,9 @@ static int makeSharedFd(const char* name, size_t size) {
     }
     return fd;
 }
+#elif defined(__EMSCRIPTEN__)
+#include <emscripten/heap.h>
+#include <stdlib.h>
 #elif defined(__APPLE__)
 #include <fcntl.h>
 // No memfd on macOS: a POSIX shared memory object, unlinked at once, gives the
@@ -97,6 +100,19 @@ extern "C" int port_mem_init(void) {
     if (sMemReady) {
         return 1;
     }
+#ifdef __EMSCRIPTEN__
+    // One wasm32 memory holds everything at the console addresses (D-019):
+    // grow it to cover MEM1, MEM2 and the locked cache.  No uncached mirrors:
+    // nothing uses uncached RAM addresses, and wasm cannot alias pages.
+    if (emscripten_get_heap_size() < (size_t)PORT_LOCKED_CACHE + 0x10000) {
+        if (!emscripten_resize_heap((size_t)PORT_LOCKED_CACHE + 0x10000)) {
+            port_fatal("cannot grow the wasm memory to %#x (MAXIMUM_MEMORY too small?)", PORT_LOCKED_CACHE + 0x10000);
+        }
+    }
+    memset((void*)(uintptr_t)PORT_MEM1_BASE, 0, PORT_MEM1_SIZE);
+    memset((void*)(uintptr_t)PORT_MEM2_BASE, 0, PORT_MEM2_SIZE);
+    memset((void*)(uintptr_t)PORT_LOCKED_CACHE, 0, 0x4000);
+#else
     int fd1 = makeSharedFd("wii-mem1", PORT_MEM1_SIZE);
     mapAt(PORT_MEM1_BASE, PORT_MEM1_SIZE, fd1);
     mapAt(PORT_MEM1_UNCACHED, PORT_MEM1_SIZE, fd1);
@@ -109,6 +125,7 @@ extern "C" int port_mem_init(void) {
 
     // Locked-cache scratchpad (16 KiB on hardware).
     mapAt(PORT_LOCKED_CACHE, 0x4000, -1);
+#endif
 
     // OS globals (see YAGCD / Wii low memory map).  The disc's ID at 0 comes
     // with the game's files (port_mem_set_disc_id).
@@ -152,6 +169,16 @@ static std::atomic<uintptr_t> sLowPoolNext{PORT_LOWPOOL_BASE};
 extern "C" void* port_low_alloc(size_t size) {
     const size_t page = 0x4000;
     size = (size + page - 1) & ~(page - 1);
+#ifdef __EMSCRIPTEN__
+    // Every wasm32 address is below 4 GiB; malloc's memory is above the game
+    // image and never collides with MEM1/MEM2 (D-019).
+    void* p = aligned_alloc(page, size);
+    if (p == nullptr) {
+        port_fatal("low alloc of %zu bytes failed", size);
+    }
+    memset(p, 0, size);
+    return p;
+#endif
     uintptr_t addr = sLowPoolNext.fetch_add(size + page);  // leave an unmapped guard page after each block
     if (addr + size > PORT_LOWPOOL_BASE + PORT_LOWPOOL_SIZE) {
         port_fatal("low pool exhausted");
