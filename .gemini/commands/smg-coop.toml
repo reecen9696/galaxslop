@@ -1,0 +1,9 @@
+description = "Load the SMG co-op project skill and working rules"
+prompt = """
+Read the following files in full and follow them for the rest of this session:
+
+@{AGENTS.md}
+@{skills/smg-coop/SKILL.md}
+
+Then read @{TASKS.md} and tell me which open task in lane B (or shared) you would claim next, and why. Do not claim it until I confirm.
+"""

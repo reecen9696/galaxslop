@@ -1,0 +1,53 @@
+# game data: never commit
+/game/
+/extracted/
+/cooked/
+*.iso
+*.rvz
+*.wbfs
+*.gcm
+*.dol
+*.rel
+*.arc
+*.rarc
+*.szs
+*.bmd
+*.bdl
+*.brres
+*.bck
+*.bti
+*.btk
+*.brk
+*.bva
+*.bpk
+*.bmt
+*.bms
+*.bcsv
+*.brsar
+*.brstm
+*.thp
+*.data
+*.wad
+*.nand
+
+# builds
+build/
+out/
+dist/
+node_modules/
+*.wasm
+*.o
+*.a
+.cache/
+__pycache__/
+*.pyc
+
+# editor
+.vscode/
+.idea/
+.DS_Store
+
+# env
+.env
+.env.*
+.dev.vars
