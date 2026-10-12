@@ -5,12 +5,21 @@
 #include <JSystem/JUtility/JUTTexture.hpp>
 #include <revolution/gx/GXVert.h>
 
+void WhirlPoolAccelerator_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)0.5f;
+    (void)3.0f;
+    (void)-1.0f;
+    (void)2.0f;
+}
+
 GXColor sWhirlPoolAcceleratorTevReg1 = {0x00, 0x34, 0x52, 0xFF};
 GXColor sWhirlPoolAcceleratorTevReg2 = {0x7C, 0xA9, 0xBD, 0xFF};
 
 namespace {
     extern const f32 sAlphaPointNum;
-};  // namespace
+}
 
 WhirlPoolPoint::WhirlPoolPoint(const TVec3f& rPosition, const TVec3f& rDirection, const TVec3f& rNormal, f32 radius, f32 texCoord, u8 alpha)
     : mPosition(rPosition), mSide(1.0f, 0.0f, 0.0f), mNormal(rNormal), mDirection(0.0f, 0.0f, 1.0f), mRadius(radius), mTexCoord(texCoord),
@@ -65,9 +74,9 @@ bool WhirlPoolAccelerator::calcInfo(const TVec3f& rPosition, TVec3f* pAccelerati
 }
 
 void WhirlPoolAccelerator::movement() {
-    mRotation = MR::repeat(-10.0f + mRotation, 0.0f, 360.0f);
-    mTexOffsetU0 = MR::repeat(0.01f + mTexOffsetU0, 0.0f, 1.0f);
-    mTexOffsetV0 = MR::repeat(-0.025f + mTexOffsetV0, 0.0f, 1.0f);
+    mRotation = MR::repeat2(-10.0f + mRotation, 0.0f, 360.0f);
+    mTexOffsetU0 = MR::repeat2(0.01f + mTexOffsetU0, 0.0f, 1.0f);
+    mTexOffsetV0 = MR::repeat2(-0.025f + mTexOffsetV0, 0.0f, 1.0f);
     MR::startLevelSound(this, "SE_AT_LV_WHIRL_POOL");
 }
 
@@ -204,4 +213,4 @@ WhirlPoolAccelerator::~WhirlPoolAccelerator() {
 
 namespace {
     const f32 sAlphaPointNum = 2.0f;
-};  // namespace
+}

@@ -6,6 +6,8 @@
 #include "Game/Util/PlayerUtil.hpp"
 
 void FollowCollisionArea_FORCE_MATCH_SDATA2() {
+    (void)0.0f;
+    (void)0.5f;
     (void)5.0f;
 }
 

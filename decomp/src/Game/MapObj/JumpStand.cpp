@@ -14,7 +14,7 @@ namespace NrvJumpStand {
     NEW_NERVE(JumpStandNrvStarPieceBound, JumpStand, StarPieceBound);
 };  // namespace NrvJumpStand
 
-JumpStand::JumpStand(const char* pName) : LiveActor(pName), mBindedActor(), mIsMarioJumpingHigh() {
+JumpStand::JumpStand(const char* pName) : LiveActor(pName), mBindedActor(nullptr), mIsMarioJumpingHigh() {
     _90.identity();
 }
 
@@ -62,10 +62,10 @@ void JumpStand::exeTrampleBound() {
     if (MR::isStep(this, 5)) {
         if (mIsMarioJumpingHigh) {
             MR::startSound(this, "SE_OJ_JUMP_STAND_BOUND_M");
-            MR::startSoundPlayer("SE_PV_JUMP_L");
+            MR::startSoundPlayer("SE_PV_JUMP_L", -1);
         } else {
             MR::startSound(this, "SE_OJ_JUMP_STAND_BOUND_S");
-            MR::startSoundPlayer("SE_PV_JUMP_M");
+            MR::startSoundPlayer("SE_PV_JUMP_M", -1);
         }
 
         if (mIsMarioJumpingHigh) {
@@ -103,7 +103,7 @@ void JumpStand::exeHipDropBound() {
 
     if (MR::isStep(this, 15)) {
         MR::startSound(this, "SE_OJ_JUMP_STAND_BOUND_L");
-        MR::startSoundPlayer("SE_PV_JUMP_JOY");
+        MR::startSoundPlayer("SE_PV_JUMP_JOY", -1);
         endBindAndShootUp(43.0f, Jump_High);
     }
 

@@ -17,7 +17,7 @@ namespace NrvPenguinRacerLeader {
     NEW_NERVE(PenguinRacerLeaderNrvTakeOutStar, PenguinRacerLeader, TakeOutStar);
 };  // namespace NrvPenguinRacerLeader
 
-PenguinRacerLeader::PenguinRacerLeader(const char* pName) : PenguinRacer(pName), mTakeOutStar(), mCameraInfo() {
+PenguinRacerLeader::PenguinRacerLeader(const char* pName) : PenguinRacer(pName), mTakeOutStar(nullptr), mCameraInfo(nullptr) {
 }
 
 void PenguinRacerLeader::init(const JMapInfoIter& rIter) {
@@ -83,7 +83,7 @@ bool PenguinRacerLeader::eventFunc(u32 state) {
 
     if (state == 1) {
         if (mTakeOutStar->takeOut()) {
-            MR::endMultiActorCamera(this, mCameraInfo, "会話", false);
+            MR::endMultiActorCamera(this, mCameraInfo, "会話", false, -1);
             return true;
         }
         return false;
@@ -94,7 +94,7 @@ bool PenguinRacerLeader::eventFunc(u32 state) {
 
 void PenguinRacerLeader::exeWait() {
     if (!tryReaction() && MR::tryTalkNearPlayerAndStartTalkAction(this) && mRaceDisabled == 0) {
-        MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "会話");
+        MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "会話", -1);
         setNerve(GET_NERVE(PenguinRacerLeader, PenguinRacerLeaderNrvPre));
     }
 }
@@ -108,7 +108,7 @@ void PenguinRacerLeader::exePre() {
         RaceManagerFunction::startRaceWithWipe();
         setNerve(GET_NERVE(PenguinRacerLeader, PenguinRacerLeaderNrvReady));
     } else {
-        MR::endMultiActorCamera(this, mCameraInfo, "会話", false);
+        MR::endMultiActorCamera(this, mCameraInfo, "会話", false, -1);
         setNerve(GET_NERVE(PenguinRacerLeader, PenguinRacerLeaderNrvWait));
     }
 }
@@ -121,7 +121,7 @@ void PenguinRacerLeader::exePost() {
         return;
     }
 
-    MR::endMultiActorCamera(this, mCameraInfo, "会話", true);
+    MR::endMultiActorCamera(this, mCameraInfo, "会話", true, -1);
 
     if (RaceManagerFunction::getRaceRank() == 1) {
         setNerve(GET_NERVE(PenguinRacerLeader, PenguinRacerLeaderNrvTalk));

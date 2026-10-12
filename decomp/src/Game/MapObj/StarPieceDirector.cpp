@@ -6,6 +6,12 @@
 #include "Game/Screen/StarPointerDirector.hpp"
 #include "Game/Util.hpp"
 
+void StarPieceDirector_FORCE_MATCH_SDATA2() {
+    (void)0.0f;
+    (void)3.814697265625e-06f;
+    (void)-1.0f;
+}
+
 namespace NrvStarPieceShooter {
     NEW_NERVE(HostTypeNrvWait, StarPieceShooter, Wait);
     NEW_NERVE(HostTypeNrvLockOn, StarPieceShooter, LockOn);
@@ -457,13 +463,8 @@ bool StarPieceShooter::shoot() {
 }
 
 bool StarPieceShooter::tryShoot() {
-    if (!((
-#if (VERSION == RMGK01)
-              !StarPointerFunction::isOnScreenEdge(_A0) ||
-#endif
-              MR::isStarPointerInScreen(_A0)) &&
-          MR::isStarPointerValid(_A0) && MR::getStarPieceNum() > 0 && MR::isEnableStarPointerShootStarPiece(_A0) &&
-          (_A0 != 0 || !MR::isStarPointer1PInvalid2PValidMode()))) {
+    if (!((!StarPointerFunction::isOnScreenEdge(_A0) || MR::isStarPointerInScreen(_A0)) && MR::isStarPointerValid(_A0) && MR::getStarPieceNum() > 0 &&
+          MR::isEnableStarPointerShootStarPiece(_A0) && (_A0 != 0 || !MR::isStarPointer1PInvalid2PValidMode()))) {
         _90 = nullptr;
         _94 = 999999.9f;
         _A4 = -1;

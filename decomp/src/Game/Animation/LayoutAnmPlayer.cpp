@@ -2,7 +2,12 @@
 #include "Game/Screen/LayoutManager.hpp"
 #include <nw4r/lyt/animation.h>
 
-LayoutAnmPlayer::LayoutAnmPlayer(const LayoutManager* pManager) : mManager(pManager), mAnimName(), mAnimTransform(), mFrameCtrl() {
+void LayoutAnmPlayer_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+}
+
+LayoutAnmPlayer::LayoutAnmPlayer(const LayoutManager* pManager) : mManager(pManager), mAnimName(), mAnimTransform(), mFrameCtrl(0) {
 }
 
 void LayoutAnmPlayer::movement() {

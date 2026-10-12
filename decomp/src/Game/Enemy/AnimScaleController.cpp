@@ -11,13 +11,20 @@ namespace NrvAnimScaleController {
     NEW_NERVE(AnimScaleControllerNrvCrush, AnimScaleController, Crush);
 };  // namespace NrvAnimScaleController
 
+void AnimScaleController_FORCE_MATCH_SDATA2() {
+    (void) 1.0f;
+    (void) 0.0f;
+    (void) 0.5f;
+    (void) 2.0f;
+}
+
 namespace {
 
     class AnimScaleDefaultParam : public AnimScaleParam {
     public:
         AnimScaleDefaultParam();
 
-        /* 0x34 */ AnimScaleParam tightParam;
+        AnimScaleParam tightParam;  // 0x34;
     };
 
     AnimScaleDefaultParam::AnimScaleDefaultParam() {
@@ -189,4 +196,4 @@ void AnimScaleController::updateScale(f32 f1, f32 f2) {
     _C.z = _C.x;
 }
 
-AnimScaleController::~AnimScaleController() {};
+AnimScaleController::~AnimScaleController(){};

@@ -71,6 +71,13 @@ namespace NrvScenarioSelectLayout {
     NEW_NERVE(ScenarioSelectLayoutNrvDisappearCometWarning, ScenarioSelectLayout, DisappearCometWarning);
 }  // namespace NrvScenarioSelectLayout
 
+void ScenarioSelectLayout_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)0.5f;
+    (void)2.0f;
+}
+
 ScenarioSelectLayout::ScenarioSelectLayout(EffectSystem* pEffectSystem, const CameraContext* pCameraContext)
     : LayoutActor("シナリオ選択レイアウト", true), mSelectedScenarioNo(-1), _24(), _28(), mStar(), mScenarioSky(), mEffectSystem(pEffectSystem),
       mCameraContext(pCameraContext), mNewTextFollowPos(0.0f, 0.0f), mNewGreenTextFollowPos(0.0f, 0.0f), mStarTopFollowPos(0.0f, 0.0f), mBackButton(),
@@ -124,10 +131,6 @@ void ScenarioSelectLayout::init(const JMapInfoIter& rIter) {
 
     mBackButton = new BackButton("戻るボタン", false);
     mBackButton->initWithoutIter();
-
-    #if (VERSION == RMGJ01 || VERSION == RMGE01)
-    MR::hidePaneRecursive(this, "CometAppear");
-    #endif
 
     initNerve(GET_NERVE(ScenarioSelectLayout, ScenarioSelectLayoutNrvAppearStar));
 }
@@ -210,11 +213,7 @@ void ScenarioSelectLayout::appear() {
     mScenarioSky->mScale.set(::cSkyScale);
     mScenarioSky->appear();
     MultiScene::startBtk(mScenarioSky, "ScenarioSelectSky");
-
-#if (VERSION == RMGP01 || VERSION == RMGK01)
     MR::hidePaneRecursive(this, "CometAppear");
-#endif
-
     mSelectedScenarioNo = -1;
     _24 = 0;
     _28 = 0;

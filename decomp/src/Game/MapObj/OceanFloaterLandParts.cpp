@@ -5,6 +5,7 @@
 #include "Game/Util.hpp"
 
 void OceanFloaterLandParts_FORCE_MATCH_SDATA2() {
+    (void)-1.0f;
     (void)100.0f;
 }
 

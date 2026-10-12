@@ -139,7 +139,7 @@ void CoinGroup::exeDemoAppear() {
 
     if (MR::isGreaterStep(this, ::sDemoAppearTime)) {
         MR::endDemo(this, "出現");
-        MR::endActorCamera(this, mCameraInfo, false);
+        MR::endActorCamera(this, mCameraInfo, false, -1);
         setNerve(GET_NERVE(CoinGroup, CoinGroupNrvKill));
         kill();
     }

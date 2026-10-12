@@ -55,7 +55,9 @@ void MoguStone::emit(bool arg1, const TVec3f& pArg2, const TVec3f& pArg3, f32 ar
 
     mPosition.set(pArg2);
 
-    mVelocity.zero();
+    mVelocity.z = 0.0f;
+    mVelocity.y = 0.0f;
+    mVelocity.x = 0.0f;
 
     MR::calcGravity(this);
 
@@ -187,7 +189,7 @@ void MoguStone::calcAndSetBaseMtx() {
     MR::setBaseTRMtx(this, mtx);
 }
 
-ThrowingIce::ThrowingIce(const char* pName) : MoguStone(pName, "IceManIce"), mPath() {
+ThrowingIce::ThrowingIce(const char* pName) : MoguStone(pName, "IceManIce"), mPath(nullptr) {
     mPath = new ParabolicPath();
     mScale.x = 1.3f;
     mScale.y = 1.3f;

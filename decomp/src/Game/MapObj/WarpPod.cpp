@@ -363,7 +363,7 @@ void WarpPod::control() {
     _CD = false;
     _A6 = mCameraTime;
 
-    MR::startEventCameraNoTarget(mCamInfo, _9C);
+    MR::startEventCameraNoTarget(mCamInfo, _9C, -1);
     MR::startSound(this, "SE_OJ_WARP_POD_PATH_APPEAR");
 
     MR::requestMovementOn(this);
@@ -425,17 +425,17 @@ void WarpPod::startEventCamera() const {
         return;
     }
 
-    MR::startEventCameraNoTarget(mCamInfo, mEventCameraName);
+    MR::startEventCameraNoTarget(mCamInfo, mEventCameraName, -1);
 }
 
 void WarpPod::endEventCamera() {
     if (_CC) {
-        MR::endEventCamera(mCamInfo, _9C, true);
+        MR::endEventCamera(mCamInfo, _9C, true, -1);
         _CC = false;
     } else if (mPairPod->_CC) {
         mPairPod->endEventCamera();
     } else {
-        MR::endEventCamera(mCamInfo, mEventCameraName, true);
+        MR::endEventCamera(mCamInfo, mEventCameraName, true, -1);
     }
 }
 

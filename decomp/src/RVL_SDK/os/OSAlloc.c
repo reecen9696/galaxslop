@@ -8,15 +8,15 @@ typedef struct Cell Cell;
 typedef struct HeapDesc HeapDesc;
 
 struct Cell {
-    /* 0x0 */ Cell* prev;
-    /* 0x4 */ Cell* next;
-    /* 0x8 */ long size;
+    Cell* prev;  // 0x0
+    Cell* next;  // 0x4
+    long size;   // 0x8
 };
 
 struct HeapDesc {
-    /* 0x0 */ long size;
-    /* 0x4 */ Cell* free;
-    /* 0x8 */ Cell* allocated;
+    long size;
+    Cell* free;
+    Cell* allocated;
 };
 
 static HeapDesc* HeapArray;

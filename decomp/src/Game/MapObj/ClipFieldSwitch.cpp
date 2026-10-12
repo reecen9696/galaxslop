@@ -4,6 +4,7 @@
 #include "Game/Util.hpp"
 
 void ClipFieldSwitch_FORCE_MATCH_SDATA2() {
+    (void)0.0f;
     (void)1000.0f;
 }
 

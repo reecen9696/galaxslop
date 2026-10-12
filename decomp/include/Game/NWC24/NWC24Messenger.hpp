@@ -22,11 +22,7 @@ public:
     virtual void calcAnim();
 
     void initAfterResourceLoaded();
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01 || VERSION == RMGP01)
-    void send(const char*, const wchar_t*, const wchar_t*, const u8*, u32, bool);
-#elif VERSION == RMGK01
     void send(const char*, const wchar_t*, const wchar_t*, const u8*, u32, bool, bool, u16, u8);
-#endif
     void term(const char*);
     bool isSent(const char*) const;
     bool isError(const char*) const;
@@ -50,28 +46,20 @@ namespace NWC24MessengerSub {
     class SendTask {
     public:
         /// @brief Creates a new `SendTask`.
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01 || VERSION == RMGP01)
-        SendTask() : _0(), mIsBG(), _2(), mRetryNo(), mErr(NWC24_OK), mErrCode(), mSentSize(), mTaskName(), mMessage(), mAltName() {
-        }
-#else
         SendTask()
             : _0(), mIsBG(), _2(), mIsMsgLedPattern(), mRetryNo(), mErr(NWC24_OK), mErrCode(), mSentSize(), mTaskName(), mMessage(), mAltName() {
         }
-#endif
+
         /* 0x00 */ bool _0;
         /* 0x01 */ bool mIsBG;
         /* 0x02 */ bool _2;
-#if (VERSION == RMGK01)
         /* 0x03 */ bool mIsMsgLedPattern;
-#endif
         /* 0x04 */ s32 mRetryNo;
         /* 0x08 */ NWC24Err mErr;
         /* 0x0C */ s32 mErrCode;
         /* 0x10 */ u32 mSentSize;
-#if (VERSION == RMGK01)
         /* 0x14 */ u16 mTag;
-        /* 0x16 */ u8 mDelayHours;
-#endif
+        /* 0x14 */ u8 mDelayHours;
         /* 0x18 */ const char* mTaskName;
         /* 0x1C */ const wchar_t* mMessage;
         /* 0x20 */ const wchar_t* mAltName;
@@ -127,9 +115,6 @@ namespace NWC24MessengerSub {
 };  // namespace NWC24MessengerSub
 
 namespace MR {
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01 || VERSION == RMGP01)
-    void sendMail(const char*, const wchar_t*, const char*, const u8*, u32, bool);
-#elif VERSION == RMGK01
     class SendMailObj {
     public:
         /// @brief Creates a new `SendMailObj`.
@@ -157,7 +142,6 @@ namespace MR {
         /* 0x16 */ u16 mTag;
         /* 0x18 */ u8 mDelay;
     };
-#endif
 
     void termMail(const char*);
     bool isMailSent(const char*);

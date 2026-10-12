@@ -74,10 +74,11 @@ public:
     /* 0x11E */ u8 _11E;
     /* 0x11F */ u8 _11F;
 
+    // 0x120
     // this isn't what they wrote but oh well
     union {
-        /* 0x120 */ vs32 mColorFrame_v;
-        /* 0x120 */ s32 mColorFrame;
+        vs32 mColorFrame_v;
+        s32 mColorFrame;
     };
 
     /* 0x124 */ volatile bool mIsGrandStar;

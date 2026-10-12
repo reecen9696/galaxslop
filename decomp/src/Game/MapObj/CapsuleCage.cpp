@@ -38,7 +38,7 @@ void CapsuleCage::exeWait() {
 
 void CapsuleCage::exeStartCamera() {
     if (MR::isFirstStep(this)) {
-        MR::startActorCameraTargetSelf(this, mCameraInfo);
+        MR::startActorCameraTargetSelf(this, mCameraInfo, -1);
     }
 
     if (MR::isStep(this, ::sStepForStartCamera)) {
@@ -74,7 +74,7 @@ void CapsuleCage::exeEndCamera() {
 
 void CapsuleCage::kill() {
     if (mCameraInfo != nullptr) {
-        MR::endActorCamera(this, mCameraInfo, false);
+        MR::endActorCamera(this, mCameraInfo, false, -1);
         MR::endDemo(this, ::cDemoCameraName);
     }
 

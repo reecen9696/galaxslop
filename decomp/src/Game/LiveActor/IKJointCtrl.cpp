@@ -7,7 +7,12 @@
 
 namespace {
     const char* sTextOutFileName = "IKJointCtrl";
-};  // namespace
+}
+
+void IKJointCtrl_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+}
 
 IKJointCtrl::IKJointCtrl(LiveActor* pActor)
     : mName(), mActor(pActor), mJoint(), mRootCtrl(), mMiddleCtrl(), mEndCtrl(), _78(0.0f, 1.0f, 0.0f), mEndLocalDir(0.0f, 1.0f, 0.0f),

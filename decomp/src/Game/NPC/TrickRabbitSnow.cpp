@@ -8,6 +8,13 @@
 #include "Game/NPC/TrickRabbitUtil.hpp"
 #include "Game/Util.hpp"
 
+void TrickRabbitSnow_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)3.0f;
+    (void)2.0f;
+}
+
 TrickRabbitSnowListener::TrickRabbitSnowListener() {
 }
 
@@ -394,14 +401,9 @@ void TrickRabbitSnow::exeBlowDamage() {
 }
 
 void TrickRabbitSnow::exeCaught() {
-#if (VERSION == RMGK01)
     if (MR::isFirstStep(this) && MR::isDemoActive()) {
         setNerve(GET_NERVE(TrickRabbitFreeRun, TrickRabbitSnowNrvCaught));
-        return;
-    }
-#endif
-
-    if (MR::updateActorState(this, mStateCaught)) {
+    } else if (MR::updateActorState(this, mStateCaught)) {
         MR::endDemo(this, "捕まり");
         MR::forwardNode(mMsgCtrl);
         mSpotMarkLight->kill();

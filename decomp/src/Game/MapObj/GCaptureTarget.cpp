@@ -19,6 +19,12 @@
 #include <JSystem/JGeometry/TVec.hpp>
 #include <revolution/types.h>
 
+void GCaptureTarget_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)0.5f;
+}
+
 namespace NrvGCaptureTarget {
     NEW_NERVE(GCaptureTargetNrvTryDemoAppear, GCaptureTarget, TryDemoAppear);
     NEW_NERVE(GCaptureTargetNrvAppear, GCaptureTarget, Appear);
@@ -161,7 +167,7 @@ void GCaptureTarget::exeAppear() {
     if (MR::isGreaterStep(this, 150)) {
         if (MR::isExistActorCamera(mCameraInfo)) {
             MR::endDemoWaitCameraInterpolating(this, "出現");
-            MR::endActorCamera(this, mCameraInfo, false);
+            MR::endActorCamera(this, mCameraInfo, false, -1);
         }
         setNerve(GET_NERVE(GCaptureTarget, GCaptureTargetNrvWait));
     }

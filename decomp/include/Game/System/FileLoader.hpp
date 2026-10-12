@@ -5,8 +5,8 @@
 #include "Game/System/FileLoaderThread.hpp"
 #include <JSystem/JKernel/JKRDvdRipper.hpp>
 #include <JSystem/JKernel/JKRHeap.hpp>
-#include <cstdio>
 #include <revolution.h>
+#include <cstdio>
 
 class JKRArchive;
 
@@ -30,10 +30,10 @@ public:
     const RequestFileInfo* getRequestFileInfoConst(const char*) const;
     RequestFileInfo* addRequest(const char*);
 
-    /* 0x00 */ FileLoaderThread* mLoaderThread;
-    /* 0x04 */ OSMutex mMutex;
-    /* 0x1C */ RequestFileInfo* mRequestFileInfos;
-    /* 0x20 */ s32 mRequestedFileCount;
-    /* 0x24 */ FileHolder* mFileHolder;
-    /* 0x28 */ ArchiveHolder* mArchiveHolder;
+    FileLoaderThread* mLoaderThread;     // 0x0
+    OSMutex mMutex;                      // 0x4
+    RequestFileInfo* mRequestFileInfos;  // 0x1C
+    s32 mRequestedFileCount;             // 0x20
+    FileHolder* mFileHolder;             // 0x24
+    ArchiveHolder* mArchiveHolder;       // 0x28
 };

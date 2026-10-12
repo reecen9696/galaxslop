@@ -34,9 +34,13 @@ extern "C" int vswprintf(wchar_t*, size_t, const wchar_t*, va_list);
 
 namespace {
     f32 getCometColorAnimFrameFromId(s32);
-};  // namespace
+}
 
 void LayoutUtil_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)3.0f;
+    (void)2.0f;
     (void)255.0f;
     (void)0.75f;
     (void)4.0f;

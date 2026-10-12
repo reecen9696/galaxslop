@@ -18,17 +18,20 @@ ReceiverTagMail::ReceiverTagMail(const char* pTaskName, const char* pMessageID, 
     MR::zeroMemory(mMessage, mMessageLength * sizeof(wchar_t));
 }
 
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01 || VERSION == RMGP01)
-
+/*
+// The non-Korean implementation of the function.
 void ReceiverTagMail::send(const u8* pImage, u32 imageSize) {
-    ReplaceTagFunction::ReplaceArgs(mMessage, mMessageLength, MR::getGameMessageDirect(mMessageID), GameDataFunction::getUserName());
+    ReplaceTagFunction::ReplaceArgs(
+        mMessage,
+        mMessageLength,
+        MR::getGameMessageDirect(mMessageID),
+        GameDataFunction::getUserName());
 
     MR::sendMail(mTaskName, mMessage, mSenderID, pImage, imageSize, false);
 
     _18 = 0;
 }
-
-#elif (VERSION == RMGK01)
+*/
 
 void ReceiverTagMail::send(const u8* pImage, u32 imageSize, bool isLedOn) {
     ReplaceTagFunction::ReplaceArgs(mMessage, mMessageLength, MR::getGameMessageDirect(mMessageID), GameDataFunction::getUserName());
@@ -48,7 +51,6 @@ void ReceiverTagMail::send(const u8* pImage, u32 imageSize, bool isLedOn) {
 
     _18 = 0;
 }
-#endif
 
 void ReceiverTagMail::update() {
     if (_18 != 0) {

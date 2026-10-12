@@ -10,6 +10,10 @@
 #include "Game/Util/MathUtil.hpp"
 #include "Game/Util/ObjUtil.hpp"
 
+void ClipAreaMovable_FORCE_MATCH_SDATA2() {
+    (void)0.0f;
+}
+
 ClipAreaMovable::ClipAreaMovable(const char* pName) : ClipArea(pName), mMapPartsRailMover(), mMapPartsRotator() {
 }
 

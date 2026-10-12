@@ -21,7 +21,7 @@ namespace {
 RaceRail::RaceRail(const char* pName) : NameObj(pName) {
 }
 
-PlayerRacer::PlayerRacer(const char* pName) : LiveActor(pName), _B0(), _B4(), mCameraInfo() {
+PlayerRacer::PlayerRacer(const char* pName) : LiveActor(pName), _B0(0), _B4(0), mCameraInfo(nullptr) {
 }
 
 void PlayerRacer::appear() {
@@ -45,7 +45,7 @@ void PlayerRacer::init(const JMapInfoIter& rIter) {
 }
 
 void PlayerRacer::startRacer() {
-    MR::endActorCamera(this, mCameraInfo, true);
+    MR::endActorCamera(this, mCameraInfo, true, -1);
 }
 
 bool PlayerRacer::updateRacer(const RaceManager* pRaceManager) {
@@ -151,7 +151,7 @@ void PlayerRacer::prepRacer(const RaceManager* pRaceManager) {
 
     MR::tryPlayerKillTakingActor();
     MR::setPlayerBaseMtx(mtx);
-    MR::startActorCameraTargetPlayer(this, mCameraInfo);
+    MR::startActorCameraTargetPlayer(this, mCameraInfo, -1);
 }
 
 void PlayerRacer::resetRacer(const RaceManager* pRaceManager) {

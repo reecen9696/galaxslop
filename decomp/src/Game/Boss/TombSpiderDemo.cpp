@@ -41,6 +41,10 @@ namespace {
     static const s32 sStepBattleEndPlanetBreak = 15;
 };  // namespace
 
+void TombSpiderDemo_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+}
+
 TombSpiderDemo::TombSpiderDemo(TombSpider* pParent) : mParent(pParent), mRotateSpeed(0.0f) {
     mMtx.identity();
     MR::declareEventCamera(getCameraInfo(), "ゲートオープンデモ[トゥームスパイダー]");
@@ -54,7 +58,7 @@ TombSpiderDemo::TombSpiderDemo(TombSpider* pParent) : mParent(pParent), mRotateS
 bool TombSpiderDemo::updateGateOpen() {
     if (MR::isFirstStep(mParent)) {
         TombSpiderFunction::startTombSpiderDemo(mParent, "ゲートオープンデモ[トゥームスパイダー]", nullptr);
-        MR::startEventCamera(getCameraInfo(), "ゲートオープンデモ[トゥームスパイダー]", CameraTargetArg(mParent));
+        MR::startEventCamera(getCameraInfo(), "ゲートオープンデモ[トゥームスパイダー]", CameraTargetArg(mParent), -1);
 
         TVec3f pos(mParent->mPosition);
         pos.z += ::sPlanetRadius;
@@ -98,8 +102,8 @@ bool TombSpiderDemo::updateGateOpen() {
     }
 
     if (MR::isStep(mParent, ::sStepGateOpenChangeCamera)) {
-        MR::endEventCamera(getCameraInfo(), "ゲートオープンデモ[トゥームスパイダー]", false);
-        MR::startEventCameraNoTarget(getCameraInfo(), "マリオ着地デモ[トゥームスパイダー]");
+        MR::endEventCamera(getCameraInfo(), "ゲートオープンデモ[トゥームスパイダー]", false, -1);
+        MR::startEventCameraNoTarget(getCameraInfo(), "マリオ着地デモ[トゥームスパイダー]", -1);
     }
 
     if (MR::isStep(mParent, ::sStepDemoGateOpen)) {

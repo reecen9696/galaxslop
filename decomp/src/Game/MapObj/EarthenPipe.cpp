@@ -7,6 +7,12 @@
 #include "Game/Scene/SceneObjHolder.hpp"
 #include "Game/Util.hpp"
 
+void EarthenPipe_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)-1.0f;
+}
+
 namespace NrvEarthenPipe {
     NEW_NERVE(EarthenPipeNrvWait, EarthenPipe, Wait);
     NEW_NERVE(EarthenPipeNrvReady, EarthenPipe, Ready);
@@ -182,7 +188,7 @@ void EarthenPipe::makeActorAppeared() {
 
 bool EarthenPipe::tryShowUp() {
     MR::invalidateClipping(this);
-    MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "出現");
+    MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "出現", -1);
     if (mPipeMode != 1 && mPipeMode != 2) {
         return false;
     }
@@ -193,7 +199,7 @@ bool EarthenPipe::tryShowUp() {
 
 bool EarthenPipe::tryHideDown() {
     MR::validateClipping(this);
-    MR::endMultiActorCamera(this, mCameraInfo, "出現", true);
+    MR::endMultiActorCamera(this, mCameraInfo, "出現", true, -1);
 
     if (!mPipeMode || (mPipeMode - 3) <= 1u) {
         setNerve(GET_NERVE(EarthenPipe, EarthenPipeNrvInvalid));

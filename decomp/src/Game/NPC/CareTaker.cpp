@@ -369,7 +369,7 @@ void Caretaker::exePreTalk() {
         MR::startBckPlayer("Watch");
         setNerve(GET_NERVE(Caretaker, CaretakerNrvPreWipeOut));
     } else {
-        MR::endNPCTalkCamera(false);
+        MR::endNPCTalkCamera(false, -1);
         setNerve(GET_NERVE(Caretaker, CaretakerNrvWait));
     }
 }
@@ -531,7 +531,7 @@ void Caretaker::exePstTalk() {
     }
 
     MR::endDemo(this, "ゴミ掃除タイムアタック");
-    MR::endNPCTalkCamera(false);
+    MR::endNPCTalkCamera(false, -1);
 
     if (MR::isOnSwitchA(this)) {
         setNerve(GET_NERVE(Caretaker, CaretakerNrvAppearedStar));

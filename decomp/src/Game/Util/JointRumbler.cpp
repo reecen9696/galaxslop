@@ -8,7 +8,6 @@
 #include "math_types.hpp"
 #include <revolution/types.h>
 
-
 JointRumbler::JointRumbler(LiveActor* pActor, const char* pJointName, f32 a3, f32 a4, u32 a5, bool a6, s32 a7)
     : mRumbleCalculator(), mJointTransform(), _8(a7), _C(), mModelScale(1.0f), mFlags() {
     for (int i = 0; i < ARRAY_SIZE(_16); i++) {

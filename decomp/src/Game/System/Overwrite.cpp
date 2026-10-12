@@ -40,6 +40,10 @@
 #include <revolution/sc.h>
 
 void Overwrite_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)0.0000038146973f;
+    (void)0.5f;
     (void)-2607.5945f;
     (void)2607.5945f;
     (void)0.333333f;
@@ -51,7 +55,7 @@ void Overwrite_FORCE_MATCH_SDATA2() {
 
 namespace {
     const u8 sUnitMask[] = {0x80, 0x40, 0x20, 0x10, 8, 4, 2, 1};
-};  // namespace
+}
 
 void* JKRUnitHeap::do_alloc(u32 size, int alignment) {
     u32 bit;

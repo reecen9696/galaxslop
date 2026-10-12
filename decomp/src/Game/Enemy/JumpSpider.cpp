@@ -21,6 +21,11 @@
 #include <JSystem/JGeometry/TVec.hpp>
 #include <revolution/types.h>
 
+void JumpSpider_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+}
+
 namespace {
     // hCommonGravity
     // hNoPowerGravity
@@ -59,7 +64,7 @@ namespace NrvJumpSpider {
     NEW_NERVE(HostTypeNrvNoPowerEnd, JumpSpider, NoPowerEnd);
 };  // namespace NrvJumpSpider
 
-JumpSpider::JumpSpider(const char* pName) : LiveActor(pName), mSpinHitController(), mScaleController(), _94(0, 0, 1), _A0(0, 0, 0) {
+JumpSpider::JumpSpider(const char* pName) : LiveActor(pName), mSpinHitController(nullptr), mScaleController(nullptr), _94(0, 0, 1), _A0(0, 0, 0) {
 }
 
 void JumpSpider::init(const JMapInfoIter& rIter) {

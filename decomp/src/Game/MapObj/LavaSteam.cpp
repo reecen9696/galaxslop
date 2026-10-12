@@ -5,6 +5,10 @@
 #include "Game/Util/ActorSensorUtil.hpp"
 #include "Game/Util/CollisionShapeUtil.hpp"
 
+void LavaSteam_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+}
+
 namespace {
     // static const s32 sIntervalTime = 120;
     static const s32 sSteamTime = 90;

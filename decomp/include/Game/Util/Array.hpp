@@ -331,9 +331,9 @@ namespace MR {
 
             void operator++();
 
-            /* 0x0 */ T* mHead;
-            /* 0x4 */ T* mTail;
-            /* 0x8 */ T* mEnd;
+            T* mHead;  // 0x0
+            T* mTail;  // 0x4
+            T* mEnd;   // 0x8
         };
 
         inline FixedRingBuffer() {
@@ -344,10 +344,10 @@ namespace MR {
 
         void push_back(const T& val);
 
-        /* 0x00 */ T mBuffer[S];
-        /* 0x40 for S=16 */ iterator mHead;
-        /* 0x4C for S=16 */ iterator mEnd;
-        /* 0x58 for S=16 */ s32 mCount;
+        T mBuffer[S];    // 0x00
+        iterator mHead;  // 0x40 for S=16
+        iterator mEnd;   // 0x4C for S=16
+        s32 mCount;      // 0x58 for S=16
     };
 
     template < class T >

@@ -26,7 +26,6 @@
 #include "Game/Util/SoundUtil.hpp"
 #include "Game/Util/StarPointerUtil.hpp"
 #include "Game/Util/TriangleFilter.hpp"
-#include "revolution/wpad.h"
 
 void MarioLauncher_FORCE_MATCH_SDATA2() {
     (void)0.0f;
@@ -227,18 +226,9 @@ void MarioLauncher::exeAim() {
         MR::hideModel(this);
     }
 
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01 || VERSION == RMGP01)
-    if (MR::isStarPointerInScreen(WPAD_CHAN0)) {
-        mLayout->appearAt(MR::getStarPointerScreenPositionOrEdge(WPAD_CHAN0));
-        MR::requestMarioLauncherGuidance();
-    } else {
-        mLayout->mLayout->kill();
-        MR::requestMarioLauncherGuidance();
-    }
-#elif (VERSION == RMGK01)
     mLayout->appearAt(MR::getStarPointerScreenPositionOrEdge(WPAD_CHAN0));
+
     MR::requestMarioLauncherGuidance();
-#endif
     MR::startSystemLevelSE("SE_SY_LV_MARIO_LAUNCHER_AIM");
 
     if (MR::testSystemTriggerA() || MR::testCorePadTriggerA(WPAD_CHAN0)) {
@@ -355,7 +345,7 @@ void MarioLauncher::exeReject() {
         TVec3f jumpZ;
         MR::extractMtxZDir(getBaseMtx(), &jumpZ);
         MR::endBindAndPlayerJump(this, jumpY * ::sRejectJumpY - jumpZ * ::sRejectJumpZ, 0);
-        MR::startSoundPlayer("SE_PV_JUMP_S");
+        MR::startSoundPlayer("SE_PV_JUMP_S", -1);
     }
 
     if (MR::isStep(this, ::sWaitFrame)) {
@@ -516,12 +506,6 @@ void MarioLauncherLayout::kill() {
 }
 
 bool MarioLauncher::doEject() {
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01 || VERSION == RMGP01)
-    if (!MR::isStarPointerInScreen(WPAD_CHAN0)) {
-        return false;
-    }
-#endif
-
     TVec3f back;
     MR::calcUpVec(&back, this);
     if (mLauncherType == LauncherType_Up) {
@@ -530,11 +514,7 @@ bool MarioLauncher::doEject() {
     }
 
     TVec3f shootDir;
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01 || VERSION == RMGP01)
-    MR::calcWorldRayDirectionFromScreen(&shootDir, *MR::getStarPointerScreenPosition(WPAD_CHAN0));
-#elif (VERSION == RMGK01)
     MR::calcWorldRayDirectionFromScreen(&shootDir, MR::getStarPointerScreenPositionOrEdge(WPAD_CHAN0));
-#endif
     MR::normalize(&shootDir);
 
     mShell->getPosition().set(mCameraTargetMtx.getPosition());

@@ -239,7 +239,9 @@ void Birikyu::exeWaitAtEdge() {
 
 void Birikyu::exeAttack() {
     if (MR::isFirstStep(this)) {
-        mVelocity.zero();
+        mVelocity.z = 0.0f;
+        mVelocity.y = 0.0f;
+        mVelocity.x = 0.0f;
         MR::emitEffect(this, "Hit");
     }
 

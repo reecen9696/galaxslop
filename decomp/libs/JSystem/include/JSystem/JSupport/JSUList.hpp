@@ -29,10 +29,10 @@ public:
         return mPrev;
     }
 
-    /* 0x0 */ void* mData;
-    /* 0x4 */ JSUPtrList* mPtrList;
-    /* 0x8 */ JSUPtrLink* mPrev;
-    /* 0xC */ JSUPtrLink* mNext;
+    void* mData;           // 0x0
+    JSUPtrList* mPtrList;  // 0x4
+    JSUPtrLink* mPrev;     // 0x8
+    JSUPtrLink* mNext;     // 0xC
 };
 
 template < class T >
@@ -89,9 +89,9 @@ public:
         return mNodeCount;
     }
 
-    /* 0x0 */ JSUPtrLink* mHead;
-    /* 0x4 */ JSUPtrLink* mTail;
-    /* 0x8 */ u32 mNodeCount;
+    JSUPtrLink* mHead;  // 0x0
+    JSUPtrLink* mTail;  // 0x4
+    u32 mNodeCount;     // 0x8
 };
 
 template < class T >
@@ -293,5 +293,5 @@ public:
         return this->getObject();
     }
 
-    /* 0x0 */ JSUTree< T >* mTree;
+    JSUTree< T >* mTree;  // 0x0
 };

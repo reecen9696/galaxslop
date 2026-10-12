@@ -14,6 +14,7 @@
 #include "Game/Util.hpp"
 
 void MarioActorRush_FORCE_MATCH_SDATA2() {
+    (void)0.0f;
     (void)0.001f;
 }
 

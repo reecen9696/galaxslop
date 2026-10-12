@@ -9,6 +9,6 @@ public:
     JKRDisposer();
     virtual ~JKRDisposer();
 
-    /* 0x4 */ JKRHeap* mHeap;
-    /* 0x8 */ JSULink< JKRDisposer > mLink;
+    JKRHeap* mHeap;                // 0x4
+    JSULink< JKRDisposer > mLink;  // 0x8
 };

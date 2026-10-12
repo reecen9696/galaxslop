@@ -1,7 +1,7 @@
 #include "Game/Speaker/SpkSystem.hpp"
 #include "Game/Speaker/SpkSpeakerCtrl.hpp"
 
-SpkSystem::SpkSystem(JKRHeap* pHeap) : JASGlobalInstance(true), mData() {
+SpkSystem::SpkSystem(JKRHeap* pHeap) : JASGlobalInstance(true), mData(nullptr) {
     if (pHeap == nullptr) {
         pHeap = JKRGetCurrentHeap();
     }

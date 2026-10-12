@@ -8,9 +8,11 @@ BtkPlayer::BtkPlayer(const ResourceHolder* pResourceHolder, J3DModelData* pModel
 }
 
 void BtkPlayer::attach(J3DAnmBase* pAnmRes, J3DModelData* pModelData) {
-    pModelData->mMaterialTable.entryTexMtxAnimator(static_cast< J3DAnmTextureSRTKey* >(pAnmRes));
+    // TODO: Should be `static_cast` because `J3DAnmTextureSRTKey` inherits J3DAnmBase`.
+    pModelData->mMaterialTable.entryTexMtxAnimator(reinterpret_cast< J3DAnmTextureSRTKey* >(pAnmRes));
 }
 
 void BtkPlayer::detach(J3DAnmBase* pAnmRes, J3DModelData* pModelData) {
-    pModelData->mMaterialTable.removeTexMtxAnimator(static_cast< J3DAnmTextureSRTKey* >(pAnmRes));
+    // TODO: Should be `static_cast` because `J3DAnmTextureSRTKey` inherits J3DAnmBase`.
+    pModelData->mMaterialTable.removeTexMtxAnimator(reinterpret_cast< J3DAnmTextureSRTKey* >(pAnmRes));
 }

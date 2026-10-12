@@ -126,9 +126,9 @@ public:
     typedef JGadget::TLinkList< JUTConsole, 0 > ConsoleList;
 #endif
 
-    /* 0x00 */ ConsoleList mList;
-    /* 0x0C */ JUTConsole* mActiveConsole;
-    /* 0x10 */ JUTConsole* mDirectConsole;
+    ConsoleList mList;           // 0x0
+    JUTConsole* mActiveConsole;  // 0xC
+    JUTConsole* mDirectConsole;  // 0x10
 
     static JUTConsoleManager* const getManager() {
         return sManager;

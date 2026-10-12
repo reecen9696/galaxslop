@@ -26,6 +26,12 @@ namespace {
     static const f32 sPlanetInsideRadius = 1800.0f;
 };  // namespace
 
+void TombSpiderFunction_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)-1.0f;
+}
+
 TombSpiderGland* TombSpiderFunction::getGlandFrontL(const TombSpider* pParent) {
     return pParent->mParts->mGlandFrontL;
 }
@@ -301,7 +307,7 @@ void TombSpiderFunction::startTombSpiderDemo(TombSpider* pParent, const char* pD
 
     ActorCameraInfo* info = pParent->mCameraInfo;  // ok
 
-    MR::startEventCamera(info, pCameraName, CameraTargetArg(pParent));
+    MR::startEventCamera(info, pCameraName, CameraTargetArg(pParent), -1);
     pauseOffTombSpiderParts(pParent);
     MR::setBckRate(MR::getPlayerDemoActor(), 0.0f);
 }
@@ -321,7 +327,7 @@ void TombSpiderFunction::endTombSpiderDemo(TombSpider* pParent, const char* pDem
         pCameraName = pDemoName;
     }
 
-    MR::endEventCamera(pParent->mCameraInfo, pCameraName, false);
+    MR::endEventCamera(pParent->mCameraInfo, pCameraName, false, -1);
     MR::endDemo(pParent, pDemoName);
 }
 

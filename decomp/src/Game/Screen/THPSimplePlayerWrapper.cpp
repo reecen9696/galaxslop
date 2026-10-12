@@ -15,12 +15,10 @@ static u16 VolumeTable[] = {0,     2,     8,     18,    32,    50,    73,    99,
                             18723, 19115, 19511, 19911, 20316, 20724, 21136, 21553, 21974, 22398, 22827, 23260, 23696, 24137, 24582, 25031,
                             25484, 25941, 26402, 26868, 27337, 27810, 28288, 28769, 29255, 29744, 30238, 30736, 31238, 31744, 32254, 32768};
 
-static s32 WorkBuffer[16] ATTRIBUTE_ALIGN(32);
+static s32 WorkBuffer[16] __attribute__((aligned(32)));
 
-#if (VERSION == RMGK01)
 THPSimplePlayerStaticAudio THPSimplePlayerWrapper::mStaticAudioPlayer;
 THPSimplePlayerWrapper* THPSimplePlayerStaticAudio::mPlayer;
-#endif
 
 namespace NrvTHPSimplePlayerWrapper {
     NEW_NERVE(HostTypeWait, THPSimplePlayerWrapper, Wait);
@@ -31,11 +29,6 @@ namespace NrvTHPSimplePlayerWrapper {
     NEW_NERVE(HostTypeReadPreLoad, THPSimplePlayerWrapper, ReadPreLoad);
 };  // namespace NrvTHPSimplePlayerWrapper
 
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
-THPSimplePlayerStaticAudio THPSimplePlayerWrapper::mStaticAudioPlayer;
-THPSimplePlayerWrapper* THPSimplePlayerStaticAudio::mPlayer;
-#endif
-
 namespace {
     void dvdCallBackFunc(s32 a1, DVDFileInfo* pFileInfo) {
         THPSimplePlayerWrapper* player = (THPSimplePlayerWrapper*)pFileInfo->cb.userData;
@@ -43,35 +36,51 @@ namespace {
     }
 };  // namespace
 
-THPSimplePlayerWrapper::THPSimplePlayerWrapper(const char* pName)
-    : NerveExecutor(pName), _8(), _9(), _C(), _10(), mTHPWork(), mOpen(), mPreFetchState(), mAudioState(), mLoop(), mAudioExist(), mCurOffset(),
-      mDvdError(), mReadProgress(), mNextDecodeIndex(), mReadIndex(), mReadSize(), mTotalReadFrame(), mCurrentVolume(), mTargetVolume(),
-      mDeltaVolume(), mRampCount(), mAudioDecodeIndex(), mAudioOutputIndex(), _2F0(), _2F4(1.0f), _2F8(), _2FC(), mSoundBufferIndex(), _30C()
-#if (VERSION == RMGK01)
-      ,
-      _310()
-#endif
-{
+THPSimplePlayerWrapper::THPSimplePlayerWrapper(const char* pName) : NerveExecutor(pName) {
+    _8 = 0;
+    _9 = 0;
+    _C = 0;
+    _10 = 0;
+    mTHPWork = nullptr;
+    mOpen = 0;
+    mPreFetchState = 0;
+    mAudioState = 0;
+    mLoop = 0;
+    mAudioExist = 0;
+    mCurOffset = 0;
+    mDvdError = 0;
+    mReadProgress = 0;
+    mNextDecodeIndex = 0;
+    mReadIndex = 0;
+    mReadSize = 0;
+    mTotalReadFrame = 0;
+    mCurrentVolume = 0.0f;
+    mTargetVolume = 0.0f;
+    mDeltaVolume = 0.0f;
+    mRampCount = 0;
+    mAudioDecodeIndex = 0;
+    mAudioOutputIndex = 0;
+    _2F0 = 0;
+    _2F4 = 1.0f;
+    _2F8 = 0.0f;
+    _2FC = 0;
+    mSoundBufferIndex = 0;
+    _30C = 0;
+    _310 = 0;
     mSoundBuffer[0] = new (32) s32[0x230];
     mSoundBuffer[1] = new (32) s32[0x230];
     MR::zeroMemory(mSoundBuffer[0], 0x8C0);
     MR::zeroMemory(mSoundBuffer[1], 0x8C0);
     DCFlushRange(mSoundBuffer[0], 0x8C0);
     DCFlushRange(mSoundBuffer[1], 0x8C0);
-    MR::zeroMemory(&mFileInfo, sizeof(mFileInfo));
-    MR::zeroMemory(&mHeader, sizeof(mHeader));
-    MR::zeroMemory(&mFrameComp, sizeof(mFrameComp));
-    MR::zeroMemory(&mVideoInfo, sizeof(mVideoInfo));
-    MR::zeroMemory(&mAudioInfo, sizeof(mAudioInfo));
-    MR::zeroMemory(mReadBuffer, sizeof(mReadBuffer));
-
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
-    MR::zeroMemory(&mTextureSet, sizeof(mTextureSet));
-#else
+    MR::zeroMemory(&mFileInfo, 0x3C);
+    MR::zeroMemory(&mHeader, 0x30);
+    MR::zeroMemory(&mFrameComp, 0x14);
+    MR::zeroMemory(&mVideoInfo, 0xC);
+    MR::zeroMemory(&mAudioInfo, 0x10);
+    MR::zeroMemory(mReadBuffer, 0xF0);
     MR::zeroMemory(&mTextureSet[0], 0x10);
     MR::zeroMemory(&mTextureSet[1], 0x10);
-#endif
-
     MR::zeroMemory(mAudioBuffer, 0xF0);
     initNerve(GET_NERVE(THPSimplePlayerWrapper, HostTypeWait));
 }
@@ -145,17 +154,10 @@ u32 THPSimplePlayerWrapper::calcNeedMemory() {
         return 0;
     }
 
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
-    u32 size = OSRoundUp32B(mHeader.bufSize) * 20;
-    size += OSRoundUp32B(mVideoInfo.xSize * mVideoInfo.ySize);
-    size += OSRoundUp32B(mVideoInfo.xSize * mVideoInfo.ySize / 4);
-    size += OSRoundUp32B(mVideoInfo.xSize * mVideoInfo.ySize / 4);
-#else
     u32 size = OSRoundUp32B(mHeader.bufSize) * 20;
     size += OSRoundUp32B(mVideoInfo.xSize * mVideoInfo.ySize * 2);
-    size += OSRoundUp32B(mVideoInfo.xSize * mVideoInfo.ySize / 2 & 0x7FFFFFFE);
-    size += OSRoundUp32B(mVideoInfo.xSize * mVideoInfo.ySize / 2 & 0x7FFFFFFE);
-#endif
+    size += OSRoundUp32B(mVideoInfo.xSize * mVideoInfo.ySize >> 1 & 0x7FFFFFFE);
+    size += OSRoundUp32B(mVideoInfo.xSize * mVideoInfo.ySize >> 1 & 0x7FFFFFFE);
 
     if (mAudioExist) {
         size += (OSRoundUp32B(mHeader.audioMaxSamples * 4) * 20);
@@ -165,7 +167,6 @@ u32 THPSimplePlayerWrapper::calcNeedMemory() {
     return size;
 }
 
-// FIXME: JPN AND USA
 bool THPSimplePlayerWrapper::setBuffer(u8* pBuffer) {
     if (mOpen && !mPreFetchState) {
         if (mAudioState == 1) {
@@ -174,18 +175,6 @@ bool THPSimplePlayerWrapper::setBuffer(u8* pBuffer) {
 
         u32 ysize = OSRoundUp32B(mVideoInfo.xSize * mVideoInfo.ySize);
         u32 uvsize = OSRoundUp32B(mVideoInfo.xSize * mVideoInfo.ySize / 4);
-
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
-        mTextureSet.ytexture = pBuffer;
-        DCInvalidateRange(pBuffer, ysize);
-        pBuffer += ysize;
-        mTextureSet.utexture = pBuffer;
-        DCInvalidateRange(pBuffer, uvsize);
-        pBuffer += uvsize;
-        mTextureSet.vtexture = pBuffer;
-        DCInvalidateRange(pBuffer, uvsize);
-        pBuffer += uvsize;
-#else
         mTextureSet[0].ytexture = pBuffer;
         DCInvalidateRange(pBuffer, ysize);
         pBuffer += ysize;
@@ -204,7 +193,6 @@ bool THPSimplePlayerWrapper::setBuffer(u8* pBuffer) {
         mTextureSet[1].vtexture = pBuffer;
         DCInvalidateRange(pBuffer, uvsize);
         pBuffer += uvsize;
-#endif
 
         for (s32 i = 0; i < 20; i++) {
             mReadBuffer[i].ptr = pBuffer;
@@ -234,15 +222,16 @@ bool THPSimplePlayerWrapper::preLoad(s32 loop) {
 
     mLoop = loop;
     _314 = 20;
-    if (!mLoop && mHeader.numFrames < 0x14) {
-        _314 = mHeader.numFrames;
+    if (!mLoop) {
+        if (mHeader.numFrames < 0x14) {
+            _314 = mHeader.numFrames;
+        }
     }
 
     setNerve(GET_NERVE(THPSimplePlayerWrapper, HostTypeReadPreLoad));
     return true;
 }
 
-// FIXME: JPN AND USA
 bool THPSimplePlayerWrapper::loadStop() {
     if (mOpen && !mAudioState) {
         mPreFetchState = 0;
@@ -260,13 +249,8 @@ bool THPSimplePlayerWrapper::loadStop() {
             mAudioBuffer[i].validSample = 0;
         }
 
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
-        mTextureSet.frameNumber = -1;
-#else
         mTextureSet[0].frameNumber = -1;
         mTextureSet[1].frameNumber = -1;
-#endif
-
         mCurOffset = mHeader.movieDataOffsets;
         mReadSize = mHeader.firstFrameSize;
         mReadIndex = 0;
@@ -277,10 +261,7 @@ bool THPSimplePlayerWrapper::loadStop() {
         mAudioOutputIndex = 0;
         mCurrentVolume = mTargetVolume;
         mRampCount = 0;
-
-#if (VERSION == RMGK01)
         _310 = 0;
-#endif
         return true;
     }
 
@@ -351,19 +332,6 @@ s32 THPSimplePlayerWrapper::decode(s32 audio) {
     return 2;
 }
 
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
-s32 THPSimplePlayerWrapper::drawCurrentFrame(_GXRenderModeObj* rmode, u32 x, u32 y, u32 polyW, u32 polyH) {
-    if (mTextureSet.frameNumber < 0) {
-        return -1;
-    }
-
-    THPGXYuv2RgbSetup(rmode);
-    THPGXYuv2RgbDraw(mTextureSet.ytexture, mTextureSet.utexture, mTextureSet.vtexture, x, y, mVideoInfo.xSize, mVideoInfo.ySize, polyW, polyH);
-    THPGXRestore();
-
-    return mTextureSet.frameNumber;
-}
-#else
 s32 THPSimplePlayerWrapper::drawCurrentFrame(_GXRenderModeObj* rmode, u32 x, u32 y, u32 polyW, u32 polyH) {
     if (mTextureSet[_310].frameNumber < 0) {
         return -1;
@@ -377,7 +345,6 @@ s32 THPSimplePlayerWrapper::drawCurrentFrame(_GXRenderModeObj* rmode, u32 x, u32
     _310 = _310 == 0;
     return ret;
 }
-#endif
 
 bool THPSimplePlayerWrapper::getVideoInfo(THPVideoInfo* pInfo) const {
     if (!mOpen) {
@@ -404,16 +371,6 @@ s32 THPSimplePlayerWrapper::getTotalFrame() const {
     return 0;
 }
 
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
-bool THPSimplePlayerWrapper::videoDecode(u8* pFile) {
-    if (THPVideoDecode(pFile, mTextureSet.ytexture, mTextureSet.utexture, mTextureSet.vtexture, mTHPWork)) {
-        return false;
-    }
-
-    mTextureSet.frameNumber = mReadBuffer[mNextDecodeIndex].frameNumber;
-    return true;
-}
-#else
 bool THPSimplePlayerWrapper::videoDecode(u8* pFile) {
     if (THPVideoDecode(pFile, mTextureSet[_310].ytexture, mTextureSet[_310].utexture, mTextureSet[_310].vtexture, mTHPWork)) {
         return false;
@@ -422,7 +379,6 @@ bool THPSimplePlayerWrapper::videoDecode(u8* pFile) {
     mTextureSet[_310].frameNumber = mReadBuffer[mNextDecodeIndex].frameNumber;
     return true;
 }
-#endif
 
 void THPSimplePlayerWrapper::readFrameAsync() {
     if (!mDvdError && mPreFetchState != 0) {
@@ -565,20 +521,14 @@ void THPSimplePlayerWrapper::setupParams() {
     mReadIndex = 0;
     mTotalReadFrame = 0;
     mDvdError = 0;
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
-    mTextureSet.frameNumber = -1;
-#else
     mTextureSet[0].frameNumber = -1;
     mTextureSet[1].frameNumber = -1;
-#endif
     mNextDecodeIndex = 0;
     mPreFetchState = 0;
     mAudioState = 0;
     mLoop = 0;
     mOpen = 1;
-#if (VERSION == RMGK01)
     _310 = 0;
-#endif
     resetAudioParams();
 }
 

@@ -3,6 +3,10 @@
 #include "Game/LiveActor/Nerve.hpp"
 #include "Game/Util.hpp"
 
+void FlameGun_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+}
+
 namespace NrvFlameGun {
     NEW_NERVE(HostTypeNrvSwitchWait, FlameGun, SwitchWait);
     NEW_NERVE(HostTypeNrvWait, FlameGun, Wait);

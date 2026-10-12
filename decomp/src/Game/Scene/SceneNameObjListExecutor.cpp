@@ -898,6 +898,3 @@ void SceneNameObjListExecutor::initCalcViewAndEntryList() {
 void SceneNameObjListExecutor::initDrawList() {
     mDrawList = new NameObjCategoryList(ARRAY_SIZE(::cDrawListInitTable) - 1, ::cDrawListInitTable, &NameObj::draw, ::sVar, "");
 }
-
-SceneNameObjListExecutor::~SceneNameObjListExecutor() {
-}

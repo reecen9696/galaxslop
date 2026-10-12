@@ -23,6 +23,10 @@ namespace NrvPoltaArm {
     NEW_NERVE(PoltaArmNrvWaitRepairEnd, PoltaArm, WaitRepairEnd);
 };  // namespace NrvPoltaArm
 
+void PoltaArm_FORCE_MATCH_SDATA2() {
+    (void) 1.0f;
+}
+
 PoltaArm::~PoltaArm() {
 }
 

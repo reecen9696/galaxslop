@@ -7,6 +7,13 @@
 #include <JSystem/JKernel/JKRHeap.hpp>
 #include <JSystem/JUtility/JUTTexture.hpp>
 
+void TrampleStar_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)3.814697265625e-06f;
+    (void)0.5f;
+}
+
 namespace {
     f32 debug1 = 0.003331f;
     f32 debug2 = -0.003331f;
@@ -379,7 +386,7 @@ void TrampleStar::exeWait() {
 void TrampleStar::exeBindingCapture() {
     if (MR::isFirstStep(this)) {
         MR::startBckPlayer("Wait");
-        MR::startSoundPlayer("SE_OJ_TRAMPOLINE_LAND_L");
+        MR::startSoundPlayer("SE_OJ_TRAMPOLINE_LAND_L", -1);
     }
 
     TVec3f down = -mVtxs[mCaptureVtx];
@@ -430,11 +437,11 @@ void TrampleStar::exeBindingShoot() {
 
                     if (MR::getPlayerLevelA()) {
                         mJumpVel *= 1.5f;
-                        MR::startSoundPlayer("SE_OJ_TRAMPOLINE_BOUND_L");
-                        MR::startSoundPlayer("SE_PV_JUMP_JOY");
+                        MR::startSoundPlayer("SE_OJ_TRAMPOLINE_BOUND_L", -1);
+                        MR::startSoundPlayer("SE_PV_JUMP_JOY", -1);
                     } else {
-                        MR::startSoundPlayer("SE_OJ_TRAMPOLINE_BOUND_S");
-                        MR::startSoundPlayer("SE_PV_JUMP_M");
+                        MR::startSoundPlayer("SE_OJ_TRAMPOLINE_BOUND_S", -1);
+                        MR::startSoundPlayer("SE_PV_JUMP_M", -1);
                     }
 
                     MR::endBindAndPlayerJump(this, up * mJumpVel, 0);

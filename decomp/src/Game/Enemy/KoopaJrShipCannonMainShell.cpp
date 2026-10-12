@@ -57,7 +57,9 @@ void KoopaJrShipCannonMainShell::init(const JMapInfoIter& rIter) {
 }
 
 void KoopaJrShipCannonMainShell::kill() {
-    mVelocity.zero();
+    mVelocity.z = 0.0f;
+    mVelocity.y = 0.0f;
+    mVelocity.x = 0.0f;
     MR::deleteEffect(this, "LocusSmoke");
     MR::deleteEffect(this, "LocusFire");
     LiveActor::kill();

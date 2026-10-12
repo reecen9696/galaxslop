@@ -10,18 +10,18 @@ struct LightInfo {
 };
 
 struct LightInfoCoin {
-    /* 0x00 */ LightInfo base;
+    LightInfo base;
     struct {
-        /* 0x14 */ GXColor _14;
-        /* 0x18 */ f32 _18;
+        GXColor _14;
+        f32 _18;
     };
 };
 
 struct ActorLightInfo {
-    /* 0x00 */ LightInfo mInfo0;
-    /* 0x14 */ LightInfo mInfo1;
-    /* 0x28 */ u8 mAlpha2;
-    /* 0x29 */ GXColor mColor;
+    LightInfo mInfo0;  // 0x0
+    LightInfo mInfo1;  // 0x14
+    u8 mAlpha2;        // 0x28
+    GXColor mColor;    // 0x29
 };
 
 struct AreaLightInfo {

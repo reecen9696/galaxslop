@@ -277,7 +277,7 @@ void StringSpider::doSwingAction(f32 a1, bool a2) {
     }
 
     MR::vecKillElement(mVelocity, stringPos, &v3);
-    if (!a2 || MR::isNearZero(v3)) {
+    if (!a2 || MR::isNearZero(v3, 0.001f)) {
         v3.set(v1);
     } else {
         v1.scale(v1.dot(v3));
@@ -403,7 +403,7 @@ void StringSpider::calcPosture(f32 a1, bool a2) {
     TVec3f v3, v9;
     _A0.getYDir(v1);
     MR::normalizeOrZero(&rootVec);
-    if (!MR::isNearZero(rootVec)) {
+    if (!MR::isNearZero(rootVec, 0.001f)) {
         _A0.getZDir(v3);
 
         if (a2) {
@@ -411,7 +411,7 @@ void StringSpider::calcPosture(f32 a1, bool a2) {
             MR::normalizeOrZero(&v9);
             v3.set(v9);
 
-            if (!MR::isNearZero(v3) == false) {
+            if (!MR::isNearZero(v3, 0.001f) == false) {
                 return;
             }
         }
@@ -620,7 +620,9 @@ void StringSpider::exeTrampleFall() {
 
 void StringSpider::exeWallHitDeath() {
     if (MR::isFirstStep(this)) {
-        mVelocity.zero();
+        mVelocity.z = 0.0f;
+        mVelocity.y = 0.0f;
+        mVelocity.x = 0.0f;
     }
 
     if (MR::isGreaterStep(this, 35)) {
@@ -743,7 +745,7 @@ void StringSpider::attackSensor(HitSensor* pSender, HitSensor* pReceiver) {
         MR::vecKillElement(v9, mGravity, &v9);
         MR::normalizeOrZero(&v9);
 
-        if (!MR::isNearZero(v9)) {
+        if (!MR::isNearZero(v9, 0.001f)) {
             v9.scale(10.0f);
             TVec3f v8(mGravity);
             v8.scale(13.0f);
@@ -768,7 +770,7 @@ bool StringSpider::reactSpinHit(HitSensor* pSender, HitSensor* pReceiver) {
     MR::vecKillElement(v10, mGravity, &v10);
     MR::normalizeOrZero(&v10);
 
-    if (!MR::isNearZero(v10)) {
+    if (!MR::isNearZero(v10, 0.001f)) {
         TVec3f v9;
         v9.cross(mGravity, v10);
         v9.setLength(-0.0f);
@@ -875,7 +877,7 @@ bool StringSpider::receiveMsgPlayerAttack(u32 msg, HitSensor* pSender, HitSensor
         MR::vecKillElement(v16, mGravity, &v16);
         MR::normalizeOrZero(&v16);
 
-        if (!MR::isNearZero(v16)) {
+        if (!MR::isNearZero(v16, 0.001f)) {
             v16 *= 10.0f;
             v16 -= mGravity * 13.0f;
             mVelocity += v16;

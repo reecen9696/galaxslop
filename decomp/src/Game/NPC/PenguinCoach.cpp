@@ -36,7 +36,7 @@ namespace NrvPenguinCoach {
     NEW_NERVE(PenguinCoachNrvPraise, PenguinCoach, Praise);
 };  // namespace NrvPenguinCoach
 
-PenguinCoach::PenguinCoach(const char* pName) : NPCActor(pName), mIsRaceComplete(), mTakeOutStar(), mBehavior(-1), mCameraInfo() {
+PenguinCoach::PenguinCoach(const char* pName) : NPCActor(pName), mIsRaceComplete(false), mTakeOutStar(nullptr), mBehavior(-1), mCameraInfo(nullptr) {
 }
 
 void PenguinCoach::init(const JMapInfoIter& rIter) {
@@ -211,7 +211,7 @@ void PenguinCoach::exeRace() {
 void PenguinCoach::exePrep() {
     if (mBehavior == Behavior_Race) {
         if (MR::isTalkStart(mMsgCtrl)) {
-            MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "会話");
+            MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "会話", -1);
         }
 
         if (MR::isTalkEnd(mMsgCtrl)) {
@@ -225,7 +225,7 @@ void PenguinCoach::exePrep() {
             MR::closeWipeFade();
             setNerve(GET_NERVE(PenguinCoach, PenguinCoachNrvFade));
         } else if (mBehavior == Behavior_Race && MR::tryTalkSelectRight(mMsgCtrl)) {
-            MR::endMultiActorCamera(this, mCameraInfo, "会話", false);
+            MR::endMultiActorCamera(this, mCameraInfo, "会話", false, -1);
         }
     }
 }
@@ -317,7 +317,7 @@ void PenguinCoach::exePraise() {
     }
 
     if (MR::isWipeOpen() && MR::tryTalkForceAtEndAndStartTalkAction(this)) {
-        MR::endMultiActorCamera(this, mCameraInfo, "会話", true);
+        MR::endMultiActorCamera(this, mCameraInfo, "会話", true, -1);
         setNerve(GET_NERVE(PenguinCoach, PenguinCoachNrvWait));
     }
 }

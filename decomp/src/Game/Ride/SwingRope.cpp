@@ -28,6 +28,13 @@
 #include <revolution/mtx.h>
 #include <revolution/wpad.h>
 
+void SwingRope_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)0.5f;
+    (void)-1.0f;
+}
+
 namespace {
     static const f32 sPointInterval = 50.0f;
     static const f32 sDrawWidthX = 30.0f;
@@ -315,7 +322,7 @@ bool SwingRope::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pReceive
         MR::invalidateClipping(this);
         MR::startSound(mRider, "SE_PV_CATCH");
         MR::startSound(mRider, "SE_PM_GRAB_OBJ");
-        MR::startActorCameraNoTarget(this, mCameraInfo);
+        MR::startActorCameraNoTarget(this, mCameraInfo, -1);
 
         setNerve(GET_NERVE(SwingRope, SwingRopeNrvBindSlideDownStart));
 
@@ -455,7 +462,7 @@ bool SwingRope::tryJump() {
         TVec3f jumpVec = jumpXZ;
         jumpVec.add(jumpY);
 
-        MR::endActorCameraAtLanding(this, mCameraInfo);
+        MR::endActorCameraAtLanding(this, mCameraInfo, -1);
         MR::startSound(mRider, "SE_PV_JUMP_S");
         MR::startSound(mRider, "SE_PM_JUMP_M");
         MR::startBckPlayer("SwingRopeSpin", 0L);

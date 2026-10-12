@@ -9,6 +9,12 @@
 #include "Game/Util/ObjUtil.hpp"
 #include "Game/Util/RailUtil.hpp"
 
+void FluffWind_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)-1.0f;
+}
+
 namespace {
     static const f32 sEffectEmitterInterval = 600.0f;
     static const s32 sStepBrowWindMin = 60;
@@ -24,7 +30,7 @@ namespace NrvFluffWindEffect {
     NEW_NERVE(FluffWindEffectNrvBrowWind, FluffWindEffect, BrowWind);
 };  // namespace NrvFluffWindEffect
 
-FluffWindEffect::FluffWindEffect(const char* pName) : LiveActor(pName), mEffectName(), mTimer(-1) {
+FluffWindEffect::FluffWindEffect(const char* pName) : LiveActor(pName), mEffectName(nullptr), mTimer(-1) {
     mMtx.identity();
 }
 

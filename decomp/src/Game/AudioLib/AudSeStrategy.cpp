@@ -8,6 +8,10 @@
 #include <JSystem/JAudio2/JAISe.hpp>
 #include <JSystem/JAudio2/JASCriticalSection.hpp>
 
+void AudSeStrategy_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+}
+
 void AudSeStrategy::calc(JAISe* pSe) {
     JAISoundID soundID = pSe->mSoundID;
 

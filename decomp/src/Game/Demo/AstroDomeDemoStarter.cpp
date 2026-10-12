@@ -5,6 +5,12 @@
 #include "Game/Util.hpp"
 #include "math_types.hpp"
 
+void AstroDomeDemoStarter_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)-1.0f;
+}
+
 namespace {
     const char* const cJumpOutPartName = "飛び出す";
     const Vec cAppearRotate = {90.0f, -5.0f, 0.0f};
@@ -119,7 +125,7 @@ void AstroDomeDemoStarter::movePlayer() {
     }
 
     _90->setCoord(demoPartStepRate);
-    MR::startLevelSoundPlayer("SE_PM_LV_SPIN_DRV_FLY");
+    MR::startLevelSoundPlayer("SE_PM_LV_SPIN_DRV_FLY", -1);
 }
 
 void AstroDomeDemoStarter::exeSpinDriverAppear() {
@@ -154,7 +160,7 @@ void AstroDomeDemoStarter::exeSpinDriverStart() {
         MR::setPlayerBaseMtx(_94);
         MR::tryRumblePadMiddle(this, WPAD_CHAN0);
         MR::startCSSound("CS_SPIN_DRIVE_LONG", "SE_SY_CS_S_SPIN_DRV_START", 0);
-        MR::startSoundPlayer("SE_PM_SPIN_ATTACK");
+        MR::startSoundPlayer("SE_PM_SPIN_ATTACK", -1);
     }
 
     if (MR::isLessStep(this, 43)) {
@@ -182,7 +188,7 @@ void AstroDomeDemoStarter::exeSpinDriverShoot() {
         }
 
         MR::startSound(this, "SE_OJ_S_SPIN_DRV_JUMP");
-        MR::startSoundPlayer("SE_PV_JUMP_JOY");
+        MR::startSoundPlayer("SE_PV_JUMP_JOY", -1);
     }
 
     TPos3f playerBaseMtx = _94;

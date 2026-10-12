@@ -17,6 +17,8 @@
 #include <cstring>
 
 void MarioActorSensor_FORCE_MATCH_SDATA2() {
+    (void)0.0f;
+    (void)1.57079637f;
     (void)100.0f;
     (void)2000.0f;
     (void)80.0f;
@@ -217,11 +219,7 @@ void MarioActor::doTrampleJump(HitSensor* pSensor) {
     }
 
     if (getMario()->isStatusActive(MarioStatus_Wall)) {
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01 || VERSION == RMGP01)
-        mMario->closeStatus(nullptr);
-#elif (VERSION == RMGK01)
         mMario->closeStatus(mMario->mWall);
-#endif
     }
 
     mMario->_402 = getConst().getTable()->mAirWalkTimeTornado;

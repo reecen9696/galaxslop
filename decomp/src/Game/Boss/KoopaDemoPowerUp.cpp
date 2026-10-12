@@ -47,8 +47,8 @@ void KoopaDemoPowerUp::appear() {
 void KoopaDemoPowerUp::kill() {
     mIsDead = true;
 
-    KoopaFunction::endKoopaCamera(getHost(), "パワーアップデモ", false);
-    KoopaFunction::endKoopaCamera(getHost(), "最終パワーアップデモ", false);
+    KoopaFunction::endKoopaCamera(getHost(), "パワーアップデモ", false, -1);
+    KoopaFunction::endKoopaCamera(getHost(), "最終パワーアップデモ", false, -1);
 }
 
 void KoopaDemoPowerUp::exeWaitDemo() {
@@ -106,9 +106,9 @@ void KoopaDemoPowerUp::exeDemo() {
     }
 
     if (KoopaFunction::isKoopaVs3(mHost) || KoopaFunction::isKoopaLv3(mHost)) {
-        KoopaFunction::endKoopaCamera(mHost, "最終パワーアップデモ", false);
+        KoopaFunction::endKoopaCamera(mHost, "最終パワーアップデモ", false, -1);
     } else {
-        KoopaFunction::endKoopaCamera(mHost, "パワーアップデモ", false);
+        KoopaFunction::endKoopaCamera(mHost, "パワーアップデモ", false, -1);
     }
 
     MR::endDemo(mHost, "パワーアップデモ");

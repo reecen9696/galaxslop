@@ -20,6 +20,10 @@
 #include <JSystem/J3DGraphAnimator/J3DJoint.hpp>
 #include <cstdio>
 
+void SkeletalFishBaby_FORCE_MATCH_SDATA2() {
+    (void)0.0f;
+}
+
 namespace {
     static const char* sStarPointerTargetJoint[] = {"Joint00", "Joint01", "Joint02", "Joint03"};
     static const Vec sStarPointerTargetOffset[] = {{

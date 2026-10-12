@@ -8,9 +8,11 @@ BrkPlayer::BrkPlayer(const ResourceHolder* pResourceHolder, J3DModelData* pModel
 }
 
 void BrkPlayer::attach(J3DAnmBase* pAnmRes, J3DModelData* pModelData) {
-    pModelData->mMaterialTable.entryTevRegAnimator(static_cast< J3DAnmTevRegKey* >(pAnmRes));
+    // TODO: Should be `static_cast` because `J3DAnmTevRegKey` inherits J3DAnmBase`.
+    pModelData->mMaterialTable.entryTevRegAnimator(reinterpret_cast< J3DAnmTevRegKey* >(pAnmRes));
 }
 
 void BrkPlayer::detach(J3DAnmBase* pAnmRes, J3DModelData* pModelData) {
-    pModelData->mMaterialTable.removeTevRegAnimator(static_cast< J3DAnmTevRegKey* >(pAnmRes));
+    // TODO: Should be `static_cast` because `J3DAnmTevRegKey` inherits J3DAnmBase`.
+    pModelData->mMaterialTable.removeTevRegAnimator(reinterpret_cast< J3DAnmTevRegKey* >(pAnmRes));
 }

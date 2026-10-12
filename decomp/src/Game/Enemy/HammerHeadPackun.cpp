@@ -25,6 +25,12 @@
 #include <revolution/mtx.h>
 #include <revolution/types.h>
 
+void HammerHeadPackun_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)3.1415927f;
+}
+
 void HammerHeadPackun_DUMMY() {
     // to emit operator-
     TVec3f a, b;

@@ -10,7 +10,7 @@
 
 namespace JGeometry {
     TVec3< f32 > TVec3< f32 >::operator*(f32) const NO_INLINE;
-};  // namespace JGeometry
+}
 
 bool Mario::doObjWarp(LiveActor* pActor) {
     if (getPlayer()->getMovementStates().debugMode) {
@@ -264,7 +264,7 @@ bool Mario::doPointWarpRecovery(const TVec3f& rVec1, const TVec3f& rVec2) {
 
     stopJump();
 
-    MR::startGlobalEventCameraNoTarget("引き戻し");
+    MR::startGlobalEventCameraNoTarget("引き戻し", -1);
 
     return true;
 }

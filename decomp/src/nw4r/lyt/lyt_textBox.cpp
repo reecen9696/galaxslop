@@ -50,11 +50,6 @@ namespace nw4r {
 
             mFontSize = pBlock->fontSize;
             mTextPosition = pBlock->textPosition;
-
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
-            mBits.textAlignment = pBlock->textAlignment;
-#endif
-
             mCharSpace = pBlock->charSpace;
             mLineSpace = pBlock->lineSpace;
 
@@ -64,8 +59,7 @@ namespace nw4r {
             if (ut::Font* pFont = resBlockSet.pResAccessor->GetFont(fontName)) {
                 mpFont = pFont;
             } else if (void* fontRes = resBlockSet.pResAccessor->GetResource('font', fontName, 0)) {
-                void* pMem = Layout::AllocMemory(sizeof(ut::ResFont));
-                if (pMem != nullptr) {
+                if (void* pMem = Layout::AllocMemory(sizeof(ut::ResFont))) {
                     ut::ResFont* pResFont = new (pMem) ut::ResFont;
                     pResFont->SetResource(fontRes);
                     mpFont = pResFont;
@@ -73,8 +67,7 @@ namespace nw4r {
                 }
             }
 
-            void* pMem = Layout::AllocMemory(sizeof(Material));
-            if (pMem != nullptr) {
+            if (void* pMem = Layout::AllocMemory(sizeof(Material))) {
                 const u32* const matOffsTbl = detail::ConvertOffsToPtr< u32 >(resBlockSet.pMaterialList, sizeof(*resBlockSet.pMaterialList));
                 const res::Material* const pResMaterial =
                     detail::ConvertOffsToPtr< res::Material >(resBlockSet.pMaterialList, matOffsTbl[pBlock->materialIdx]);
@@ -322,41 +315,6 @@ namespace nw4r {
             return mag;
         }
 
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
-        u32 TextBox::MakeDrawFlag() const {
-            u32 flag = 0;
-            switch (mBitsu8 >> 5 & 0x3) {
-            case 0:
-            default:
-                switch (GetTextPositionH()) {
-                case 1:
-                    flag = 1;
-
-                    break;
-                case 2:
-                    flag = 2;
-
-                    break;
-                }
-
-                break;
-            case 1:
-                flag = 0;
-
-                break;
-            case 2:
-                flag = 1;
-
-                break;
-            case 3:
-                flag = 2;
-
-                break;
-            }
-
-            return flag;
-        }
-#else
         u32 TextBox::MakeDrawFlag() const {
             u32 flag = 0;
 
@@ -378,7 +336,6 @@ namespace nw4r {
 
             return flag;
         }
-#endif
 
         f32 TextBox::GetTextAlignMag() const {
             switch (GetTextAlignment()) {

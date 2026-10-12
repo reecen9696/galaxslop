@@ -8,9 +8,11 @@ BpkPlayer::BpkPlayer(const ResourceHolder* pResourceHolder, J3DModelData* pModel
 }
 
 void BpkPlayer::attach(J3DAnmBase* pAnmRes, J3DModelData* pModelData) {
-    pModelData->mMaterialTable.entryMatColorAnimator(static_cast< J3DAnmColor* >(pAnmRes));
+    // TODO: Should be `static_cast` because `J3DAnmColor` inherits J3DAnmBase`.
+    pModelData->mMaterialTable.entryMatColorAnimator(reinterpret_cast< J3DAnmColor* >(pAnmRes));
 }
 
 void BpkPlayer::detach(J3DAnmBase* pAnmRes, J3DModelData* pModelData) {
-    pModelData->mMaterialTable.removeMatColorAnimator(static_cast< J3DAnmColor* >(pAnmRes));
+    // TODO: Should be `static_cast` because `J3DAnmColor` inherits J3DAnmBase`.
+    pModelData->mMaterialTable.removeMatColorAnimator(reinterpret_cast< J3DAnmColor* >(pAnmRes));
 }

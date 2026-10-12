@@ -1,6 +1,10 @@
 #include "Game/Enemy/OnimasuJump.hpp"
 #include "Game/Util.hpp"
 
+void OnimasuJump_FORCE_MATCH_SDATA2() {
+    (void) 0.0f;
+}
+
 OnimasuJump::OnimasuJump(const char* pName) : Onimasu(pName), mCurNormal(), mNormals() {
 }
 

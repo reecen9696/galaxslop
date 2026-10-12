@@ -26,6 +26,12 @@ MarioAnimator::MarioAnimator(MarioActor* pActor) : MarioModule(pActor) {
 }
 
 void MarioAnimator_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)0.5f;
+    (void)-1.0f;
+    (void)3.14159274f;
+    (void)1.57079637f;
     (void)79.0f;
     (void)59.0f;
     (void)0.00100000005f;
@@ -558,7 +564,7 @@ extern const char* jname_chest;
 void MarioAnimator::setTilt() {
     f32 tiltAngle = 0.0f;
 
-    if (!MR::isNearZero(_60)) {
+    if (!MR::isNearZero(_60, 0.001f)) {
         f32 frontDot = _60.dot(getFrontVec());
         tiltAngle = 1.0f - frontDot;
 

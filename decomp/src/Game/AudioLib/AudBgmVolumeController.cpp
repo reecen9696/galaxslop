@@ -7,6 +7,10 @@
 #define FADER_AUX 3
 #define FADER_NOTEFAIRY 4
 
+void AudBgmVolumeController_FORCE_MATCH_SDATA() {
+    (void)1.0f;
+}
+
 AudBgmVolumeController::AudBgmVolumeController() : mIsMuted() {
     for (s32 i = 0; i < NUM_FADERS; i++) {
         mTimers[i] = -1;

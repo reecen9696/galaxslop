@@ -46,6 +46,16 @@
 #include <JSystem/JUtility/JUTVideo.hpp>
 
 void MarioActor_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)3.81469727e-06f;
+    (void)-3.81469727e-06f;
+    (void)0.5f;
+    (void)-1.0f;
+    (void)3.14159274f;
+    (void)1.57079637f;
+    (void)2.0f;
+    (void)-1.57079637f;
     (void)1000.0f;
     (void)360.0f;
     (void)100.0f;
@@ -308,9 +318,9 @@ void MarioActor::init(const JMapInfoIter& rInfo) {
     MR::getJMapInfoRotate(rInfo, &rotation);
     MR::getJMapInfoScale(rInfo, &scale);
 
-    rotation.x = MR::repeat(rotation.x, 0.0f, 360.0f);
-    rotation.y = MR::repeat(rotation.y, 0.0f, 360.0f);
-    rotation.z = MR::repeat(rotation.z, 0.0f, 360.0f);
+    rotation.x = BASE_ROTATION + (f32)fmod(rotation.x - BASE_ROTATION + 360.0f, 360.0);
+    rotation.y = BASE_ROTATION + (f32)fmod(rotation.y - BASE_ROTATION + 360.0f, 360.0);
+    rotation.z = BASE_ROTATION + (f32)fmod(rotation.z - BASE_ROTATION + 360.0f, 360.0);
 
     if (MR::isExistJMapArg(rInfo)) {
         MR::getJMapInfoArg0NoInit(rInfo, &initialAnimation);

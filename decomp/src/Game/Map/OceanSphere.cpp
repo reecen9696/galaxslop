@@ -16,6 +16,14 @@
 #include <JSystem/JUtility/JUTTexture.hpp>
 #include <revolution/gx/GXVert.h>
 
+void OceanSphere_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)0.5f;
+    (void)3.1415927f;
+    (void)1.5707964f;
+}
+
 GXColor sOceanSphereTevReg0Face = {0x48, 0x80, 0xBE, 0x1C};
 GXColor sOceanSphereTevReg1FrontDefault = {0x00, 0x51, 0x70, 0x6F};
 GXColor sOceanSphereTevReg1FrontTear = {0x00, 0x64, 0xFF, 0x6F};
@@ -362,10 +370,10 @@ void OceanSphere::control() {
     const f32 add = 0.0008f;
     const f32 sub = -0.0008f;
 
-    mTexOffs0X = MR::repeat(add + mTexOffs0X, 0.0f, 1.0f);
-    mTexOffs0Y = MR::repeat(add + mTexOffs0Y, 0.0f, 1.0f);
-    mTexOffs1X = MR::repeat(add + mTexOffs1X, 0.0f, 1.0f);
-    mTexOffs1Y = MR::repeat(sub + mTexOffs1Y, 0.0f, 1.0f);
+    mTexOffs0X = MR::repeat2(add + mTexOffs0X, 0.0f, 1.0f);
+    mTexOffs0Y = MR::repeat2(add + mTexOffs0Y, 0.0f, 1.0f);
+    mTexOffs1X = MR::repeat2(add + mTexOffs1X, 0.0f, 1.0f);
+    mTexOffs1Y = MR::repeat2(sub + mTexOffs1Y, 0.0f, 1.0f);
 }
 
 void OceanSphere::updatePoints() {

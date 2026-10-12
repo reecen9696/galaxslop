@@ -20,6 +20,13 @@
 #include <JSystem/JMath.hpp>
 #include <cstring>
 
+void Pole_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)0.5f;
+    (void)-1.0f;
+}
+
 namespace {
     static const f32 sSensorOffsetY = 50.0f;
     // static const f32 sPlayerSpeedToRideMin =
@@ -428,7 +435,7 @@ void Pole::exeBindFallDown() {
 
         MR::setPlayerPos(pos);
         MR::setPlayerFrontTargetVec(front, 1);
-        MR::endActorCamera(this, mCameraInfo, true);
+        MR::endActorCamera(this, mCameraInfo, true, -1);
         MR::endBindAndPlayerWait(this);
 
         mRider = nullptr;
@@ -529,7 +536,7 @@ void Pole::attackSensor(HitSensor* pSender, HitSensor* pReceiver) {
 
 bool Pole::receiveMsgEnemyAttack(u32 msg, HitSensor* pSender, HitSensor* pReceiver) {
     if (mRider != nullptr && MR::isSensor(pReceiver, "bind")) {
-        MR::endActorCamera(this, mCameraInfo, true);
+        MR::endActorCamera(this, mCameraInfo, true, -1);
         MR::endBindAndPlayerDamageMsg(this, msg);
 
         mRider = nullptr;
@@ -602,7 +609,7 @@ bool Pole::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pReceiver) {
         MR::invalidateClipping(this);
         MR::startSound(mRider, "SE_PM_GRAB_OBJ");
         MR::startSound(mRider, "SE_PV_LIFT_UP");
-        MR::startActorCameraNoTarget(this, mCameraInfo);
+        MR::startActorCameraNoTarget(this, mCameraInfo, -1);
         MR::tryRumblePadWeak(this, WPAD_CHAN0);
 
         if (speedXZ > ::sPlayerSpeedToCatchMax) {
@@ -673,7 +680,7 @@ bool Pole::tryJump(bool handstand, f32 rotateSpeed) {
 
         MR::startSound(mRider, "SE_PM_JUMP_M");
         MR::startSound(mRider, "SE_PV_JUMP_JOY");
-        MR::endActorCamera(this, mCameraInfo, 1);
+        MR::endActorCamera(this, mCameraInfo, 1, -1);
 
         if (mIsSquare) {
             TVec3f jumpPos = jumpFront * ::sSquareJumpPosOffset;

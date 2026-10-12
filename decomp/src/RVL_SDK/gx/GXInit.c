@@ -29,11 +29,7 @@ static void EnableWriteGatherPipe(void);
 static GXTlutRegion* __GXDefaultTlutRegionCallback(u32);
 static GXTexRegion* __GXDefaultTexRegionCallback(const GXTexObj*, GXTexMapID);
 
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01 || VERSION == RMGP01)
-const char* __GXVersion = "<< RVL_SDK - GX \trelease build: Aug  8 2007 02:05:28 (0x4199_60831) >>";
-#elif (VERSION == RMGK01)
 const char* __GXVersion = "<< RVL_SDK - GX \trelease build: Dec 11 2007 01:34:15 (0x4199_60831) >>";
-#endif
 
 static BOOL __GXShutdown(BOOL, u32);
 
@@ -42,7 +38,7 @@ static BOOL __GXShutdown(BOOL, u32);
 #define GX_32k 0x08000
 #define GX_8k 0x02000
 
-static u16 DefaultTexData[] ATTRIBUTE_ALIGN(32) = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+static u16 DefaultTexData[] __attribute__((aligned(32))) = {0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
                                                             0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF};
 
 static GXVtxAttrFmtList GXDefaultVATList[] = {

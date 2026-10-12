@@ -23,6 +23,10 @@
 #include <JSystem/JMath/JMath.hpp>
 
 void Pukupuku_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)0.5f;
+    (void)2.0f;
     (void)300.0f;
     (void)15.0f;
     (void)500.0f;

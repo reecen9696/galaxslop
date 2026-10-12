@@ -64,16 +64,11 @@ void TitleSequenceProduct::exeDisplayEncouragePal60Window() {
 
         if (timeAnnounced == 0 || ticks < timeAnnounced || dayAnnounced < day) {
             mEncouragePal60Window->appear();
-#if (VERSION == RMGP01 || VERSION == RMGK01)
             GameDataFunction::updateSysConfigFileTimeAnnounced();
-#endif
         }
     }
 
     if (MR::isDead(mEncouragePal60Window)) {
-#if (VERSION == RMGJ01 || VERSION == RMGE01)
-        GameDataFunction::updateSysConfigFileTimeAnnounced();
-#endif
         setNerve(GET_NERVE_ANON(TitleSequenceProductBgmPrepare));
     }
 }

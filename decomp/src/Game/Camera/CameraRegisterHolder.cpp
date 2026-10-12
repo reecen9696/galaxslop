@@ -91,7 +91,9 @@ void CameraRegisterHolder::initDummyRegister() {
     mDummyMatrix.identity();
     declareMtxReg(::sDummyMtxRegName, reinterpret_cast< MtxPtr >(&mDummyMatrix));
 
-    mDummyVector.zero();
+    mDummyVector.z = 0.0f;
+    mDummyVector.y = 0.0f;
+    mDummyVector.x = 0.0f;
     declareVecReg(::sDummyVecRegName, &mDummyVector);
 
     mDummyFloat = 0.0f;

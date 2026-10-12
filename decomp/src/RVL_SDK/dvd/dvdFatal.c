@@ -176,12 +176,10 @@ void __DVDShowFatalMessage(void) {
         case 2:
             messageList = __DVDErrorMessageEurope;
             break;
-#if (VERSION == RMGK01)
         case 4:
         case 5:
             messageList = __DVDErrorMessage104;
             break;
-#endif
     }
 
     if (SCGetLanguage() > 6) {

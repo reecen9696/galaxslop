@@ -8,6 +8,11 @@ namespace {
     const f32 sFrictionRate = 0.995f;
 }  // namespace
 
+void GravityDust_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+}
+
 GravityDustParticleCallBack::GravityDustParticleCallBack(const LiveActor* pActor) : MultiEmitterParticleCallBack(), mActor(pActor) {
 }
 

@@ -14,6 +14,10 @@
 #include "Game/Util/SoundUtil.hpp"
 #include <revolution/types.h>
 
+void Jiraira_FORCE_MATCH_SDATA2() {
+    (void)0.0f;
+}
+
 namespace {
     static const s32 hPreRecoverTime = 188;
     static const s32 hBeginExplodeTime = 30;
@@ -30,7 +34,7 @@ namespace NrvJiraira {
     NEW_NERVE(HostTypeNrvExplode, Jiraira, Explode);
 };  // namespace NrvJiraira
 
-Jiraira::Jiraira(const char* pName) : LiveActor(pName), _8C(), _90(500.0f) {
+Jiraira::Jiraira(const char* pName) : LiveActor(pName), _8C(nullptr), _90(500.0f) {
 }
 
 void Jiraira::init(const JMapInfoIter& rIter) {

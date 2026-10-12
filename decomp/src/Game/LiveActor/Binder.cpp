@@ -5,6 +5,10 @@
 #include "Game/Util/MathUtil.hpp"
 #include <algorithm>
 
+void Binder_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+}
+
 namespace {
     // hPrintFixReactionLength
     const f32 hOverlapAddValue = 1.2f;

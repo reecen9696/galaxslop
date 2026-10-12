@@ -42,11 +42,7 @@ public:
     void startScrollAnimPrev();
     bool tryShowSeparator(s32, f32);
     void setSeparatorPaneSize();
-    
-#if (VERSION == RMGK01)
     void setTotalPowerStarNumForMessageBoardCapture();
-#endif
-
     void exeAppear();
     void exeWait();
     void exeDisappear();

@@ -23,6 +23,11 @@
 #include "Game/Util/SoundUtil.hpp"
 #include "Game/Util/StringUtil.hpp"
 
+void StarReturnDemoStarter_FORCE_MATCH_SDATA2() {
+    (void)0.0f;
+    (void)-1.0f;
+}
+
 namespace {
     const s32 cDemoAppearEffectStep = 30;
     const s32 cDemoAppearWaitFrame = 45;
@@ -214,7 +219,7 @@ void StarReturnDemoStarter::exeMove() {
     int totalStep = MR::getDemoPartTotalStep(pDemoName) - 45;
     mReturnDemoRailMove->update(partStep, totalStep);
     PowerStar::requestPointLightAtResultSequence(mPowerStar);
-    MR::startLevelSoundPlayer("SE_PM_LV_SPIN_DRV_FLY");
+    MR::startLevelSoundPlayer("SE_PM_LV_SPIN_DRV_FLY", -1);
 
     if (MR::isDemoPartLastStep(pDemoName)) {
         setNerve(::isGrandStar() ? static_cast< const Nerve* >(GET_NERVE(StarReturnDemoStarter, StarReturnDemoStarterNrvFlyWaitGrandStar)) :
@@ -274,7 +279,7 @@ void StarReturnDemoStarter::exeFall() {
     mTransform.getTrans(position);
 
     if (MR::isFirstStep(this)) {
-        MR::startSoundPlayer("SE_PV_DM_ASTRO_RET_LANDING");
+        MR::startSoundPlayer("SE_PV_DM_ASTRO_RET_LANDING", -1);
         MR::startBckPlayer("Fall");
         mPowerStar->kill();
 

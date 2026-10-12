@@ -28,6 +28,14 @@
 #include <revolution/gx/GXVert.h>
 #include <revolution/mtx.h>
 
+void Trapeze_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)0.5f;
+    (void)3.0f;
+    (void)-1.0f;
+}
+
 namespace {
     static const f32 sStickLength = 120.0f;
     static const f32 sDrawWidthX = 12.0f;
@@ -466,7 +474,7 @@ bool Trapeze::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pReceiver)
         MR::startSound(mRider, "SE_PM_GRAB_OBJ");
 
         if (!MR::isActiveActorCamera(this, mCameraInfo) || MR::isActiveActorCamera(this, mCameraInfo)) {
-            MR::startActorCameraNoTarget(this, mCameraInfo);
+            MR::startActorCameraNoTarget(this, mCameraInfo, -1);
         }
 
         setNerve(GET_NERVE(Trapeze, TrapezeNrvSwingSlideDownStart));
@@ -532,7 +540,7 @@ bool Trapeze::tryJump() {
         }
 
         MR::setPlayerFrontTargetVec(frontDir, 1);
-        MR::endActorCameraAtLanding(this, mCameraInfo);
+        MR::endActorCameraAtLanding(this, mCameraInfo, -1);
 
         getSensor("body")->invalidate();
         getSensor("bind")->validate();

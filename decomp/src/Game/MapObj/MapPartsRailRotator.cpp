@@ -6,8 +6,12 @@
 #include "Game/Util/MathUtil.hpp"
 
 void MapPartsRailRotator_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)-1.0f;
     (void)0.01745329238474369f;
     (void)0.009999999776482582f;
+    (void)0.0f;
 }
 
 namespace NrvMapPartsRailRotator {

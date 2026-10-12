@@ -72,7 +72,7 @@ namespace {
         const u16& rWidth = JUTGetVideoManager()->getFbWidth();
         return rWidth;
     }
-};  // namespace
+}
 
 void GalaxyMapController::init(const JMapInfoIter& rIter) {
     MR::connectToSceneLayoutOnPause(this);
@@ -595,11 +595,9 @@ bool GalaxyMapController::tryDisplayAndKeyWait() {
         mMap->_71 = false;
     }
 
-#if (VERSION == RMGK01)
     if (MR::isStep(this, ::sDisplayKeepFrame)) {
         mMap->dispIconAButton();
     }
-#endif
 
     if (MR::isGreaterStep(this, ::sDisplayKeepFrame) && MR::testCorePadTriggerA(WPAD_CHAN0)) {
         setNerve(GET_NERVE_ANON(GalaxyMapControllerFadeout));

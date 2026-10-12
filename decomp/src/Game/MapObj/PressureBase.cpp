@@ -2,6 +2,10 @@
 #include "Game/LiveActor/Nerve.hpp"
 #include "Game/Util.hpp"
 
+void PressureBase_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+}
+
 namespace {
     static const s32 sDefaultShotInterval = 300;
     static const f32 sDefaultFirstSpeed = 30.0f;

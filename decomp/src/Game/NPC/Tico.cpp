@@ -48,7 +48,7 @@ namespace {
                                    Color8(0xFF, 0, 0, 0xFF),    Color8(0x78, 0, 0xFF, 0xFF), Color8(0xFF, 0x64, 0x64, 0xFF)};
 };  // namespace
 
-const f32 Tico::sFloatSeMinVolume = 0.2f;
+f32 Tico::sFloatSeMinVolume = 0.2f;
 
 Tico::Tico(const char* pName)
     : NPCActor(pName), _15C(), _160(0.0f, 0.0f, 0.0f), _16C(), mDemoGetPower(), _174(), _178(), _17C(255, 255, 255, 255), _180(), mDemoStarter(this) {
@@ -77,7 +77,9 @@ void Tico::initBase(const JMapInfoIter& rIter, s32 color) {
     caps.mWaitNerve = GET_NERVE(Tico, TicoNrvWait);
     caps.mSensorJoint = "Body";
     caps.mSensorSize = 60.0f;
-    caps.mSensorOffset.zero();
+    caps.mSensorOffset.z = 0.0f;
+    caps.mSensorOffset.y = 0.0f;
+    caps.mSensorOffset.x = 0.0f;
     caps._6C = "Body";
     caps.mBinder = 0;
 

@@ -8,9 +8,13 @@
 #include "Game/Util/MathUtil.hpp"
 #include "Game/Util/VectorUtil.hpp"
 
+void CameraFixedThere_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+}
+
 namespace {
     static const f32 sGroundFixAngle = 30.0f;
-};  // namespace
+}
 
 CameraFixedThere::CameraFixedThere(const char* pName)
     : Camera(pName), mCameraType(), mIsFovyFixed(), mUp(0.0f, 1.0f, 0.0f), mAxis(0.0f, 0.0f, 1.0f), mRoll() {

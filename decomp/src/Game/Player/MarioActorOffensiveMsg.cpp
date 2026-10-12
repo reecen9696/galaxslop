@@ -22,6 +22,11 @@ static f32 mSensorRadiusTornadoStorm = 1000.0f;
 static f32 mSensorRadiusSpinPull = 450.0f;
 static f32 mSensorRadiusSpinPullOnGround = 450.0f;
 
+void MarioActorOffensiveMsg_FORCE_MATCH_SDATA2() {
+    (void)0.0f;
+    (void)0.000003814697265625f;
+}
+
 inline bool MarioActor::cylinderPushCheck(HitSensor* pSensor, f32 radius, f32 width, f32 height) {
     TVec3f offset(pSensor->mPosition - _2A0);
     return cylinderPushCheck(offset, radius, width, height);
@@ -557,7 +562,7 @@ namespace {
     inline HitSensor* getDummySensor(MarioActor* pActor) {
         return pActor->getSensor("dummy");
     }
-};  // namespace
+}
 
 bool MarioActor::cylinderPushCheck(const TVec3f& rOffset, f32 radius, f32 width, f32 height) {
     TVec3f radial;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <revolution/types.h>
+#include <revolution.h>
 
 class WPad;
 

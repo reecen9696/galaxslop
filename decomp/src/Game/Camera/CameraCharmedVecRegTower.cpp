@@ -4,6 +4,11 @@
 #include "Game/Camera/CameraTargetObj.hpp"
 #include "Game/Util/MathUtil.hpp"
 
+void CameraCharmedVecRegTower_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+}
+
 CameraCharmedVecRegTower::CameraCharmedVecRegTower(const char* pName) : Camera(pName), mArrange() {
 }
 

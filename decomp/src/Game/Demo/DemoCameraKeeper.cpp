@@ -13,7 +13,7 @@
 
 namespace {
     extern char sSheetName[];
-};  // namespace
+}
 
 DemoCameraInfo::DemoCameraInfo()
     : mPartName(), mCameraTargetName(), mCameraTargetCastID(-1), mAnimCameraName(), mAnimCameraStartFrame(-1), mAnimCameraEndFrame(-1),
@@ -90,12 +90,12 @@ void DemoCameraKeeper::executeFirst(const DemoCameraInfo* pInfo) {
             MR::removeExtensionString(animCameraName, sizeof(animCameraName), pInfo->mAnimCameraName);
             MR::startAnimCameraTargetSelf(pInfo->_24, pInfo->_20, animCameraName, pInfo->mAnimCameraStartFrame, 1.0f);
         } else {
-            MR::startEventCamera(pInfo->_20, pInfo->_1C, CameraTargetArg(pInfo->_24));
+            MR::startEventCamera(pInfo->_20, pInfo->_1C, CameraTargetArg(pInfo->_24), -1);
         }
     } else if (DemoCameraFunction::isCameraTargetMario(pInfo)) {
-        MR::startEventCameraTargetPlayer(pInfo->_20, pInfo->_1C);
+        MR::startEventCameraTargetPlayer(pInfo->_20, pInfo->_1C, -1);
     } else {
-        MR::startEventCameraNoTarget(pInfo->_20, pInfo->_1C);
+        MR::startEventCameraNoTarget(pInfo->_20, pInfo->_1C, -1);
     }
 }
 
@@ -111,7 +111,7 @@ void DemoCameraKeeper::executeLast(const DemoCameraInfo* pInfo) {
 
 void DemoCameraKeeper::endCurrentCamera() {
     if (_10 != nullptr) {
-        MR::endEventCamera(_10->_20, _10->_1C, _10->mIsContinuous != false);
+        MR::endEventCamera(_10->_20, _10->_1C, _10->mIsContinuous != false, -1);
     }
 
     _10 = nullptr;
@@ -155,4 +155,4 @@ DemoCameraKeeper::DemoCameraKeeper(DemoExecutor* pExecutor, const JMapInfoIter& 
 
 namespace {
     char sSheetName[] = "Camera";
-};  // namespace
+}

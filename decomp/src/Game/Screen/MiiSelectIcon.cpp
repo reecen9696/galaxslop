@@ -11,6 +11,8 @@
 #include <nw4r/lyt/texMap.h>
 
 void MiiSelectIcon_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
     (void)5.0f;
 }
 

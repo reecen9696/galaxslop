@@ -12,6 +12,10 @@
 #include "Game/Util/LiveActorUtil.hpp"
 #include "Game/Util/ObjUtil.hpp"
 
+void ShockWaveGenerator_FORCE_MATCH_SDATA2() {
+    (void)0.0f;
+}
+
 namespace {
     static const char* cDemoCameraName = "衝撃波カメラ";
     static const s32 sStepForGenerate = 50;
@@ -58,15 +62,13 @@ void ShockWaveGenerator::exeWait() {
         MR::startBtk(this, "SpinHit");
         MR::setBrkFrameAndStop(this, 0.0f);
         MR::setBtkFrameAndStop(this, 0.0f);
-#if (VERSION == RMGP01 || VERSION == RMGK01)
         MR::validateClipping(this);
-#endif
     }
 }
 
 void ShockWaveGenerator::exeDemoEcho() {
     if (MR::isFirstStep(this)) {
-        MR::startActorCameraTargetSelf(this, mCameraInfo);
+        MR::startActorCameraTargetSelf(this, mCameraInfo, -1);
     }
 
     MR::tryRumblePadVeryWeak(this, WPAD_CHAN0);
@@ -88,7 +90,7 @@ void ShockWaveGenerator::exeGenerate() {
 
     if (MR::isStep(this, ::sStepForGenerate)) {
         if (mCameraInfo != nullptr) {
-            MR::endActorCamera(this, mCameraInfo, false);
+            MR::endActorCamera(this, mCameraInfo, false, -1);
         }
         setNerve(GET_NERVE(ShockWaveGenerator, ShockWaveGeneratorNrvWait));
     }
@@ -126,20 +128,13 @@ bool ShockWaveGenerator::isPlayerInCameraStartRange() const {
 }
 
 void ShockWaveGenerator::startShockWave() {
-#if (VERSION == RMGP01 || VERSION == RMGK01)
     MR::invalidateClipping(this);
-#endif
-
     MR::startSound(this, "SE_OJ_SHOCK_WAVE_GENERATE");
     if (mCameraInfo != nullptr) {
         if (isPlayerInCameraStartRange()) {
-#if (VERSION == RMGJ01 || VERSION == RMGE01)
-            MR::requestStartDemoWithoutCinemaFrame(this, ::cDemoCameraName, GET_NERVE(ShockWaveGenerator, ShockWaveGeneratorNrvDemoEcho), nullptr);
-#else
             if (MR::tryStartDemoWithoutCinemaFrame(this, ::cDemoCameraName)) {
                 setNerve(GET_NERVE(ShockWaveGenerator, ShockWaveGeneratorNrvDemoEcho));
             }
-#endif
         } else {
             setNerve(GET_NERVE(ShockWaveGenerator, ShockWaveGeneratorNrvGenerate));
         }

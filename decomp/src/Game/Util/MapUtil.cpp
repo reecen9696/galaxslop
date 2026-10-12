@@ -18,6 +18,7 @@ static HitInfo mSortBuffer[32];
 static u32 mSortCount;
 
 void MapUtil_FORCE_MATCH_SDATA2() {
+    (void)0.0f;
     (void)1000000.0f;
     (void)0.001f;
     (void)0.34202015f;

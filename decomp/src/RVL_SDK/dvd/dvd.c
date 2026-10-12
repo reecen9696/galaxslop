@@ -7,16 +7,12 @@
 extern DVDErrorInfo __ErrorInfo;
 static DVDCommandBlock* executing;
 
-static DVDBB2 BB2 ATTRIBUTE_ALIGN(32);
-static DVDDiskID CurrDiskID ATTRIBUTE_ALIGN(32);
+static DVDBB2 BB2 __attribute__((aligned(32)));
+static DVDDiskID CurrDiskID __attribute__((aligned(32)));
 
 static DVDDiskID* IDShouldBe;
 static OSBootInfo* bootInfo;
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01 || VERSION == RMGP01)
-const char* __DVDVersion = "<< RVL_SDK - DVD \trelease build: Aug  8 2007 01:59:13 (0x4199_60831) >>";
-#elif (VERSION == RMGK01)
 const char* __DVDVersion = "<< RVL_SDK - DVD \trelease build: Feb 22 2008 06:17:35 (0x4199_60831) >>";
-#endif
 static BOOL autoInvalidation = TRUE;
 
 static DVDCommandBlock DummyCommandBlock;
@@ -45,7 +41,7 @@ static volatile BOOL Prepared = FALSE;
 static DVDPartitionInfo* BootGameInfo = NULL;
 static DVDPartitionInfo* PartInfo = NULL;
 static DVDGameTOC* GameToc = NULL;
-static u32 __DVDNumTmdBytes ATTRIBUTE_ALIGN(32) = 0;
+static u32 __DVDNumTmdBytes __attribute__((aligned(32))) = 0;
 static volatile s64 LastResetEnd = 0;
 static u32 MotorState = 0;
 static BOOL ResetRequired = FALSE;
@@ -62,10 +58,10 @@ static OSAlarm CoverAlarm;
 
 extern BOOL __OSInIPL;
 
-static u8 __DVDGameTocBuffer[OSRoundUp32B(sizeof(DVDGameTOC) * 4)] ATTRIBUTE_ALIGN(32);
-static u8 __DVDPartInfoBuffer[OSRoundUp32B(sizeof(DVDPartitionInfo) * 4)] ATTRIBUTE_ALIGN(32);
-static u8 __DVDTmdBuffer[OSRoundUp32B(sizeof(ESTitleMeta))] ATTRIBUTE_ALIGN(64);
-static u8 __DVDTicketViewBuffer[OSRoundUp32B(sizeof(ESTicketView))] ATTRIBUTE_ALIGN(64);
+static u8 __DVDGameTocBuffer[OSRoundUp32B(sizeof(DVDGameTOC) * 4)] __attribute__((aligned(32)));
+static u8 __DVDPartInfoBuffer[OSRoundUp32B(sizeof(DVDPartitionInfo) * 4)] __attribute__((aligned(32)));
+static u8 __DVDTmdBuffer[OSRoundUp32B(sizeof(ESTitleMeta))] __attribute__((aligned(64)));
+static u8 __DVDTicketViewBuffer[OSRoundUp32B(sizeof(ESTicketView))] __attribute__((aligned(64)));
 
 vu16 __OSDeviceCode : (OS_BASE_CACHED | 0x30E6);
 vu8 __OSLockedFlag : (OS_BASE_CACHED | 0x3187);

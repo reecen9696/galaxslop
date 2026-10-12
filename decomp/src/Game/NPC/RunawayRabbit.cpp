@@ -25,6 +25,15 @@
 #include "Game/Util/StarPointerUtil.hpp"
 #include "Game/Util/TalkUtil.hpp"
 
+void RunawayRabbit_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)0.5f;
+    (void)3.0f;
+    (void)-1.0f;
+    (void)2.0f;
+}
+
 namespace {
     static const f32 sLightLength = 1500.0f;
     static const f32 sBodyRadius = 70.0f;
@@ -416,7 +425,7 @@ void RunawayRabbit::exeCaught() {
         MR::startAction(this, "TossStart");
         MR::startBckPlayer("TossStart");
         MR::startSound(this, "SE_SM_RABBIT_CAUGHT");
-        MR::startSoundPlayer("SE_PV_CATCH");
+        MR::startSoundPlayer("SE_PV_CATCH", -1);
         mSpotMarkLight->kill();
         MR::makeQuatRotateDegree(&mPlayerPoseQuat, *MR::getPlayerRotate());
         mPlayerBindPos.set(*MR::getPlayerPos());
@@ -461,7 +470,7 @@ void RunawayRabbit::exeCaughtEnd() {
         MR::startBckPlayer("Toss");
     }
     if (MR::isStep(this, ::sTossStep)) {
-        MR::startSoundPlayer("SE_PV_THROW");
+        MR::startSoundPlayer("SE_PV_THROW", -1);
     }
     updateBindActorMatrix();
     if (MR::isBckStopped(this)) {

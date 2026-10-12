@@ -10,17 +10,7 @@
 #include "Game/Screen/LuigiLetter.hpp"
 #include "Game/Screen/PeachLetter.hpp"
 #include "Game/System/ResourceHolder.hpp"
-#include "Game/Util/ActorMovementUtil.hpp"
-#include "Game/Util/CameraUtil.hpp"
-#include "Game/Util/DemoUtil.hpp"
-#include "Game/Util/EventUtil.hpp"
-#include "Game/Util/JMapUtil.hpp"
-#include "Game/Util/LayoutUtil.hpp"
-#include "Game/Util/NPCUtil.hpp"
-#include "Game/Util/ObjUtil.hpp"
-#include "Game/Util/RailUtil.hpp"
-#include "Game/Util/SceneUtil.hpp"
-#include "Game/Util/SoundUtil.hpp"
+#include "Game/Util.hpp"
 
 namespace {
     const s32 sMessangerOneUpNum = 5;
@@ -106,11 +96,7 @@ bool KinopioAstro::sendLetter() {
         const char* pImage = MR::isPlayerLuigi() ? "AllCompleteImage2.bin" : "AllCompleteImage1.bin";
 
         size = _19C->mArchive->getExpandedResSize(_19C->mArchive->getResource(pImage));
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01 || VERSION == RMGP01)
-        _198->send(reinterpret_cast< u8* >(_19C->mFileInfoTable->getRes(pImage)), size);
-#elif (VERSION == RMGK01)
         _198->send(reinterpret_cast< u8* >(_19C->mFileInfoTable->getRes(pImage)), size, false);
-#endif
         _197 = true;
     }
 
@@ -161,16 +147,13 @@ bool KinopioAstro::eventFunc(u32 letterEvent) {
         return true;
     } else if (letterEvent == LetterEvent_SendLetter) {
         return sendLetter();
-    }
-#if (VERSION == RMGK01)
-    else if (letterEvent == LetterEvent_OnMsgLedPattern) {
+    } else if (letterEvent == LetterEvent_OnMsgLedPattern) {
         MR::onMsgLedPattern();
         return true;
     } else if (letterEvent == LetterEvent_OffMsgLedPattern) {
         MR::offMsgLedPattern();
         return true;
     }
-#endif
 
     return true;
 }

@@ -2,11 +2,11 @@
 
 class __partial_array_destructor {
 public:
-    /* 0x00 */ void* mArrayStart;
-    /* 0x04 */ size_t mElemSize;
-    /* 0x08 */ size_t mArraySize;
-    /* 0x0C */ ctor_dtor_ptr mDtorPtr;
-    /* 0x10 */ size_t mCurElement;
+    void* mArrayStart;       // 0x0
+    size_t mElemSize;        // 0x4
+    size_t mArraySize;       // 0x8
+    ctor_dtor_ptr mDtorPtr;  // 0xC
+    size_t mCurElement;      // 0x10
 
     __partial_array_destructor(void* arr, unsigned int size, unsigned int count, ctor_dtor_ptr ptr) {
         mArrayStart = arr;
@@ -28,6 +28,15 @@ public:
 
 extern "C" {
 
+void __construct_array(void* pBlock, ctor_dtor_ptr ctor, ctor_dtor_ptr dtor, size_t size, size_t n) {
+    __partial_array_destructor pad(pBlock, size, n, dtor);
+
+    char* p = (char*)pBlock;
+    for (pad.mCurElement = 0; pad.mCurElement < n; p += size, pad.mCurElement++) {
+        ((void (*)(void*, short))ctor)(p, 1);
+    }
+}
+
 void* __construct_new_array(void* block, ctor_dtor_ptr ctor, ctor_dtor_ptr dtor, size_t size, size_t n) {
     char* ptr = (char*)block;
 
@@ -46,15 +55,6 @@ void* __construct_new_array(void* block, ctor_dtor_ptr ctor, ctor_dtor_ptr dtor,
         }
     }
     return ptr;
-}
-
-void __construct_array(void* pBlock, ctor_dtor_ptr ctor, ctor_dtor_ptr dtor, size_t size, size_t n) {
-    __partial_array_destructor pad(pBlock, size, n, dtor);
-
-    char* p = (char*)pBlock;
-    for (pad.mCurElement = 0; pad.mCurElement < n; p += size, pad.mCurElement++) {
-        ((void (*)(void*, short))ctor)(p, 1);
-    }
 }
 
 void __destroy_arr(void* pArraySource, ctor_dtor_ptr dtor, size_t size, size_t num) {

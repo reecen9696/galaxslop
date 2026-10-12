@@ -11,6 +11,9 @@
 #include "Game/Util/SoundUtil.hpp"
 
 void DinoPackunBall_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)2.0f;
     (void)135.0f;
     (void)0.001f;
     (void)500.0f;

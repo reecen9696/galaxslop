@@ -34,6 +34,11 @@
 #include <JSystem/JMath/JMath.hpp>
 #include <revolution/mtx.h>
 
+void WaterBazooka_FORCE_MATCH_SDATA2() {
+    (void)0.0f;
+    (void)2.0f;
+}
+
 namespace NrvWaterBazooka {
     NEW_NERVE(WaterBazookaNrvWaitForBattle, WaterBazooka, WaitForBattle);
     NEW_NERVE(WaterBazookaNrvWait, WaterBazooka, Wait);

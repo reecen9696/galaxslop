@@ -2,11 +2,7 @@
 #include <mem.h>
 #include "revolution/sc.h"
 
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01 || VERSION == RMGP01)
-const char* __SCVersion = "<< RVL_SDK - SC \trelease build: Aug  8 2007 02:09:03 (0x4199_60831) >>";
-#elif (VERSION == RMGK01)
 const char* __SCVersion = "<< RVL_SDK - SC \trelease build: Feb 22 2008 06:21:38 (0x4199_60831) >>";
-#endif
 
 static void __SCFlushSyncCallback(u32 result);
 
@@ -58,8 +54,8 @@ static const char ConfDirName[] = "/shared2/sys";
 static const char ConfFileName[] = "/shared2/sys/SYSCONF";
 static const char ProductInfoFileName[] = "/title/00000001/00000002/data/setting.txt";
 
-static u8 ConfBuf[16384] ATTRIBUTE_ALIGN(32);
-static u8 ConfBufForFlush[16384] ATTRIBUTE_ALIGN(32);
+static u8 ConfBuf[16384] __attribute__((aligned(32)));
+static u8 ConfBufForFlush[16384] __attribute__((aligned(32)));
 
 static u8 Initialized;
 static u8 DirtyFlag;
@@ -949,3 +945,4 @@ static void ErrorFromFlush(void) {
 BOOL __SCIsDirty(void) {
     return DirtyFlag ? TRUE : FALSE;
 }
+

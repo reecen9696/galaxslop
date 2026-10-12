@@ -162,9 +162,9 @@ void TalkMessageCtrl::rootNodePre(bool arg) {
         bool cond = false;
 
         switch (branch->mIndex) {
-        case TalkMessageCtrl_Type0:
+        case 0:
             return;
-        case TalkMessageCtrl_Type1:
+        case 1:
             if (mBranchFunc == nullptr) {
                 cond = true;
             } else {
@@ -172,45 +172,43 @@ void TalkMessageCtrl::rootNodePre(bool arg) {
             }
 
             break;
-        case TalkMessageCtrl_Type2:
+        case 2:
             cond = MR::isNearPlayerAnyTime(mHostActor, mTalkDistance);
             break;
-        case TalkMessageCtrl_Type3:
+        case 3:
             cond = MR::isOnSwitchA(mHostActor);
             break;
-        case TalkMessageCtrl_Type4:
+        case 4:
             cond = MR::isOnSwitchB(mHostActor);
             break;
-        case TalkMessageCtrl_Type5:
+        case 5:
             cond = MR::isPlayerElementModeNormal();
             break;
-        case TalkMessageCtrl_Type6:
+        case 6:
             cond = MR::isPlayerElementModeBee();
             break;
-        case TalkMessageCtrl_Type7:
+        case 7:
             cond = MR::isPlayerElementModeTeresa();
             break;
-        case TalkMessageCtrl_Type8:
+        case 8:
             cond = MR::isStageStatePowerStarAppeared();
             break;
-        case TalkMessageCtrl_Type9:
+        case 9:
             cond = _3C != 0;
             break;
-        case TalkMessageCtrl_TypeA:
+        case 10:
             cond = MR::isPlayerLuigi();
             break;
-        case TalkMessageCtrl_TypeB:
+        case 11:
             cond = MR::isTimeKeepDemoActive();
             break;
-        case TalkMessageCtrl_TypeC:
+        case 12:
             cond = MR::isOnMessageAlreadyRead(branch->mNextIdx);
             break;
-#if (VERSION == RMGK01)
-        case TalkMessageCtrl_TypeD:
+        case 13:
             cond = MR::isMsgLedPattern();
             break;
-#endif
-        case TalkMessageCtrl_TypeE:
+        case 14:
             cond = TalkFunction::getBranchAstroGalaxyResult(branch->mNextIdx);
             break;
         }
@@ -367,68 +365,66 @@ const char* TalkMessageCtrl::getBranchID() const {
     const char* result = nullptr;
 
     switch (node->mNextIdx) {
-    case BranchNode_Type0:
+    case 0:
         result = "PenguinRace";
         break;
-    case BranchNode_Type1:
+    case 1:
         result = "SwimmingSchool";
         break;
-    case BranchNode_Type2:
+    case 2:
         result = "PenguinRace";
         break;
-    case BranchNode_Type3:
+    case 3:
         result = "BombTimeAttackLv1";
         break;
-    case BranchNode_Type4:
+    case 4:
         result = "PhantomTeresaRacer";
         break;
-    case BranchNode_Type5:
+    case 5:
         result = "BombTimeAttackLv2";
         break;
-    case BranchNode_Type6:
+    case 6:
         result = "TrialSurfingCoach";
         break;
-    case BranchNode_Type7:
+    case 7:
         result = "TrialSurfingHowTo";
         break;
-    case BranchNode_Type8:
+    case 8:
         result = "DeathPromenadeTeresaRacer";
         break;
-    case BranchNode_Type9:
+    case 9:
         result = "RosettaFinalBattle";
         break;
-    case BranchNode_TypeA:
+    case 10:
         result = "CometTico";
         break;
-    case BranchNode_TypeB:
+    case 11:
         result = "TransformTico";
         break;
-    case BranchNode_TypeC:
+    case 12:
         result = "ChallengeSurfingCoach";
         break;
-    case BranchNode_TypeD:
+    case 13:
         result = "TicoShopExchange";
         break;
-    case BranchNode_TypeE:
+    case 14:
         result = "TicoShopWhich";
         break;
-    case BranchNode_TypeF:
+    case 15:
         result = "KinopioPurple";
         break;
-    case BranchNode_Type10:
+    case 16:
         result = "CometTicoTell";
         break;
-    case BranchNode_Type11:
+    case 17:
         result = "TrialTamakoroHowTo";
         break;
-    case BranchNode_Type12:
+    case 18:
         result = "KnockOnTheDoor";
         break;
-#if (VERSION == RMGK01)
-    case BranchNode_Type13:
+    case 19:
         result = "LedPattern";
         break;
-#endif
     }
 
     return result;

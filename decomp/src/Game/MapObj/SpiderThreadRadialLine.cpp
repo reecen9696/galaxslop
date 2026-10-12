@@ -3,7 +3,7 @@
 #include "Game/MapObj/SpiderThreadMainPoint.hpp"
 #include "Game/Util.hpp"
 
-SpiderThreadRadialLine::SpiderThreadRadialLine(int bufferSize) : mBufferSize(bufferSize), mNumPoints(), mPoints() {
+SpiderThreadRadialLine::SpiderThreadRadialLine(int bufferSize) : mBufferSize(bufferSize), mNumPoints(0), mPoints(nullptr) {
     mPoints = new SpiderThreadMainPoint*[mBufferSize];
     for (s32 idx = 0; idx < mBufferSize; idx++) {
         mPoints[idx] = nullptr;

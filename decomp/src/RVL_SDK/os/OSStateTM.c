@@ -5,14 +5,14 @@
 #include "revolution/os/OSResetSW.h"
 #include "revolution/vi.h"
 
-static u32 StmImInBuf[8] ATTRIBUTE_ALIGN(32);
-static u32 StmImOutBuf[8] ATTRIBUTE_ALIGN(32);
+static u32 StmImInBuf[8] __attribute__((align(32)));
+static u32 StmImOutBuf[8] __attribute__((align(32)));
 
-static u32 StmVdInBuf[8] ATTRIBUTE_ALIGN(32);
-static u32 StmVdOutBuf[8] ATTRIBUTE_ALIGN(32);
+static u32 StmVdInBuf[8] __attribute__((align(32)));
+static u32 StmVdOutBuf[8] __attribute__((align(32)));
 
-static u32 StmEhInBuf[8] ATTRIBUTE_ALIGN(32);
-static u32 StmEhOutBuf[8] ATTRIBUTE_ALIGN(32);
+static u32 StmEhInBuf[8] __attribute__((align(32)));
+static u32 StmEhOutBuf[8] __attribute__((align(32)));
 
 static BOOL ResetDown = FALSE;
 static int StmReady = 0;
@@ -41,15 +41,11 @@ OSPowerCallback OSSetPowerCallback(OSPowerCallback callback) {
     enabled = OSDisableInterrupts();
     prevCallback = PowerCallback;
 
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
-    PowerCallback = callback;
-#elif (VERSION == RMGK01)
     if (callback) {
         PowerCallback = callback;
     } else {
         PowerCallback = __OSDefaultPowerCallback;
     }
-#endif
 
     if (!StmEhRegistered) {
         __OSRegisterStateEvent();
@@ -57,16 +53,11 @@ OSPowerCallback OSSetPowerCallback(OSPowerCallback callback) {
 
     OSRestoreInterrupts(enabled);
 
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
-    return prevCallback;
-#elif (VERSION == RMGK01)
     if (prevCallback == __OSDefaultPowerCallback) {
         return NULL;
     } else {
         return prevCallback;
     }
-#endif
-
 }
 
 BOOL OSGetResetButtonState(void) {
@@ -120,11 +111,7 @@ void __OSShutdownToSBY(void) {
     __VIRegs[1] = 0;
 
     if (!StmReady) {
-#if(VERSION  == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01 || VERSION == RMGP01)
-        OSPanic(__FILE__, 281, "Error: The firmware doesn't support shutdown feature.\n");
-#elif (VERSION == RMGK01)
-        OSPanic(__FILE__, 316, "Error: The firmware doesn't support shutdown feature.\n");
-#endif
+        OSPanic(__FILE__, 0x13C, "Error: The firmware doesn't support shutdown feature.\n");
     }
 
     StmImInBuf[0] = 0;
@@ -138,11 +125,7 @@ void __OSHotReset(void) {
     __VIRegs[1] = 0;
 
     if (!StmReady) {
-#if(VERSION  == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01 || VERSION == RMGP01)
-        OSPanic(__FILE__, 345, "Error: The firmware doesn't support reboot feature.\n");
-#elif (VERSION == RMGK01)
         OSPanic(__FILE__, 380, "Error: The firmware doesn't support reboot feature.\n");
-#endif
     }
 
     result = IOS_Ioctl(StmImDesc, 0x2001, StmImInBuf, sizeof(StmImInBuf), StmImOutBuf, sizeof(StmImOutBuf));
@@ -261,11 +244,7 @@ static s32 __OSStateEventHandler(s32 ret, void* pUnused) {
     OSResetCallback cb;
 
     if (ret != 0) {
-#if(VERSION  == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01 || VERSION == RMGP01)
-        OSPanic(__FILE__, 753, "Error on STM state event handler\n");
-#elif (VERSION == RMGK01)
-        OSPanic(__FILE__, 788, "Error on STM state event handler\n");
-#endif
+        OSPanic(__FILE__, 0x314, "Error on STM state event handler\n");
     }
 
     StmEhRegistered = 0;
@@ -304,3 +283,4 @@ static void LockUp(void) {
     while (1) {
     }
 }
+

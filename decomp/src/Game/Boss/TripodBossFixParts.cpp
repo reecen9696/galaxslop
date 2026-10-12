@@ -13,6 +13,10 @@
 #include "Game/Util/SoundUtil.hpp"
 #include "Game/Util/StringUtil.hpp"
 
+void TripodBossFixParts_FORCE_MATCH_SDATA2() {
+    (void)0.0f;
+}
+
 namespace NrvTripodBossFixParts {
     NEW_NERVE(TripodBossFixPartsNrvNonActive, TripodBossFixParts, NonActive);
     NEW_NERVE(TripodBossFixPartsNrvStartDemo, TripodBossFixParts, StartDemo);
@@ -21,8 +25,8 @@ namespace NrvTripodBossFixParts {
 };  // namespace NrvTripodBossFixParts
 
 struct TripodBossSetting {
-    /* 0x0 */ const char* mPartName;
-    /* 0x4 */ s32 mType;
+    const char* mPartName;  // 0x00
+    s32 mType;              // 0x04
 };
 
 namespace {

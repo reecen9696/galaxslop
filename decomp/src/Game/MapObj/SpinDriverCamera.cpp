@@ -8,6 +8,11 @@
 #include "Game/Util/MtxUtil.hpp"
 #include "Game/Util/MultiEventCamera.hpp"
 
+void SpinDriverCamera_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)2.0f;
+}
+
 SpinDriverCamera::SpinDriverCamera() : mCamera(), mTargetMtx(), mCameraInfo(), mAppearCameraFrame() {
 }
 
@@ -22,7 +27,7 @@ void SpinDriverCamera::startAppearCamera(LiveActor* pActor, const TVec3f& a2, co
         return;
     }
 
-    MR::startMultiActorCameraTargetOther(pActor, mCameraInfo, "出現イベント用", CameraTargetArg(mTargetMtx));
+    MR::startMultiActorCameraTargetOther(pActor, mCameraInfo, "出現イベント用", CameraTargetArg(mTargetMtx), -1);
 
     TPos3f upPos;
     MR::makeMtxUpFrontPos(&upPos, a2, a3, a4);
@@ -38,7 +43,7 @@ void SpinDriverCamera::endAppearCamera(LiveActor* pActor) {
         return;
     }
 
-    MR::endMultiActorCamera(pActor, mCameraInfo, "出現イベント用", false);
+    MR::endMultiActorCamera(pActor, mCameraInfo, "出現イベント用", false, -1);
 }
 
 s32 SpinDriverCamera::getAppearCameraFrames() const {

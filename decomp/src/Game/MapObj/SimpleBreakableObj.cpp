@@ -6,6 +6,7 @@
 #include "Game/MapObj/StageEffectDataTable.hpp"
 #include "Game/Util.hpp"
 
+
 namespace {
     const s32 sDefaultBreakOffsetFrame = 60;
     const s32 sDefaultItemNumCoin = 1;
@@ -21,8 +22,8 @@ namespace NrvSimpleBreakableObj {
 }  // namespace NrvSimpleBreakableObj
 
 SimpleBreakableObj::SimpleBreakableObj(const char* pName)
-    : SimpleBreakableObjBase(pName), mCameraInfo(), mBreakOffsetFrame(::sDefaultBreakOffsetFrame), _CC(-1), mSwitchDeadDelay(-1), mBreakFlags(1),
-      mItemType(-1), mItemNum(-1), mKinokoOneUp(), mPlayRiddleSound(), mBreakEnded(), _E6() {
+    : SimpleBreakableObjBase(pName), mCameraInfo(), mBreakOffsetFrame(::sDefaultBreakOffsetFrame), _CC(-1), mSwitchDeadDelay(-1), mBreakFlags(1), mItemType(-1),
+      mItemNum(-1), mKinokoOneUp(), mPlayRiddleSound(), mBreakEnded(), _E6() {
 }
 
 void SimpleBreakableObj::init(const JMapInfoIter& rIter) {
@@ -191,7 +192,7 @@ void SimpleBreakableObj::setStateBreak() {
 
 void SimpleBreakableObj::startBreak() {
     if (mPlayRiddleSound && MR::StageEffect::isRiddleSeTypeStop(mObjectName)) {
-        MR::startSystemSE("SE_SY_READ_RIDDLE_S");
+        MR::startSystemSE("SE_SY_READ_RIDDLE_S", -1, -1);
     }
 
     appearItem();
@@ -213,7 +214,7 @@ void SimpleBreakableObj::startBreak() {
 
 void SimpleBreakableObj::endBreak() {
     if (mCameraInfo != nullptr) {
-        MR::endActorCamera(this, mCameraInfo, false);
+        MR::endActorCamera(this, mCameraInfo, false, -1);
         MR::endDemo(this, ::cDemoName);
     }
 
@@ -257,7 +258,7 @@ void SimpleBreakableObj::appearItem() {
 
 void SimpleBreakableObj::exeTryStartDemo() {
     if (MR::tryStartDemoWithoutCinemaFrame(this, ::cDemoName)) {
-        MR::startActorCameraTargetSelf(this, mCameraInfo);
+        MR::startActorCameraTargetSelf(this, mCameraInfo, -1);
         MR::startRumbleWithShakeCameraWeak(this, "中", "中", 1000.0f, FLOAT_MAX);
         MR::invalidateCollisionParts(this);
         setNerve(GET_NERVE(SimpleBreakableObj, HostTypeDemo));
@@ -266,7 +267,7 @@ void SimpleBreakableObj::exeTryStartDemo() {
 
 void SimpleBreakableObj::exeDemo() {
     if (MR::isStep(this, MR::getActorCameraFrames(this, mCameraInfo))) {
-        MR::endActorCamera(this, mCameraInfo, false);
+        MR::endActorCamera(this, mCameraInfo, false, -1);
         MR::endDemo(this, ::cDemoName);
         mCameraInfo = nullptr;
         return;

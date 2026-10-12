@@ -22,6 +22,11 @@ namespace {
 };  // namespace
 
 void MarioJump_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)0.5f;
+    (void)1.57079637f;
+    (void)2.0f;
     (void)0.00100000005f;
     (void)15.0f;
     (void)0.300000012f;
@@ -1836,7 +1841,7 @@ void Mario::procHipDrop() {
     } else {
         _3BC++;
 
-        if (MR::isNearZero(mActor->getLastMove())) {
+        if (MR::isNearZero(mActor->getLastMove(), 0.001f)) {
             _422++;
             if (_422 == 0xF) {
                 stopAnimation(nullptr, "基本");

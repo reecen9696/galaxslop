@@ -206,7 +206,7 @@ void AudSingleBgm::updateTrackControl() {
     }
 }
 
-AudMultiBgm::AudMultiBgm() : AudBgm(), mHandle(), mRhythmHandle(), mSyncState(), mBgmId(-1), mIsLocked() {
+AudMultiBgm::AudMultiBgm() : AudBgm(), mHandle(), mRhythmHandle(), _1F4(), mBgmId(-1), mIsLocked() {
     init();
 }
 
@@ -235,7 +235,7 @@ void AudMultiBgm::stop(u32 time) {
         mHandle->stop(time);
     }
 
-    mSyncState = 0;
+    _1F4 = 0;
     mBgmId = -1;
 }
 
@@ -503,7 +503,7 @@ JAISoundHandle* AudMultiBgm::prepare(u32 id) {
     }
 
     mBgmId = bgmId;
-    mSyncState = 1;
+    _1F4 = 1;
     return &mHandle;
 }
 
@@ -535,13 +535,13 @@ void AudMultiBgm::unlock() {
         mHandle->unlockIfLocked();
     }
 
-    mSyncState = 2;
+    _1F4 = 2;
 }
 
 void AudMultiBgm::updateSyncProcess() {
     pauseSyncProcess();
 
-    if (mSyncState == 1) {
+    if (_1F4 == 1) {
         if (isPrepared()) {
             unlock();
         }

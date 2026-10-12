@@ -21,14 +21,13 @@ namespace NrvKoopaBattleStairsVs3 {
 
 KoopaBattleStairsVs3::KoopaBattleStairsVs3(Koopa* pKoopa) : KoopaBattleStairsBase(pKoopa), mNamePos(0.0f, 0.0f, 0.0f) {
     initNerve(GET_NERVE(KoopaBattleStairsVs3, KoopaBattleStairsVs3NrvWaitDemo));
-    
     MR::findNamePos("クッパ階段戦の砲弾出現", &mNamePos, nullptr);
-
     KoopaFunction::initKoopaAnimCamera(mKoopa, "DemoKoopaBattleStairsVs3Start");
 }
 
 s32 KoopaBattleStairsVs3::registerStair(KoopaBattleMapStair* pBattleMapStair) {
     mStairsGroup->registerActor(pBattleMapStair);
+
     return calcFireAttackStep(pBattleMapStair, ::sFireSpeed, 0, mNamePos);
 }
 
@@ -89,12 +88,15 @@ void KoopaBattleStairsVs3::exeWait() {
 void KoopaBattleStairsVs3::tryAttack() {
     KoopaBattleMapStair* pBattleMapStair;
 
-    for (s32 i = 0; i < mStairsGroup->getObjNum(); i++) {
-        pBattleMapStair = static_cast< KoopaBattleMapStair* >(mStairsGroup->getActor(i));
+    for (int idx = 0; idx < mStairsGroup->getObjNum(); idx++) {
+        pBattleMapStair = static_cast< KoopaBattleMapStair* >(mStairsGroup->getActor(idx));
 
         if (pBattleMapStair->isRequestAttackVs3()) {
             pBattleMapStair->_A6 = true;
             KoopaFunction::emitFireStairsToTarget(mKoopa, pBattleMapStair, mNamePos, true);
         }
     }
+}
+
+KoopaBattleStairsVs3::~KoopaBattleStairsVs3() {
 }

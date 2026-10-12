@@ -192,13 +192,3 @@ void DrawSyncManager::pushBreakPoint() {
         OSSendMessage(&mQueue, pWrite, OS_MESSAGE_BLOCK);
     }
 }
-
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
-void DrawSyncManager::clearSceneCallback() {
-    mHighTokenCount = 0;
-
-    for (s32 i = 3; i < ARRAY_SIZE(mTokenRanges); i++) {
-        mTokenRanges[i].mCallback = nullptr;
-    }
-}
-#endif

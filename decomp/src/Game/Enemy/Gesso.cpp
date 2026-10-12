@@ -38,6 +38,15 @@ namespace {
     static const s32 sStepForWalk = 43;
 };  // namespace
 
+void Gesso_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)0.5f;
+    (void)3.0f;
+    (void)-1.0f;
+    (void)2.0f;
+}
+
 namespace NrvGesso {
     NEW_NERVE(GessoNrvComeFromBox, Gesso, ComeFromBox);
     NEW_NERVE(GessoNrvWait, Gesso, Wait);
@@ -134,7 +143,7 @@ void Gesso::control() {
 
     mVelocity.add(_C8);
     _C8 *= 0.7f;
-    if (MR::isNearZero(_C8)) {
+    if (MR::isNearZero(_C8, 0.001f)) {
         _C8.zero();
     }
 

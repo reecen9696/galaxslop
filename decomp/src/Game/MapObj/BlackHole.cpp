@@ -5,6 +5,9 @@
 #include "Game/Util.hpp"
 
 void BlackHole_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)0.5f;
     (void)500.0f;
     (void)0.009999999776482582f;
     (void)1000.0f;
@@ -82,7 +85,7 @@ void BlackHole::kill() {
 
 bool BlackHole::tryStartDemoCamera() {
     if (mCameraInfo != nullptr) {
-        MR::startActorCameraTargetSelf(this, mCameraInfo);
+        MR::startActorCameraTargetSelf(this, mCameraInfo, -1);
         return true;
     }
 

@@ -1,6 +1,6 @@
 #include "Game/Util/ValueControl.hpp"
 
-ValueControl::ValueControl(int maxFrame) : mFrame(), mMaxFrame(maxFrame), mDirection(Direction_Forward) {
+ValueControl::ValueControl(int maxFrame) : mFrame(0), mMaxFrame(maxFrame), mDirection(Direction_Forward) {
 }
 
 void ValueControl::setDirToOne() {
@@ -48,6 +48,10 @@ void ValueControl::setOne() {
 
 f32 ValueControl::getValue() const {
     return static_cast< f32 >(mFrame) / mMaxFrame;
+}
+
+s32 ValueControl::getDirection() const {
+    return mDirection;
 }
 
 void ValueControl::resetFrame() {

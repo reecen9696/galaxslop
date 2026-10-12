@@ -427,9 +427,7 @@ void StarPointerOnOffController::clearInfo() {
         (*request)->mMode = -1;
     }
 
-    #if (VERSION == RMGK01)
     updateMode();
-    #endif
 }
 
 void StarPointerOnOffController::incModeCounter(void* pRequester, s32 mode) {

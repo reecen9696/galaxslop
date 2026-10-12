@@ -20,9 +20,9 @@ public:
     void joinToGroupClipping(LiveActor*, const JMapInfoIter&, int);
     void entryLodCtrl(LodCtrl*, const JMapInfoIter&);
 
-    /* 0x0C */ ClippingJudge* mJudge;
-    /* 0x10 */ ClippingActorHolder* mActorHolder;
-    /* 0x14 */ ClippingGroupHolder* mGroupHolder;
+    ClippingJudge* mJudge;              // 0xC
+    ClippingActorHolder* mActorHolder;  // 0x10
+    ClippingGroupHolder* mGroupHolder;  // 0x14
 };
 
 namespace MR {

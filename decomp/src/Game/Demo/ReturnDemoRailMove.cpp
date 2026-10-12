@@ -6,6 +6,10 @@
 #include "Game/Util/PlayerUtil.hpp"
 #include "Game/Util/SoundUtil.hpp"
 
+void ReturnDemoRailMove_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+}
+
 namespace {
     void setResultFlyStartFrame(LiveActor* liveActor, s32 frame) NO_INLINE {
         int maxFrames = MR::getBckFrameMax(liveActor);
@@ -92,7 +96,7 @@ void ReturnDemoRailMove::update(s32 currentStep, s32 maxSteps) {
         MR::startBck(mPowerStar, pBckName);
 
         if (!mIsGrandStar) {
-            MR::startSoundPlayer("SE_PM_S_SPIN_DRV_COOL_DOWN");
+            MR::startSoundPlayer("SE_PM_S_SPIN_DRV_COOL_DOWN", -1);
         }
     }
 

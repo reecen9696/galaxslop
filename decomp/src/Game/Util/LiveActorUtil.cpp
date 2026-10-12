@@ -1,4 +1,3 @@
-#include "Game/Util/LiveActorUtil.hpp"
 #include "Game/Animation/BckCtrl.hpp"
 #include "Game/Animation/XanimeCore.hpp"
 #include "Game/AudioLib/AudAnmSoundObject.hpp"
@@ -32,9 +31,13 @@
 #include "Game/Util.hpp"
 #include "Game/Util/CollisionPartsFilter.hpp"
 #include "Game/Util/FurMulti.hpp"
+#include "Game/Util/LiveActorUtil.hpp"
 #include <cstdio>
 
 void LiveActorUtil_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)2.0f;
     (void)360.0f;
     (void)0.001f;
     (void)5000.0f;
@@ -123,25 +126,6 @@ namespace {
 
     bool isShowModel(LiveActor* pActor) NO_INLINE {
         return !pActor->mFlag.mIsHiddenModel;
-    }
-
-    void callFuncAllGroupMember(const NameObj* pActor, void (*pFunc)(NameObj*)) NO_INLINE {
-        LiveActorGroupArray* pGroupArray = MR::getSceneObj< LiveActorGroupArray >(SceneObj_LiveActorGroupArray);
-        LiveActorGroup* pGroup = pGroupArray->getLiveActorGroup(static_cast<const LiveActor*>(pActor));
-
-        if (pGroup == nullptr) {
-            return;
-        }
-
-        for (s32 i = 0; i < pGroup->getObjNum(); i++) {
-            LiveActor* pMember = pGroup->getActor(i);
-
-            if (pMember == pActor) {
-                continue;
-            }
-
-            pFunc(pMember);
-        }
     }
 
     void callFuncAllGroupMember(const LiveActor* pActor, void (*pFunc)(LiveActor*)) NO_INLINE {
@@ -1225,7 +1209,7 @@ namespace MR {
     }
 
     void callRequestMovementOnAllGroupMember(const LiveActor* pActor) {
-        ::callFuncAllGroupMember(static_cast<const NameObj*>(pActor), requestMovementOn);
+        ::callFuncAllGroupMember(pActor, requestMovementOn);
     }
 
     void callInvalidateClippingAllGroupMember(const LiveActor* pActor) {
@@ -2181,7 +2165,7 @@ namespace MR {
         TVec3f gravity;
         calcGravityVectorOrZero(pActor, rPos, &gravity, nullptr, 0);
 
-        if (!isNearZero(gravity)) {
+        if (!isNearZero(gravity, 0.001f)) {
             pActor->mGravity.set(gravity);
             return;
         }

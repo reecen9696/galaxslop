@@ -29,6 +29,12 @@
 #include <revolution/mtx.h>
 #include <revolution/types.h>
 
+void BossStinkBug_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)2.0f;
+}
+
 namespace {
     const char* sSensorNameList[] = {"Body", "BodyHipDrop"};
 
@@ -389,11 +395,11 @@ bool BossStinkBug::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pRece
 }
 
 void BossStinkBug::startEventCamera(const char* pName) {
-    MR::startMultiActorCameraTargetSelf(this, _CC, pName);
+    MR::startMultiActorCameraTargetSelf(this, _CC, pName, -1);
 }
 
 void BossStinkBug::endEventCamera(const char* pName) {
-    MR::endMultiActorCamera(this, _CC, pName, false);
+    MR::endMultiActorCamera(this, _CC, pName, false, -1);
 }
 
 bool BossStinkBug::isSensorBody(const HitSensor* pSensor) const {

@@ -22,6 +22,14 @@
 #include "Game/Util/StarPointerUtil.hpp"
 #include "Game/Util/StringUtil.hpp"
 
+void BombHei_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)0.5f;
+    (void)3.0f;
+    (void)2.0f;
+}
+
 void BombHei_DUMMY() {
     TVec3f a;
     a *= 1.0f;
@@ -266,7 +274,9 @@ void BombHei::exeStarting() {
     if (MR::isFirstStep(this)) {
         MR::validateExCollisionParts(this);
         MR::startBck(this, "Starting");
-        mVelocity.zero();
+        mVelocity.z = 0.0f;
+        mVelocity.y = 0.0f;
+        mVelocity.x = 0.0f;
     }
 
     if (!MR::isNearZero(mGravity)) {
@@ -349,11 +359,11 @@ void BombHei::exePursue() {
     }
 
     if (isNerve(GET_NERVE(BombHei, HostTypeNrvPursueFast))) {
-        MR::tryStartBck(this, "CountDown");
+        MR::tryStartBck(this, "CountDown", nullptr);
         MR::moveAndTurnToPlayer(this, &mFront, ::hPursueFastFarParam.mSpeedH, ::hPursueFastFarParam.mGravAccel, ::hPursueFastFarParam.mFriction,
                                 ::hPursueFastFarParam.mTurnRate);
     } else {
-        MR::tryStartBck(this, "Run");
+        MR::tryStartBck(this, "Run", nullptr);
         MR::moveAndTurnToPlayer(this, &mFront, ::hPursueFarParam.mSpeedH, ::hPursueFarParam.mGravAccel, ::hPursueFarParam.mFriction,
                                 ::hPursueFarParam.mTurnRate);
     }
@@ -492,7 +502,7 @@ void BombHei::exeStop() {
 void BombHei::exeThrown() {
     if (MR::isFirstStep(this)) {
         MR::startBck(this, "Stop");
-        MR::startSoundPlayer("SE_PV_THROW");
+        MR::startSoundPlayer("SE_PV_THROW", -1);
         MR::startSound(this, "SE_EM_BOMB_THROW");
         MR::invalidateExCollisionParts(this);
         MR::offCalcGravity(this);
@@ -536,7 +546,7 @@ void BombHei::exeTaken() {
         MR::startBck(this, "Carry");
         if (MR::sendMsgTaken(mCarrySensor, getSensor("body"))) {
             getSensor("body")->invalidate();
-            MR::startSoundPlayer("SE_PV_LIFT_UP");
+            MR::startSoundPlayer("SE_PV_LIFT_UP", -1);
             MR::startSound(this, "SE_EM_BOMB_LIFT");
         } else {
             setNerve(GET_NERVE(BombHei, HostTypeNrvPhysics));

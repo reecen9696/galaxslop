@@ -1,7 +1,7 @@
 #include "Game/LiveActor/Spine.hpp"
 #include "Game/LiveActor/ActorStateKeeper.hpp"
 
-Spine::Spine(void* pExecutor, const Nerve* pNerve) : mExecutor(pExecutor), mCurrNerve(pNerve), mNextNerve(), mStep(), mStateKeeper() {
+Spine::Spine(void* pExecutor, const Nerve* pNerve) : mExecutor(pExecutor), mCurrNerve(pNerve), mNextNerve(nullptr), mStep(0), mStateKeeper(nullptr) {
 }
 
 void Spine::update() {

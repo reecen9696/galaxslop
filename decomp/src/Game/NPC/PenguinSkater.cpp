@@ -56,7 +56,9 @@ PenguinSkater::PenguinSkater(const char* pName)
     : NPCActor(pName), mCameraInfo(0), mCurrentRail(nullptr), mSwitchRail(nullptr), mRail(nullptr), mNumRails(0) {
     // TODO: doubtful this is written like this, fix later.
     mMarioQuat.set< f32 >(0.0f, 0.0f, 0.0f, 1.0f);
-    mMarioPos.zero();
+    mMarioPos.z = 0.0f;
+    mMarioPos.y = 0.0f;
+    mMarioPos.x = 0.0f;
 }
 
 void PenguinSkater::init(const JMapInfoIter& rIter) {
@@ -275,7 +277,7 @@ void PenguinSkater::exeWait() {
     } else if (MR::tryTalkNearPlayerAtEndAndStartTalkAction(this)) {
         MR::invalidateClipping(this);
         MR::tryStartDemo(this, "ペンギンスケート開始");
-        MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "開始");
+        MR::startMultiActorCameraTargetSelf(this, mCameraInfo, "開始", -1);
         MR::forwardNode(mMsgCtrl);
         TVec3f pos;
         MR::calcRailStartPointDirection(&pos, mRail);
@@ -303,7 +305,7 @@ void PenguinSkater::exeDemo() {
     }
     moveRail(::sDemoSpeed, ::sBlendRatio);
     if (inProvokeRangeIn(calcLead())) {
-        MR::endMultiActorCamera(this, mCameraInfo, "開始", false);
+        MR::endMultiActorCamera(this, mCameraInfo, "開始", false, -1);
         MR::endDemo(this, "ペンギンスケート開始");
         setNerve(GET_NERVE(PenguinSkater, PenguinSkaterNrvAway));
     }
@@ -373,7 +375,7 @@ void PenguinSkater::exeProvoke() {
 void PenguinSkater::exeCaught() {
     if (MR::isFirstStep(this)) {
         MR::tryStartDemoMarioPuppetable(this, "捕まり");
-        MR::startMultiActorCameraTargetPlayer(this, mCameraInfo, "終了");
+        MR::startMultiActorCameraTargetPlayer(this, mCameraInfo, "終了", -1);
         MR::startAction(this, "Caught");
         MR::startBckPlayer("TossStart");
         MR::startSound(this, "SE_SM_PENGUIN_CAUGHT");
@@ -410,7 +412,7 @@ void PenguinSkater::exeFadeIn() {
         MR::findNamePos("マリオ移動後", pos);
         MR::setNPCActorPos(this, "ペンギン移動後");
         MR::setPlayerPosOnGroundAndWait("マリオ移動後");
-        MR::endMultiActorCamera(this, mCameraInfo, "終了", false);
+        MR::endMultiActorCamera(this, mCameraInfo, "終了", false, -1);
         MR::endDemo(this, "捕まり");
         MR::startTalkingSequence(this);
         MR::startNPCTalkCamera(getMsgCtrl(), getBaseMtx(), pos, 1.0f, 0);
@@ -430,7 +432,7 @@ void PenguinSkater::exeGiveUp() {
         MR::endTalkingSequence(this);
     }
     if (MR::tryTalkForceAtEndAndStartTalkAction(this)) {
-        MR::endNPCTalkCamera(false);
+        MR::endNPCTalkCamera(false, -1);
         MR::forwardNode(mMsgCtrl);
         MR::onSwitchA(this);
         MR::validateClipping(this);

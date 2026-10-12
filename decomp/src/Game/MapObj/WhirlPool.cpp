@@ -6,6 +6,14 @@
 #include <JSystem/JUtility/JUTTexture.hpp>
 #include <revolution/gx/GXVert.h>
 
+void WhirlPool_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)0.5f;
+    (void)-1.0f;
+    (void)2.0f;
+}
+
 GXColor sWhirlPoolTevReg1 = {0x28, 0x28, 0x28, 0x14};
 GXColor sWhirlPoolTevReg2 = {0x55, 0x96, 0xBE, 0xFF};
 
@@ -35,13 +43,13 @@ void WhirlPool::init(const JMapInfoIter& rIter) {
 }
 
 void WhirlPool::movement() {
-    mRotation = MR::repeat(2.0f + mRotation, 0.0f, 360.0f);
-    mTexOffsetU0 = MR::repeat(0.001f + mTexOffsetU0, 0.0f, 1.0f);
-    mTexOffsetV0 = MR::repeat(-0.001f + mTexOffsetV0, 0.0f, 1.0f);
-    mTexOffsetU1 = MR::repeat(mTexOffsetU1 - 0.001f, 0.0f, 1.0f);
-    mTexOffsetV1 = MR::repeat(-0.001f + mTexOffsetV1, 0.0f, 1.0f);
-    mTexOffsetU2 = MR::repeat(0.001f + mTexOffsetU2, 0.0f, 1.0f);
-    mTexOffsetV2 = MR::repeat(-0.01f + mTexOffsetV2, 0.0f, 1.0f);
+    mRotation = MR::repeat2(2.0f + mRotation, 0.0f, 360.0f);
+    mTexOffsetU0 = MR::repeat2(0.001f + mTexOffsetU0, 0.0f, 1.0f);
+    mTexOffsetV0 = MR::repeat2(-0.001f + mTexOffsetV0, 0.0f, 1.0f);
+    mTexOffsetU1 = MR::repeat2(mTexOffsetU1 - 0.001f, 0.0f, 1.0f);
+    mTexOffsetV1 = MR::repeat2(-0.001f + mTexOffsetV1, 0.0f, 1.0f);
+    mTexOffsetU2 = MR::repeat2(0.001f + mTexOffsetU2, 0.0f, 1.0f);
+    mTexOffsetV2 = MR::repeat2(-0.01f + mTexOffsetV2, 0.0f, 1.0f);
     MR::startLevelSound(this, "SE_AT_LV_WHIRL_POOL");
 }
 
@@ -66,7 +74,7 @@ void WhirlPool::initPoints() {
         f32 radius = 100.0f + rate * (mRadius - 100.0f);
         mPoints[i] = new WhirlPoolPoint(position, mAxis, normal, radius, angle / 360.0f, 0xFF);
         rotation.mult(normal, normal);
-        angle = MR::repeat(10.0f + angle, 0.0f, 360.0f);
+        angle = MR::repeat2(10.0f + angle, 0.0f, 360.0f);
     }
 }
 

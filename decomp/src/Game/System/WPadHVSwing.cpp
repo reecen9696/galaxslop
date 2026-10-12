@@ -1,17 +1,34 @@
-#include "Game/System/WPadHVSwing.hpp"
-#include "Game/System/WPad.hpp"
+#include <JSystem/JGeometry/TVec.hpp>
 
-WPadHVSwing::WPadHVSwing(const WPad* pPad, u32 channel)
-    : mPad(pPad), mChannel(channel), mDistanceSwingThreshold(1.0f), mIsSwing(), mIsSwingLatched(), mSwingLatchedFrames(),
-      mSwingBelowThresholdFrames(), mIsTriggerSwing(), mSwingThreshold(0.4f), mSwingDetected(), mSwingTriggered(), mSwingHoldFrames(),
-      mSwingCooldownFrames() {
+#include "Game/System/WPad.hpp"
+#include "Game/System/WPadHVSwing.hpp"
+
+void WPadHVSwing_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+}
+
+WPadHVSwing::WPadHVSwing(const WPad* pPad, u32 channel) {
+    this->pPad = pPad;
+    mChannel = channel;
+    mDistanceSwingThreshold = 1.0;
+    mIsSwing = false;
+    mIsSwingLatched = 0;
+    mSwingLatchedFrames = 0;
+    mSwingBelowThresholdFrames = 0;
+    mIsTriggerSwing = 0;
+    mSwingThreshold = 0.4f;
+    mSwingDetected = false;
+    mSwingTriggered = false;
+    mSwingHoldFrames = 0;
+    mSwingCooldownFrames = 0;
 }
 
 void WPadHVSwing::updateSwing() {
     TVec3f pastAccel;
     TVec3f curAccel;
 
-    if (!mPad->getPastAcceleration(&pastAccel, 20, mChannel) || !mPad->getAcceleration(&curAccel, mChannel)) {
+    if (!pPad->getPastAcceleration(&pastAccel, 20, mChannel) || !pPad->getAcceleration(&curAccel, mChannel)) {
         mIsSwing = false;
         return;
     }
@@ -43,7 +60,7 @@ void WPadHVSwing::updateCentrifugal() {
     TVec3f pastAccel;
     TVec3f curAccel;
 
-    if (!mPad->getPastAcceleration(&pastAccel, 20, mChannel) || !mPad->getAcceleration(&curAccel, mChannel)) {
+    if (!pPad->getPastAcceleration(&pastAccel, 20, mChannel) || !pPad->getAcceleration(&curAccel, mChannel)) {
         mSwingDetected = false;
         mSwingTriggered = false;
         mSwingHoldFrames = 0;
@@ -53,16 +70,12 @@ void WPadHVSwing::updateCentrifugal() {
     float accelDeltaSum = 0.0f;
     float peakDelta = 0.0f;
 
-    if (mPad->getEnableAccelPastCount(mChannel) >= 15) {
+    if (pPad->getEnableAccelPastCount(mChannel) >= 15) {
         for (int i = 1; i < 15; i++) {
-            TVec3f prevSample;
-            mPad->getPastAcceleration(&prevSample, i - 1, mChannel);
-
-            TVec3f currSample;
-            mPad->getPastAcceleration(&currSample, i, mChannel);
-
-            accelDeltaSum += (prevSample.y - currSample.y);
-
+            TVec3f prevSample, curSample;
+            pPad->getPastAcceleration(&prevSample, i - 1, mChannel);
+            pPad->getPastAcceleration(&curSample, i, mChannel);
+            accelDeltaSum += (prevSample.y - curSample.y);
             if (peakDelta < accelDeltaSum) {
                 peakDelta = accelDeltaSum;
             }
@@ -97,7 +110,6 @@ void WPadHVSwing::update() {
     updateCentrifugal();
 
     mIsTriggerSwing = false;
-
     if (mSwingLatchedFrames == 1) {
         mIsTriggerSwing = true;
     } else if (mSwingHoldFrames >= 30) {

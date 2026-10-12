@@ -42,6 +42,8 @@
 #include <cstdio>
 
 void SkeletalFishBoss_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
     (void)1000.0f;
     (void)1.8325958f;
     (void)2607.5945f;
@@ -1023,17 +1025,10 @@ void SkeletalFishBoss::endBreakDemo() {
 }
 
 bool SkeletalFishBoss::isEnableToBeDamaged() const {
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01 || VERSION == RMGP01)
-    return !isNerve(GET_NERVE_ANON(SkeletalFishBossNrvDamage)) && !isNerve(GET_NERVE_ANON(SkeletalFishBossNrvDown)) &&
-           !isNerve(GET_NERVE_ANON(SkeletalFishBossNrvDeadDamage)) && !isNerve(GET_NERVE_ANON(SkeletalFishBossNrvDead)) &&
-           !isNerve(GET_NERVE_ANON(SkeletalFishBossNrvAppearDemo)) && !isNerve(GET_NERVE_ANON(SkeletalFishBossNrvPowerUpDemo)) &&
-           !isNerve(GET_NERVE_ANON(SkeletalFishBossNrvDeadDemo));
-#elif (VERSION == RMGK01)
     return !isNerve(GET_NERVE_ANON(SkeletalFishBossNrvDamage)) && !isNerve(GET_NERVE_ANON(SkeletalFishBossNrvDown)) &&
            !isNerve(GET_NERVE_ANON(SkeletalFishBossNrvDeadDamage)) && !isNerve(GET_NERVE_ANON(SkeletalFishBossNrvDead)) &&
            !isNerve(GET_NERVE_ANON(SkeletalFishBossNrvDemoWait)) && !isNerve(GET_NERVE_ANON(SkeletalFishBossNrvAppearDemo)) &&
            !isNerve(GET_NERVE_ANON(SkeletalFishBossNrvPowerUpDemo)) && !isNerve(GET_NERVE_ANON(SkeletalFishBossNrvDeadDemo));
-#endif
 }
 
 SkeletalFishBossHead::SkeletalFishBossHead(LiveActor* pActor)

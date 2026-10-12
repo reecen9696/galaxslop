@@ -130,21 +130,6 @@ void __OSShutdownDevices(u32 event) {
     KillThreads();
 }
 
-#if (VERSION == RMGJ01 || VERSION == RMGE01 || VERSION == RMGP01)
-u8 __OSGetDiscState(u8 last) {
-    u32 flags;
-
-    if (__DVDGetCoverStatus() != 2) {
-        return 3;
-    } else {
-        if ((last != 1) || (__OSGetRTCFlags(&flags) && flags)) {
-            return 2;
-        } else {
-            return 1;
-        }
-    }
-}
-#else
 u8 __OSGetDiscState(u8 last) {
     u32 flags;
 
@@ -158,7 +143,6 @@ u8 __OSGetDiscState(u8 last) {
         }
     }
 }
-#endif
 
 void OSRebootSystem(void) {
     OSStateFlags state;
@@ -226,11 +210,7 @@ void OSRestart(u32 resetCode) {
     if (type == 0x81) {
         OSDisableScheduler();
         __OSShutdownDevices(4);
-        #if (VERSION ==  RMGJ01)
-        resetCode = OSEnableScheduler();
-        #else
         OSEnableScheduler();
-        #endif
         __OSRelaunchTitle(resetCode);
     } else if (type == 0x80) {
         OSDisableScheduler();

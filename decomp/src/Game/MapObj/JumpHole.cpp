@@ -3,6 +3,16 @@
 #include "Game/LiveActor/Nerve.hpp"
 #include "Game/Util.hpp"
 
+void JumpHole_FORCE_MATCH_SDATA2() {
+    (void)1.0f;
+    (void)0.0f;
+    (void)0.000003814697265625f;
+    (void)0.5f;
+    (void)3.0f;
+    (void)-1.0f;
+    (void)2.0f;
+}
+
 namespace {
     const f32 sGravityAcc = 1.2f;
     const f32 sHoleRadius = 200.0f;
@@ -128,8 +138,8 @@ void JumpHole::exeRailMove() {
         initParabola(mBoundSensor->mHost->mPosition);
         MR::shakeCameraNormal();
         MR::startSound(this, "SE_OJ_JUMP_HOLE_FLIP");
-        MR::startSoundPlayer("SE_PV_JUMP_JOY");
-        MR::startSoundPlayer("SE_PM_JUMP_LONG");
+        MR::startSoundPlayer("SE_PV_JUMP_JOY", -1);
+        MR::startSoundPlayer("SE_PM_JUMP_LONG", -1);
         mBoundSensor->receiveMessage(ACTMES_SHOOT_JUMP_HOLE, getSensor("body"));
     }
 

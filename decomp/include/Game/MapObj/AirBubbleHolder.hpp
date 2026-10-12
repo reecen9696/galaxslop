@@ -10,7 +10,6 @@ public:
     /// @brief Creates a new `AirBubbleHolder`.
     /// @param pName A pointer to the null-terminated name of the object.
     AirBubbleHolder(const char* pName);
-    virtual ~AirBubbleHolder();
 
     virtual void init(const JMapInfoIter&);
 

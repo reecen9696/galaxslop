@@ -473,7 +473,7 @@ void Sandstorm::endBind() {
     mBindActor = nullptr;
 
     MR::validateClipping(this);
-    MR::endActorCamera(this, _8C, true);
+    MR::endActorCamera(this, _8C, true, -1);
 }
 
 void Sandstorm::updateSpiral() {
@@ -513,7 +513,7 @@ bool Sandstorm::tryStartBind(HitSensor* pSensor) {
 
     MR::tryRumblePadStrong(this, 0);
     MR::shakeCameraNormal();
-    MR::startActorCameraTargetSelf(this, _8C);
+    MR::startActorCameraTargetSelf(this, _8C, -1);
     MR::startBckPlayer("StormIn");
     MR::startSound(mBindActor, "SE_PV_UPSET");
     MR::invalidateClipping(this);

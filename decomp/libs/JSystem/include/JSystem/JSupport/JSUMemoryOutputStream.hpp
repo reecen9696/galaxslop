@@ -18,7 +18,7 @@ public:
 
     void setBuffer(void*, s32);
 
-    /* 0x08 */ void* mBuffer;
-    /* 0x0C */ s32 mLength;
-    /* 0x10 */ s32 mPosition;
+    void* mBuffer;  // 0x8
+    s32 mLength;    // 0xC
+    s32 mPosition;  // 0x10
 };

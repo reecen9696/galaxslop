@@ -16,6 +16,10 @@
 #include "Game/Util/PlayerUtil.hpp"
 #include "Game/Util/SoundUtil.hpp"
 
+void TripodBossKillerGenerater_FORCE_MATCH_SDATA2() {
+    (void)0.0f;
+}
+
 namespace {
     // static const s32 sForceKillTime = _;
     static const s32 sDemoAnimStartDelayTime = 90;

@@ -4,6 +4,8 @@
 #include "Game/Util.hpp"
 
 void FloaterFloatingForceTypeNormal_FORCE_MATCH_SDATA2() {
+    (void)0.0f;
+    (void)-1.0f;
     (void)0.05f;
     (void)0.0001f;
     (void)0.98f;

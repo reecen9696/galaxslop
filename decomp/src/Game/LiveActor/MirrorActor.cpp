@@ -8,6 +8,10 @@
 #include "Game/Util/ObjUtil.hpp"
 #include <JSystem/JMath/JMath.hpp>
 
+void MirrorActor_FORCE_MATCH_SDATA2() {
+    (void)0.0f;
+}
+
 MirrorActor::~MirrorActor() {
 }
 
