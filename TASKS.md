@@ -331,6 +331,7 @@ with no desync complaints at 100 ms delay.
 - what: Main-thread WebSocket writes incoming frames to a SAB ring the game worker reads; game worker writes outgoing to another ring the main thread flushes. `NetClient` in C++ samples local player each 2nd frame and publishes. Per-remote ring of 32 states. Net status (RTT, loss) to overlay.
 - done when: two tabs on one machine exchange states, visible in the overlay.
 - log:
+  - 2026-10-13 (A): verified end to end natively: remote state -> interpolation -> puppet pose on screen.
   - 2026-10-13 (A): native half works: net/client (WsClient + session), two desktop clients joined relay room PLAY22, each logs the other "visible" with live positions, RTT ~15 ms on localhost. Interpolation 100 ms behind, freeze 0.5 s, hide 3 s, stage/cutscene gating. Web half: implement net::Transport on the page WebSocket (P0-06 owner).
 
 ### P2-04 Local player state capture hook
@@ -355,6 +356,7 @@ with no desync complaints at 100 ms delay.
 - what: `LiveActor` subclass with Mario and Luigi model loading (copy an NPC's pattern), animation player, Hermite interpolation at now-100ms, freeze/hide rules, tint by palette, galaxy/scenario gating. Spawn on scene enter for every known remote; despawn on scene exit. Heap budget measured and logged. For scale: smg-online draws up to 16 remote Marios inside real Wii memory, so 4 puppets fitting is expected, not a risk.
 - done when: a second tab's Mario is visible and moves smoothly in Good Egg.
 - log:
+  - 2026-10-13 (A): networked: two desktop clients in relay room PLAY22, each drawing the other as a GhostMario puppet (screenshot: Bob idle at the courtyard spawn inside Alice's game). Remaining: Luigi model per remote (Hello character), tint, heap budget measurement.
   - 2026-10-12: loopback milestone works natively: PETARI_LOOPBACK=1 draws a GhostMario puppet replaying the local player 1 s late in the prologue courtyard (screenshot: blue ghost trailing Mario). Lessons: (1) create puppets during scene init (SceneDataInitializer::initAfterScenarioSelected), never from the frame update: ModelManager::init waits on a main-thread job and deadlocks there; (2) add GhostMario/GhostLuigi to the stage's archive list (startStageFileLoadAfterScenarioSelected); (3) build the XanimePlayers on the first frame the player exists (the table is the player's); (4) skip the file-select stage. Next: animation sync check (does the hash map to the right motion?), then drive it from P2-03 instead of the loopback.
   - 2026-10-12 (A): model it on GhostPlayer (Cosmic Mario ghost): XanimePlayer + upper-body player, changeAnimationByHash, receiveGhostPacket's apply logic. First milestone: a loopback puppet that replays the local player's captured state ~1 s late, no network.
 
