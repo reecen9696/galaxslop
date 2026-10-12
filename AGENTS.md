@@ -108,9 +108,9 @@ Architecture decisions go in `docs/DECISIONS.md`, append-only, numbered,
 dated, with the lane that made it. Small ones get three lines. Format:
 
 ```
-## D-012 (2026-10-14, lane A): Use WebGL2, not WebGPU, for Phase 1
-Why: Safari WebGPU is behind flags; GalaxyQuest's GLES layer maps 1:1.
-Revisit: when Phase 1 is done, benchmark an Aurora/WebGPU spike.
+## D-021 (2026-11-03, lane B): Cache OPFS sync handles for the session
+Why: opening a handle per read costs ~0.3 ms; the DVD layer reads often.
+Revisit: if open handles ever exceed the browser's per-origin limit.
 ```
 
 Do not reverse a decision in code without a new entry that supersedes it.
@@ -123,6 +123,13 @@ Do not reverse a decision in code without a new entry that supersedes it.
   `docs/UPSTREAM_NOTES.md` so a human can report it in their own words.
 - GalaxyQuest (bigmak94) is Unlicense and AI-built. Pulling fixes from it
   is fine. Note the commit hash in `DECISIONS.md`.
+- Aurora (encounter) is MIT. It is a pinned submodule in `extern/aurora`;
+  don't edit it in place. Fixes go upstream as PRs under your own name
+  with a human reviewing, or into `platform/src/gx/` as a shim. Dawn, SDL3,
+  nod and kabufuda arrive through Aurora's providers; they keep their own
+  licenses (all permissive).
+- webcompiled and WiiCompiled are GPL-3. Read their Emscripten/Aurora
+  build setup for the approach. Copy nothing. This repo stays Unlicense.
 - smg-online: FimeV1's own code is MIT. Headpenguin's code in its
   `SMGNetworkMultiplayer/` folder has no license. Do not copy it. Read it
   for ideas only.

@@ -26,9 +26,11 @@ Get one before Phase 1 ends.
 ## What this is
 
 - A native port of SMG (not an emulator). Petari's C++ runs as WebAssembly.
-- A platform layer that replaces the Wii: GX graphics to WebGL2, DSP audio
-  to an AudioWorklet, Wii Remote to gamepad and mouse, disc reads to the
-  browser's Origin Private File System, NAND saves to IndexedDB.
+- A platform layer that replaces the Wii: GX graphics through Aurora to
+  WebGPU (Dawn natively), DSP audio to an AudioWorklet, Wii Remote to
+  gamepad and mouse, disc reads to the browser's Origin Private File
+  System, NAND saves to IndexedDB. The non-graphics layers and the asset
+  cooker come from GalaxyQuest.
 - Online co-op on the "independent worlds" model used by every working
   Mario online mod: each player runs their own full copy of the game, other
   players appear as puppet Marios/Luigis, and progress (stars, story flags)
@@ -58,17 +60,20 @@ docs/
   DECISIONS.md         architecture decision log (append-only)
   REVIEW_2026-10-12.md the review that produced D-007..D-013
 decomp/                Petari sources + TARGET_PC fixes (GalaxyQuest snapshot)
+extern/
+  aurora/              GX layer (encounter/aurora, MIT, pinned submodule)
 platform/              the Wii replacement layer (C++), GalaxyQuest layout
   include/
   src/
-    gx/                GX FIFO -> WebGL2 / GL 3.3 (after the ES 3.0 rework)
+    gx/                glue between the game and Aurora; GalaxyQuest's
+                       GLES renderer kept only as the WebGL2 fallback
     audio/             DSP mixer -> AudioWorklet / SDL
     input/             WPAD <- Gamepad API / mouse / keyboard
     dvd/  nand/        disc reads <- OPFS, saves -> IndexedDB
     os/                emulated OS threads, timers, memory window
-    sdk/  port/        THP decoder, misc SDK, port glue
-    native/            SDL2 desktop host
-    web/               Emscripten host glue
+    sdk/  port/        misc SDK, port glue
+    native/            desktop host on Aurora's SDL3 main
+    web/               Emscripten host glue (emdawnwebgpu)
 net/                   client-side netcode (C++ + JS bridge)
 server/                relay server (TypeScript, WebSocket, container)
 web/                   the web shell: file import, lobby, canvas, HUD overlay
@@ -80,7 +85,9 @@ game/                  YOUR cooked disc. gitignored. never commit.
 ```
 
 State on 2026-10-12: docs and board exist; `decomp/` holds raw Petari until
-P0-02 swaps in the GalaxyQuest snapshot; `platform/` is empty dirs.
+P0-02 swaps in the GalaxyQuest snapshot; `platform/` is empty dirs;
+`extern/aurora` is added in P0-11. Why this shape and not an emulator, a
+static recompilation or a stream: `docs/DECISIONS.md` D-014 and D-015.
 
 ## Getting started (either agent)
 
@@ -98,12 +105,13 @@ P0-02 swaps in the GalaxyQuest snapshot; `platform/` is empty dirs.
 ## Prerequisites
 
 - Emscripten SDK (emsdk) 3.1.60+ with pthreads support
-- Clang with C++20; CMake 3.24+, Ninja
-- SDL2 (native build)
+- Clang with C++20; CMake 3.25+ (Aurora's minimum), Ninja
+- Aurora's dependencies (Dawn, SDL3, nod) come through its own CMake
+  providers; nothing to install by hand on macOS or Linux
 - Node 20+ (web shell, relay server, tests)
 - Python 3.10+ (cook tool)
 - Dolphin (to extract the disc) - only needed once, by a human
-- A Chromium browser for testing (WebGL2, SharedArrayBuffer, OPFS)
+- Chrome or Edge for testing (WebGPU, OPFS). Firefox and Safari later.
 
 ## Build
 

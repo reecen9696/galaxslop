@@ -80,7 +80,7 @@ save/restore every frame; snapshotting an 88 MB Wii heap is not that.
  |  web/ (TypeScript, Vite)                                        |
  |   import screen -> cooker (WASM) -> OPFS                        |
  |   lobby, settings, player list, toasts, net status              |
- |   <canvas> (OffscreenCanvas transferred to the game worker)     |
+ |   <canvas> (WebGPU; OffscreenCanvas on the game worker, D-005)  |
  |   AudioWorklet (receives PCM from the game worker)              |
  |   Gamepad API + mouse -> SharedArrayBuffer input ring           |
  |   WebSocket client -> SharedArrayBuffer net ring                |
@@ -89,7 +89,7 @@ save/restore every frame; snapshotting an 88 MB Wii heap is not that.
  +--------------------------------v-------------------------------+
  |  game worker (WASM, pthreads)                                   |
  |   decomp/   Petari game code, TARGET_WEB                        |
- |   platform/ gx->WebGL2, dsp->pcm ring, wpad<-input ring,        |
+ |   platform/ gx->Aurora->WebGPU, dsp->pcm ring, wpad<-input ring, |
  |             dvd<-OPFS sync reads, nand<-IndexedDB, os           |
  |   net/      PlayerState out, remote states in, puppet spawner,  |
  |             progress event merge                                |
@@ -129,24 +129,25 @@ force-includes `platform/include/port/compat.h`. Keep those flags.
 GalaxyQuest's layout, kept as is so its fixes can be pulled later:
 `platform/src/<subsystem>/` with `platform/include/`. Subsystems: `os`,
 `dvd`, `nand`, `input`, `sdk` (THP decoder and other SDK bits), `gx`,
-`audio`, `port`, plus ours: `native` (SDL2 host) and `web` (Emscripten
-glue). `xr` is deleted. One `CMakeLists.txt` per subsystem.
+`audio`, `port`, plus ours: `native` (desktop host) and `web` (Emscripten
+glue). `xr` is deleted. One `CMakeLists.txt` per subsystem. The GX layer
+itself is not in `platform/`; it is Aurora, a pinned submodule in
+`extern/aurora`.
 
-- `gx/`: GX command stream -> WebGL2. GalaxyQuest records the GX FIFO per
-  frame, decodes and caches display lists, batches draws that share state
-  (~200 batches a frame), and generates GLSL for TEV, Z textures and EFB
-  copies. Keep all of that. What has to change (D-008, task P0-10): it is
-  written against GLES 3.2. Per-draw state lives in four shader storage
-  buffers indexed from `gl_VertexID`; it uses the separate vertex attrib
-  binding API, `glProgramBinary` for its disk cache, and a compile thread on
-  a shared EGL context. WebGL2 is ES 3.0 and macOS GL is 4.1; neither has
-  any of those. Replace SSBOs with data textures and `texelFetch`, the
-  per-vertex record index with an integer attribute, the binding API with
-  `glVertexAttribPointer`, the binary cache with a GLSL source cache plus
-  `KHR_parallel_shader_compile`. Already stubbed upstream and staying
-  stubbed: `GXPeekARGB`/`GXPeekZ` readback (the sun's lens flare). EFB
-  copies to textures used later are fine. Shader variant cache: serialise
-  generated GLSL keyed by TEV config hash, ship a seed, warm on load.
+- `gx/`: the game's GX calls go to Aurora (D-014). Aurora implements the
+  GX API behind SDK-compatible headers (`include/dolphin/gx.h`), decodes
+  hardware FIFO opcodes and baked display lists in its command processor,
+  generates WGSL for TEV, and renders through WebGPU: emdawnwebgpu in the
+  browser, Dawn (Metal/Vulkan/D3D12) natively. It has a per-array
+  little-endian flag, so cooked vertex data is a supported input, and a
+  pipeline cache with transferable entries that we persist to OPFS. Our
+  `gx/` holds only the glue: FIFO hand-off, the EFB-copy and depth-snapshot
+  requests SMG makes, `VI` timing, and the null backend for headless CI.
+  Petari's `src/RVL_SDK/gx` is not compiled. GalaxyQuest's GLES 3.2
+  renderer (FIFO recorder, display-list cache, batching, GLSL shader gen)
+  stays in the tree as the WebGL2 fallback (D-008, P0-10) and as a
+  reference for what SMG actually asks of GX. Already unsupported in both
+  and staying so: `GXPeekARGB`/`GXPeekZ` readback (the sun's lens flare).
 - `audio/`: GalaxyQuest's DSP mixer. Output 48 kHz stereo float into a
   ring buffer in a SharedArrayBuffer; an AudioWorklet drains it. Resample
   if the AudioContext isn't 48 kHz.
@@ -165,11 +166,12 @@ glue). `xr` is deleted. One `CMakeLists.txt` per subsystem.
   per D-013: MEM1 at 0x80000000, MEM2 at 0x90000000 inside the wasm heap
   to start with. Main loop driven by `emscripten_set_main_loop` or a
   manual `requestAnimationFrame` proxy.
-- `native/`: a desktop SDL2 + OpenGL 3.3/4.1 core backend so you can build
-  and debug without a browser. Same `gx/` and `audio/` code, different
-  window and input glue. This is where most iteration happens. On macOS the
-  low 4 GB is PAGEZERO; link with `-Wl,-pagezero_size,0x1000` for the
-  fixed memory window.
+- `native/`: the desktop host, built on Aurora's `aurora::main` (SDL3
+  window, gamepad, Dawn device) so you can build and debug without a
+  browser. Same `gx/` and `audio/` code as the web build, different host
+  glue. This is where most iteration happens. On macOS the low 4 GB is
+  PAGEZERO; link with `-Wl,-pagezero_size,0x1000` for the fixed memory
+  window.
 
 ### 5.3 net/
 
@@ -240,10 +242,13 @@ tasks until the gate passes. Task IDs are in `TASKS.md`.
 
 Goal: prove the toolchain end to end.
 
+- Both humans play smg-online in Dolphin for an evening (P0-00). It is the
+  model we are building; feel it before building it.
 - Vendor the GalaxyQuest snapshot (decomp + platform + cook). Strip
   Android/OpenXR. Two parallel tracks: lane B builds the desktop host
-  (SDL2, memory window, null renderer) while lane A reworks the renderer
-  to ES 3.0 (the critical path; D-008).
+  (memory window, OS/DVD glue, null renderer) while lane A integrates
+  Aurora as the GX layer (P0-11, the critical path, 3-week timebox;
+  fallback is the WebGL2 rework of GalaxyQuest's renderer, P0-10).
 - Get the native build to boot to the title screen with a cooked disc.
 - Build the same with Emscripten. Boot to the title screen in Chromium
   with the cooked folder loaded from OPFS. Audio may be silent, input may
@@ -308,11 +313,11 @@ play testing.
 ### Phase 5: Polish (optional, open-ended)
 
 - Disc image import (ISO/RVZ/WBFS) with the user's own common key.
-- Safari support (OffscreenCanvas + WebGL2 checks).
+- Firefox and Safari support (their WebGPU, OffscreenCanvas and OPFS
+  sync-handle behaviour; test matrix).
 - Mobile touch controls.
-- WebGPU renderer spike, compared against WebGL2 on the bench. GalaxyQuest's
-  storage-buffer design maps onto WebGPU directly; pull forward if the
-  WebGL2 data-texture path costs more than ~2 ms a frame.
+- WebGL2 fallback renderer (P0-10's rework), only if a browser we care
+  about still lacks usable WebGPU by then.
 - Local 2-player on one machine (two puppets? No: two real players. This
   is where single-player assumptions bite. Scope carefully.)
 
@@ -364,10 +369,13 @@ headers. Cloudflare Pages can set headers natively via `_headers`.
 
 **Worker + OffscreenCanvas.** The game must not block the main thread, so
 it runs on a pthread (`-sPROXY_TO_PTHREAD`) with the canvas transferred
-(`-sOFFSCREENCANVAS_SUPPORT`). WebGL2 context is created on the worker. If
-Emscripten's offscreen path fights you, fallback: run the game on the main
-thread with `emscripten_set_main_loop` and accept jank during cooking.
-Decide in Phase 0, record in `DECISIONS.md`.
+(`-sOFFSCREENCANVAS_SUPPORT`). The WebGPU device and swap chain are
+created on the worker; Chrome supports this. `webcompiled` took a
+different path (main thread, JSPI for blocking waits, no
+SharedArrayBuffer); GalaxyQuest's OS layer schedules its own threads, so
+we may not need JSPI. If Emscripten's offscreen path fights you, fallback:
+run the game on the main thread with `emscripten_set_main_loop` and accept
+jank during cooking. Decide in Phase 0, record in `DECISIONS.md` (D-005).
 
 **OPFS sync reads.** `FileSystemSyncAccessHandle` is worker-only and gives
 real synchronous reads, which is what the DVD layer wants. Open handles are
@@ -383,10 +391,14 @@ matches all four, which doesn't matter for a port: we compile the C++. If a
 JP or KOR disc breaks, it is probably a DOL table offset in the cooker. Add
 the region to `tools/cook/dol_data.py` and move on.
 
-**GLES 3.2 in the renderer.** See D-008 and P0-10. The GalaxyQuest renderer
-uses SSBOs, the vertex attrib binding API, program binaries and a shared
-EGL context for compiles. WebGL2 and macOS GL have none of them. This is
-Phase 0's real work; everything else in Phase 0 is plumbing.
+**The GX layer is Phase 0's real work.** Everything else in Phase 0 is
+plumbing. Primary: Aurora on WebGPU (D-014, P0-11). Its open questions are
+listed in D-014: baked J3D display lists through Aurora's command
+processor, what the cooker must stop byte-swapping, EFB-copy coverage,
+frame time at 720p, and whether JSPI is needed. Fallback: GalaxyQuest's
+renderer is GLES 3.2 (SSBOs, attrib binding API, program binaries, shared
+EGL context) and runs on neither WebGL2 nor macOS GL without the rework in
+D-008 (P0-10). Don't try to build it unmodified on a Mac or in a browser.
 
 **Memory map in wasm32.** See D-013. GalaxyQuest's fixed 0x80000000 window
 exists to keep `u32` pointer casts valid on 64-bit; wasm32 pointers are
@@ -454,5 +466,14 @@ D-007 to D-013; `DECISIONS.md` is authoritative, this list is history.
 - sm64coopdx: https://github.com/coop-deluxe/sm64coopdx (sync model
   reference)
 - noclip.website: https://github.com/magcius/noclip.website (GX reference)
-- Aurora: https://github.com/encounter/aurora (MIT, Phase 5)
+- Aurora: https://github.com/encounter/aurora (MIT; the GX layer, D-014)
+- webcompiled: https://github.com/dynamiteswag81/webcompiled (GPL-3;
+  WiiCompiled + Aurora in Chrome via emdawnwebgpu. Read, don't copy.)
+- WiiCompiled: https://github.com/pgattic/Wiicompiled (GPL-3; static
+  recomp of Mario Kart Wii on Aurora. Read, don't copy.)
+- Browser SM64 multiplayer precedents: https://github.com/sm64js/sm64js,
+  https://github.com/sh1ftmaker/sm64coopdx,
+  https://github.com/metalfox-b/sm64-coop-web
+- wasm-dolphin: https://github.com/chuntaoc/wasm-dolphin (why not an
+  emulator, D-015)
 - coi-serviceworker: https://github.com/gzuidhof/coi-serviceworker

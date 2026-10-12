@@ -98,7 +98,7 @@ renders in Chromium; one human has seen it.
 - touches: platform/src/native, CMakeLists.txt, tools/bench/stub-game
 - flags:
 - what: Host window and input for the native build. If P0-11 goes, Aurora brings SDL3 windowing (`aurora::main`) and gamepad input; this task then wires `--game <dir>`, `--galaxy <name>`, `--headless --frames N`, keyboard into the WPAD surface and SDL audio behind `PortAudioSink` on top of it. If P0-11 fails, it is an SDL2 window with a GL 3.3/4.1 core context. Until a renderer lands, link against a null `gx` backend (`-DSMG_GX=null`) that accepts the FIFO and draws nothing, so B is not blocked on A and CI has a GL-free headless target for good. Create `tools/bench/stub-game/` with the cooked layout but empty files. Be honest about what the stub proves: platform init, arg parsing, a clean "no valid disc" exit. Not boot.
-- done when: `./smg --game tools/bench/stub-game --headless --frames 60` exits 0 with the null backend. With P0-10 merged and a real cooked disc, boots to title (human check, log it).
+- done when: `./smg --game tools/bench/stub-game --headless --frames 60` exits 0 with the null backend. With P0-11 (or P0-10) merged and a real cooked disc, boots to title (human check, log it).
 - log:
 
 ### P0-05 Cook tool: desktop path
@@ -119,7 +119,7 @@ renders in Chromium; one human has seen it.
 - blocked_by: P0-04, P0-11
 - touches: CMakeLists.txt, platform/src/web, web/
 - flags:
-- what: `-DSMG_TARGET=web`. Emscripten toolchain file; emdawnwebgpu port for Aurora (D-014; `webcompiled` pins Emscripten 6.0.12 and uses JSPI instead of SharedArrayBuffer, which we may not need since GalaxyQuest's OS layer schedules its own threads; decide in P0-09). Starting flags (measure, don't trust): `-pthread -sPTHREAD_POOL_SIZE=4` (GalaxyQuest emulates OS threads in its own scheduler; real threads are only the frame builder and audio), `-sPROXY_TO_PTHREAD -sOFFSCREENCANVAS_SUPPORT` (D-005, with the main-thread fallback compiled in), `-sMAXIMUM_MEMORY=4GB -sALLOW_MEMORY_GROWTH` (D-013: the fixed 0x80000000 window needs >2 GB of address space; note Emscripten's >2 GB pointer caveats), `-sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2`. No `-sFULL_ES3` unless something needs client-side arrays. SMGwebport publishes no source or flags; its `shell.js` only shows what it exports (`web_audio_ring`, `web_input_update`, `web_shader_warmup`), which is a reasonable shape for our `platform/src/web` glue. A minimal `web/index.html` + Vite config with COOP/COEP headers that loads the wasm and shows console output.
+- what: `-DSMG_TARGET=web`. Emscripten toolchain file; emdawnwebgpu port for Aurora (D-014; `webcompiled` pins Emscripten 6.0.12 and uses JSPI instead of SharedArrayBuffer, which we may not need since GalaxyQuest's OS layer schedules its own threads; decide in P0-09). Starting flags (measure, don't trust): `-pthread -sPTHREAD_POOL_SIZE=4` (GalaxyQuest emulates OS threads in its own scheduler; real threads are only the frame builder and audio), `-sPROXY_TO_PTHREAD -sOFFSCREENCANVAS_SUPPORT` (D-005, with the main-thread fallback compiled in), `-sMAXIMUM_MEMORY=4GB -sALLOW_MEMORY_GROWTH` (D-013: the fixed 0x80000000 window needs >2 GB of address space; note Emscripten's >2 GB pointer caveats), `--use-port=emdawnwebgpu` (no `-sUSE_WEBGL2`; the fallback renderer would add `-sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2`). SMGwebport publishes no source or flags; its `shell.js` only shows what it exports (`web_audio_ring`, `web_input_update`, `web_shader_warmup`), which is a reasonable shape for our `platform/src/web` glue. A minimal `web/index.html` + Vite config with COOP/COEP headers that loads the wasm and shows console output.
 - done when: the wasm links and the page loads it without a crash before `main()`; `wasmMemory.buffer.byteLength` and the page's resident memory are both logged.
 - log:
 
@@ -218,15 +218,15 @@ Chromium, with sound, on a gamepad, at 60 fps on the reference machine.
 - done when: save, reload page, continue.
 - log:
 
-### P1-06 Shader variant cache and seed
+### P1-06 Pipeline cache and seed
 - lane: A
 - status: open
 - owner:
 - blocked_by: P0-09
-- touches: platform/gx, web/src/shaders, tools/bench
+- touches: platform/src/gx, platform/src/web, web/src/shaders, tools/bench
 - flags: parallel-ok
-- what: Key TEV configs by hash. Serialise generated GLSL (WebGL2 has no program binaries; the cache is source + a compiled-program map in memory). Compile with `KHR_parallel_shader_compile` and poll `COMPLETION_STATUS_KHR`; never block the frame on a link. Persist to OPFS. Ship a seed file built by a `tools/bench/shader-tour.ts` script that visits every galaxy headless (human runs it once with a real disc; the seed contains no game data, only our GLSL). The seed is invalid whenever `gl_shadergen.cpp` changes; version it.
-- done when: second load of Good Egg has no shader hitch over 50 ms.
+- what: Aurora keeps a pipeline cache with transferable entries (zstd by default). Persist it to OPFS on the web and to the user data dir natively; load it before the first frame. Pipeline creation goes through `createRenderPipelineAsync`; never block the frame on it. Ship a seed built by a `tools/bench/shader-tour.ts` script that visits every galaxy headless (human runs it once with a real disc; the seed contains no game data, only pipeline descriptors and WGSL). Version the seed against the Aurora commit; a submodule bump invalidates it. If P0-11 went no-go, this task is the WebGL2 version: GLSL source cache keyed by TEV hash plus `KHR_parallel_shader_compile`.
+- done when: second load of Good Egg has no pipeline hitch over 50 ms.
 - log:
 
 ### P1-07 Frame pacing and resolution scale
@@ -487,24 +487,24 @@ Starter list, unordered: switches, launch stars (fired), coins (collected), 1-up
 - done when: an ISO imports without Dolphin; RVZ if time allows.
 - log:
 
-### P5-02 Safari support
+### P5-02 Firefox and Safari support
 - lane: A
 - status: open
 - owner:
 - blocked_by: P3-06
-- touches: platform/web, web/
+- touches: platform/src/web, web/
 - flags:
-- what: OffscreenCanvas + WebGL2 + OPFS sync handle checks. Fallbacks. Test matrix.
+- what: Both ship WebGPU now; what differs is OffscreenCanvas-on-worker, OPFS sync handles, JSPI and pipeline-cache behaviour. Build the test matrix, fix what is cheap, document what is not. Decide whether P5-03 is needed.
 - log:
 
-### P5-03 Aurora/WebGPU renderer spike
+### P5-03 WebGL2 fallback renderer
 - lane: A
 - status: open
 - owner:
-- blocked_by: P3-06
-- touches: platform/gx-webgpu (new)
+- blocked_by: P5-02
+- touches: platform/src/gx
 - flags:
-- what: Time-boxed 2 weeks. GalaxyQuest's per-draw-state-in-storage-buffers design maps directly onto WebGPU storage buffers, so this is mostly a WGSL emitter in `gl_shadergen.cpp` plus a command encoder in place of `gl_renderer.cpp`. Bench against the data-texture WebGL2 path (D-008). Pull forward if P0-08 shows the data-texture fetches cost more than ~2 ms. Decide in DECISIONS.
+- what: Only if P5-02 finds a browser we care about without usable WebGPU. Finish P0-10's rework of GalaxyQuest's renderer and select it at runtime when `navigator.gpu` is missing. Bench against Aurora. Decide in DECISIONS.
 - log:
 
 ### P5-04 Mobile touch controls

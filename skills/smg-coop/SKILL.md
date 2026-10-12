@@ -15,8 +15,11 @@ Petari (the SMG decomp, C++) is compiled with Emscripten to WebAssembly. It
 does not know it is in a browser. A platform layer in `platform/` implements
 the Wii SDK surface the game calls: GX (graphics), AX/DSP (audio), WPAD
 (controllers), DVD (disc reads), NAND (saves), OS (threads, timers, memory).
-GalaxyQuest already wrote most of this for Android/GLES; we are porting that
-layer to the web, not writing it from scratch. The web shell in `web/` owns
+GalaxyQuest already wrote most of this for Android; we port its OS, disc,
+save, audio and input layers to the web rather than writing them from
+scratch. Graphics are different: GX goes to Aurora (`extern/aurora`), the
+MIT GX implementation AstroCore and other decomp ports use, which renders
+through WebGPU in the browser and Dawn natively. The web shell in `web/` owns
 the canvas, file import, lobby and settings. For multiplayer, each client
 runs the full game locally; a `net/` module sends the local player's pose
 and receives other players' poses, which drive puppet actors in the game.
@@ -148,15 +151,22 @@ verified in the spec. Grep before you assume.
   this is why.
 - **Main-thread blocking**: the game loop can't block the browser main
   thread, and OPFS sync reads only work on a worker. Run the game on a
-  pthread (`-sPROXY_TO_PTHREAD`) with OffscreenCanvas for WebGL2 (D-005).
-  SMGwebport runs without OffscreenCanvas, so the main-thread fallback is
-  known to work if the offscreen path fights you. Safari is Phase 5.
-- **GLES 3.2 in the renderer**: `#version 320 es`, four SSBOs for per-draw
-  state, `glVertexAttribFormat`, `glProgramBinary`, shared-context compile
-  thread. WebGL2 (ES 3.0) and macOS GL (4.1) have none of them. P0-10 moves
-  per-draw state into data textures (`texelFetch`), the per-vertex record
-  index into an integer attribute, and the shader cache to GLSL source.
-  Don't try to build the unmodified renderer on a Mac or in a browser.
+  pthread (`-sPROXY_TO_PTHREAD`) with OffscreenCanvas and the WebGPU
+  device created on the worker (D-005). SMGwebport runs without
+  OffscreenCanvas and `webcompiled` runs Aurora on the main thread with
+  JSPI, so the main-thread fallback is known to work if the offscreen path
+  fights you. Firefox and Safari are Phase 5.
+- **Aurora is the GX layer, not GalaxyQuest's renderer**: link
+  `aurora::gx`; don't compile `decomp/src/RVL_SDK/gx` or GalaxyQuest's
+  `gl_renderer.cpp`. Aurora wants hardware-format (big-endian) display
+  lists and tells the shader per vertex array whether the data is
+  little-endian; P0-11 settles what the cooker must leave alone. Aurora's
+  `include/dolphin/` headers replace `<revolution/gx.h>` for GX only.
+- **GalaxyQuest's renderer is GLES 3.2**: `#version 320 es`, four SSBOs,
+  `glVertexAttribFormat`, `glProgramBinary`, shared-context compile
+  thread. WebGL2 (ES 3.0) and macOS GL (4.1) have none of them. It is the
+  fallback (P0-10), not the plan. Don't try to build it unmodified on a
+  Mac or in a browser.
 - **GX readback**: `GXPeekARGB`/`GXPeekZ` are unsupported in GalaxyQuest's
   renderer too. Stub them. The sun's lens flare never appears. Don't spend
   a week on it.
@@ -166,10 +176,11 @@ verified in the spec. Grep before you assume.
   (CMPR, RGB5A3, I8, IA4...) reach the renderer byte-swapped and are
   decoded to RGBA8 at load (`TexImage`). No S3TC extension needed. THP
   video decodes to I8 planes and TEV does the YUV->RGB.
-- **Shader compile stalls**: GX TEV configs compile to many shader
-  variants. First visit to a galaxy will hitch. WebGL2 has no program
-  binaries: cache GLSL source keyed by TEV hash, compile with
-  `KHR_parallel_shader_compile`, ship our own seed (P1-06). SMGwebport's
+- **Shader compile stalls**: GX TEV configs compile to many pipeline
+  variants. First visit to a galaxy will hitch. Aurora has a pipeline
+  cache with transferable entries; persist it to OPFS and ship a seed
+  built by a headless tour (P1-06). WebGPU pipeline creation is async
+  (`createRenderPipelineAsync`); never block the frame on it. SMGwebport's
   seed is for a different shader generator; useless to us.
 - **OPFS quota**: 3.3 GB is over the default quota on some browsers.
   Ask for persistent storage (`navigator.storage.persist()`). Ship without
