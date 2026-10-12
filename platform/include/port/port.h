@@ -105,6 +105,7 @@ typedef void (*PortIrqHandler)(void);
 void port_irq_set_handler(int irq, PortIrqHandler handler);
 void port_irq_raise(int irq);  // thread-safe, from any host thread
 void port_irq_poll(void);      // safe point; only from the thread owning the CPU
+void port_debug_where(const char* tag);  // breadcrumb for port_debug_dump_threads
 
 // ---------------------------------------------------------------------------
 // Threads

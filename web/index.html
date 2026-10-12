@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SMG Co-op</title>
+<style>
+  :root { color-scheme: dark; }
+  html, body { margin: 0; height: 100%; background: #000; color: #ccc; font: 14px system-ui, sans-serif; }
+  #wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 8px; }
+  canvas { width: min(100vw, calc(100vh * 640 / 456)); aspect-ratio: 640 / 456; background: #000; }
+  #status { opacity: .7; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="canvas" tabindex="0" oncontextmenu="event.preventDefault()"></canvas>
+  <div id="status">loading…</div>
+</div>
+<script>
+  // Development page (P0-08).  Needs cross-origin isolation for threads:
+  // serve with web/dev-server.mjs, which also serves the cooked game files.
+  const status = document.getElementById("status");
+  if (!crossOriginIsolated) status.textContent = "not cross-origin isolated: serve with web/dev-server.mjs";
+  var smgLog = [];  // recent game log lines, for automated checks
+  var Module = {
+    canvas: document.getElementById("canvas"),
+    print: (t) => console.log(t),
+    printErr: (t) => { console.log(t); smgLog.push(t); if (smgLog.length > 2000) smgLog.shift(); if (/joined room|present:|disc:|web:/.test(t)) status.textContent = t; },
+    onAbort: (e) => { status.textContent = "aborted: " + e; },
+  };
+</script>
+<script src="smg.js"></script>
+</body>
+</html>

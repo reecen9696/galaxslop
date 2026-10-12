@@ -120,6 +120,7 @@ struct HostThread {
     size_t stackSize = 0;
     pthread_t pt{};          // host thread (for diagnostics)
     bool hasPt = false;
+    std::atomic<const char*> where{nullptr};  // last breadcrumb (port_debug_where)
 };
 
 static constexpr int kMaxThreads = 64;
@@ -129,6 +130,7 @@ static OSThread* sHostOwner[kMaxThreads];
 static std::mutex sCpuMutex;
 static OSThread* sCpuOwner;  // guarded by sCpuMutex
 static thread_local OSThread* tlsSelf;
+static thread_local HostThread* tlsHost;  // diagnostics only
 static thread_local int tlsHostAllocDepth;
 
 static HostThread* hostOf(OSThread* t) {
@@ -150,6 +152,14 @@ static HostThread* hostOf(OSThread* t) {
         }
     }
     port_fatal("too many OSThreads");
+}
+
+// Breadcrumbs for port_debug_dump_threads: where each host thread last was.
+// Cheap enough to leave in; the browser build has no remote backtraces.
+extern "C" void port_debug_where(const char* tag) {
+    if (tlsHost) {
+        tlsHost->where.store(tag, std::memory_order_relaxed);
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -174,18 +184,22 @@ static void runIrqHandlers() {
     // Called with the CPU held.  Handlers run with interrupts disabled and
     // may not switch threads (SelectThread checks sInIrq).
     bool savedEn = sIntEnabled;
+    const char* savedWhere = tlsHost ? tlsHost->where.load(std::memory_order_relaxed) : nullptr;
     sInIrq = true;
     sIntEnabled = false;
     u32 bits;
     while ((bits = sPendingIrq.exchange(0)) != 0) {
         for (int i = 0; i < PORT_IRQ_COUNT; i++) {
             if ((bits & (1u << i)) && sIrqHandlers[i]) {
+                static const char* const kTags[] = {"irq0", "irq1", "irq2", "irq3", "irq4", "irq5", "irq6", "irq7", "irq8", "irq9", "irq10", "irq11", "irq12", "irq13", "irq14", "irq15"};
+                port_debug_where(i < 16 ? kTags[i] : "irq");
                 sIrqHandlers[i]();
             }
         }
     }
     sIntEnabled = savedEn;
     sInIrq = false;
+    port_debug_where(savedWhere);  // back where the interrupt was taken
 }
 
 extern "C" OSThread* SelectThread(BOOL yield);
@@ -256,7 +270,9 @@ static void startHostThread(OSThread* t, HostThread* h) {
 
 // Waits (with sCpuMutex held via lk) until `self` owns the CPU again.
 static void waitForCpu(std::unique_lock<std::mutex>& lk, OSThread* self, HostThread* h) {
+    port_debug_where("waitForCpu");
     h->cv.wait(lk, [&] { return sCpuOwner == self || h->cancelled; });
+    port_debug_where("has cpu");
     if (h->cancelled && sCpuOwner != self) {
         lk.unlock();
         pthread_exit(nullptr);
@@ -275,7 +291,9 @@ static void switchTo(OSThread* next, bool callerExiting) {
     }
     HostThread* hn = hostOf(next);
     HostThread* hs = (self && !callerExiting) ? hostOf(self) : nullptr;
+    port_debug_where("switchTo lock");
     std::unique_lock<std::mutex> lk(sCpuMutex);
+    port_debug_where("switchTo");
     if (hs) {
         hs->intEnabled = sIntEnabled;
     }
@@ -299,6 +317,7 @@ static void* hostThreadMain(void* arg) {
     OSThread* self = (OSThread*)arg;
     tlsSelf = self;
     HostThread* h = hostOf(self);
+    tlsHost = h;
     h->pt = pthread_self();
     h->hasPt = true;
     {
@@ -317,6 +336,7 @@ static void* hostThreadMain(void* arg) {
 static void idleUntilRunnable() {
     while (RunQueueBits == 0) {
         {
+            port_debug_where("idle");
             std::unique_lock<std::mutex> lk(sIdleMutex);
             sIdleCv.wait(lk, [] { return sPendingIrq.load() != 0; });
         }
@@ -813,6 +833,7 @@ extern "C" void port_host_free(void* p) { free(p); }
 // Diagnostics: emulated thread states and native backtraces
 // ---------------------------------------------------------------------------
 static std::atomic<int> sBtDone;
+#ifndef __EMSCRIPTEN__
 static uintptr_t sBtPcs[40];
 static int sBtCount;
 
@@ -829,12 +850,15 @@ static void btSignal(int) {
     _Unwind_Backtrace(btCallback, nullptr);
     sBtDone.store(1);
 }
+#endif
 
 extern "C" void port_debug_dump_threads(void) {
+#ifndef __EMSCRIPTEN__
     struct sigaction sa;
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = btSignal;
     sigaction(SIGURG, &sa, nullptr);
+#endif
     port_log("threads: cpu owner %p, pending irqs %08x, int enabled %d", (void*)sCpuOwner, sPendingIrq.load(), (int)sIntEnabled);
     for (int i = 0; i < kMaxThreads; i++) {
         OSThread* t = sHostOwner[i];
@@ -842,8 +866,12 @@ extern "C" void port_debug_dump_threads(void) {
             continue;
         }
         HostThread& h = sHost[i];
-        port_log("thread %p prio %d/%d state %d suspend %d queue %p mutex %p%s", (void*)t, t->priority, t->base, t->state, t->suspend,
-                 (void*)t->queue, (void*)t->mutex, t == sCpuOwner ? " [CPU]" : "");
+        const char* where = h.where.load();
+        port_log("thread %p prio %d/%d state %d suspend %d queue %p mutex %p%s at %s", (void*)t, t->priority, t->base, t->state, t->suspend,
+                 (void*)t->queue, (void*)t->mutex, t == sCpuOwner ? " [CPU]" : "", where ? where : "-");
+#ifdef __EMSCRIPTEN__
+        (void)h;  // no signal-driven native backtraces in wasm
+#else
         if (!h.hasPt) {
             continue;
         }
@@ -865,6 +893,7 @@ extern "C" void port_debug_dump_threads(void) {
             }
         }
         port_log("  bt:%s", line);
+#endif
     }
 }
 
@@ -876,6 +905,7 @@ static void (*sBootEntry)(void);
 static void* defaultThreadMain(void*) {
     OSThread* thread = &DefaultThread;
     tlsSelf = thread;
+    tlsHost = hostOf(thread);
     hostOf(thread)->pt = pthread_self();
     hostOf(thread)->hasPt = true;
     __OSCurrentThread = thread;

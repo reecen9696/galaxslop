@@ -83,6 +83,7 @@ static struct {
 } sFrame;
 
 static void executePacket() {
+    port_debug_where("dsp packet");
     const std::vector<u32>& p = sPacket;
     u32 w0 = p.empty() ? 0 : p[0];
     u32 cmd = w0 >> 24;
@@ -118,6 +119,7 @@ static void executePacket() {
         break;
     }
     port_irq_raise(PORT_IRQ_DSP);
+    port_debug_where("dsp packet done");
 }
 
 static void dspIrq() {
@@ -140,9 +142,18 @@ void DSPInit(void) {
     port_irq_set_handler(PORT_IRQ_DSP, dspIrq);
 }
 
-u32 DSPCheckMailToDSP(void) { return 0; }  // the HLE consumes mail instantly
+// Game code spins on these two (JAudio's dsptask/osdsp_task loops), so they
+// are interrupt safe points like OSGetTime: on the console the DSP interrupt
+// preempts the spin, here a pending one is taken at the next poll.
+u32 DSPCheckMailToDSP(void) {
+    port_debug_where("DSPCheckMailToDSP");
+    port_irq_poll();
+    return 0;  // the HLE consumes mail instantly
+}
 
 u32 DSPCheckMailFromDSP(void) {
+    port_debug_where("DSPCheckMailFromDSP");
+    port_irq_poll();
     std::lock_guard<std::mutex> lk(sMailMutex);
     return sMailFromDsp.empty() ? 0 : 0x80000000u;
 }
@@ -158,13 +169,16 @@ u32 DSPReadMailFromDSP(void) {
 }
 
 void DSPSendMailToDSP(u32 mail) {
+    port_debug_where("DSPSendMailToDSP");
     if (sWaitingCount) {
         sPacket.clear();
         sPacketExpected = mail == 0 ? 1 : mail;
         sWaitingCount = false;
         return;
     }
+    port_debug_where("DSPSendMailToDSP push");
     sPacket.push_back(mail);
+    port_debug_where("DSPSendMailToDSP pushed");
     if (sPacket.size() >= sPacketExpected) {
         sWaitingCount = true;
         executePacket();

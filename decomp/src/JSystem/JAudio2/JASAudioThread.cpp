@@ -1,3 +1,6 @@
+#ifdef TARGET_PC
+#include "port/port.h"
+#endif
 #include "JSystem/JAudio2/JASAudioThread.hpp"
 #include "JSystem/JAudio2/JASAiCtrl.hpp"
 #include "JSystem/JAudio2/JASChannel.hpp"
@@ -46,6 +49,9 @@ void* JASAudioThread::run() {
         msg = waitMessageBlock();
         switch ((intptr_t)msg) {
         case AUDIOMSG_DMA:
+#ifdef TARGET_PC
+            port_debug_where("aud DMA");
+#endif
             if (sbPauseFlag) {
                 JASDriver::stopDMA();
                 OSSleepThread(&sThreadQueue);
@@ -53,9 +59,15 @@ void* JASAudioThread::run() {
 
             JASDriver::updateDac();
             JASDriver::updateDacCallback();
+#ifdef TARGET_PC
+            port_debug_where("aud DMA done");
+#endif
             continue;
 
         case AUDIOMSG_DSP:
+#ifdef TARGET_PC
+            port_debug_where("aud DSP");
+#endif
             snIntCount -= 1;
             if (snIntCount == 0) {
                 JASProbe::stop(7);
@@ -65,7 +77,9 @@ void* JASAudioThread::run() {
                 JASDriver::updateDSP();
                 JASProbe::stop(2);
             }
-
+#ifdef TARGET_PC
+            port_debug_where("aud DSP done");
+#endif
             continue;
 
         case AUDIOMSG_STOP:

@@ -164,8 +164,15 @@ if(EMSCRIPTEN)
     -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2
     --profiling-funcs)  # function names in traps and profiles
   if(SMG_WEB_NODE)
+    target_compile_definitions(smg PRIVATE SMG_WEB_NODE=1)
     target_link_options(smg PRIVATE -sNODERAWFS=1 -sENVIRONMENT=node -sEXIT_RUNTIME=1
       --pre-js ${CMAKE_SOURCE_DIR}/platform/src/web/node_env.js)
+  else()
+    # Browser: WebGL2 on the canvas, transferred to the proxied main thread;
+    # WasmFS for the fetch (dev) and OPFS (P0-07) backends.
+    target_link_options(smg PRIVATE -sENVIRONMENT=web,worker -sWASMFS -sOFFSCREENCANVAS_SUPPORT
+      -sOFFSCREENCANVASES_TO_PTHREAD=\#canvas -sEXPORTED_RUNTIME_METHODS=ENV
+      --pre-js ${CMAKE_SOURCE_DIR}/platform/src/web/browser_env.js)
   endif()
   return()
 endif()

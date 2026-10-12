@@ -1,3 +1,6 @@
+#ifdef TARGET_PC
+#include "port/port.h"
+#endif
 #include "JSystem/JAudio2/dspproc.hpp"
 #include "JSystem/JAudio2/JASDspInterface.hpp"
 #include "JSystem/JAudio2/dsptask.hpp"
@@ -30,6 +33,12 @@ void DsetupTable(u32 param_0, u32 param_1, u32 param_2, u32 param_3, u32 param_4
     flag = TRUE;
     DSPSendCommands2(table, 5, setup_callback);
     do {
+#ifdef TARGET_PC
+        // The callback runs from the DSP interrupt, which the port only takes
+        // at safe points (see MR::waitEndChangeArchivePlayer).
+        port_debug_where("DsetupTable wait");
+        port_irq_poll();
+#endif
     } while (flag);
 }
 
@@ -72,5 +81,11 @@ void DsetVARAM(u32 param_0) {
     d_waitflag = TRUE;
     DSPSendCommands2(msgs, 2, dummy_callback);
     do {
+#ifdef TARGET_PC
+        // The callback runs from the DSP interrupt, which the port only takes
+        // at safe points (see MR::waitEndChangeArchivePlayer).
+        port_debug_where("DsetVARAM wait");
+        port_irq_poll();
+#endif
     } while (d_waitflag);
 }
