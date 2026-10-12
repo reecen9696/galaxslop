@@ -46,6 +46,8 @@ f16  up[3]          gravity up vector
 f16  vel[3]
 u32  anim_hash      MR::getHashCode(current animation name); the
                     receiver calls XanimePlayer::changeAnimationByHash (D-018)
+u8   anim_weight[4] track blend weights x255; the locomotion group mixes
+                    stand/walk/run/dash this way (D-018)
 f16  anim_frame
 u16  flags          bit0 character, bit1 grounded, bit2 spinning,
                     bit3 visible, bits4-7 powerup, bit8 on_launch_star,
@@ -53,7 +55,7 @@ u16  flags          bit0 character, bit1 grounded, bit2 spinning,
 u16  galaxy_id
 u8   scenario_id
 ```
-54 bytes with the forwarded id.
+58 bytes with the forwarded id.
 
 ### ProgressEvent kinds
 

@@ -95,6 +95,21 @@ void RemotePlayerPuppet::applyState(const NetPlayerCapture& rState, bool valid) 
         mAnimHash = rState.animHash;
         mXanimePlayer->changeAnimationByHash(rState.animHash);
     }
+    // GhostPlayer::setAnimationWeight: the locomotion group ("basic") blends
+    // its tracks by speed; without the weights the puppet stands still while
+    // it slides along.
+    for (int i = 0; i < 4; i++) {
+        mXanimePlayer->changeTrackWeight(i, rState.animWeights[i]);
+    }
+    // PETARI_PUPPETLOG=1: what the puppet was given and did, once a second.
+    static const bool sLog = getenv("PETARI_PUPPETLOG") != nullptr;
+    static u32 sN = 0;
+    if (sLog && (sN++ % 60) == 0) {
+        port_log("puppet: hash %08x -> playing '%s'; side %.2f %.2f %.2f up %.2f %.2f %.2f front %.2f %.2f %.2f", rState.animHash,
+                 mXanimePlayer->getCurrentAnimationName(), rState.baseMtx[0][0], rState.baseMtx[1][0], rState.baseMtx[2][0], rState.baseMtx[0][1],
+                 rState.baseMtx[1][1], rState.baseMtx[2][1], rState.baseMtx[0][2], rState.baseMtx[1][2], rState.baseMtx[2][2]);
+        port_log("puppet: weights %.2f %.2f %.2f %.2f", rState.animWeights[0], rState.animWeights[1], rState.animWeights[2], rState.animWeights[3]);
+    }
 }
 
 void RemotePlayerPuppet::control() {}

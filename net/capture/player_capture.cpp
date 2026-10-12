@@ -60,6 +60,9 @@ extern "C" void port_net_capture_player(void) {
             anim = xp->getCurrentAnimationName();
             c.animFrame = xp->tellAnimationFrame();
             c.animRate = xp->getRate();
+            for (int i = 0; i < 4; i++) {
+                c.animWeights[i] = xp->mWeights[i];
+            }
         }
     }
     c.animHash = anim != nullptr ? MR::getHashCode(anim) : 0;

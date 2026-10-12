@@ -22,6 +22,7 @@ typedef struct NetPlayerCapture {
     uint32_t animHash;    // MR::getHashCode(current animation name)
     float animFrame;      // frame within that animation
     float animRate;       // playback rate
+    float animWeights[4]; // track blend weights; the basic locomotion group mixes stand/walk/run/dash this way
     uint32_t stageHash;   // MR::getHashCode(MR::getCurrentStageName())
     int32_t scenario;     // MR::getCurrentScenarioNo()
     uint16_t flags;       // NET_CAPTURE_*
