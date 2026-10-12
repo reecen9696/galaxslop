@@ -92,8 +92,9 @@ tools/
 game/                  YOUR cooked disc. gitignored. never commit.
 ```
 
-State on 2026-10-12: docs and board exist; `decomp/` holds raw Petari until
-P0-02 swaps in the GalaxyQuest snapshot; `platform/` is empty dirs;
+State on 2026-10-12: P0-02 done. `decomp/` is Petari `0a5c660`
+(`petari-base`) plus GalaxyQuest's port; `platform/`, `tools/` and the root
+`CMakeLists.txt` are GalaxyQuest's, still Android/OpenXR-shaped until P0-03;
 `extern/aurora` is added in P0-11. Why this shape and not an emulator, a
 static recompilation or a stream: `docs/DECISIONS.md` D-014 and D-015.
 

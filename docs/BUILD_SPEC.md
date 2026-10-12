@@ -111,13 +111,14 @@ from the Quest (it rarely should; the platform layer absorbs differences).
 The `petari-base` tag marks the Petari commit GalaxyQuest started from, so
 `git diff petari-base -- decomp` shows all port changes, theirs and ours.
 
-Current state (2026-10-12): `decomp/` holds raw Petari `8c5307d` with full
-upstream history; P0-02 swaps in the snapshot. Keeping Petari's history in
-this repo is deliberate: a later rebase onto upstream is a merge, not a
-re-vendor.
+Current state (2026-10-12, P0-02 done): `petari-base` tags Petari
+`0a5c660`; `decomp/` holds GalaxyQuest's port on top of it. Petari's full
+upstream history is still in this repo, so a later rebase onto upstream is
+a merge, not a re-vendor.
 
-Petari's own build (`configure.py`, `orig/`, `config/`) stays untouched and
-unused. Our CMake picks up `decomp/src` and `decomp/include` directly.
+Petari's matching-build tooling (`configure.py`, `orig/`, `config/`) is not
+in `decomp/`; GalaxyQuest dropped it and we don't build for the Wii. Our
+CMake picks up `decomp/src`, `decomp/include` and `decomp/libs` directly.
 GalaxyQuest's CMake is the starting point: it globs `Game`, `JSystem`,
 `nw4r` and six RVL_SDK modules (`gx gd mem arc tpl aralt`, minus `GXFifo.c`
 and `GXPerf.c`), compiles as C++20/C11 with `-fshort-wchar -fsigned-char
@@ -128,8 +129,8 @@ force-includes `platform/include/port/compat.h`. Keep those flags.
 
 GalaxyQuest's layout, kept as is so its fixes can be pulled later:
 `platform/src/<subsystem>/` with `platform/include/`. Subsystems: `os`,
-`dvd`, `nand`, `input`, `sdk` (THP decoder and other SDK bits), `gx`,
-`audio`, `port`, plus ours: `native` (desktop host) and `web` (Emscripten
+`dvd`, `nand`, `input`, `sdk` (THP decoder and other SDK bits), `gx`, `vi`
+(video interface, retrace), `audio`, `port`, plus ours: `native` (desktop host) and `web` (Emscripten
 glue). `xr` is deleted. One `CMakeLists.txt` per subsystem. The GX layer
 itself is not in `platform/`; it is Aurora, a pinned submodule in
 `extern/aurora`.

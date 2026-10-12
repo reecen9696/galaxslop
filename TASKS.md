@@ -48,14 +48,15 @@ renders in Chromium; one human has seen it.
 
 ### P0-02 Vendor the GalaxyQuest snapshot (decomp + platform + cook)
 - lane: B
-- status: open
-- owner:
+- status: done
+- owner: A (solo, before lane B joined)
 - blocked_by:
 - touches: decomp/, platform/, tools/cook/, docs/DECISIONS.md, THIRD_PARTY_NOTICES.md, AGENTS.md (lane paths)
 - flags:
 - what: Per D-007. Clone bigmak94/GalaxyQuest at `d8a039c96f89c188fc44cdb7382ab9a4cf9ce92e`. (1) Replace the contents of `decomp/` with its `decomp/` in one commit; do not rewrite our history. (2) Copy its `platform/` (keep its `platform/src/<subsystem>/` + `platform/include/` layout; delete our empty `platform/<x>/.gitkeep` dirs) and `tools/cook/`. (3) Find the Petari commit it started from: `git -C galaxyquest rev-parse 'petari-base:decomp'` gives a tree hash; search our history for a Petari commit whose root tree matches (`git log --format='%H %T'` before the move commit). Move our `petari-base` tag there (`git tag -f`, `git push -f origin petari-base`, the one allowed force). If no exact match, pick the closest by `git diff --stat` and say so in the log. (4) Confirm `decomp/src/Game/System/*.bcsv` are gone (D-011); if the snapshot still has them, delete them. (5) Fill D-007's Petari hash. (6) Keep GalaxyQuest's file-level attribution; add the snapshot hash to THIRD_PARTY_NOTICES. CAS and Inter are `xr/`-only and leave with P0-03.
 - done when: `git diff petari-base -- decomp` shows only GalaxyQuest's port changes; `platform/` and `tools/cook/` present; D-007 filled.
 - log:
+  - 2026-10-12: GalaxyQuest's own `petari-base` tag = Petari `0a5c660` (2026-09-28) minus Petari tooling, line endings only differ. Our `petari-base` now tags `b3783b5` (decomp/ = that tree). Snapshot `d8a039c` applied in `f4af7d4`: 986 decomp files changed, platform/ incl. `vi/`, `xr/`, `android/`, all of GalaxyQuest's tools/ (cook.py imports ../rarc.py), root CMakeLists.txt, docs/galaxyquest/. bcsv tables gone. Petari's configure.py/config/orig are gone too (GalaxyQuest dropped them); upstream history keeps them.
 
 ### P0-03 Strip Android/OpenXR from the platform layer; desktop host glue
 - lane: B

@@ -61,7 +61,7 @@ upstream history, which is already in this repo, for later rebases. Find
 the Petari commit GalaxyQuest started from by matching its `petari-base`
 tree hash against our Petari history and move our `petari-base` tag there,
 so `git diff petari-base -- decomp` shows only port changes. Petari base
-hash: `<FILL IN P0-02>`.
+hash: `0a5c6608dc3b4c44a9aa68c2535d1793dc565f02` (2026-09-28; filled by P0-02).
 Revisit: if a Petari fix after the snapshot matters, rebase as its own task.
 
 ## D-008 (2026-10-12, lane A): The renderer needs an ES 3.0 rework before WebGL2 or macOS. Amends D-002

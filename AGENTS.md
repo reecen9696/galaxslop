@@ -18,7 +18,7 @@ lane's directories unless a task in `TASKS.md` explicitly says otherwise.
 
 | Lane | Default driver | Owns |
 |---|---|---|
-| A | Claude | `platform/src/gx/`, `platform/src/audio/`, `platform/src/web/`, `web/`, `tools/bench/` |
+| A | Claude | `platform/src/gx/`, `platform/src/vi/`, `platform/src/audio/`, `platform/src/web/`, `web/`, `tools/bench/` |
 | B | Gemini | `platform/src/os/`, `platform/src/dvd/`, `platform/src/nand/`, `platform/src/input/`, `platform/src/sdk/`, `platform/src/port/`, `platform/src/native/`, `net/`, `server/`, `tools/cook/`, `tools/cook-ts/` |
 | shared | both, by task | `decomp/`, `platform/include/`, `CMakeLists.txt`, `docs/`, `TASKS.md`, `AGENTS.md`, `skills/` |
 
