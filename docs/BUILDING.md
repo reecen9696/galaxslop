@@ -88,6 +88,33 @@ PETARI_STAGE=EggStarGalaxy:1 PETARI_INPUT="$MENU$ICON$REST" \
 The pointer must hover before a press: a press whose entry also sets the
 pointer arrives before the cursor is over the button.
 
+## Co-op (native, early)
+
+Two or more desktop builds can already see each other as ghost Marios
+(P2-01..P2-05; the browser version comes later). One machine runs the
+relay; everyone points their game at it and joins the same room.
+
+```
+# on the machine hosting (needs Node 22+):
+cd server && npm install && ROOMS=PLAY22 npm run dev      # ws://<its-ip>:8787
+
+# every player (the host too):
+SMG_RELAY=ws://<host-ip>:8787 SMG_ROOM=PLAY22 SMG_NAME=Reece ./build/native/smg --game ~/smg/game
+```
+
+- Same Wi-Fi: use the host's LAN IP (`ipconfig getifaddr en0` on a Mac).
+  Over the internet: expose port 8787 with a tunnel (`cloudflared tunnel
+  --url http://localhost:8787` gives a URL; use it as `ws://...`), until
+  P3-05 deploys the relay.
+- Without `ROOMS`, leave `SMG_ROOM` unset on the first player: the relay
+  makes a room and the game logs `net: joined room ABC123`; the others use
+  that code.
+- Others appear only when you are in the same stage and scenario, and not
+  during cutscenes. They are drawn 100 ms in the past, as the race-ghost
+  model. Nothing else is shared yet (no stars, no enemies).
+- `PETARI_NETLOG=1` logs the room, round-trip time and where the others are.
+  `PETARI_LOOPBACK=1` shows a ghost of yourself 1 s behind, with no network.
+
 ## 3. Linux
 
 The CMake path exists (`-no-pie -Wl,-Ttext-segment=0x98000000`) but

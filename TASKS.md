@@ -323,14 +323,15 @@ with no desync complaints at 100 ms delay.
 
 ### P2-03 NetClient and SAB ring
 - lane: B
-- status: open
-- owner:
+- status: in_progress
+- owner: A (native half; web half goes with P0-06/P0-08)
 - blocked_by: P2-01, P2-02, P1-10
 - touches: net/client, web/src/net
 - flags:
 - what: Main-thread WebSocket writes incoming frames to a SAB ring the game worker reads; game worker writes outgoing to another ring the main thread flushes. `NetClient` in C++ samples local player each 2nd frame and publishes. Per-remote ring of 32 states. Net status (RTT, loss) to overlay.
 - done when: two tabs on one machine exchange states, visible in the overlay.
 - log:
+  - 2026-10-13 (A): native half works: net/client (WsClient + session), two desktop clients joined relay room PLAY22, each logs the other "visible" with live positions, RTT ~15 ms on localhost. Interpolation 100 ms behind, freeze 0.5 s, hide 3 s, stage/cutscene gating. Web half: implement net::Transport on the page WebSocket (P0-06 owner).
 
 ### P2-04 Local player state capture hook
 - lane: A
