@@ -1,8 +1,8 @@
 # Building and running
 
 What works today (2026-10-12): the native desktop build on macOS boots a
-cooked disc and renders the game in a window (title screen and menus
-verified). The browser build is P0-06 onward.
+cooked disc and plays it in a window with sound: menus, the prologue and
+Good Egg Galaxy verified. The browser build is P0-06 onward.
 
 ## 1. Your own disc data
 
@@ -71,6 +71,22 @@ PETARI_GLITEMS=60              # log the renderer's batches every 60th frame
 ```
 
 The full list is in `docs/galaxyquest/TECHNICAL.md`.
+
+### Scripted boot to a galaxy (fresh save, no human)
+
+Creates file 1 with the Toad icon, plays through the prologue by tapping A,
+then jumps to Good Egg. Pointer positions are for the default 640x456 EFB.
+
+```
+MENU="28-28.4:A|B,30-36:PX=-0.25|PY=0.27,33-33.2:A,36-42:PX=0.29|PY=0.59,42-42.2:A,45-45.2:A,48-66:PX=0.55|PY=-0.38,66-77:PX=0.29|PY=0.59,77-300:PX=0.52|PY=0.78"
+ICON=",58-58.2:A,61-61.2:A,64-64.2:A"
+REST=$(for t in $(seq 70 3 290); do printf ",%s-%s.2:A" $t $t; done)
+PETARI_STAGE=EggStarGalaxy:1 PETARI_INPUT="$MENU$ICON$REST" \
+  ./build/native/smg --game ~/smg/game --save /tmp/smg-save --headless --seconds 300 --shots /tmp/shots --shot-every 6000
+```
+
+The pointer must hover before a press: a press whose entry also sets the
+pointer arrives before the cursor is over the button.
 
 ## 3. Linux
 

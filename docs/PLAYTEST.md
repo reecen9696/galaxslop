@@ -13,10 +13,10 @@ each. This list reorders Phases 2-4.
 ## Phase 0 gate
 - [ ] native: `--headless --frames 600` exits 0 on stub folder (null renderer)
 - [ ] web: same, in Playwright-Chromium
-- [ ] native (Aurora/Dawn): title screen renders with real disc
-- [ ] native: Good Egg matches Dolphin side by side (screenshot pair in the log)
-- [ ] web (Aurora/WebGPU): title screen renders with real disc from OPFS
-- [ ] P0-11 go/no-go logged with frame time at 720p
+- [x] native (GL 4.1, macOS): title screen renders with real disc (2026-10-12, RMGP01)
+- [ ] native: Good Egg matches Dolphin side by side (screenshot pair in the log). Good Egg renders correctly by eye (2026-10-12: terrain, foliage alpha, water, sky, HUD, 0 shader errors); Dolphin comparison not done.
+- [ ] web (WebGL2): title screen renders with real disc from OPFS
+- [x] P0-11 go/no-go logged (no-go, D-017)
 - [ ] D-005 decided with a measured reason (worker + OffscreenCanvas vs main thread)
 - [ ] D-013 decided with resident-memory numbers
 
