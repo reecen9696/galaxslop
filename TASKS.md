@@ -36,9 +36,8 @@ renders in Chromium; one human has seen it.
 
 ### P0-01 Repo init and scaffolding
 - lane: shared
-- status: in_progress
-- owner: B
-- started: 2026-10-12
+- status: open
+- owner:
 - blocked_by:
 - touches: root, .gitignore, CMakeLists.txt, platform/*/CMakeLists.txt, server/, web/, tools/
 - flags: solo
