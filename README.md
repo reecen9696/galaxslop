@@ -99,6 +99,8 @@ static recompilation or a stream: `docs/DECISIONS.md` D-014 and D-015.
 
 ## Getting started (either agent)
 
+0. Get your own disc data: `docs/GETTING_YOUR_DISC.md`. Nobody else's
+   copy, ever.
 1. Clone. Read `AGENTS.md`, then `skills/smg-coop/SKILL.md`, then
    `docs/BUILD_SPEC.md`, then `docs/REVIEW_2026-10-12.md` once.
 2. Open `TASKS.md`. Pick an unclaimed task in the earliest open phase that
