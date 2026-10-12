@@ -51,3 +51,8 @@ __pycache__/
 .env
 .env.*
 .dev.vars
+
+# built on first use by tools/rarc.py
+*.dylib
+*.so
+*.dll

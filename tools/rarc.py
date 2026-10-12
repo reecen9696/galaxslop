@@ -3,9 +3,17 @@
 import ctypes
 import os
 import struct
+import subprocess
+import sys
 
 _dll = None
-_dll_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cook', 'native', 'yaz0.dll')
+_native_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cook', 'native')
+_dll_name = {'win32': 'yaz0.dll', 'darwin': 'libyaz0.dylib'}.get(sys.platform, 'libyaz0.so')
+_dll_path = os.path.join(_native_dir, _dll_name)
+if not os.path.exists(_dll_path) and sys.platform != 'win32':
+    # Build the decoder on first use; without it decompression falls back to pure Python.
+    subprocess.run(['cc', '-O2', '-shared', '-fPIC', '-o', _dll_path,
+                    os.path.join(_native_dir, 'yaz0.c')], check=False)
 if os.path.exists(_dll_path):
     _dll = ctypes.CDLL(_dll_path)
     _dll.yaz0_decode.restype = ctypes.c_longlong

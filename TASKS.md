@@ -104,14 +104,15 @@ renders in Chromium; one human has seen it.
 
 ### P0-05 Cook tool: desktop path
 - lane: B
-- status: open
-- owner:
+- status: done
+- owner: A (solo)
 - blocked_by: P0-02
 - touches: tools/cook
 - flags: human
 - what: `tools/cook/` arrives with P0-02. Make sure `cook.py extracted game` works on EUR and USA. It accepts an extracted folder only (`sys/fst.bin`, `sys/main.dol`, `files/`; Dolphin's `DATA/` subfolder is handled). Region tables live in `dol_data.py`; document them in `tools/cook/README.md`. `validate.py` exists; wire it as `cook.py --verify <out>` and make it write `<out>/manifest.json` (path, size, sha1 per file) so the browser can check an import without re-reading everything. The `native/` hot-path dir: note what it accelerates; it is a hint for D-009's TS port, not something to ship.
 - done when: a human cooks their disc, `--verify` passes, `manifest.json` written.
 - log:
+  - 2026-10-12: RMGP01 cooked in ~9 s (2,371 files, 1.0 GB), validate.py 0 problems over 24,827 files / 2,235 archives. Added `manifest.json` (tools/cook/manifest.py), `--verify`, `--write-manifest`; corruption test fails as expected. `tools/rarc.py` now builds and loads `libyaz0.dylib/.so` on macOS/Linux (it only knew `yaz0.dll`). Note for D-009: at 9 s natively, the browser cooker's 10-minute budget has lots of room.
 
 ### P0-06 Emscripten build: compile and link
 - lane: A

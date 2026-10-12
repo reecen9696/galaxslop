@@ -36,8 +36,10 @@ import jaudio  # noqa: E402
 import jpa  # noqa: E402
 import kcl  # noqa: E402
 import lyt  # noqa: E402
+import manifest  # noqa: E402
 import rarc_swap  # noqa: E402
 import thp  # noqa: E402
+import validate  # noqa: E402
 from util import sw32  # noqa: E402
 
 TEXT_EXT = {'.txt', '.ini', '.csv', '.csv#', '.xnim', '.dtp', '.dck'}
@@ -309,18 +311,43 @@ def convert(data_dir, out_dir, jobs=None, only=None, no_audio=False,
         print('note (%dx): %s' % (v, msg))
     for e in errors:
         print('ERROR', e)
+    if not errors and not args.only:
+        print('manifest: %d files' % manifest.write(args.out_dir))
     return 1 if errors else 0
+
+
+def verify(cooked_dir):
+    """Structure check (validate.py) plus manifest check. 0 means good."""
+    rc = validate.main(cooked_dir)
+    problems = manifest.check(cooked_dir)
+    for pr in problems[:50]:
+        print('PROBLEM', pr)
+    print('manifest: %d problems' % len(problems))
+    return 1 if rc or problems else 0
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('data_dir')
-    ap.add_argument('out_dir')
+    ap.add_argument('data_dir', nargs='?')
+    ap.add_argument('out_dir', nargs='?')
     ap.add_argument('--jobs', type=int, default=os.cpu_count())
     ap.add_argument('--only')
     ap.add_argument('--no-audio', action='store_true')
     ap.add_argument('--with-movies', action='store_true')
-    return convert(**vars(ap.parse_args()))
+    ap.add_argument('--verify', metavar='COOKED_DIR',
+                    help='check a cooked folder (structure and manifest.json) and exit')
+    ap.add_argument('--write-manifest', metavar='COOKED_DIR',
+                    help='(re)write manifest.json for a cooked folder and exit')
+    args = ap.parse_args()
+    if args.verify:
+        return verify(args.verify)
+    if args.write_manifest:
+        print('manifest: %d files' % manifest.write(args.write_manifest))
+        return 0
+    if not (args.data_dir and args.out_dir):
+        ap.error('data_dir and out_dir are required unless --verify or --write-manifest is given')
+    del args.verify, args.write_manifest
+    return convert(**vars(args))
 
 
 if __name__ == '__main__':
