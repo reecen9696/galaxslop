@@ -124,7 +124,7 @@ if(NOT ANDROID)
   # Desktop: one executable linked at the game's fixed slot (see
   # platform/src/native/main.cpp).  The Android launcher, the OpenXR layer,
   # AAudio and the EGL renderers stay out; native/ replaces them.
-  list(FILTER PLATFORM_SRCS EXCLUDE REGEX "/platform/src/xr/|/audio/aaudio_out\\.cpp$|/gx/headless_render\\.cpp$")
+  list(FILTER PLATFORM_SRCS EXCLUDE REGEX "/platform/src/xr/|/gx/headless_render\\.cpp$")
 
   # SDL3 for the window, GL context and input, built from source: the Mac
   # build is x86_64 (D-016) and Homebrew's libraries are arm64.  Same release

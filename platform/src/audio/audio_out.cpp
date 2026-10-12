@@ -1,9 +1,13 @@
 // Host audio output: the game's AI DMA stream (16-bit stereo, right sample
-// first, normally 32 kHz) played through AAudio.  Blocks go into a ring that
-// AAudio's data callback drains at the device's pace; the AI clock
-// (ai_dsp.cpp) keeps the ring topped up.  PETARI_WAV=<path> also records the
-// stream to a WAV file.
+// first, normally 32 kHz) played through AAudio (Android) or an SDL3 audio
+// stream (desktop, web).  Blocks go into a ring that the device's callback
+// drains at its own pace; the AI clock (ai_dsp.cpp) keeps the ring topped up.
+// PETARI_WAV=<path> also records the stream to a WAV file.
+#ifdef __ANDROID__
 #include <aaudio/AAudio.h>
+#else
+#include <SDL3/SDL.h>
+#endif
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,7 +23,13 @@
 namespace {
 
 std::mutex sLock;  // the stream, the resampler and the WAV file
+#ifdef __ANDROID__
 AAudioStream* sStream = nullptr;
+#else
+SDL_AudioStream* sStream = nullptr;
+// The rate the SDL stream is fed at; SDL converts to the device's.
+const int32_t kSdlRate = 48000;
+#endif
 bool sOpenFailed = false;
 std::atomic<bool> sDisconnected{false};
 int32_t sDeviceRate = 0;
@@ -138,10 +148,9 @@ void writeWavHeader(FILE* f, u32 frames, u32 rate) {
     fseek(f, 0, SEEK_END);
 }
 
-// AAudio's real-time thread: copies queued frames out, silence when there
+// The device's real-time thread: copies queued frames out, silence when there
 // are none.
-aaudio_data_callback_result_t dataCallback(AAudioStream*, void*, void* audioData, int32_t numFrames) {
-    s16* out = (s16*)audioData;
+void drainRing(s16* out, int32_t numFrames) {
     u32 r = sRingRead.load(std::memory_order_relaxed);
     u32 avail = sRingWrite.load(std::memory_order_acquire) - r;
     u32 n = avail < (u32)numFrames ? avail : (u32)numFrames;
@@ -160,6 +169,11 @@ aaudio_data_callback_result_t dataCallback(AAudioStream*, void*, void* audioData
         sPlaying = true;
     }
     sRingRead.store(r + n, std::memory_order_release);
+}
+
+#ifdef __ANDROID__
+aaudio_data_callback_result_t dataCallback(AAudioStream*, void*, void* audioData, int32_t numFrames) {
+    drainRing((s16*)audioData, numFrames);
     return AAUDIO_CALLBACK_RESULT_CONTINUE;
 }
 
@@ -205,6 +219,50 @@ bool openStream(u32 rate) {
     return true;
 }
 
+void closeStream() {
+    AAudioStream_close(sStream);
+    sStream = nullptr;
+}
+#else
+// SDL asks for more data (on its audio thread) when its queue runs low; hand
+// it what it asks for, from the ring, in small chunks.
+void SDLCALL sdlCallback(void*, SDL_AudioStream* stream, int additional, int) {
+    s16 buf[1024 * 2];
+    while (additional > 0) {
+        int frames = additional / 4;
+        if (frames > 1024) frames = 1024;
+        if (frames <= 0) frames = 1;
+        drainRing(buf, frames);
+        SDL_PutAudioStreamData(stream, buf, frames * 4);
+        additional -= frames * 4;
+    }
+}
+
+bool openStream(u32 rate) {
+    if (!SDL_WasInit(SDL_INIT_AUDIO) && !SDL_InitSubSystem(SDL_INIT_AUDIO)) {
+        port_log("audio: SDL audio init failed: %s", SDL_GetError());
+        return false;
+    }
+    SDL_AudioSpec spec = {SDL_AUDIO_S16, 2, kSdlRate};
+    sStream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, sdlCallback, nullptr);
+    if (!sStream) {
+        port_log("audio: SDL open failed: %s", SDL_GetError());
+        return false;
+    }
+    sDeviceRate = kSdlRate;
+    sRingRead.store(sRingWrite.load());
+    sResampler = Resampler();
+    SDL_ResumeAudioStreamDevice(sStream);
+    port_log("audio: SDL %s, %d Hz stream (source %u Hz)", SDL_GetCurrentAudioDriver(), sDeviceRate, rate);
+    return true;
+}
+
+void closeStream() {
+    SDL_DestroyAudioStream(sStream);
+    sStream = nullptr;
+}
+#endif
+
 }  // namespace
 
 extern "C" void port_audio_submit(const s16* rightLeft, u32 frames, u32 rate) {
@@ -237,8 +295,7 @@ extern "C" void port_audio_submit(const s16* rightLeft, u32 frames, u32 rate) {
 
     if (sStream && sDisconnected.exchange(false)) {
         port_log("audio: output device disconnected, reopening");
-        AAudioStream_close(sStream);
-        sStream = nullptr;
+        closeStream();
     }
     if (!sStream && !sOpenFailed) {
         sOpenFailed = !openStream(rate);

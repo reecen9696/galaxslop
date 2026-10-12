@@ -1,5 +1,5 @@
 // Flat-screen meanings for the hooks GalaxyQuest's VR layer (platform/src/xr,
-// not built on desktop) and its AAudio output provide.  The game calls them
+// not built on desktop) provides.  The game calls them
 // from TARGET_PC code; on a flat screen there is no headset view, diorama,
 // laser pointer or VR transit, so every query answers "not in VR" and the
 // game takes its original Wii path.
@@ -26,9 +26,6 @@ void port_vr_transit_begin(const void*) {}
 void port_vr_transit_end(const void*) {}
 const void* port_vr_transit_host(void) { return nullptr; }
 void port_vr_pause_menu(int) {}
-
-// The Wii remote's speaker.  TODO(P1-01): mix into the main output.
-void port_speaker_push(const int16_t*, int) {}
 
 }  // extern "C"
 
