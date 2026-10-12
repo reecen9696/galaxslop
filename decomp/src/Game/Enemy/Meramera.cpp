@@ -228,6 +228,10 @@ namespace NrvMeramera {
     NEW_NERVE(MerameraNrvReadyRestart, Meramera, ReadyRestart);
 }  // namespace NrvMeramera
 
+#ifdef TARGET_PC
+// libstdc++'s <math.h> brings C++20's std::lerp into the global namespace.
+#define lerp merameraLerp
+#endif
 f32 lerp(f32 start, f32 end, f32 t) {
     return start + (end - start) * t;
 }
