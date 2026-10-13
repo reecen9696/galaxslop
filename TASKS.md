@@ -393,14 +393,15 @@ with no desync complaints at 100 ms delay.
 
 ### P2-07 Name tags and player list overlay
 - lane: A
-- status: open
-- owner:
+- status: review
+- owner: A
 - blocked_by: P2-05, P2-06
 - touches: web/src/overlay, net/bridge
 - flags:
 - what: Game worker posts projected screen positions for visible puppets each frame (or every other). Overlay draws name tags. Player list shows galaxy and status per player.
 - done when: tags track puppets with no visible lag.
 - log:
+  - 2026-10-13 (A): browser: present_web.cpp projects each visible remote (head + 210 along their up) with the drawn frame's camera; the page draws HTML labels over the canvas (colour by tint). Player list = room bar under the canvas. Verified headless with two quick-start clients in Good Egg (tag above the walking puppet, none for a player behind the camera). Native build has no tags yet.
 
 ### P2-08 Playtest: 3 players over the internet
 - lane: shared

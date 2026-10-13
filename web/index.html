@@ -33,12 +33,19 @@
   #settings input[type=range], #settings select { width: 100%; }
   #settings select { font: inherit; padding: 6px; border-radius: 8px; background: #0b0e18; color: var(--fg); border: 1px solid #333a50; }
   #settings label { display: block; color: var(--dim); font-size: 13px; margin-top: 10px; }
+  #stage { position: relative; display: none; }
+  #stage canvas { display: block; }
+  #tags { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  #tags span { position: absolute; transform: translate(-50%, -100%); font: 600 13px system-ui, sans-serif; color: #fff; background: #0008; padding: 1px 6px; border-radius: 6px; white-space: nowrap; }
   #perfbox { position: fixed; top: 12px; left: 12px; font: 12px ui-monospace, monospace; color: #9fe39f; background: #000a; padding: 6px 8px; border-radius: 6px; display: none; white-space: pre; }
 </style>
 </head>
 <body>
 <div id="wrap">
-  <canvas id="canvas" tabindex="0" oncontextmenu="event.preventDefault()"></canvas>
+  <div id="stage">
+    <canvas id="canvas" tabindex="0" oncontextmenu="event.preventDefault()"></canvas>
+    <div id="tags"></div>
+  </div>
   <div id="import">
     <h1>Load your game files</h1>
     <p>This page runs Super Mario Galaxy from your own disc. Nothing is uploaded: the files are copied

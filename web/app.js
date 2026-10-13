@@ -309,11 +309,40 @@ function onNetLine(t) {
     : "reconnecting…";
 }
 
+// Name tags over remote players (P2-07), from present_web.cpp's projection.
+const kTagColors = ["#ffffff", "#ff6b6b", "#6bc5ff", "#7ee081", "#ffd166", "#c792ea", "#ff9f43", "#f78fb3"];
+function drawTags() {
+  requestAnimationFrame(drawTags);
+  const box = document.getElementById("tags");
+  if (!window.Module || !Module._web_name_tags || !Module.HEAPU8) return;
+  const ptr = Module._web_name_tags() >>> 0;
+  const v = new DataView(Module.HEAPU8.buffer, ptr, 4 + 48 * 4);
+  const n = v.getUint32(0, true);
+  while (box.children.length < n) box.appendChild(document.createElement("span"));
+  for (let i = 0; i < box.children.length; i++) {
+    const el = box.children[i];
+    if (i >= n) {
+      el.style.display = "none";
+      continue;
+    }
+    const o = 4 + 48 * i;
+    const bytes = new Uint8Array(Module.HEAPU8.buffer, ptr + o + 12, 36);
+    const name = new TextDecoder().decode(bytes.slice(0, bytes.indexOf(0) < 0 ? 36 : bytes.indexOf(0)));
+    el.textContent = name;
+    el.style.color = kTagColors[v.getUint32(o + 8, true) % kTagColors.length];
+    el.style.left = ((v.getFloat32(o, true) + 1) * 50).toFixed(2) + "%";
+    el.style.top = ((1 - v.getFloat32(o + 4, true)) * 50).toFixed(2) + "%";
+    el.style.display = "block";
+  }
+}
+
 function boot(args, env = {}) {
   window.smgEnv = { SMG_SCALE: store("smg.scale") || "2", ...env }; // read by browser_env.js in preRun
   importPanel.style.display = "none";
   const canvas = document.getElementById("canvas");
   canvas.style.display = "block";
+  document.getElementById("stage").style.display = "block";
+  requestAnimationFrame(drawTags);
   canvas.focus();
   window.Module = {
     canvas,

@@ -22,6 +22,7 @@
 #include <unordered_set>
 
 #include "../gx/gl_renderer.h"
+#include "net/client/net_client.h"
 #include "port/port.h"
 
 namespace {
@@ -101,6 +102,7 @@ extern "C" pthread_t web_event_thread(void) { return sEventThread; }
 
 static void applyScale();
 static void recordTiming(double presentMs);
+static void updateNameTags();
 
 bool web_present_init(int scale) {
     sEventThread = pthread_self();
@@ -160,6 +162,7 @@ void web_present_frame() {
     glBlitFramebuffer(0, 0, sEfb.width, sEfb.height, 0, 0, cw, ch, GL_COLOR_BUFFER_BIT, GL_LINEAR);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     recordTiming(emscripten_get_now() - t0);
+    updateNameTags();
 }
 
 // Gamepad (standard mapping) on top of keyboard/mouse, per BUILD_SPEC
@@ -313,6 +316,48 @@ static void recordTiming(double presentMs) {
     present.clear();
     interval.clear();
     windowStart = now;
+}
+
+// Name tags (P2-07): where each visible remote player's head is on screen,
+// for the page to draw HTML labels over the canvas (web/app.js).  Uses the
+// camera of the frame just drawn, so tags move with the picture.
+struct NameTag {
+    float x, y;  // normalized device coordinates (-1..1, y up)
+    uint32_t tint;
+    char name[36];
+};
+struct NameTags {
+    uint32_t count;
+    NameTag tags[net::kMaxRemotes];
+};
+static NameTags sTags;
+extern "C" EMSCRIPTEN_KEEPALIVE NameTags* web_name_tags(void) { return &sTags; }
+
+static void updateNameTags() {
+    NameTags out{};
+    const gpu::CameraInfo& cam = gpu::renderer().camera();
+    if (cam.valid && net::netEnabled()) {
+        float t = tanf(cam.fovy * 0.5f * 3.14159265f / 180.0f);
+        float aspect = cam.aspect > 0 ? cam.aspect : 640.0f / 456.0f;
+        for (int i = 0; i < net::kMaxRemotes; i++) {
+            const net::RemoteView& v = net::netRemote(i);
+            if (!v.present || !v.visible) continue;
+            // A little above the head, along the player's own up.
+            float w[3];
+            for (int k = 0; k < 3; k++) w[k] = v.pose.pos[k] + v.pose.up[k] * 210.0f;
+            const float* m = cam.view;
+            float vx = m[0] * w[0] + m[1] * w[1] + m[2] * w[2] + m[3];
+            float vy = m[4] * w[0] + m[5] * w[1] + m[6] * w[2] + m[7];
+            float vz = m[8] * w[0] + m[9] * w[1] + m[10] * w[2] + m[11];
+            if (vz > -50.0f) continue;  // behind the camera
+            NameTag& tag = out.tags[out.count++];
+            tag.x = vx / -vz / (t * aspect);
+            tag.y = vy / -vz / t;
+            tag.tint = v.tint;
+            snprintf(tag.name, sizeof(tag.name), "%s", v.name);
+        }
+    }
+    sTags = out;
 }
 
 unsigned long long web_present_frame_number() { return gpu::renderer().frameNumber(); }
