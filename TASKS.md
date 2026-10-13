@@ -547,6 +547,18 @@ playtest pain. Template:
   - 2026-10-13 (A): coins and star bits: drops (MR::appearCoinPop/ToDirection, appearStarPiece/ToDirection) are announced and re-made on the others from a loot host declared during placement (the star bit director exists only from then, and allocates after placement); pickups (Coin::noticeGetCoin except purple, StarPiece::touchPlayer) remove the item on the others (placed: by id; spawned: nearest same name within 300). Shooting stars (the star bits falling from the sky) are host-led so the burst happens everywhere at once; their bursts are not announced (every client makes them). Verified with two clients: F11 drops appear on both, pickups vanish on both, shooting stars fire 5/5 in step. WorldEvent 35 bytes.
   - 2026-10-13 (A): "random flashing" (b3's report: frames with only the map on the clear colour, no sky, players or HUD) was not world sync: it happens offline too. The recorder ended frames at the VI retrace, which lands mid-draw of the next frame when one runs slow, cutting its start into the shown frame (draw counts 12k/32k around a normal 19.5k). Frames now end at the display copy (gx_recorder efbCopy). Broken frames: 37-45 per 50 s run before, 0 in 456 + 2x551 after. PETARI_FRAMELOG=1 logs each recorded frame's draws.
 
+### P4-02 Sync: switches, finishing a star together, boss defeats
+- lane: A
+- status: in_progress
+- owner: A
+- started: 2026-10-13
+- blocked_by: (started before P3-06 at the user's request)
+- touches: net/world, decomp/src/Game/Map (stage switches), decomp/src/Game/MapObj/PowerStar.cpp, boss files (named in log), server/src
+- flags: parallel-ok
+- what: Stage switches turned on by one client turn on for the others in the same stage and scenario (doors, bridges, appearing stars). A Power Star collected by one player is collected by everyone in that level (both see the star-get and leave together; the user's choice). A boss defeated by one player is defeated for everyone (the user chose defeat only, no shared health).
+- done when: two clients: a switch flipped by one opens the door for both; one grabs the star, both finish; one defeats a boss, it is defeated on the other.
+- log:
+
 ### P4-NN Sync: <object type>
 - lane:
 - status: open
