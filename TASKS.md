@@ -649,6 +649,18 @@ Starter list, unordered: switches, launch stars (fired), coins (collected), 1-up
 - what: Virtual stick and buttons. Only if the bench says mobile hits 30 fps.
 - log:
 
+### P5-07 Leaderboard: coins and star bits per player
+- lane: shared
+- status: in_progress
+- owner: A
+- started: 2026-10-14
+- blocked_by:
+- touches: web/, server/src (board.ts, relay leave hook, main.ts), platform/src/web/present_web.cpp, decomp/src/Game/Scene/ScenePlayingResult.cpp, decomp/src/Game/System/GameDataHolder.cpp (star get), decomp/src/Game/System/GameDataFunction.cpp (stage), docs/
+- flags: solo
+- what: Asked for by the user. A leaderboard of the coins and star bits each player picked up themselves (not the shared counters): this galaxy (best run) and overall (all runs). Opened by a button next to the settings gear, Tab, or the gamepad's Y; shows by itself for a few seconds after a star. Scores live in each player's browser, so they last across sessions and rooms; in a room the relay shows those of the players online now.
+- done when: the board opens three ways, fills from real pickups, survives a reload, and shows two players in one room.
+- log:
+
 ### P5-05 Local 2-player (two real players, one machine)
 - lane: shared
 - status: open
