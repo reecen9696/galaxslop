@@ -290,7 +290,32 @@ void MoviePlayingSequence::exePlayWait() {
     }
 }
 
+#ifdef TARGET_PC
+namespace {
+    // A game folder cooked without --with-movies still lists the movies in
+    // its fst.bin, but the files are absent (size 0).  The player would wait
+    // in its Open state forever, leaving the screen black.
+    bool isMovieFilePresent(const char* pName) {
+        DVDFileInfo info;
+        if (!DVDOpen(pName, &info)) {
+            return false;
+        }
+        bool present = info.length != 0;
+        DVDClose(&info);
+        return present;
+    }
+};  // namespace
+#endif
+
 void MoviePlayingSequence::exePlayStart() {
+#ifdef TARGET_PC
+    // No movie to play: carry on as if it had been skipped.
+    if (MR::isFirstStep(this) && !isMovieFilePresent(::getMovieName(mInfo))) {
+        MR::forceCloseWipeFade();
+        setNerve(GET_NERVE(MoviePlayingSequence, HostTypeEndWait));
+        return;
+    }
+#endif
     if (MR::isFirstStep(this)) {
         MR::startMoviePlayer(::getMovieName(mInfo));
         MR::tryFrameToScreenCinemaFrame();
