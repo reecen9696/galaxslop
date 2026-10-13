@@ -15,10 +15,12 @@
 #include <cstdio>
 #ifdef TARGET_PC
 #include "Game/Util/HashUtil.hpp"
+#include "Game/System/GameDataPlayerStatus.hpp"
 #include "net/client/progress.h"
 #include "Game/Util/SceneUtil.hpp"
 #include "Game/Util/SequenceUtil.hpp"
 #include "net/client/net_client.h"
+#include "port/heap_routing.h"
 #include "port/port.h"
 #include <atomic>
 #include <cstdlib>
@@ -457,6 +459,157 @@ namespace GameDataFunction {
 };  // namespace GameDataFunction
 
 #ifdef TARGET_PC
+// The room takes its host's progress (P3-07).  Every client offers its
+// current file, in the save's own format, to the relay, which passes the
+// host's (the room's owner) to everyone else.  A save gets what it lacks
+// from the host's, as with the log; a brand-new file started in the room
+// becomes a copy of it (port_net_dropin_new_file).
+namespace {
+    u8 sSnapBuf[PORT_NET_SNAPSHOT_MAX];
+
+    // The host's progress in sSnapBuf; 0 when there is none.
+    u32 takeHostProgress() {
+        return port_net_host_snapshot(sSnapBuf, sizeof(sSnapBuf), nullptr, nullptr);
+    }
+
+    // The host's progress, read into a holder of its own.  It lives in host
+    // memory: the game's heaps have no room to spare for it (the stationed
+    // heap is full, and the scene heap goes away with the scene).
+    GameDataHolder* readHostProgress() {
+        u32 version = 0;
+        u8 origin = 0;
+        u32 len = port_net_host_snapshot(sSnapBuf, sizeof(sSnapBuf), &version, &origin);
+        if (len == 0) {
+            return nullptr;
+        }
+        static GameDataHolder* sHost = nullptr;
+        if (sHost == nullptr) {
+            GameDataHolder* current = GameDataFunction::getCurrentGameDataHolder();
+            PortHostAllocScope hostAlloc;
+            sHost = new GameDataHolder(current != nullptr ? current->mUserFile : nullptr);
+        }
+        sHost->resetAllData();
+        if (!sHost->loadFromFileBinary("host", sSnapBuf, len)) {
+            port_log("net: host progress from player %u unreadable (%u bytes)", origin, len);
+            return nullptr;
+        }
+        return sHost;
+    }
+
+    bool isSharedFlag(const GameEventFlag* pFlag) {
+        if (pFlag == nullptr || (pFlag->mSaveFlag & 0x1) != 0) {
+            return false;  // computed from stars and other flags
+        }
+        switch (pFlag->mType) {
+        case GameEventFlag::Type_SpecialStar:
+        case GameEventFlag::Type_EventFlag:
+        case GameEventFlag::Type_StoryEvent:
+        case GameEventFlag::Type_Galaxy:
+            return true;
+        default:
+            return false;  // tutorials stay per player, as in the log
+        }
+    }
+
+    // Gives `pLocal` the stars, shared flags and story progress the host has
+    // and it lacks.  Never takes anything away.
+    void mergeHostProgress(GameDataHolder* pLocal, GameDataHolder* pHost) {
+        port_net_progress_applying(1);
+        s32 stars = 0, flags = 0;
+        GameDataAllGalaxyStorage* all = pHost->mAllGalaxyStorage;
+        for (s32 i = 0; i < all->getGalaxyNum(); i++) {
+            const char* galaxy = all->getGalaxyStorage(i)->mGalaxyName;
+            for (s32 scenario = 1; scenario <= 8; scenario++) {
+                if (pHost->hasPowerStar(galaxy, scenario) && !pLocal->hasPowerStar(galaxy, scenario)) {
+                    pLocal->setPowerStar(galaxy, scenario, true);
+                    stars++;
+                }
+            }
+        }
+        for (s32 i = 0; i < GameEventFlagTable::getTableSize(); i++) {
+            const GameEventFlag* flag = GameEventFlagTable::getFlag(i);
+            if (isSharedFlag(flag) && pHost->isOnGameEventFlag(flag->mName) && !pLocal->isOnGameEventFlag(flag->mName)) {
+                pLocal->tryOnGameEventFlag(flag->mName);
+                flags++;
+            }
+        }
+        u8 story = pHost->mPlayerStatus->mStoryProgress;
+        bool storyUp = story > pLocal->mPlayerStatus->mStoryProgress;
+        if (storyUp) {
+            pLocal->mPlayerStatus->mStoryProgress = story;
+        }
+        port_net_progress_applying(0);
+        if (stars != 0 || flags != 0 || storyUp) {
+            port_log("net: host progress: %d stars, %d flags%s", stars, flags, storyUp ? ", story" : "");
+        }
+    }
+
+    // Each gameplay frame: offer this client's progress now and then, and
+    // merge the host's when a new one arrives.
+    void netHostProgress(GameDataHolder* pHolder) {
+        if (pHolder == nullptr || !port_net_in_room()) {
+            return;
+        }
+        static s32 sFrames = 0;
+        if (sFrames++ % 120 == 0) {
+            u32 len = pHolder->makeFileBinary(sSnapBuf, sizeof(sSnapBuf));
+            if (len > 0 && len <= sizeof(sSnapBuf)) {
+                port_net_snapshot_offer(sSnapBuf, len);
+            }
+        }
+        static u32 sMerged = 0;
+        u32 version = 0;
+        port_net_host_snapshot(nullptr, 0, &version, nullptr);
+        if (version == sMerged) {
+            return;
+        }
+        sMerged = version;
+        if (GameDataHolder* host = readHostProgress()) {
+            mergeHostProgress(pHolder, host);
+        }
+    }
+}  // namespace
+
+// StorySequenceExecutor::overwriteGalaxyNameAfterLoading, as a file starts:
+// a brand-new file (no story yet, no stars) started in a room becomes a copy
+// of the host's progress, so the game sends it where the host's save would
+// go (the Observatory) instead of the prologue.  SMG_DROP_IN=0 turns it off.
+extern "C" void port_net_dropin_new_file() {
+    const char* setting = getenv("SMG_DROP_IN");
+    if (!port_net_in_room() || (setting != nullptr && strcmp(setting, "0") == 0)) {
+        return;
+    }
+    GameDataHolder* local = GameDataFunction::getCurrentGameDataHolder();
+    if (local == nullptr || local->mPlayerStatus->mStoryProgress != 0 || local->calcCurrentPowerStarNum() != 0) {
+        return;  // not a new file: it gets what it lacks during play instead
+    }
+    u32 len = takeHostProgress();
+    if (len == 0) {
+        port_log("net: new file, no host progress yet: the prologue as usual");
+        return;
+    }
+    // The copy goes into the file and into its scene-start copy, which the
+    // game compares against for "just got" moments and saves from early on.
+    GameDataHolder* files[2] = {local, GameDataFunction::getSceneStartGameDataHolder()};
+    for (GameDataHolder* file : files) {
+        if (file == nullptr) {
+            continue;
+        }
+        char name[sizeof(file->mName)];
+        snprintf(name, sizeof(name), "%s", file->mName);
+        file->resetAllData();
+        if (!file->loadFromFileBinary(name, sSnapBuf, len)) {
+            file->resetAllData();  // unreadable: a new file after all
+            port_log("net: host progress unreadable, the prologue as usual");
+            return;
+        }
+    }
+    port_log("net: new file starts with the host's progress (%d stars)", local->calcCurrentPowerStarNum());
+}
+
+#endif
+
+#ifdef TARGET_PC
 // Co-op (P3-02, D-022): applies what the room's progress log holds that this
 // save lacks.  Never clears anything.  Called from GameScene during gameplay.
 extern "C" void port_net_apply_progress() {
@@ -465,6 +618,10 @@ extern "C" void port_net_apply_progress() {
     static bool sFaked = false;
     if (!sFaked) {
         sFaked = true;
+        // PETARI_FAKE_UNSHARED=1: the fakes stay out of the room's log, like
+        // progress made before the room (tests the host's progress, P3-07).
+        const char* unshared = getenv("PETARI_FAKE_UNSHARED");
+        port_net_progress_applying(unshared != nullptr && *unshared == '1');
         if (const char* fake = getenv("PETARI_FAKESTAR")) {  // Galaxy:scenario[,Galaxy:scenario...]
             char list[256];
             snprintf(list, sizeof(list), "%s", fake);
@@ -487,6 +644,7 @@ extern "C" void port_net_apply_progress() {
                 port_log("net: PETARI_FAKEFLAG %s", name);
             }
         }
+        port_net_progress_applying(0);
     }
     PortNetProgress p;
     while (port_net_progress_poll(&p)) {
@@ -524,6 +682,7 @@ extern "C" void port_net_apply_progress() {
         }
         port_net_progress_applying(0);
     }
+    netHostProgress(GameDataFunction::getCurrentGameDataHolder());
 }
 #endif
 

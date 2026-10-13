@@ -141,6 +141,7 @@ void handle(Session& s, const std::vector<uint8_t>& m) {
             }
         }
         port_log("net: joined room %s as player %u (%u others)", s.room.c_str(), s.you, n ? n - 1 : 0);
+        progressOnJoined();  // our progress to the room, theirs to come (P3-07)
         break;
     }
     case kMsgJoined: {
@@ -203,6 +204,9 @@ void handle(Session& s, const std::vector<uint8_t>& m) {
         break;
     case 0x21:  // ProgressLog (P3-02)
         progressOnLog(m.data(), m.size());
+        break;
+    case 0x23:  // ProgressSnapshot: the host's progress (P3-07)
+        progressOnSnapshot(m.data(), m.size());
         break;
     default:
         break;

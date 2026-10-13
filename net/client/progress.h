@@ -25,6 +25,11 @@ void progressOnLog(const uint8_t* msg, size_t len);
 // net_client.cpp, every netPump while connected: (re)sends pending events
 // and acks what was applied.
 void progressPump(Transport& t, int64_t nowNs);
+// net_client.cpp: a ProgressSnapshot (the host's progress, P3-07) arrived.
+void progressOnSnapshot(const uint8_t* msg, size_t len);
+// net_client.cpp: joined a room (Welcome): this client's progress goes to
+// the new room, and the old room's host progress is forgotten.
+void progressOnJoined();
 
 }  // namespace net
 extern "C" {
@@ -47,6 +52,17 @@ void port_net_progress_applying(int on);
 int port_net_progress_is_applying(void);
 // A player's name by relay id ("a player" if not in the room now).
 const char* port_net_player_name(uint8_t id);
+
+// The room takes its host's progress (P3-07).  The game's current file in
+// its own save format (GameDataHolder::makeFileBinary, at most 0xF80 bytes):
+#define PORT_NET_SNAPSHOT_MAX 0xF80
+// Game thread: this client's progress now; sent to the relay when it changed.
+void port_net_snapshot_offer(const uint8_t* data, uint32_t len);
+// Game thread: the host's progress (0: none, or this client is the host).
+// *version changes each time a new one arrives.
+uint32_t port_net_host_snapshot(uint8_t* out, uint32_t cap, uint32_t* version, uint8_t* origin);
+// In a room (joined, connected).
+int port_net_in_room(void);
 
 #ifdef __cplusplus
 }

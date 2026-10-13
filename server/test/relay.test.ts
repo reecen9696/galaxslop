@@ -345,3 +345,68 @@ describe("progress log (P3-01)", () => {
     expect(logs(b)).toEqual([]);
   });
 });
+
+describe("host snapshot (P3-07)", () => {
+  function setup() {
+    const relay = new Relay({ fixedRooms: ["ROOM22"] });
+    const inbox: Uint8Array[][] = [];
+    const conns: Conn[] = [];
+    const join = (name: string) => {
+      const i = conns.length;
+      inbox.push([]);
+      const c: Conn = { send: (b) => inbox[i].push(b), close: () => {} };
+      conns.push(c);
+      relay.connect(c);
+      relay.message(c, hello(name, "ROOM22"));
+      return i;
+    };
+    const snaps = (i: number) => inbox[i].filter((m) => m[0] === Msg.ProgressSnapshot);
+    const offer = (i: number, fill: number, len = 32) => {
+      const b = new Uint8Array(3 + len);
+      b[0] = Msg.ProgressSnapshot;
+      b[1] = len & 0xff;
+      b[2] = len >> 8;
+      b.fill(fill, 3);
+      relay.message(conns[i], b);
+    };
+    return { relay, conns, join, snaps, offer };
+  }
+
+  it("passes the host's progress to everyone else, not a guest's", () => {
+    const { join, snaps, offer } = setup();
+    const host = join("Host");
+    const guest = join("Guest");
+    offer(guest, 7);
+    expect(snaps(host)).toEqual([]);
+    offer(host, 9);
+    expect(snaps(host)).toEqual([]);
+    const got = snaps(guest);
+    expect(got.length).toBe(1);
+    expect(got[0][1]).toBe(1); // origin: the host's id
+    expect(got[0].length).toBe(4 + 32);
+    expect(got[0][4]).toBe(9);
+  });
+
+  it("sends the host's progress to a late joiner, and the next host's when the host leaves", () => {
+    const { relay, conns, join, snaps, offer } = setup();
+    const host = join("Host");
+    offer(host, 9);
+    const guest = join("Guest");
+    expect(snaps(guest).map((m) => m[4])).toEqual([9]);
+    const third = join("Third");
+    offer(guest, 5);
+    expect(snaps(third).map((m) => m[4])).toEqual([9]);
+    relay.disconnect(conns[host]);
+    // The guest is host now: its own progress goes to the third player.
+    expect(snaps(third).map((m) => m[4])).toEqual([9, 5]);
+    expect(snaps(guest).length).toBe(1);
+  });
+
+  it("drops a malformed or oversized snapshot", () => {
+    const { join, snaps, offer } = setup();
+    const host = join("Host");
+    const guest = join("Guest");
+    offer(host, 1, 0x1000);
+    expect(snaps(guest)).toEqual([]);
+  });
+});

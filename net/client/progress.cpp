@@ -18,6 +18,7 @@ namespace {
 constexpr uint8_t kMsgProgressEvent = 0x20;
 constexpr uint8_t kMsgProgressLog = 0x21;
 constexpr uint8_t kMsgProgressAck = 0x22;
+constexpr uint8_t kMsgProgressSnapshot = 0x23;
 constexpr int64_t kResendNs = 2000000000ll;
 constexpr size_t kLogEntrySize = 14;  // u32 seq, u8 origin, u16 kind, u32 stage, u8 scenario, u16 arg
 
@@ -36,6 +37,11 @@ int64_t sApplied = -1;               // highest contiguous seq taken from the lo
 bool sAckDue = false;
 int64_t sLastSend = 0;
 bool sSendNow = false;
+std::vector<uint8_t> sOwnSnap;   // this client's progress, as last offered
+bool sOwnSnapDue = false;        // not yet sent to this room
+std::vector<uint8_t> sHostSnap;  // the host's progress (P3-07)
+uint32_t sHostSnapVersion = 0;
+uint8_t sHostSnapOrigin = 0;
 
 uint16_t rd16(const uint8_t* p) { return (uint16_t)(p[0] | p[1] << 8); }
 uint32_t rd32(const uint8_t* p) { return (uint32_t)p[0] | (uint32_t)p[1] << 8 | (uint32_t)p[2] << 16 | (uint32_t)p[3] << 24; }
@@ -76,10 +82,39 @@ void progressOnLog(const uint8_t* m, size_t len) {
     }
 }
 
+void progressOnSnapshot(const uint8_t* m, size_t len) {
+    if (len < 4 || m[0] != kMsgProgressSnapshot) return;
+    size_t n = (size_t)(m[2] | m[3] << 8);
+    if (n == 0 || n > PORT_NET_SNAPSHOT_MAX || len != 4 + n) return;
+    PortHostAllocScope hostAlloc;
+    std::lock_guard<std::mutex> lk(sLock);
+    sHostSnap.assign(m + 4, m + 4 + n);
+    sHostSnapOrigin = m[1];
+    sHostSnapVersion++;
+    port_log("net: host progress from player %u (%u bytes)", m[1], (unsigned)n);
+}
+
+void progressOnJoined() {
+    PortHostAllocScope hostAlloc;
+    std::lock_guard<std::mutex> lk(sLock);
+    sOwnSnapDue = !sOwnSnap.empty();
+    sHostSnap.clear();
+    sHostSnapVersion++;
+}
+
 void progressPump(Transport& t, int64_t nowNs) {
     std::vector<uint8_t> out;
     PortHostAllocScope hostAlloc;
     std::lock_guard<std::mutex> lk(sLock);
+    if (sOwnSnapDue && netLocalId() != 0) {
+        out.reserve(3 + sOwnSnap.size());
+        out.push_back(kMsgProgressSnapshot);
+        out.push_back((uint8_t)sOwnSnap.size());
+        out.push_back((uint8_t)(sOwnSnap.size() >> 8));
+        out.insert(out.end(), sOwnSnap.begin(), sOwnSnap.end());
+        t.send(out.data(), out.size());
+        sOwnSnapDue = false;
+    }
     if (sAckDue && sApplied >= 0) {
         uint8_t ack[5] = {kMsgProgressAck, (uint8_t)sApplied, (uint8_t)(sApplied >> 8), (uint8_t)(sApplied >> 16), (uint8_t)(sApplied >> 24)};
         t.send(ack, sizeof(ack));
@@ -126,6 +161,27 @@ extern "C" int port_net_progress_poll(PortNetProgress* out) {
 static int sApplying = 0;
 extern "C" void port_net_progress_applying(int on) { sApplying = on; }
 extern "C" int port_net_progress_is_applying(void) { return sApplying; }
+
+extern "C" void port_net_snapshot_offer(const uint8_t* data, uint32_t len) {
+    if (len == 0 || len > PORT_NET_SNAPSHOT_MAX) return;
+    PortHostAllocScope hostAlloc;
+    std::lock_guard<std::mutex> lk(net::sLock);
+    if (net::sOwnSnap.size() == len && memcmp(net::sOwnSnap.data(), data, len) == 0) return;
+    net::sOwnSnap.assign(data, data + len);
+    net::sOwnSnapDue = true;
+}
+
+extern "C" uint32_t port_net_host_snapshot(uint8_t* out, uint32_t cap, uint32_t* version, uint8_t* origin) {
+    PortHostAllocScope hostAlloc;
+    std::lock_guard<std::mutex> lk(net::sLock);
+    if (version) *version = net::sHostSnapVersion;
+    if (origin) *origin = net::sHostSnapOrigin;
+    if (net::sHostSnap.empty() || net::sHostSnap.size() > cap) return 0;
+    memcpy(out, net::sHostSnap.data(), net::sHostSnap.size());
+    return (uint32_t)net::sHostSnap.size();
+}
+
+extern "C" int port_net_in_room(void) { return net::netLocalId() != 0; }
 
 extern "C" const char* port_net_player_name(uint8_t id) {
     for (int i = 0; i < net::kMaxRemotes; i++) {

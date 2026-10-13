@@ -16,6 +16,7 @@ export const Msg = {
   ProgressEvent: 0x20,
   ProgressLog: 0x21,
   ProgressAck: 0x22,
+  ProgressSnapshot: 0x23,
   Ping: 0x30,
   Pong: 0x31,
   Error: 0x40,
@@ -137,6 +138,28 @@ export function decodeProgressEvent(b: Uint8Array): ProgressEvent | null {
 }
 
 const LOG_ENTRY_SIZE = 4 + 1 + 2 + 4 + 1 + 2;
+
+// The host's progress (P3-07).  c->s: u16 len, then the client's current
+// file in the game's own save format (GameDataHolder::makeFileBinary, at
+// most a save slot, 0xF80 bytes).  s->c: u8 origin id, u16 len, the same.
+export const SNAPSHOT_MAX = 0xf80;
+
+export function decodeSnapshot(b: Uint8Array): Uint8Array | null {
+  if (b.length < 3 || b[0] !== Msg.ProgressSnapshot) return null;
+  const len = b[1] | (b[2] << 8);
+  if (len === 0 || len > SNAPSHOT_MAX || b.length !== 3 + len) return null;
+  return b.slice(3);
+}
+
+export function encodeSnapshot(origin: number, data: Uint8Array): Uint8Array {
+  const b = new Uint8Array(4 + data.length);
+  b[0] = Msg.ProgressSnapshot;
+  b[1] = origin;
+  b[2] = data.length & 0xff;
+  b[3] = data.length >> 8;
+  b.set(data, 4);
+  return b;
+}
 
 export function encodeProgressLog(fromSeq: number, events: LoggedEvent[]): Uint8Array {
   const b = new Uint8Array(1 + 4 + 2 + events.length * LOG_ENTRY_SIZE);

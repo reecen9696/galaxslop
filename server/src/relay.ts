@@ -9,6 +9,8 @@ import {
   PROTO_VERSION,
   decodeHello,
   decodeProgressEvent,
+  decodeSnapshot,
+  encodeSnapshot,
   encodeError,
   encodeProgressLog,
   MAX_LOG_PER_MESSAGE,
@@ -47,6 +49,7 @@ interface Client {
   windowCount: number;
   acked: number; // highest contiguous progress seq the client confirmed (-1: none)
   lastLogSent: number;
+  snapshot?: Uint8Array; // this client's progress (P3-07); only the host's is passed on
 }
 
 interface Room {
@@ -140,6 +143,9 @@ export class Relay {
       case Msg.ProgressEvent:
         this.onProgressEvent(c, data);
         break;
+      case Msg.ProgressSnapshot:
+        this.onSnapshot(c, data);
+        break;
       case Msg.ProgressAck:
         if (data.length >= 5) {
           const seq = new DataView(data.buffer, data.byteOffset, data.byteLength).getUint32(1, true);
@@ -221,6 +227,8 @@ export class Relay {
     c.conn.send(encodeWelcome(id, room.code, everyone));
     c.acked = -1;
     if (room.log.length > 0) this.sendLog(c, 0); // join-in-progress: the whole log
+    const host = room.players.get(room.hostId);
+    if (host && host !== c && host.snapshot) c.conn.send(encodeSnapshot(room.hostId, host.snapshot));
     const joined = encodePlayerJoined(info);
     for (const other of room.players.values()) if (other !== c) other.conn.send(joined);
     this.log(`${info.name} joined ${room.code} as ${id} (${room.players.size} players)`);
@@ -265,6 +273,25 @@ export class Relay {
     this.log(`progress ${room.code}#${entry.seq} from ${c.info.name}: kind ${e.kind} stage ${e.stageHash.toString(16)}/${e.scenario} arg ${e.arg}`);
   }
 
+  // The room takes its host's progress (P3-07): every client sends its own,
+  // the host's goes to everyone else, now and to each joiner (onHello), and
+  // the next host's when the host leaves (leaveRoom).
+  private onSnapshot(c: Client, data: Uint8Array): void {
+    const room = c.room;
+    if (!room || !c.info) return;
+    const snap = decodeSnapshot(data);
+    if (!snap) return;
+    c.snapshot = snap;
+    if (room.hostId === c.info.id) this.sendHostSnapshot(room);
+  }
+
+  private sendHostSnapshot(room: Room): void {
+    const host = room.players.get(room.hostId);
+    if (!host?.snapshot) return;
+    const msg = encodeSnapshot(room.hostId, host.snapshot);
+    for (const p of room.players.values()) if (p !== host) p.conn.send(msg);
+  }
+
   private sendLog(c: Client, from: number): void {
     const room = c.room;
     if (!room) return;
@@ -286,7 +313,10 @@ export class Relay {
     const left = encodePlayerLeft(c.info.id);
     for (const other of room.players.values()) other.conn.send(left);
     if (room.players.size === 0) room.emptySince = this.now();
-    else if (room.hostId === c.info.id) room.hostId = room.players.keys().next().value!;
+    else if (room.hostId === c.info.id) {
+      room.hostId = room.players.keys().next().value!;
+      this.sendHostSnapshot(room);
+    }
     this.log(`${c.info.name} left ${room.code} (${room.players.size} players)`);
   }
 

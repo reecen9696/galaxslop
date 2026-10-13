@@ -31,6 +31,7 @@ unless marked f16.
 | 0x20 | ProgressEvent | c->s | yes | u16 kind, u32 stage_hash, u8 scenario, u16 arg |
 | 0x21 | ProgressLog | s->c | yes | u32 from_seq, u16 count, then count x (u32 seq, u8 origin_id, u16 kind, u32 stage_hash, u8 scenario, u16 arg) |
 | 0x22 | ProgressAck | c->s | yes | u32 seq |
+| 0x23 | ProgressSnapshot | c->s, s->c | yes | c->s: u16 len, then the client's current file in the game's save format (GameDataHolder::makeFileBinary, 1..0xF80 bytes), sent on joining and whenever it changes (checked every 2 s of gameplay). s->c: u8 origin id, u16 len, the same: the host's, sent to everyone else when it changes, to each joiner, and the next host's when the host leaves. D-025 |
 | 0x30 | Ping | both | no | u32 t |
 | 0x31 | Pong | both | no | u32 t |
 | 0x40 | Error | s->c | yes | u8 code, u8 msg_len, msg |
@@ -117,7 +118,18 @@ Phase 4 adds 100+ for objects.
   log from the sender's acked position, so it learns the event is in.
 - Events and the log are broadcast to everyone in the room, the sender
   included (that is its confirmation). Implemented in `server/src/relay.ts`.
-- Join-in-progress: `Welcome` is followed by `ProgressLog` from seq 0.
+- Join-in-progress: `Welcome` is followed by `ProgressLog` from seq 0,
+  then the host's `ProgressSnapshot`.
+- The host's progress (D-025, P3-07): progress from before the room comes
+  from the host's snapshot. On a new one, a save gets the power stars,
+  shared flags (the StoryFlag rule) and story progress it lacks, never
+  losing any. A brand-new file (no story, no stars) started while in a room
+  is replaced by the host's snapshot (and its scene-start copy) before the
+  game picks where it starts (StorySequenceExecutor::
+  overwriteGalaxyNameAfterLoading), so it goes where the host's save would:
+  the Observatory once the host has the first grand star. `SMG_DROP_IN=0`
+  turns the copy off. `PETARI_QUICKSTART=@new` tests it;
+  `PETARI_FAKE_UNSHARED=1` keeps the PETARI_FAKE* progress out of the log.
 
 ## Server behaviour
 

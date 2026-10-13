@@ -21,6 +21,9 @@
 #include "Game/Util/StarPointerUtil.hpp"
 #include "Game/Util/StringUtil.hpp"
 #include <cstdio>
+#ifdef TARGET_PC
+extern "C" void port_net_dropin_new_file();  // GameDataFunction.cpp
+#endif
 
 namespace {
     enum {
@@ -1025,6 +1028,9 @@ void StorySequenceExecutor::decideNextStageForGalaxyOut(GalaxyMoveArgument* pMov
 }
 
 void StorySequenceExecutor::overwriteGalaxyNameAfterLoading(GalaxyMoveArgument* pMoveArgument) {
+#ifdef TARGET_PC
+    port_net_dropin_new_file();  // a new file in a room: the host's progress (P3-07)
+#endif
     if (GameDataFunction::hasGrandStar(1)) {
         setNextStageToAstroGalaxy(pMoveArgument);
     } else if (GameDataFunction::isPassedStoryEvent("\x83\x73\x81\x5b\x83\x60\x8f\xe9\x95\x82\x8f\xe3\x8c\xe3") || !GameDataFunction::isDataMario()) {

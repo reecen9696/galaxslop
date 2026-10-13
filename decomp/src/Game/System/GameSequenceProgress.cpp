@@ -28,6 +28,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "Game/System/GameDataHolder.hpp"
+#include "net/client/progress.h"
 #endif
 
 namespace {
@@ -40,6 +42,9 @@ namespace {
     // galaxy on user file 1, skipping the title, file select and prologue
     // (what FileSelector::exeDemo does, then a galaxy move).  Mario unless
     // PETARI_QUICKSTART_LUIGI=1.  For co-op testing (tools/coop_two_players.sh).
+    // "@new" starts file 1 as a brand-new file the way file select does
+    // (the after-loading move), waiting up to 10 s in a room for the host's
+    // progress: the drop-in test (P3-07).
     bool sQuickStartPending = false;
 
     const char* quickStartStage(s32* pScenario) {
@@ -289,11 +294,26 @@ void GameSequenceProgress::exeWaitGoToFirstScene() {
         if (GameSequenceFunction::isActiveSaveDataHandleSequence()) {
             return;  // the boot-time save preload (LogoScene)
         }
-        sQuickStartPending = false;
         s32 scenario;
         const char* stage = quickStartStage(&scenario);
+        bool fresh = strcmp(stage, "@new") == 0;
+        static s32 sWaited = 0;
+        if (fresh && getenv("SMG_RELAY") != nullptr && sWaited++ < 600) {
+            static u8 sProbe[PORT_NET_SNAPSHOT_MAX];
+            if (!port_net_in_room() || port_net_host_snapshot(sProbe, sizeof(sProbe), nullptr, nullptr) == 0) {
+                return;  // not in the room, or no host progress yet
+            }
+        }
+        sQuickStartPending = false;
         const char* luigi = getenv("PETARI_QUICKSTART_LUIGI");
         GameSequenceFunction::startGameDataLoadSequence(0, !(luigi != nullptr && *luigi == '1'));
+        if (fresh) {
+            GameDataFunction::getCurrentGameDataHolder()->resetAllData();
+            GameDataFunction::getSceneStartGameDataHolder()->resetAllData();
+            OSReport("port: quick start as a new file\n");
+            requestGalaxyMove(GalaxyMoveArgument(6, nullptr, 1, nullptr));
+            return;
+        }
         // Spin is withheld until this story event (startScene).
         GameDataFunction::followStoryEventByName("\x83\x58\x83\x73\x83\x93\x8c\xa0\x97\x98");
         OSReport("port: quick start into %s scenario %d\n", stage, (int)scenario);

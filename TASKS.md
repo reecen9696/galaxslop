@@ -515,7 +515,7 @@ observatory state.
 
 ### P3-07 Drop in with the host's progress
 - lane: shared
-- status: in_progress
+- status: review
 - owner: A
 - started: 2026-10-14
 - blocked_by: P3-02, P3-03
@@ -524,6 +524,7 @@ observatory state.
 - what: The room takes the host's (room owner's) progress. Each client uploads a snapshot of its current file's progress; the relay keeps the host's and sends it to everyone else and to each joiner. A joiner's save gets what it lacks from the host's (stars, stored flags), as with the log. A brand-new file started in a room becomes a copy of the host's progress and skips the prologue, so a newcomer drops in at the Observatory.
 - done when: a host with stars before the room was made, a joiner with no save: the joiner starts a new file and lands in the Observatory with the host's stars; a joiner with an older save gets the host's stars.
 - log:
+  - 2026-10-14 (A): D-025. ProgressSnapshot 0x23 (NETCODE): each client offers GameDataHolder::makeFileBinary of its file every 120 gameplay frames when it changed; the relay keeps each client's and passes the host's on (to others, to joiners, the next host's on leaving; vitest). Clients merge a new host snapshot into the current file (GameDataFunction.cpp netHostProgress: stars, shared flags, story progress; read into a holder in host memory, the stationed heap is full). New file: port_net_dropin_new_file from StorySequenceExecutor::overwriteGalaxyNameAfterLoading loads the snapshot into the current and scene-start holders. Verified, 3 web clients in one room, host progress kept out of the log (PETARI_FAKE_UNSHARED): the new file (PETARI_QUICKSTART=@new) started with the host's 4 stars in AstroGalaxy 1; a quick-started save got the 4 stars by merge. Not tried: the real file-select create path by hand, a host leaving mid-session. The relay holds snapshots in memory only.
 
 ### P3-06 Playtest: 5 players, 2 hours
 - lane: shared

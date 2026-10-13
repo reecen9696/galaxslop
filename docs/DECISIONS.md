@@ -417,3 +417,17 @@ Revisit: if a permissively licensed Rodin lookalike turns up, or the server shou
 ## D-024 (2026-10-13, lane A, asked for by the user): A dancing Luma on the first-visit loading screen, with three.js, and its model and song kept out of git
 Why: the user wanted their Luma model dancing above the loading bar, with Comet Observatory looping a little quieter than the menu music. three.js 0.169.0 (MIT) is vendored in `web/vendor/three/` (the core build, FBXLoader and what it imports) and loaded only on that screen. The model (`web/luma/luma.fbx`, a fan Sketchfab model of a Nintendo character, no license given) and both songs (Nintendo's) are in git because the user committed them (221ff706f), superseding D-023's ignore rule for `web/music/`. The page still works without them: no Luma, no music. `?demo=loading` shows the screen with a fake bar.
 Revisit: the repo is public, so these files are published once pushed; or if the relay's static hosting should serve these files (server/src/static.ts has no .mp3 or .fbx type).
+
+## D-025 (2026-10-14, lane A, decided by the user): The room takes its host's progress. Extends D-022
+What: the room's host (its owner: whoever made it, or the next player when
+they leave) is the source of progress from before the room. Each client
+uploads its current file (the game's own save format, ~1.8 KB); the relay
+passes the host's to everyone else. An existing save gets the stars, shared
+flags and story progress it lacks (adds only); a brand-new file started in
+the room becomes a copy of the host's and skips the prologue. Progress made
+in the room is still shared by everyone, as in D-022.
+Why: the user's choice (asked 2026-10-14; the alternative was everyone's
+saves combined, so one friend's full save would fill everyone's). Lets a
+newcomer drop in at any time.
+Revisit: if players want to keep a fresh file (SMG_DROP_IN=0 for now).
+
