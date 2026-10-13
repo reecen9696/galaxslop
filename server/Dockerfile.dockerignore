@@ -1,0 +1,6 @@
+# Context is the repo root; the image needs only these.
+*
+!server/package.json
+!server/package-lock.json
+!server/src
+!dist/web

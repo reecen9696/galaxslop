@@ -1,0 +1,52 @@
+# Publishes the whole site (relay + web build, server/Dockerfile) to GHCR on
+# every push to main, so the host only has to `docker pull`.  No game data:
+# players import their own disc in the page.
+name: docker
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  image:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y ninja-build
+      - name: Emscripten
+        run: |
+          git clone --depth 1 https://github.com/emscripten-core/emsdk ~/emsdk
+          ~/emsdk/emsdk install 6.0.12 && ~/emsdk/emsdk activate 6.0.12
+      - name: Build (browser)
+        run: |
+          source ~/emsdk/emsdk_env.sh
+          emcmake cmake -S . -B build/web -G Ninja -DCMAKE_BUILD_TYPE=Release -DSMG_WEB_NODE=OFF
+          ninja -C build/web smg
+      - name: Bundle
+        run: node tools/web/bundle.mjs
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Image name
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: server/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:${{ github.sha }}
+          labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

@@ -16,7 +16,11 @@ export function startServer(port: number, log: (m: string) => void = console.log
   const fixedRooms = (process.env.ROOMS ?? "").split(",").filter((s) => s.trim());
   const relay = new Relay({ log, fixedRooms });
   const serve = process.env.STATIC_DIR ? staticHandler(process.env.STATIC_DIR, process.env.GAME_DIR) : (_req: unknown, res: { writeHead: (n: number) => { end: () => void } }) => res.writeHead(426).end();
-  const http = createServer(serve);
+  // /healthz: for the host's health check, with or without STATIC_DIR.
+  const http = createServer((req, res) => {
+    if (req.url === "/healthz") res.writeHead(200, { "Content-Type": "text/plain" }).end("ok\n");
+    else serve(req, res);
+  });
   const ready = new Promise<void>((resolve, reject) => {
     http.once("listening", resolve);
     http.once("error", reject);

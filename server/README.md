@@ -25,3 +25,20 @@ join a known room without passing a code around).
 - `src/main.ts`: the WebSocket server.
 
 Deployment is P3-05 (a container on a cheap host, D-010).
+
+## Running the published image
+
+Every push to `main` builds the wasm, bundles the page and pushes
+`ghcr.io/reecen9696/galaxslop:latest` (amd64 + arm64,
+`.github/workflows/docker.yml`). On the host:
+
+```
+docker run -d --name smg --restart unless-stopped -p 8787:8787 \
+  -e ROOMS=PLAY22 ghcr.io/reecen9696/galaxslop:latest
+```
+
+To update: `docker pull ghcr.io/reecen9696/galaxslop:latest`, then remove the
+container and run it again (or run Watchtower to do that for you). `/healthz`
+answers `ok`. Put HTTPS in front (Caddy, a Cloudflare tunnel, or the host's
+own TLS): the page needs a secure context, and the relay is `wss://` on the
+same origin.

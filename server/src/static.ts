@@ -17,6 +17,9 @@ const kTypes: Record<string, string> = {
   ".css": "text/css",
   ".png": "image/png",
   ".svg": "image/svg+xml",
+  ".woff2": "font/woff2",
+  ".mp3": "audio/mpeg",
+  ".txt": "text/plain; charset=utf-8",
 };
 
 // gameDir (GAME_DIR): a cooked game folder (tools/cook/cook.py output) the
