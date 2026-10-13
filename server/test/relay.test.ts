@@ -239,7 +239,8 @@ describe("world events", () => {
       relay.message(c, hello("P" + i, "ROOM22"));
     });
     inbox.forEach((m) => (m.length = 0));
-    const ev = Uint8Array.of(Msg.WorldEvent, 1, 1, 2, 3, 4, 1, 9, 8, 7, 6);
+    const ev = new Uint8Array(27);
+    ev.set([Msg.WorldEvent, 1, 1, 2, 3, 4, 1, 9, 8, 7, 6]);
     relay.message(conns[0], ev);
     expect(inbox[0].length).toBe(0);
     expect(Array.from(inbox[1][0])).toEqual(Array.from(ev));

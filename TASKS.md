@@ -543,6 +543,7 @@ playtest pain. Template:
 - done when: two clients by the same enemy: one defeats it, it disappears on the other.
 - log:
   - 2026-10-13 (A): works natively: Good Egg registers 40 enemies; Alice defeats an Octoomba next to both players (F10), Bob's copy dies (2 -> 1 Octoombas on Bob's screen), ids match. Relay vitest. Not yet: late joiners (no persistence), generator-spawned enemies (no placement id), death animation on the receiving side (plain kill()), loot from the enemy's kill() may drop twice. SMG_WORLD_SYNC=0 turns it off.
+  - 2026-10-13 (A): the four limits: (1) receivers play the enemy's "Death" effect + SE_EM_EXPLODE_S before kill() (smoke puff seen on Bob's screen); (2) arrivals: each client keeps the visit's defeats and resends them when a player newly enters its stage/scenario (Alice defeats 2 Undergrunts in Good Egg star 2, Bob arrives from Honeyhive, his copies die); (3) spawned enemies (appeared during gameplay, no placement id) are matched by name hash + nearest within 400 units (untested: none in Good Egg, Honeyhive, Battlerock, Space Junk, Beach Bowl, Tri-leg); (4) coin/star bit spawns are suppressed while a remote defeat runs kill(). Also: a 'live' gate (first gameplay frame) so scene set-up kills (Dino Piranha's tail parts) are not reported, and star chips (enemy sensor) are excluded. WorldEvent is now 27 bytes (+name hash, position).
 
 ### P4-NN Sync: <object type>
 - lane:

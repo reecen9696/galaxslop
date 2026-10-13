@@ -1,3 +1,6 @@
+#ifdef TARGET_PC
+#include "net/world/world_sync.h"
+#endif
 #include "Game/Util/ObjUtil.hpp"
 #include "Game/Camera/CameraDirector.hpp"
 #include "Game/Camera/CameraShaker.hpp"
@@ -747,6 +750,11 @@ void MR::appearCoinFix(const NameObj* pObj, const TVec3f& rParam2, s32 param3) {
 }
 
 void MR::appearCoinPop(const NameObj* pObj, const TVec3f& rParam2, s32 param3) {
+#ifdef TARGET_PC
+    if (port_world_suppress_loot()) {
+        return;  // co-op: an enemy defeated by another player (net/world)
+    }
+#endif
     MR::getCoinHolder()->appearCoinPop(pObj, rParam2, param3);
 }
 
@@ -787,10 +795,20 @@ void MR::hopStarPiece(const NameObj* pObj, const TVec3f& rVec1, const TVec3f& rV
 }
 
 bool MR::appearStarPiece(const NameObj* pObj, const TVec3f& rVec1, s32 a1, f32 f1, f32 f2, bool a2) {
+#ifdef TARGET_PC
+    if (port_world_suppress_loot()) {
+        return false;  // co-op: an enemy defeated by another player (net/world)
+    }
+#endif
     return getStarPieceDirector()->appearPiece(pObj, rVec1, a1, f1, f2, false, a2);
 }
 
 bool MR::appearStarPieceToDirection(const NameObj* pObj, const TVec3f& rVec1, const TVec3f& rVec2, s32 a1, f32 f1, f32 f2, bool a2) {
+#ifdef TARGET_PC
+    if (port_world_suppress_loot()) {
+        return false;  // co-op: an enemy defeated by another player (net/world)
+    }
+#endif
     return getStarPieceDirector()->appearPieceToDirection(pObj, rVec1, rVec2, a1, f1, f2, false, a2);
 }
 

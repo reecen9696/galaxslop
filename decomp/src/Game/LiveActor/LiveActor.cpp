@@ -49,6 +49,9 @@ void LiveActor::appear() {
 }
 
 void LiveActor::makeActorAppeared() {
+#ifdef TARGET_PC
+    port_world_actor_appeared(this);  // co-op world sync (net/world)
+#endif
     if (mSensorKeeper != nullptr) {
         mSensorKeeper->validateBySystem();
     }

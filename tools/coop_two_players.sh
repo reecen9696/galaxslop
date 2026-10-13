@@ -15,7 +15,7 @@
 #                             7 flying).  In a window F1-F8 do the same.
 #   HEADLESS=1 RUN_SECONDS=60 SHOTS=<dir>   unattended run: hidden windows,
 #                             stop after RUN_SECONDS, screenshots every 2 s
-#                             into <dir>/a and <dir>/b
+#                             into <dir>/a and <dir>/b (SHOT_EVERY=<ms>)
 cd "$(dirname "$0")/.."
 GAME=${1:-$HOME/smg/game}
 PORT=${PORT:-8799}
@@ -43,7 +43,7 @@ launch() {  # name, window x, tint, luigi, input, shots subdir, debug modes
   fi
   if [ -n "$SHOTS" ]; then
     mkdir -p "$SHOTS/$6"
-    args+=(--shots "$SHOTS/$6" --shot-every 2000)
+    args+=(--shots "$SHOTS/$6" --shot-every "${SHOT_EVERY:-2000}")
   fi
   SMG_RELAY=ws://127.0.0.1:$PORT SMG_ROOM=$ROOM SMG_NAME=$1 SMG_TINT=$3 SMG_WINDOW="$2,40,715,450" \
   PETARI_QUICKSTART=$GALAXY PETARI_QUICKSTART_LUIGI=$4 PETARI_INPUT=$5 PETARI_DEBUG_MODES=$7 \

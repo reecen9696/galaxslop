@@ -25,6 +25,12 @@ void port_world_register(void* actor, const char* name, float x, float y, float 
 void port_world_actor_dead(void* actor);
 // A new scene: forget the old one's actors.
 void port_world_scene_reset(void);
+// LiveActor::makeActorAppeared: unplaced (spawned) actors, matched by name
+// and position.
+void port_world_actor_appeared(void* actor);
+// Coin and star bit spawns check this: nonzero while a remote defeat runs
+// the local copy's kill() (the defeating player got the loot).
+int port_world_suppress_loot(void);
 // Once per gameplay frame (net/puppet): apply received events.
 void port_world_update(void);
 // Debug (F10): defeat the registered enemy nearest (x, y, z); 0 if none.
@@ -35,7 +41,9 @@ int port_world_debug_kill_nearest(float x, float y, float z);
 
 namespace net {
 constexpr uint8_t kMsgWorldEvent = 0x13;
-constexpr unsigned kWorldEventSize = 11;  // [0x13][u8 kind][u32 stage][u8 scenario][u32 id]
+// [0x13][u8 kind][u32 stage][u8 scenario][u32 placement id or 0]
+// [u32 name hash][f32 pos[3]]
+constexpr unsigned kWorldEventSize = 27;
 enum : uint8_t { kWorldEnemyDefeated = 1 };
 // Placement id: FNV-1a of the name and the position rounded to whole units.
 uint32_t worldPlacementId(const char* name, float x, float y, float z);
