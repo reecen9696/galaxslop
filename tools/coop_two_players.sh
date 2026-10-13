@@ -1,15 +1,26 @@
 #!/bin/bash
-# Two co-op clients on this machine, side by side, scripted onto the same
-# spot in Good Egg; after that the keyboard drives whichever window has focus.
+# Two co-op clients on this machine, side by side, booted straight into the
+# same galaxy (PETARI_QUICKSTART: no title, file select or prologue; ~20 s to
+# gameplay); the keyboard drives whichever window has focus.
 #   tools/coop_two_players.sh [game dir]        (default ~/smg/game)
 # Starts its own relay (port $PORT, room TEST01), fresh saves in a temp dir.
-# The script creates file 1 and taps A through the prologue: keep the mouse
-# off both windows until Mario is standing in Good Egg (~4 min).
-# Env passes through: SMG_TINT_A / SMG_TINT_B pick colours (docs/NETCODE.md).
+# Environment:
+#   GALAXY=EggStarGalaxy:1    galaxy[:scenario] both players start in
+#   LUIGI_A=1 / LUIGI_B=1     play that client as Luigi
+#   SMG_TINT_A / SMG_TINT_B   colour override (docs/NETCODE.md)
+#   INPUT_A / INPUT_B         PETARI_INPUT scripts (platform/include/port/input_script.h)
+#   MODES_A / MODES_B         PETARI_DEBUG_MODES "seconds:form,..." (seconds after
+#                             gameplay starts; forms as F1-F8: 0 normal,
+#                             1 rainbow, 2 fire, 3 ice, 4 bee, 5 spring, 6 boo,
+#                             7 flying).  In a window F1-F8 do the same.
+#   HEADLESS=1 RUN_SECONDS=60 SHOTS=<dir>   unattended run: hidden windows,
+#                             stop after RUN_SECONDS, screenshots every 2 s
+#                             into <dir>/a and <dir>/b
 cd "$(dirname "$0")/.."
 GAME=${1:-$HOME/smg/game}
 PORT=${PORT:-8799}
 ROOM=TEST01
+GALAXY=${GALAXY:-EggStarGalaxy:1}
 SMG=./build/native/smg
 [ -x "$SMG" ] || { echo "build first: cmake --build build/native" >&2; exit 1; }
 [ -d "$GAME" ] || { echo "no cooked game at $GAME" >&2; exit 1; }
@@ -25,21 +36,21 @@ PIDS=($!)
 trap 'kill "${PIDS[@]}" 2>/dev/null' EXIT INT TERM
 sleep 1
 
-# The fresh-save boot from docs/BUILDING.md: file 1 with the Toad icon, the
-# prologue by tapping A, then PETARI_STAGE jumps to Good Egg (~130-180 s
-# in; a window that renders slower gets there later).  A taps (Mario hops)
-# go on until 240 s so the slower window still gets through; then it's yours.
-MENU="28-28.4:A|B,30-36:PX=-0.25|PY=0.27,33-33.2:A,36-42:PX=0.29|PY=0.59,42-42.2:A,45-45.2:A,48-66:PX=0.55|PY=-0.38,66-77:PX=0.29|PY=0.59,77-240:PX=0.52|PY=0.78"
-ICON=",58-58.2:A,61-61.2:A,64-64.2:A"
-TAPS=$(for t in $(seq 70 3 240); do printf ",%s-%s.2:A" $t $t; done)
-
-launch() {  # name, window x, tint
+launch() {  # name, window x, tint, luigi, input, shots subdir, debug modes
+  local args=(--game "$GAME" --save "$WORK/save-$1")
+  if [ -n "$HEADLESS" ]; then
+    args+=(--headless --seconds "${RUN_SECONDS:-60}")
+  fi
+  if [ -n "$SHOTS" ]; then
+    mkdir -p "$SHOTS/$6"
+    args+=(--shots "$SHOTS/$6" --shot-every 2000)
+  fi
   SMG_RELAY=ws://127.0.0.1:$PORT SMG_ROOM=$ROOM SMG_NAME=$1 SMG_TINT=$3 SMG_WINDOW="$2,40,715,450" \
-  PETARI_STAGE=EggStarGalaxy:1 PETARI_INPUT="$MENU$ICON$TAPS" \
-    "$SMG" --game "$GAME" --save "$WORK/save-$1" > "$WORK/$1.log" 2>&1 &
+  PETARI_QUICKSTART=$GALAXY PETARI_QUICKSTART_LUIGI=$4 PETARI_INPUT=$5 PETARI_DEBUG_MODES=$7 \
+    "$SMG" "${args[@]}" > "$WORK/$1.log" 2>&1 &
   PIDS+=($!)
 }
-launch Alice 0 "${SMG_TINT_A:-0}"
-launch Bob 725 "${SMG_TINT_B:-0}"
-echo "two windows opening; close both (or Ctrl-C here) to stop"
+launch Alice 0 "${SMG_TINT_A:-0}" "${LUIGI_A:-0}" "$INPUT_A" a "$MODES_A"
+launch Bob 725 "${SMG_TINT_B:-0}" "${LUIGI_B:-0}" "$INPUT_B" b "$MODES_B"
+echo "two clients starting in $GALAXY; close both windows (or Ctrl-C here) to stop"
 wait "${PIDS[1]}" "${PIDS[2]}"

@@ -50,7 +50,7 @@ u32  anim_hash      MR::getHashCode(current animation name); the receiver
                     calls XanimePlayer::changeAnimationByHash (D-018)
 u8   anim_weight[4] track blend weights x255 (locomotion group, D-018)
 f16  anim_frame
-u16  flags          bit0 luigi, bit1 grounded, bit2 hidden, bit3 in_cutscene, bits4-5 eyelid (0 open..3 closed)
+u16  flags          bit0 luigi, bit1 grounded, bit2 hidden, bit3 in_cutscene, bits4-5 eyelid (0 open..3 closed), bits6-9 power-up form (MarioActor PlayerMode)
 u32  stage_hash     MR::getHashCode(stage name): same galaxy check
 u8   scenario
 ```

@@ -80,6 +80,7 @@ extern "C" void port_net_capture_player(void) {
     if (MR::isPlayerHidden()) c.flags |= NET_CAPTURE_HIDDEN;
     if (MR::isDemoActive()) c.flags |= NET_CAPTURE_IN_DEMO;
     c.flags |= (uint16_t)((actor->_B6A & 3) << NET_CAPTURE_EYELID_SHIFT);
+    c.flags |= (uint16_t)((actor->mPlayerMode & 15) << NET_CAPTURE_MODE_SHIFT);
 
     std::lock_guard<std::mutex> lock(sLock);
     c.frame = sCount;

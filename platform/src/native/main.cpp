@@ -13,6 +13,7 @@
 //   smg --game <cooked dir> [--save <dir>] [--headless] [--seconds N]
 //       [--shots <dir>] [--shot-every <ms>] [--scale N]
 #include <errno.h>
+#include <execinfo.h>
 #include <signal.h>
 #include <spawn.h>
 #include <stdint.h>
@@ -104,7 +105,26 @@ static void usage(const char* argv0) {
             argv0);
 }
 
+// A crash prints the native stack to stderr (symbols from the executable;
+// `atos -o build/native/smg -l 0x... <addr>` for file:line), then dies as
+// before.  Debuggers are unreliable on the Rosetta-hosted x86_64 build.
+static void crashHandler(int sig) {
+    void* frames[64];
+    int n = backtrace(frames, 64);
+    char head[64];
+    int len = snprintf(head, sizeof(head), "smg: fatal signal %d; backtrace:\n", sig);
+    write(2, head, (size_t)len);
+    backtrace_symbols_fd(frames, n, 2);
+    signal(sig, SIG_DFL);
+    raise(sig);
+}
+
 int main(int argc, char** argv) {
+    signal(SIGSEGV, crashHandler);
+    signal(SIGBUS, crashHandler);
+    signal(SIGILL, crashHandler);
+    signal(SIGABRT, crashHandler);
+    signal(SIGFPE, crashHandler);
     std::string game, save, shots;
     bool headless = false;
     int seconds = -1, shotEvery = 2000, scale = 2;

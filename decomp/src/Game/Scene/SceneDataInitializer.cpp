@@ -1,5 +1,6 @@
 #ifdef TARGET_PC
 #include "Game/Util/EventUtil.hpp"
+#include <JSystem/JKernel/JKRSolidHeap.hpp>
 #include "net/puppet/remote_player_puppet.hpp"
 #endif
 #include "Game/Scene/SceneDataInitializer.hpp"
@@ -32,10 +33,20 @@ void SceneDataInitializer::startStageFileLoadAfterScenarioSelected() {
     LuigiLetter::makeArchiveListForMenu(&collector, JMapInfoIter());
 #ifdef TARGET_PC
     // Co-op: remote players are drawn with the player models (net/puppet).
-    // The save's own character is stationed; load the other with the stage.
+    // The save's own character is stationed; load the other with the stage,
+    // and every power-up form for both characters: a remote player can be
+    // in a form the local stage places no item for (the local player gets
+    // them too, for the F-key debug switch).  ~2.6 MB, so into the scene
+    // heap rather than the stage's fixed 16 MB file cache, which they
+    // overflow (OSPanic in a later stage file load).
     if (port_net_wants_puppets() && !MR::isStageFileSelect()) {
-        collector.addArchive(MR::isPlayerLuigi() ? "Mario" : "Luigi");
-        collector.addArchive(MR::isPlayerLuigi() ? "MarioFace" : "LuigiFace");
+        const char* const coop[] = {MR::isPlayerLuigi() ? "Mario" : "Luigi", MR::isPlayerLuigi() ? "MarioFace" : "LuigiFace",
+                                    "BeeMario", "BeeLuigi", "BeeMarioWing", "HopperMario", "HopperLuigi", "IceMario",
+                                    "IceLuigi", "IceMarioHandL", "IceMarioHandR", "InvincibleMario", "InvincibleLuigi",
+                                    "InvincibleMarioHandL", "InvincibleMarioHandR", "TeresaMario", "TeresaLuigi"};
+        for (const char* name : coop) {
+            MR::mountAsyncArchiveByObjectOrLayoutName(name, MR::getSceneHeapGDDR3());
+        }
     }
 #endif
 

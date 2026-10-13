@@ -10,6 +10,18 @@ namespace {
     inline f32 JPACosShort(s16 v) {
         return reinterpret_cast< const f32* >(&JMath::sSinCosTable.table[static_cast< u16 >(v) >> 2])[1];
     }
+
+#ifdef TARGET_PC
+    // PowerPC's divw does not trap on a zero divisor; x86 raises SIGFPE.
+    // Some emitters (the player's transform and bee effects) divide by an
+    // emit count or division number of 1 - 1 = 0.
+    inline s32 JPADivS32(s32 a, s32 b) {
+        return b != 0 ? a / b : 0;
+    }
+#define JPA_DIV(a, b) JPADivS32((s32)(a), (s32)(b))
+#else
+#define JPA_DIV(a, b) ((a) / (b))
+#endif
 }
 
 void JPAVolumePoint(JPAEmitterWorkData* work) {
@@ -38,7 +50,7 @@ void JPAVolumeCircle(JPAEmitterWorkData* work) {
     f32 distance;
 
     if (work->mpEmtr->checkFlag(JPADynFlag_FixedInterval)) {
-        theta = (s16)((work->mVolumeEmitIdx << 16) / work->mEmitCount);
+        theta = (s16)JPA_DIV(work->mVolumeEmitIdx << 16, work->mEmitCount);
         theta *= work->mVolumeSweep;
         work->mVolumeEmitIdx++;
     } else {
@@ -68,8 +80,8 @@ void JPAVolumeCube(JPAEmitterWorkData* work) {
 static void JPAVolumeSphere(JPAEmitterWorkData* work) {
     s16 phi, theta;
     if (work->mpEmtr->checkFlag(JPADynFlag_FixedInterval)) {
-        phi = (u16)(work->mVolumeX * 0x8000 / (work->mDivNumber - 1) + 0x4000);
-        u16 angle = (u16)(work->mVolumeAngleNum * 0x10000 / (work->mVolumeAngleMax - 1));
+        phi = (u16)(JPA_DIV(work->mVolumeX * 0x8000, work->mDivNumber - 1) + 0x4000);
+        u16 angle = (u16)JPA_DIV(work->mVolumeAngleNum * 0x10000, work->mVolumeAngleMax - 1);
         theta = (f32)angle * work->mVolumeSweep + 0x8000;
         work->mVolumeAngleNum++;
         if (work->mVolumeAngleNum == work->mVolumeAngleMax) {

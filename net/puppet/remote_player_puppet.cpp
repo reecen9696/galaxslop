@@ -2,19 +2,27 @@
 // of each function are named in comments.
 #include "remote_player_puppet.hpp"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <atomic>
 
 #include "Game/Animation/XanimeCore.hpp"
 #include "Game/Animation/XanimePlayer.hpp"
 #include "Game/LiveActor/ModelManager.hpp"
+#include "Game/LiveActor/PartsModel.hpp"
+#include "Game/Player/DrawAdaptor.hpp"
 #include "Game/Player/J3DModelX.hpp"
 #include "Game/Player/MarioAccess.hpp"
 #include "Game/Player/MarioActor.hpp"
 #include "Game/Player/ModelHolder.hpp"
 #include "Game/Scene/SceneFunction.hpp"
+#include "Game/System/GameDataFunction.hpp"
 #include "Game/Util/ActorShadowUtil.hpp"
 #include "Game/Util/EventUtil.hpp"
+#include "Game/Util/FileUtil.hpp"
+#include "Game/Util/Functor.hpp"
 #include "Game/Util/JointUtil.hpp"
 #include "Game/Util/SceneUtil.hpp"
 #include "Game/Util/LiveActorUtil.hpp"
@@ -34,6 +42,7 @@
 #include <JSystem/J3DGraphBase/J3DPacket.hpp>
 #include <JSystem/J3DGraphBase/J3DShape.hpp>
 #include <JSystem/J3DGraphBase/J3DMaterial.hpp>
+#include <JSystem/JKernel/JKRHeap.hpp>
 #include <JSystem/JUtility/JUTTexture.hpp>
 #include <revolution/gd/GDBase.h>
 
@@ -67,17 +76,18 @@ u8* makeTextureDL(const void* pImage, u16* pSize) {
 }
 }  // namespace
 
-ModelTint::ModelTint() : mLuigi(false), mTint(net::kTintClassic) { memset(mTextures, 0, sizeof(mTextures)); }
+ModelTint::ModelTint() : mLuigi(false), mTint(net::kTintClassic), mSuit(0) { memset(mTextures, 0, sizeof(mTextures)); }
 
 void ModelTint::init(J3DModelData* pData, bool luigi) {
     mLuigi = luigi;
     mTint = net::kTintClassic;
+    mSuit = 0;
     // Shirt and sleeves, cap (texture slot 0 of each).
-    initTexture(&mTextures[0], pData, "Body1_v");
-    initTexture(&mTextures[1], pData, "Cap_v");
+    initTexture(&mTextures[0], pData, "Body1_v", "MarioBody");
+    initTexture(&mTextures[1], pData, "Cap_v", "MarioCap");
 }
 
-void ModelTint::initTexture(Texture* pTex, J3DModelData* pData, const char* pMaterialName) {
+void ModelTint::initTexture(Texture* pTex, J3DModelData* pData, const char* pMaterialName, const char* pTexturePrefix) {
     u16 materialNo = MR::getMaterialNo(pData, pMaterialName);
     J3DMaterial* material = pData->getMaterialNodePointer(materialNo);
     ResTIMG* img = MR::getResTIMG(pData, material->getTexNo(0));
@@ -85,11 +95,22 @@ void ModelTint::initTexture(Texture* pTex, J3DModelData* pData, const char* pMat
         port_log("puppet: %s texture is format %u, not CMPR; no tint", pMaterialName, img->mFormat);
         return;
     }
+    u32 size = (u32)img->mWidth * img->mHeight / 2;
+    for (int suit = 0; suit < 3; suit++) {
+        // "<prefix>.<suit>", same size and format; fall back to the bound one.
+        char name[32];
+        snprintf(name, sizeof(name), "%s.%d", pTexturePrefix, suit);
+        s32 index = pData->mMaterialTable.mTextureName->getIndex(name);
+        const ResTIMG* variant = index >= 0 ? MR::getResTIMG(pData, index) : img;
+        if (variant->mFormat != img->mFormat || variant->mWidth != img->mWidth || variant->mHeight != img->mHeight) {
+            variant = img;
+        }
+        pTex->mSource[suit] = reinterpret_cast< const u8* >(variant) + variant->mImageDataOffset;
+    }
     pTex->mMaterialNo = materialNo;
-    pTex->mSource = reinterpret_cast< const u8* >(img) + img->mImageDataOffset;
-    pTex->mSize = (u32)img->mWidth * img->mHeight / 2;
-    pTex->mCopy = new (0x20) u8[pTex->mSize];
-    memcpy(pTex->mCopy, pTex->mSource, pTex->mSize);
+    pTex->mSize = size;
+    pTex->mCopy = new (0x20) u8[size];
+    memcpy(pTex->mCopy, pTex->mSource[0], size);
     pTex->mDL = makeTextureDL(pTex->mCopy, &pTex->mDLSize);
 }
 
@@ -102,14 +123,16 @@ void ModelTint::install(J3DModelX* pModel) const {
     }
 }
 
-void ModelTint::set(u8 tint) {
-    if (tint == mTint) {
+void ModelTint::set(u8 tint, u8 suit) {
+    suit = suit < 3 ? suit : 0;
+    if (tint == mTint && suit == mSuit) {
         return;
     }
     mTint = tint;
+    mSuit = suit;
     for (Texture& t : mTextures) {
         if (t.mCopy != nullptr) {
-            net::tintCmpr(t.mSource, t.mCopy, t.mSize, mLuigi, tint);
+            net::tintCmpr(t.mSource[suit], t.mCopy, t.mSize, mLuigi, tint);
         }
     }
 }
@@ -166,8 +189,13 @@ struct HideFlags {
 
 RemotePlayerPuppet::RemotePlayerPuppet(const char* pName, bool luigi)
     : LiveActor(pName), mXanimePlayer(nullptr), mXanimePlayerUpper(nullptr), mAnimHash(0), mLuigi(luigi), mHidden(true), mFace(nullptr),
-      mHandL(nullptr), mHandR(nullptr), mFacePose(0), mHandPoseL(0), mHandPoseR(0), mEyelidMaterial(0xFFFF), mEyelid(0) {
+      mHandL(nullptr), mHandR(nullptr), mBeeWing(nullptr), mTeresa(nullptr), mMode(0), mAirborne(false), mFacePose(0), mHandPoseL(0),
+      mHandPoseR(0), mEyelidMaterial(0xFFFF), mEyelid(0) {
     PSMTXIdentity(mTargetRotationMtx);
+    for (Form& f : mForms) {
+        f.mBody = f.mHandL = f.mHandR = nullptr;
+        f.mTinted = false;
+    }
     memset(mEyelidDL, 0, sizeof(mEyelidDL));
     memset(mEyelidDLSize, 0, sizeof(mEyelidDLSize));
 }
@@ -228,6 +256,7 @@ void RemotePlayerPuppet::init(const JMapInfoIter&) {
     // one packet per pose joint.
     mHandL = initPart("MarioHandL", "HandL0", 0);
     mHandR = initPart("MarioHandR", "HandR0", 0);
+    initForms();
     MR::connectToScene(this, MR::MovementType_Player, MR::CalcAnimType_Player, MR::DrawBufferType_None, MR::DrawType_Player);
     mVelocity.zero();
     // The animation players need the player's animation table, and the player
@@ -262,6 +291,7 @@ void RemotePlayerPuppet::applyState(const NetPlayerCapture& rState, bool valid) 
     }
     mHidden = !valid || (rState.flags & NET_CAPTURE_HIDDEN) != 0;
     if (mHidden) {
+        showParts(false, false);
         return;
     }
     mPosition.set(rState.pos[0], rState.pos[1], rState.pos[2]);
@@ -291,6 +321,47 @@ void RemotePlayerPuppet::applyState(const NetPlayerCapture& rState, bool valid) 
     // at the same point of the same animation instead of on its own clock.
     mXanimePlayer->getFrameCtrl()->setFrame(rState.animFrame);
     mEyelid = (u8)((rState.flags & NET_CAPTURE_EYELID_MASK) >> NET_CAPTURE_EYELID_SHIFT);
+    mMode = (u8)((rState.flags & NET_CAPTURE_MODE_MASK) >> NET_CAPTURE_MODE_SHIFT);
+    bool airborne = (rState.flags & NET_CAPTURE_GROUNDED) == 0;
+    // Form animations advance like MarioActor's hidden holders do: movement()
+    // on a killed actor still updates its frame controllers.
+    int form = formForMode(mMode);
+    if (form >= 0 && mForms[form].mBody != nullptr) {
+        // MarioActor::calcAnim: the active form's material DLs
+        // (MR::updateModelDiffDL on _9E4, _9C0 and its hands, _9C8 ...).
+        MR::updateModelDiffDL(mForms[form].mBody);
+        if (form == kFormIce && mForms[form].mHandL != nullptr && mForms[form].mHandR != nullptr) {
+            MR::updateModelDiffDL(mForms[form].mHandL);
+            MR::updateModelDiffDL(mForms[form].mHandR);
+        }
+    }
+    if (form == kFormRainbow && mForms[form].mBody != nullptr) {
+        Form& f = mForms[kFormRainbow];
+        f.mBody->movement();
+        if (f.mHandL != nullptr && f.mHandR != nullptr) {
+            f.mHandL->movement();
+            f.mHandR->movement();
+            MR::setBrkFrame(f.mHandL, MR::getBrkFrame(f.mBody));  // calcAnimInMovement
+            MR::setBrkFrame(f.mHandR, MR::getBrkFrame(f.mBody));
+            MR::updateModelDiffDL(f.mHandL);
+            MR::updateModelDiffDL(f.mHandR);
+        }
+    }
+    showParts(form == kFormBee, mMode == 6);
+    if (form == kFormBee && mBeeWing != nullptr) {
+        // MarioActor::updateBeeWingAnimation, by grounded state only.
+        if (airborne != mAirborne || !MR::isBckPlaying(mBeeWing, airborne ? "Fly" : "Wait")) {
+            MR::startBck(mBeeWing, airborne ? "Fly" : "Wait");
+        }
+    }
+    if (mMode == 6 && mTeresa != nullptr) {
+        // The boo has its own animations; airborne or moving: fly, else wait.
+        const char* anim = airborne || mVelocity.length() > 2.0f ? "fly" : "wait";
+        if (!MR::isBckPlaying(mTeresa, anim)) {
+            MR::startBck(mTeresa, anim);
+        }
+    }
+    mAirborne = airborne;
     // GhostPlayer::setAnimationWeight: the locomotion group ("basic") blends
     // its tracks by speed; without the weights the puppet stands still while
     // it slides along.
@@ -310,6 +381,110 @@ void RemotePlayerPuppet::applyState(const NetPlayerCapture& rState, bool valid) 
 }
 
 void RemotePlayerPuppet::control() {}
+
+int RemotePlayerPuppet::formForMode(u8 mode) {
+    switch (mode) {
+    case 1:
+        return kFormRainbow;
+    case 3:
+        return kFormIce;
+    case 4:
+        return kFormBee;
+    case 5:
+        return kFormSpring;
+    default:
+        return -1;
+    }
+}
+
+// MarioActor::initBeeMario & co: a form model, killed (drawn by us, never by
+// the scene).  `shareJoints`: posed by the body's animated joints, which
+// works because every human form has the body's skeleton.
+ModelHolder* RemotePlayerPuppet::initFormModel(const char* pName, bool shareJoints) {
+    if (!MR::isLoadedObjectOrLayoutArchive(pName)) {
+        return nullptr;
+    }
+    ModelHolder* holder = new ModelHolder(pName, true);
+    holder->initWithoutIter();
+    if (shareJoints) {
+        reinterpret_cast< J3DModelX* >(MR::getJ3DModel(holder))->copyAnmMtxBuffer(reinterpret_cast< J3DModelX* >(MR::getJ3DModel(this)));
+    }
+    MR::initDLMakerFog(holder, true);
+    MR::newDifferedDLBuffer(holder);
+    holder->kill();
+    return holder;
+}
+
+void RemotePlayerPuppet::initForms() {
+    const bool l = mLuigi;
+    Form& rainbow = mForms[kFormRainbow];
+    rainbow.mBody = initFormModel(l ? "InvincibleLuigi" : "InvincibleMario", true);
+    if (rainbow.mBody != nullptr) {
+        rainbow.mHandL = initFormModel("InvincibleMarioHandL", false);
+        rainbow.mHandR = initFormModel("InvincibleMarioHandR", false);
+        // The colour cycle (MarioActor::setPlayerMode, mode 1).
+        MR::startBrk(rainbow.mBody, "InvincibleMario");
+        if (rainbow.mHandL != nullptr && rainbow.mHandR != nullptr) {
+            MR::startBrk(rainbow.mHandL, "InvincibleMarioHandL");
+            MR::startBrk(rainbow.mHandR, "InvincibleMarioHandR");
+        }
+    }
+    Form& ice = mForms[kFormIce];
+    ice.mBody = initFormModel(l ? "IceLuigi" : "IceMario", true);
+    if (ice.mBody != nullptr) {
+        ice.mHandL = initFormModel("IceMarioHandL", false);
+        ice.mHandR = initFormModel("IceMarioHandR", false);
+        new DrawAdaptor(MR::Functor(this, &RemotePlayerPuppet::drawIndirect), MR::DrawType_0x24);
+    }
+    mForms[kFormBee].mBody = initFormModel(l ? "BeeLuigi" : "BeeMario", true);
+    if (mForms[kFormBee].mBody != nullptr && MR::isLoadedObjectOrLayoutArchive("BeeMarioWing")) {
+        mBeeWing = new PartsModel(this, "RemoteBeeWing", "BeeMarioWing", MR::getJointMtx(this, "Spine2"), MR::DrawBufferType_PlayerDecoration,
+                                  false);
+        mBeeWing->initWithoutIter();
+        MR::startBck(mBeeWing, "Wait");
+        mBeeWing->makeActorDead();
+    }
+    mForms[kFormSpring].mBody = initFormModel(l ? "HopperLuigi" : "HopperMario", true);
+    // Bee and spring Mario still wear the shirt and cap; tint them too.
+    for (int f : {kFormBee, kFormSpring}) {
+        if (mForms[f].mBody != nullptr) {
+            mForms[f].mTint.init(MR::getJ3DModelData(mForms[f].mBody), mLuigi);
+            mForms[f].mTint.install(reinterpret_cast< J3DModelX* >(MR::getJ3DModel(mForms[f].mBody)));
+            mForms[f].mTinted = true;
+        }
+    }
+    const char* teresa = l ? "TeresaLuigi" : "TeresaMario";
+    if (MR::isLoadedObjectOrLayoutArchive(teresa)) {
+        mTeresa = new PartsModel(this, "RemoteTeresa", teresa, MR::getJ3DModel(this)->getBaseTRMtx(), MR::DrawBufferType_UNK_0x17, false);
+        mTeresa->initWithoutIter();
+        MR::startBck(mTeresa, "wait");
+        mTeresa->makeActorDead();
+    }
+}
+
+void RemotePlayerPuppet::showParts(bool wing, bool teresa) {
+    PartsModel* parts[] = {mBeeWing, mTeresa};
+    bool show[] = {wing, teresa};
+    for (int i = 0; i < 2; i++) {
+        if (parts[i] == nullptr) {
+            continue;
+        }
+        if (show[i] && MR::isDead(parts[i])) {
+            parts[i]->makeActorAppeared();
+        } else if (!show[i] && !MR::isDead(parts[i])) {
+            parts[i]->makeActorDead();
+        }
+    }
+}
+
+void RemotePlayerPuppet::setTint(u8 tint, u8 suit) {
+    mTint.set(tint, suit);
+    for (Form& f : mForms) {
+        if (f.mTinted) {
+            f.mTint.set(tint, 0);
+        }
+    }
+}
 
 // MarioActor::calcViewAndEntry's part: face and hands follow the body's
 // joints; MarioActor::updateFace / updateHand: the expression and hand
@@ -339,7 +514,7 @@ void RemotePlayerPuppet::updateParts() {
 
 // A face or hand model with only the joint of `pose` shown (joint 0 is the
 // root), in the player's light.
-void RemotePlayerPuppet::drawPart(ModelHolder* pPart, u8 pose, u32 poses) const {
+void RemotePlayerPuppet::drawPart(ModelHolder* pPart, u8 pose, u32 poses, bool lit) const {
     HideFlags keep(MR::getJ3DModelData(pPart));
     for (u32 i = 0; i < poses; i++) {
         J3DJoint* joint = MR::getJoint(pPart, (u16)(i + 1));
@@ -351,7 +526,7 @@ void RemotePlayerPuppet::drawPart(ModelHolder* pPart, u8 pose, u32 poses) const 
     }
     J3DModelX* model = reinterpret_cast< J3DModelX* >(MR::getJ3DModel(pPart));
     u32 lightSize = 0;
-    const u8* light = playerLightDL(&lightSize);
+    const u8* light = lit ? playerLightDL(&lightSize) : nullptr;
     model->setDynamicDL(const_cast< u8* >(light), lightSize);
     model->directDraw(nullptr);
 }
@@ -367,38 +542,99 @@ void RemotePlayerPuppet::calcAndSetBaseMtx() {
     MR::getJ3DModel(this)->setBaseScale(mScale);
 }
 
-// MarioActor::drawMarioModel + drawHand + the face, for the normal suit.
+// One body model (the puppet's own or a form's) with the body's face and
+// hand joints hidden (the separate parts replace them) unless the form
+// shows its own face (ice, rainbow: MarioActor::updateFace hides the part).
+void RemotePlayerPuppet::drawBody(J3DModelX* pModel, bool ownFace, bool lit) const {
+    u32 lightSize = 0;
+    const u8* light = lit ? playerLightDL(&lightSize) : nullptr;
+    HideFlags keep(pModel->getModelData());
+    if (ownFace) {
+        MR::showJoint(pModel, "Face0");
+    } else {
+        MR::hideJoint(pModel, "Face0");
+    }
+    MR::hideJoint(pModel, "HandL0");
+    MR::hideJoint(pModel, "HandR0");
+    pModel->mFlags.clear();
+    pModel->setDynamicDL(const_cast< u8* >(light), lightSize);
+    pModel->viewCalc2();  // GhostPlayer::draw (setDrawView needs the player's extra buffers)
+    GXInvalidateVtxCache();
+    pModel->directDraw(nullptr);
+    pModel->mFlags.clear();
+}
+
+// A form's body on the puppet's base matrix.  The joints are the body's
+// (shared animation matrices), but the skinned vertices need this model's
+// own weighted-envelope matrices, which its calc() would make (calcAnmMtx is
+// the body's job).
+J3DModelX* RemotePlayerPuppet::prepareFormModel(const Form& rForm) const {
+    J3DModelX* body = reinterpret_cast< J3DModelX* >(MR::getJ3DModel(this));
+    J3DModelX* model = reinterpret_cast< J3DModelX* >(MR::getJ3DModel(rForm.mBody));
+    PSMTXCopy(body->getBaseTRMtx(), model->getBaseTRMtx());
+    model->setBaseScale(mScale);
+    j3dSys.setModel(model);
+    model->calcWeightEnvelopeMtx();
+    return model;
+}
+
+// MarioActor::drawIndirectModel + drawIndirectHand: ice, with its own face.
+void RemotePlayerPuppet::drawIndirect() const {
+    const Form& ice = mForms[kFormIce];
+    if (MR::isDead(this) || mHidden || mMode != 3 || ice.mBody == nullptr || mXanimePlayer == nullptr) {
+        return;
+    }
+    drawBody(prepareFormModel(ice), true, true);
+    if (mFace != nullptr && ice.mHandL != nullptr && ice.mHandR != nullptr) {
+        const_cast< RemotePlayerPuppet* >(this)->updateParts();
+        ice.mHandL->updateMtx(MR::getJointMtx(this, "HandL"));
+        ice.mHandR->updateMtx(MR::getJointMtx(this, "HandR"));
+        drawPart(ice.mHandL, mHandPoseL, MR::getJointNum(ice.mHandL) - 1, true);
+        drawPart(ice.mHandR, mHandPoseR, MR::getJointNum(ice.mHandR) - 1, true);
+    }
+}
+
+// MarioActor::drawMarioModel + drawHand + the face.
 void RemotePlayerPuppet::draw() const {
     if (MR::isDead(this) || mHidden) {
         return;
     }
-    u32 lightSize = 0;
-    const u8* light = playerLightDL(&lightSize);
-    J3DModelX* model = reinterpret_cast< J3DModelX* >(MR::getJ3DModel(this));
-    {
-        // The body's own face and hands stay hidden (the parts replace them);
-        // the local player hides them on its data, but not on the other
-        // character's.
-        HideFlags keep(MR::getJ3DModelData(this));
-        MR::hideJoint(model, "Face0");
-        MR::hideJoint(model, "HandL0");
-        MR::hideJoint(model, "HandR0");
-        model->mFlags.clear();
+    J3DModelX* body = reinterpret_cast< J3DModelX* >(MR::getJ3DModel(this));
+    if (mMode == 6 && mTeresa != nullptr) {
+        return;  // boo: only the Teresa part shows (MarioActor::isAllHidden)
+    }
+    int formIndex = formForMode(mMode);
+    const Form* form = formIndex >= 0 && mForms[formIndex].mBody != nullptr ? &mForms[formIndex] : nullptr;
+    if (formIndex == kFormIce && form != nullptr) {
+        return;  // drawIndirect (MarioActor::drawMarioModel skips model 3)
+    }
+    bool ownFace = formIndex == kFormRainbow;
+    if (form != nullptr) {
+        drawBody(prepareFormModel(*form), ownFace, formIndex != kFormRainbow);  // rainbow: no light DL (drawMarioModel)
+    } else {
+        J3DModelX* model = body;
+        HideFlags keep(model->getModelData());
         if (mEyelidMaterial != 0xFFFF && mEyelidDL[mEyelid & 3] != nullptr) {
             model->_1C8[mEyelidMaterial] = mEyelidDL[mEyelid & 3];  // MarioActor::swapTexture
             model->_1CC[mEyelidMaterial] = mEyelidDLSize[mEyelid & 3];
         }
-        model->setDynamicDL(const_cast< u8* >(light), lightSize);
-        model->viewCalc2();  // GhostPlayer::draw (setDrawView needs the player's extra buffers)
-        GXInvalidateVtxCache();
-        model->directDraw(nullptr);
-        model->mFlags.clear();
+        drawBody(model, false, true);
     }
     if (mFace != nullptr && mXanimePlayer != nullptr) {
         const_cast< RemotePlayerPuppet* >(this)->updateParts();
-        drawPart(mHandL, mHandPoseL, MR::getJointNum(mHandL) - 1);
-        drawPart(mHandR, mHandPoseR, MR::getJointNum(mHandR) - 1);
-        drawPart(mFace, mFacePose, 8);
+        if (form != nullptr && form->mHandL != nullptr && form->mHandR != nullptr) {
+            // Rainbow and ice gloves (MarioActor::updateHand picks the set).
+            form->mHandL->updateMtx(MR::getJointMtx(this, "HandL"));
+            form->mHandR->updateMtx(MR::getJointMtx(this, "HandR"));
+            drawPart(form->mHandL, mHandPoseL, MR::getJointNum(form->mHandL) - 1, formIndex != kFormRainbow);
+            drawPart(form->mHandR, mHandPoseR, MR::getJointNum(form->mHandR) - 1, formIndex != kFormRainbow);
+        } else if (formIndex != kFormSpring) {  // spring Mario has no hands out
+            drawPart(mHandL, mHandPoseL, MR::getJointNum(mHandL) - 1, true);
+            drawPart(mHandR, mHandPoseR, MR::getJointNum(mHandR) - 1, true);
+        }
+        if (!ownFace) {
+            drawPart(mFace, mFacePose, 8, true);
+        }
     }
     GXSetAlphaUpdate(GX_FALSE);
     GXSetColorUpdate(GX_TRUE);
@@ -450,7 +686,8 @@ void updateLocalTint() {
         sLocalTint->install(model);
     }
     const char* tint = getenv("SMG_TINT");
-    sLocalTint->set(net::puppetTint(tint ? (u8)atoi(tint) : 0, net::netLocalId()));
+    sLocalTint->set(net::puppetTint(tint ? (u8)atoi(tint) : 0, net::netLocalId()),
+                    ModelTint::suitForMode((u8)MarioAccess::getPlayerActor()->mPlayerMode));
 }
 
 // Shows the slot's puppet for `luigi` posed by `pose`, hides the other.
@@ -462,12 +699,76 @@ void showSlot(int slot, bool luigi, const NetPlayerCapture& pose, bool visible, 
         }
         bool mine = (c == 1) == luigi;
         if (mine) {
-            p->setTint(tint);
+            p->setTint(tint, ModelTint::suitForMode((u8)((pose.flags & NET_CAPTURE_MODE_MASK) >> NET_CAPTURE_MODE_SHIFT)));
         }
         p->applyState(pose, mine && visible);
     }
 }
 }  // namespace
+
+namespace {
+std::atomic<int> sDebugMode{-1};
+
+// PETARI_DEBUG_MODES and the F-key requests, applied on the game thread.
+// Forms with their own model need its archive in this stage (see
+// SceneDataInitializer); MarioActor skips a form it has no model for.
+void applyDebugModes() {
+    static const char* sSchedule = getenv("PETARI_DEBUG_MODES");
+    static int sDone = 0;
+    if (sSchedule != nullptr && *sSchedule != 0) {
+        double now = port_host_time_ns() / 1e9;
+        static double sStart = now;
+        int index = 0;
+        for (const char* p = sSchedule; p != nullptr && *p != 0; index++) {
+            double t;
+            int mode;
+            if (sscanf(p, "%lf:%d", &t, &mode) != 2) {
+                break;
+            }
+            if (index >= sDone) {
+                if (now - sStart < t) {
+                    break;
+                }
+                sDebugMode = mode;
+                sDone++;
+            }
+            p = strchr(p, ',');
+            p = p != nullptr ? p + 1 : nullptr;
+        }
+    }
+    int mode = sDebugMode.exchange(-1);
+    if (mode < 0 || !MR::isExistMario()) {
+        return;
+    }
+    MarioActor* actor = MarioAccess::getPlayerActor();
+    // setPlayerMode uses the form's model holder unchecked.
+    const void* holder = mode == 1 ? (const void*)actor->_9C8 : mode == 3 ? (const void*)actor->_9C0 : mode == 4 ? (const void*)actor->_9E4
+                       : mode == 5 ? (const void*)actor->_A00 : mode == 6 ? (const void*)actor->_9A4 : (const void*)actor;
+    if (mode > 9 || holder == nullptr) {
+        port_log("puppet: debug: player mode %d has no model in this stage", mode);
+        return;
+    }
+    // The first time per form plays a camera aimed at the collected item
+    // (MarioActor::calcAnimInMovement, _4A4), which a debug switch has none
+    // of, and a message that waits for A: mark the firsts as seen.
+    static const char* const kFirsts[] = {
+        "\x83\x6e\x83\x60\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67",              // bee
+        "\x83\x65\x83\x8c\x83\x54\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67",      // boo
+        "\x83\x7a\x83\x62\x83\x70\x81\x5b\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67",  // spring
+        "\x83\x74\x83\x40\x83\x43\x83\x41\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67",  // fire
+        "\x83\x41\x83\x43\x83\x58\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67",      // ice
+        "\x83\x74\x83\x89\x83\x43\x83\x93\x83\x4f\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67",  // flying
+        "\x96\xb3\x93\x47\x83\x7d\x83\x8a\x83\x49\x8f\x89\x95\xcf\x90\x67",                    // rainbow
+    };
+    for (const char* first : kFirsts) {
+        GameDataFunction::onGameEventFlag(first);
+    }
+    port_log("puppet: debug: player mode %d", mode);
+    actor->setPlayerMode((u16)mode, true);
+}
+}  // namespace
+
+extern "C" void port_net_debug_request_mode(int mode) { sDebugMode = mode; }
 
 extern "C" int port_net_wants_puppets(void) { return loopbackDelay() != nullptr || net::netEnabled(); }
 
@@ -477,6 +778,8 @@ extern "C" void port_net_puppets_create_for_scene(void) {
     }
     int count = net::netEnabled() ? net::kMaxRemotes : 1;
     forgetPuppets();
+    JKRHeap* heap = JKRHeap::getCurrentHeap();
+    s32 freeBefore = heap->getTotalFreeSize();
     for (int i = 0; i < count; i++) {
         for (int c = 0; c < 2; c++) {
             sPuppets[i][c] = new RemotePlayerPuppet(c ? "RemoteLuigiPuppet" : "RemoteMarioPuppet", c == 1);
@@ -489,7 +792,8 @@ extern "C" void port_net_puppets_create_for_scene(void) {
         sLocalTint->init(MR::getJ3DModelData(sPuppets[0][MR::isPlayerLuigi() ? 1 : 0]), MR::isPlayerLuigi());
     }
     sAdoptOnNextScene = true;
-    port_log("puppet: %d Mario + %d Luigi created for the new scene", count, count);
+    port_log("puppet: %d Mario + %d Luigi created for the new scene: %d KB of the current heap, %d KB left", count, count,
+             (int)((freeBefore - heap->getTotalFreeSize()) / 1024), (int)(heap->getTotalFreeSize() / 1024));
 }
 
 extern "C" void port_net_puppets_update(void* pScene) {
@@ -504,6 +808,7 @@ extern "C" void port_net_puppets_update(void* pScene) {
             forgetPuppets();  // the old scene's actors died with its heap
         }
     }
+    applyDebugModes();
     NetPlayerCapture now;
     bool haveLocal = net_capture_latest(&now) != 0;
 
@@ -523,6 +828,17 @@ extern "C" void port_net_puppets_update(void* pScene) {
         int64_t delayNs = (int64_t)(atof(delay) * 1e9);
         NetPlayerCapture past;
         bool valid = net_capture_at(now.timeNs - delayNs, &past) && past.stageHash == now.stageHash;
+        // PETARI_LOOPBACK_SIDE=<units>: stand the copy that far to the
+        // player's side (baseMtx column 0), e.g. "PETARI_LOOPBACK=0
+        // PETARI_LOOPBACK_SIDE=120" for a side-by-side comparison.
+        static const char* sSide = getenv("PETARI_LOOPBACK_SIDE");
+        if (sSide != nullptr && *sSide != 0) {
+            float side = (float)atof(sSide);
+            for (int i = 0; i < 3; i++) {
+                past.pos[i] += past.baseMtx[i][0] * side;
+                past.baseMtx[i][3] = past.pos[i];
+            }
+        }
         // SMG_TINT picks the copy's colour, otherwise as player 2 (green).
         const char* tint = getenv("SMG_TINT");
         showSlot(0, (past.flags & NET_CAPTURE_LUIGI) != 0, past, valid, net::puppetTint(tint ? (u8)atoi(tint) : 0, 2));

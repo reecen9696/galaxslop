@@ -108,12 +108,18 @@ bool desktop_present_init(bool headless, int scale) {
     return true;
 }
 
+// Co-op debug (net/puppet): F1-F8 put the player into a power-up form.
+extern "C" void port_net_debug_request_mode(int mode);
+
 // Keyboard/mouse -> one Wii remote + Nunchuk.  Mapping per BUILD_SPEC 7.
 static void readInput(PortPadState* pad, bool* quit) {
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
         if (e.type == SDL_EVENT_QUIT || (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_F12)) {
             *quit = true;
+        }
+        if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat && e.key.key >= SDLK_F1 && e.key.key <= SDLK_F8) {
+            port_net_debug_request_mode((int)(e.key.key - SDLK_F1));  // F1 normal, F2 rainbow, F3 fire...
         }
     }
     const bool* k = SDL_GetKeyboardState(nullptr);

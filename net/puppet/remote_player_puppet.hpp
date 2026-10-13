@@ -11,6 +11,13 @@
 // initHand, updateFace, updateHand), lit with the player's light display
 // list (MarioActor::updateLightDL), with the shirt and cap textures copied
 // per puppet so each can be tinted (puppet_tint.h).
+//
+// Power-up forms follow the sender's PlayerMode: fire and flying are suit
+// textures (ModelTint); rainbow, ice, bee and spring swap the body for that
+// form's model, which has the same skeleton and so shares the body's
+// animated joints (J3DModelX::copyAnmMtxBuffer, as MarioActor does for its
+// ice and rainbow models), with the form's own hands and extras (rainbow
+// colour cycle, bee wings); boo draws the Teresa model instead.
 #pragma once
 
 #include "Game/LiveActor/LiveActor.hpp"
@@ -19,33 +26,41 @@
 class J3DModelData;
 class J3DModelX;
 class ModelHolder;
+class PartsModel;
 class XanimePlayer;
 
 // Recolourable shirt and cap for a player-model instance (puppet_tint.h):
 // a private copy of each texture plus a display list binding it, hooked in
 // through J3DModelX's per-material DL (the one MarioActor::swapTexture uses
-// for blinking).  Buffers come from the current heap, so init() runs during
-// scene initialisation; install() and set() are cheap and run any time.
+// for blinking).  The copy is made from one of the three suit variants
+// (MarioBody.0/.1/.2, MarioCap.0/.1/.2: normal, flying, fire), which the
+// player otherwise selects with its "ColorChange" btp; the DL replaces that
+// choice, so the variant has to come through here.  Buffers come from the
+// current heap, so init() runs during scene initialisation; install() and
+// set() are cheap and run any time.
 class ModelTint {
 public:
     ModelTint();
     void init(J3DModelData* pData, bool luigi);
     void install(J3DModelX* pModel) const;
-    void set(u8 tint);
+    void set(u8 tint, u8 suit);
+    // ColorChange frame for a PlayerMode: 2 fire, 1 flying, else 0.
+    static u8 suitForMode(u8 mode) { return mode == 2 ? 2 : mode == 7 ? 1 : 0; }
 
 private:
     struct Texture {
-        const u8* mSource;
+        const u8* mSource[3];  // per suit
         u8* mCopy;
         u32 mSize;
         u16 mMaterialNo;
         u8* mDL;
         u16 mDLSize;
     };
-    void initTexture(Texture* pTex, J3DModelData* pData, const char* pMaterialName);
+    void initTexture(Texture* pTex, J3DModelData* pData, const char* pMaterialName, const char* pTexturePrefix);
     Texture mTextures[2];
     bool mLuigi;
     u8 mTint;
+    u8 mSuit;
 };
 
 class RemotePlayerPuppet : public LiveActor {
@@ -56,12 +71,14 @@ public:
     virtual void control();
     virtual void calcAndSetBaseMtx();
     virtual void draw() const;
+    // Ice is drawn in the refraction pass (MarioActor::drawIndirectModel).
+    void drawIndirect() const;
 
     void initAnimation();
     // Pose for this frame; `valid` false hides the puppet.
     void applyState(const NetPlayerCapture& rState, bool valid);
     // Clothes colour (net::kTint*); cheap when unchanged.
-    void setTint(u8 tint) { mTint.set(tint); }
+    void setTint(u8 tint, u8 suit);
 
     XanimePlayer* mXanimePlayer;
     XanimePlayer* mXanimePlayerUpper;
@@ -73,6 +90,24 @@ public:
     ModelHolder* mFace;
     ModelHolder* mHandL;
     ModelHolder* mHandR;
+
+    // Body-swapping forms, by PlayerMode (1 rainbow, 3 ice, 4 bee, 5 spring);
+    // null where the stage has no model for it.
+    enum { kFormRainbow, kFormIce, kFormBee, kFormSpring, kFormCount };
+    struct Form {
+        ModelHolder* mBody;
+        ModelHolder* mHandL;  // own hands (rainbow, ice); null: the normal ones
+        ModelHolder* mHandR;
+        ModelTint mTint;      // bee and spring keep Mario's shirt and cap
+        bool mTinted;
+    };
+    Form mForms[kFormCount];
+    // Drawn by the scene as parts that follow a matrix (MarioActor's
+    // MarioParts): the wings on Spine2, the boo on the base matrix.
+    PartsModel* mBeeWing;
+    PartsModel* mTeresa;  // boo
+    u8 mMode;              // sender's PlayerMode
+    bool mAirborne;
     // Expression and hand poses this frame (joint index - 1 in the face and
     // hand models), from the animation's PartsControl joint.
     u8 mFacePose;
@@ -86,9 +121,15 @@ public:
     u8 mEyelid;
 
 private:
+    static int formForMode(u8 mode);
+    void initForms();
+    void showParts(bool wing, bool teresa);
+    ModelHolder* initFormModel(const char* pName, bool shareJoints);
+    J3DModelX* prepareFormModel(const Form& rForm) const;
+    void drawBody(J3DModelX* pModel, bool ownFace, bool lit) const;
     void updateParts();
     ModelHolder* initPart(const char* pName, const char* pBodyJoint, u32 packets);
-    void drawPart(ModelHolder* pPart, u8 pose, u32 poses) const;
+    void drawPart(ModelHolder* pPart, u8 pose, u32 poses, bool lit) const;
 };
 
 // Per-scene management, called from GameScene::update (TARGET_PC) every
@@ -103,3 +144,10 @@ extern "C" void port_net_puppets_create_for_scene(void);
 // Whether this session draws remote players, so stage loading also mounts
 // the puppet models (SceneDataInitializer, TARGET_PC).
 extern "C" int port_net_wants_puppets(void);
+
+// Debug: put the local player into PlayerMode `mode` on the next gameplay
+// frame (0 normal, 1 rainbow, 2 fire, 3 ice, 4 bee, 5 spring, 6 boo,
+// 7 flying).  Any thread.  The desktop window maps F1-F8 to it;
+// PETARI_DEBUG_MODES="seconds:mode,..." schedules them (seconds after the
+// first gameplay frame).
+extern "C" void port_net_debug_request_mode(int mode);

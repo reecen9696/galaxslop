@@ -34,8 +34,10 @@ enum : uint16_t {
     NET_STATE_HIDDEN = 0x0004,
     NET_STATE_IN_DEMO = 0x0008,
     NET_STATE_EYELID_MASK = 0x0030,  // eyelid frame 0 (open) .. 3 (closed)
+    NET_STATE_MODE_MASK = 0x03C0,    // power-up form (MarioActor's PlayerMode, 0-9)
 };
 constexpr int kNetStateEyelidShift = 4;
+constexpr int kNetStateModeShift = 6;
 
 struct PlayerState {
     uint32_t tick = 0;

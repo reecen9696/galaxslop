@@ -114,7 +114,13 @@ SMG_RELAY=ws://<host-ip>:8787 SMG_ROOM=PLAY22 SMG_NAME=Reece ./build/native/smg 
   their save plays, in a shirt/cap colour fixed by player number (1 normal,
   2 green, 3 pink, 4 orange, 5 purple), the same on every screen including
   your own; `SMG_TINT=<n>` picks yours (values in `docs/NETCODE.md`).
-  `tools/coop_two_players.sh` runs two clients side by side on one Mac. Nothing else is shared yet (no stars, no enemies).
+  `tools/coop_two_players.sh` runs two clients side by side on one Mac,
+  straight into Good Egg in ~20 s (`PETARI_QUICKSTART=Galaxy[:scenario]`
+  skips the title, file select and prologue; `PETARI_QUICKSTART_LUIGI=1`).
+  In a window F1-F8 switch your power-up form (normal, rainbow, fire, ice,
+  bee, spring, boo, flying); `PETARI_DEBUG_MODES` schedules them.
+  `PETARI_LOOPBACK=0 PETARI_LOOPBACK_SIDE=110` draws a copy of yourself
+  beside you, for comparing the puppet with the real player. Nothing else is shared yet (no stars, no enemies).
 - `PETARI_NETLOG=1` logs the room, round-trip time and where the others are.
   `PETARI_LOOPBACK=1` shows a copy of yourself 1 s behind, with no network
   (green, or by `SMG_TINT`).

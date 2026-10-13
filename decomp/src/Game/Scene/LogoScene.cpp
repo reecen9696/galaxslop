@@ -1,4 +1,7 @@
 #include "Game/Scene/LogoScene.hpp"
+#ifdef TARGET_PC
+#include <stdlib.h>
+#endif
 #include "Game/LiveActor/Nerve.hpp"
 #include "Game/Scene/SceneFunction.hpp"
 #include "Game/Scene/SceneObjHolder.hpp"
@@ -171,6 +174,13 @@ void LogoScene::exeStrapDisplay() {
         (MR::testCorePadTriggerAnyWithoutHome(WPAD_CHAN0) || MR::isGreaterEqualStep(this, STRAP_DISPLAY_MAX_FRAME))) {
         setNerve(GET_NERVE_ANON(LogoSceneStrapFadeout));
     }
+#ifdef TARGET_PC
+    // PETARI_QUICKSTART (GameSequenceProgress): no strap reminder either.
+    static const char* sQuickStart = getenv("PETARI_QUICKSTART");
+    if (sQuickStart != nullptr && *sQuickStart != 0) {
+        setNerve(GET_NERVE_ANON(LogoSceneStrapFadeout));
+    }
+#endif
 }
 
 void LogoScene::exeStrapFadeout() {

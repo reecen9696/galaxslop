@@ -36,6 +36,10 @@ typedef struct NetPlayerCapture {
 // animations (sleeping), which the animation itself does not carry.
 #define NET_CAPTURE_EYELID_MASK 0x0030
 #define NET_CAPTURE_EYELID_SHIFT 4
+// Power-up form: MarioActor's PlayerMode (0 normal, 1 rainbow, 2 fire,
+// 3 ice, 4 bee, 5 spring, 6 boo, 7 flying, 9 spin drill...).
+#define NET_CAPTURE_MODE_MASK 0x03C0
+#define NET_CAPTURE_MODE_SHIFT 6
 
 // Called by game code once per gameplay frame (Mario exists, scene in play).
 void port_net_capture_player(void);

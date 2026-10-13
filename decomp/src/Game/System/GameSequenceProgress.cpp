@@ -24,10 +24,40 @@
 #include "Game/Util/SoundUtil.hpp"
 #include "Game/Util/StarPointerUtil.hpp"
 #include "Game/Util/StringUtil.hpp"
+#ifdef TARGET_PC
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#endif
 
 namespace {
     static const s32 sTimingPlayingTicoSE = 180;
 };  // namespace
+
+#ifdef TARGET_PC
+namespace {
+    // Debug: PETARI_QUICKSTART="Galaxy[:scenario]" boots straight into that
+    // galaxy on user file 1, skipping the title, file select and prologue
+    // (what FileSelector::exeDemo does, then a galaxy move).  Mario unless
+    // PETARI_QUICKSTART_LUIGI=1.  For co-op testing (tools/coop_two_players.sh).
+    bool sQuickStartPending = false;
+
+    const char* quickStartStage(s32* pScenario) {
+        static char sName[64];
+        const char* v = getenv("PETARI_QUICKSTART");
+        if (v == nullptr || *v == 0) {
+            return nullptr;
+        }
+        snprintf(sName, sizeof(sName), "%s", v);
+        *pScenario = 1;
+        if (char* colon = strchr(sName, ':')) {
+            *colon = 0;
+            *pScenario = atoi(colon + 1);
+        }
+        return sName;
+    }
+};  // namespace
+#endif
 
 namespace {
     NEW_NERVE(GameSequenceProgressBooting, GameSequenceProgress, Booting);
@@ -128,6 +158,15 @@ void GameSequenceProgress::startScene() {
 
 void GameSequenceProgress::endScene() {
     if (isNerve(GET_NERVE_ANON(GameSequenceProgressLogo))) {
+#ifdef TARGET_PC
+        s32 scenario;
+        if (quickStartStage(&scenario) != nullptr) {
+            sQuickStartPending = true;  // exeWaitGoToFirstScene moves to the galaxy
+            GameSystemFunction::setResetOperationApplicationReset();
+            setNerve(GET_NERVE_ANON(GameSequenceProgressWaitGoToFirstScene));
+            return;
+        }
+#endif
         MR::requestChangeSceneAfterBoot();
 
         GameSystemFunction::setResetOperationApplicationReset();
@@ -245,6 +284,23 @@ void GameSequenceProgress::exeLogo() {
 }
 
 void GameSequenceProgress::exeWaitGoToFirstScene() {
+#ifdef TARGET_PC
+    if (sQuickStartPending) {
+        if (GameSequenceFunction::isActiveSaveDataHandleSequence()) {
+            return;  // the boot-time save preload (LogoScene)
+        }
+        sQuickStartPending = false;
+        s32 scenario;
+        const char* stage = quickStartStage(&scenario);
+        const char* luigi = getenv("PETARI_QUICKSTART_LUIGI");
+        GameSequenceFunction::startGameDataLoadSequence(0, !(luigi != nullptr && *luigi == '1'));
+        // Spin is withheld until this story event (startScene).
+        GameDataFunction::followStoryEventByName("\x83\x58\x83\x73\x83\x93\x8c\xa0\x97\x98");
+        OSReport("port: quick start into %s scenario %d\n", stage, (int)scenario);
+        requestGalaxyMove(GalaxyMoveArgument(0, stage, scenario, nullptr));
+        return;
+    }
+#endif
     if (GameSequenceFunction::isReadyToStartScene()) {
         setNerve(GET_NERVE_ANON(GameSequenceProgressNormal));
     }
