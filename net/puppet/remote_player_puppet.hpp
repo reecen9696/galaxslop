@@ -125,6 +125,7 @@ public:
     u8 mRemoteId;
     bool mSolid;
     u8 mTrampleCooldown;   // frames
+    u8 mSpinCooldown;      // frames: one knock-back per spin
     // Own light (MarioActor::calcFogLighting / updateLightDL, without the
     // damage and item fog): the area light where the puppet stands, from its
     // own ActorLightCtrl, rebuilt each draw; double-buffered like the player's.

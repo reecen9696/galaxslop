@@ -39,6 +39,7 @@
 #include "Game/Util/ObjUtil.hpp"
 #include "Game/Util/PlayerUtil.hpp"
 #include "Game/Util/SchedulerUtil.hpp"
+#include "Game/Util/SoundUtil.hpp"
 #include "net/client/net_client.h"
 #include "net/puppet/puppet_fx.h"
 
@@ -204,7 +205,7 @@ struct HideFlags {
 
 RemotePlayerPuppet::RemotePlayerPuppet(const char* pName, bool luigi)
     : LiveActor(pName), mXanimePlayer(nullptr), mXanimePlayerUpper(nullptr), mAnimHash(0), mLuigi(luigi), mHidden(true), mFace(nullptr),
-      mHandL(nullptr), mHandR(nullptr), mBeeWing(nullptr), mTeresa(nullptr), mMode(0), mRemoteId(0), mSolid(false), mTrampleCooldown(0),
+      mHandL(nullptr), mHandR(nullptr), mBeeWing(nullptr), mTeresa(nullptr), mMode(0), mRemoteId(0), mSolid(false), mTrampleCooldown(0), mSpinCooldown(0),
       mAirborne(false), mLightDLSize(0), mLightDLIndex(0), mPendingLight(nullptr), mFacePose(0), mHandPoseL(0),
       mHandPoseR(0), mEyelidMaterial(0xFFFF), mEyelid(0) {
     PSMTXIdentity(mTargetRotationMtx);
@@ -323,6 +324,21 @@ void RemotePlayerPuppet::attackSensor(HitSensor* pSender, HitSensor* pReceiver) 
         return;
     }
     MarioActor* local = MarioAccess::getPlayerActor();
+    // A spin (its first frames, the game's own spin-hit window,
+    // MarioActor::attackOrPushSensor) knocks the other player back: on their
+    // client they stagger away as from a Topman's bump, without damage.
+    if (local->_3E5 && local->_945 < 15 && mSpinCooldown == 0 && mRemoteId != 0) {
+        TVec3f away = mPosition - local->mPosition;
+        const TVec3f& up = -*MR::getPlayerGravity();
+        away -= up * away.dot(up);
+        if (!MR::normalizeOrZero(&away)) {
+            float dir[3] = {away.x, away.y, away.z};
+            net::netSendContact(mRemoteId, net::kContactSpin, dir);
+            MR::startSpinHitSound(local);
+            port_log("puppet: spun into player %u", mRemoteId);
+        }
+        mSpinCooldown = 30;
+    }
     if (!MR::isOnGroundPlayer()) {
         if (MR::sendMsgPush(pReceiver, pSender)) {
             static const bool sLog = getenv("PETARI_PUPPETLOG") != nullptr;
@@ -555,6 +571,9 @@ void RemotePlayerPuppet::applyState(const NetPlayerCapture& rState, bool valid, 
 }
 
 void RemotePlayerPuppet::control() {
+    if (mSpinCooldown != 0) {
+        mSpinCooldown--;
+    }
     if (mTrampleCooldown != 0) {
         mTrampleCooldown--;
     }
@@ -1033,6 +1052,14 @@ void applyContacts() {
             TVec3f dir(c.dir[0], c.dir[1], c.dir[2]);
             bool flinched = actor->mMario->doFlipWeak(dir);
             port_log("puppet: stomped by player %u%s", c.playerId, flinched ? "" : " (no reaction in this state)");
+        } else if (c.kind == net::kContactSpin) {
+            // Knocked back without damage: the Topman bump
+            // (ACTMES_ENEMY_ATTACK_FLIP_MAXIMUM -> doFlipLarge); spin
+            // against spin is the game's spin clash (doFlipRot).
+            TVec3f dir(c.dir[0], c.dir[1], c.dir[2]);
+            dir.setLength(15.0f);
+            bool knocked = actor->_3E5 ? actor->mMario->doFlipRot(dir) : actor->mMario->doFlipLarge(dir);
+            port_log("puppet: spun into by player %u%s", c.playerId, knocked ? "" : " (no reaction in this state)");
         } else if (c.kind == net::kContactHipDrop) {
             actor->mMario->requestCrush();
             port_log("puppet: ground-pounded by player %u: squashed", c.playerId);

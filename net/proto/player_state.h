@@ -62,6 +62,7 @@ constexpr size_t kContactSize = 9;
 enum : uint8_t {
     kContactTrample = 1,  // jumped on (the target flinches)
     kContactHipDrop = 2,  // ground-pounded (the target is squashed and loses health)
+    kContactSpin = 3,     // spun into: knocked back with the stagger, no health lost
 };
 struct Contact {
     uint8_t playerId = 0;  // target when sending, sender when received
