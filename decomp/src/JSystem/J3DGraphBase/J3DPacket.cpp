@@ -66,6 +66,17 @@ u32 J3DDisplayListObj::endDL() {
     GDPadCurr32();
     OSRestoreInterrupts(sInterruptFlag);
     mSize = GDGetGDLObjOffset(&sGDLObj);
+#ifdef TARGET_PC
+    if (mSize > mMaxSize) {
+        static int sReported = 0;
+        if (sReported++ < 10) {
+            J3DMatPacket* mp = j3dSys.getMatPacket();
+            OSReport("J3D: display list %p wrote %u bytes into %u (overrun); model %p data %p material %d\n", (void*)this, (unsigned)mSize,
+                     (unsigned)mMaxSize, (void*)j3dSys.getModel(), j3dSys.getModel() ? (void*)j3dSys.getModel()->getModelData() : nullptr,
+                     mp && mp->mpMaterial ? (int)mp->mpMaterial->mIndex : -1);
+        }
+    }
+#endif
     GDFlushCurrToMem();
     GDSetCurrent(NULL);
     return mSize;

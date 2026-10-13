@@ -24,6 +24,15 @@ void GDPadCurr32() {
 }
 
 void GDOverflowed() {
+#ifdef TARGET_PC
+    {
+        static int sReported = 0;
+        if (sReported++ < 5) {
+            OSReport("GD: display list overflow (start %p, length %u, at +%d)\n", (void*)__GDCurrentDL->start, (unsigned)__GDCurrentDL->length,
+                     (int)(__GDCurrentDL->ptr - __GDCurrentDL->start));
+        }
+    }
+#endif
     if (overflowcb) {
         (*overflowcb)();
     }

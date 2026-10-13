@@ -147,6 +147,7 @@ public:
 
 private:
     const u8* lightDL(u32* pSize) const;
+    void updateLightDL();
     static int formForMode(u8 mode);
     void initForms();
     void showParts(bool wing, bool teresa);

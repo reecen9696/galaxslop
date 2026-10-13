@@ -48,6 +48,7 @@
 #include <JSystem/J3DGraphAnimator/J3DModelData.hpp>
 #include <JSystem/J3DGraphBase/J3DPacket.hpp>
 #include <JSystem/J3DGraphBase/J3DShape.hpp>
+#include <JSystem/J3DGraphBase/J3DSys.hpp>
 #include <JSystem/J3DGraphBase/J3DMaterial.hpp>
 #include <JSystem/JKernel/JKRHeap.hpp>
 #include <JSystem/JUtility/JUTTexture.hpp>
@@ -70,13 +71,14 @@ u8* makeTextureDL(const void* pImage, u16* pSize) {
     u32 size;
     {
         MR::ProhibitSchedulerAndInterrupts prohibit(false);  // __GDCurrentDL is global
+        GDLObj* previous = __GDCurrentDL;
         GDLObj obj;
         GDInitGDLObj(&obj, tempDL, sizeof(tempDL));
         __GDCurrentDL = &obj;
         GDSetTexImgPtr(GX_TEXMAP0, const_cast< void* >(pImage));
         GDPadCurr32();
         size = (u32)(obj.ptr - obj.start);
-        __GDCurrentDL = nullptr;
+        __GDCurrentDL = previous;
     }
     u8* dl = new (0x20) u8[(size + 0x1F) & ~0x1F];
     memcpy(dl, tempDL, size);
@@ -293,9 +295,23 @@ void RemotePlayerPuppet::init(const JMapInfoIter&) {
     makeActorAppeared();
 }
 
-// GhostPlayer::attackSensor, racing branch: push the local Mario out.
+// GhostPlayer::attackSensor, racing branch: push the local Mario out, unless
+// he is the faster of the two.  Each client moves only its own Mario, so
+// with plain mutual repulsion the walker is deflected around the stander
+// and the stander, seeing the walker late, barely moves.  Instead the faster
+// one is the pusher: he walks on (into the puppet), and on the other
+// player's client the same contact shoves the slower one out of the way.
+// Equal speeds (both standing) push both apart.
 void RemotePlayerPuppet::attackSensor(HitSensor* pSender, HitSensor* pReceiver) {
-    if (mSolid && MR::isSensorPlayer(pReceiver) && MR::sendMsgPush(pReceiver, pSender)) {
+    if (!mSolid || !MR::isSensorPlayer(pReceiver)) {
+        return;
+    }
+    const f32 kPusherMargin = 1.0f;  // units/frame faster than the other
+    f32 localSpeed = MarioAccess::getPlayerActor()->mVelocity.length();
+    if (localSpeed > mVelocity.length() + kPusherMargin) {
+        return;
+    }
+    if (MR::sendMsgPush(pReceiver, pSender)) {
         static const bool sLog = getenv("PETARI_PUPPETLOG") != nullptr;
         static u32 sN = 0;
         if (sLog && (sN++ % 30) == 0) {
@@ -325,8 +341,11 @@ bool RemotePlayerPuppet::receiveMsgPlayerAttack(u32 msg, HitSensor* pSender, Hit
     return false;
 }
 
+// GhostPlayer swallows everything else; a puppet must not: Mario walking
+// into it sends ACTMES_KICK (MarioActor::sendBodyAttack) and, when that is
+// accepted, plays the running kick instead of walking, every frame.
 bool RemotePlayerPuppet::receiveOtherMsg(u32, HitSensor*, HitSensor*) {
-    return mSolid;  // GhostPlayer: everything else is swallowed
+    return false;
 }
 
 // GhostPlayer::initAnimation: the player's own animation table, so the
@@ -441,16 +460,18 @@ void RemotePlayerPuppet::applyState(const NetPlayerCapture& rState, bool valid, 
         }
     }
     mAirborne = airborne;
+    updateLightDL();
     // GhostPlayer::setAnimationWeight: the locomotion group ("basic") blends
     // its tracks by speed; without the weights the puppet stands still while
     // it slides along.
     for (int i = 0; i < 4; i++) {
         mXanimePlayer->changeTrackWeight(i, rState.animWeights[i]);
     }
-    // PETARI_PUPPETLOG=1: what the puppet was given and did, once a second.
-    static const bool sLog = getenv("PETARI_PUPPETLOG") != nullptr;
+    // PETARI_PUPPETLOG=<frames>: what the puppet was given and did, every
+    // that many frames (1 = 60).
+    static const int sLog = getenv("PETARI_PUPPETLOG") != nullptr ? atoi(getenv("PETARI_PUPPETLOG")) : 0;
     static u32 sN = 0;
-    if (sLog && (sN++ % 60) == 0) {
+    if (sLog > 0 && (sN++ % (u32)(sLog == 1 ? 60 : sLog)) == 0) {
         port_log("puppet: hash %08x -> playing '%s'; side %.2f %.2f %.2f up %.2f %.2f %.2f front %.2f %.2f %.2f", rState.animHash,
                  mXanimePlayer->getCurrentAnimationName(), rState.baseMtx[0][0], rState.baseMtx[1][0], rState.baseMtx[2][0], rState.baseMtx[0][1],
                  rState.baseMtx[1][1], rState.baseMtx[2][1], rState.baseMtx[0][2], rState.baseMtx[1][2], rState.baseMtx[2][2]);
@@ -647,6 +668,35 @@ void RemotePlayerPuppet::drawBody(J3DModelX* pModel, bool ownFace, bool lit) con
     pModel->mFlags.clear();
 }
 
+// MarioActor::calcFogLighting + updateLightDL for the puppet: built in the
+// movement phase like the player's (GD display lists are written through
+// the global __GDCurrentDL, which the player's material updates also use;
+// building one while drawing corrupted those, intermittently).
+void RemotePlayerPuppet::updateLightDL() {
+    if (mActorLightCtrl == nullptr || mActorLightCtrl->mAreaLightInf == nullptr || mLightDL[0] == nullptr) {
+        return;
+    }
+    u8 buffer[0x80] ATTRIBUTE_ALIGN(32);
+    u32 length;
+    {
+        MR::ProhibitSchedulerAndInterrupts lock(false);
+        GDLObj* previous = __GDCurrentDL;
+        GDLObj dl;
+        GDInitGDLObj(&dl, buffer, sizeof(buffer));
+        __GDCurrentDL = &dl;
+        GDSetChanAmbColor(GX_COLOR0A0, *MR::getLightAmbientColor(this));
+        GXColor white = {255, 255, 255, 255};
+        GDSetChanMatColor(GX_COLOR0A0, white);
+        GDSetChanCtrl(GX_COLOR1, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+        GDPadCurr32();
+        length = (u32)(dl.ptr - dl.start);
+        __GDCurrentDL = previous;
+    }
+    mLightDLIndex = (u8)(1 - mLightDLIndex);
+    memcpy(mLightDL[mLightDLIndex], buffer, (length + 31) & ~31u);
+    mLightDLSize = length;
+}
+
 // MarioActor::updateLightDL with the puppet's own area ambient colour and
 // white material colour (the directional lights are loaded by draw()).  The
 // player's display list until the puppet has an area light.
@@ -678,6 +728,8 @@ void RemotePlayerPuppet::drawIndirect() const {
     if (MR::isDead(this) || mHidden || mMode != 3 || ice.mBody == nullptr || mXanimePlayer == nullptr) {
         return;
     }
+    J3DModel* keepModel = j3dSys.getModel();
+    J3DTexture* keepTexture = j3dSys.getTexture();
     drawBody(prepareFormModel(ice), true, true);
     if (mFace != nullptr && ice.mHandL != nullptr && ice.mHandR != nullptr) {
         const_cast< RemotePlayerPuppet* >(this)->updateParts();
@@ -686,6 +738,8 @@ void RemotePlayerPuppet::drawIndirect() const {
         drawPart(ice.mHandL, mHandPoseL, MR::getJointNum(ice.mHandL) - 1, true);
         drawPart(ice.mHandR, mHandPoseR, MR::getJointNum(ice.mHandR) - 1, true);
     }
+    j3dSys.setModel(keepModel);
+    j3dSys.setTexture(keepTexture);
 }
 
 // MarioActor::drawMarioModel + drawHand + the face.
@@ -693,30 +747,25 @@ void RemotePlayerPuppet::draw() const {
     if (MR::isDead(this) || mHidden) {
         return;
     }
+    // j3dSys keeps the last drawn model and texture table; the local
+    // player's next material update (MarioActor::calcAnim -> updateDL ->
+    // J3DTevBlock::diffTexNo) reads texture numbers through it, and a puppet
+    // part's smaller table there crashed it (seen in boo mode).  Put back
+    // what the scene had.
+    struct J3DSysKeep {
+        J3DSysKeep() : mModel(j3dSys.getModel()), mTexture(j3dSys.getTexture()) {}
+        ~J3DSysKeep() {
+            j3dSys.setModel(mModel);
+            j3dSys.setTexture(mTexture);
+        }
+        J3DModel* mModel;
+        J3DTexture* mTexture;
+    } keep;
     // This puppet's light: its area's lights into GX (the scene loaded the
     // local player's for the whole DrawType_Player list; restored below),
     // and its ambient colour into a display list for the models.
     bool ownLight = mActorLightCtrl != nullptr && mActorLightCtrl->mAreaLightInf != nullptr && mLightDL[0] != nullptr;
     if (ownLight) {
-        RemotePlayerPuppet* self = const_cast< RemotePlayerPuppet* >(this);
-        u8 buffer[0x80] ATTRIBUTE_ALIGN(32);
-        u32 length;
-        {
-            MR::ProhibitSchedulerAndInterrupts lock(false);  // __GDCurrentDL is global
-            GDLObj dl;
-            GDInitGDLObj(&dl, buffer, sizeof(buffer));
-            __GDCurrentDL = &dl;
-            GDSetChanAmbColor(GX_COLOR0A0, *MR::getLightAmbientColor(this));
-            GXColor white = {255, 255, 255, 255};
-            GDSetChanMatColor(GX_COLOR0A0, white);
-            GDSetChanCtrl(GX_COLOR1, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
-            GDPadCurr32();
-            length = (u32)(dl.ptr - dl.start);
-            __GDCurrentDL = nullptr;
-        }
-        self->mLightDLIndex = (u8)(1 - mLightDLIndex);
-        memcpy(self->mLightDL[mLightDLIndex], buffer, (length + 31) & ~31u);
-        self->mLightDLSize = length;
         // Exactly the player's light set-up (area light + point lights),
         // with this puppet's controller standing in for the player's.
         LightFunction::registerPlayerLightCtrl(mActorLightCtrl);
@@ -857,6 +906,10 @@ void trySpawnSpacing() {
         return;
     }
     if (!MR::isExistMario() || !MR::isOnGroundPlayer() || MR::isDemoActive() || net::netLocalId() == 0) {
+        if (getenv("PETARI_PUPPETLOG") && sSpawnWaitFrames % 120 == 1) {
+            port_log("puppet: spawn spacing waiting: mario %d ground %d demo %d id %d", MR::isExistMario(),
+                     MR::isExistMario() && MR::isOnGroundPlayer(), MR::isDemoActive(), net::netLocalId());
+        }
         return;
     }
     sSpawnPending = false;
@@ -951,9 +1004,37 @@ void applyDebugModes() {
             p = p != nullptr ? p + 1 : nullptr;
         }
     }
+    static int sPending = -1;  // a form to enter once back to normal
     int mode = sDebugMode.exchange(-1);
-    if (mode < 0 || !MR::isExistMario()) {
+    if (mode < 0) {
+        mode = sPending;
+        if (mode < 0) {
+            return;
+        }
+    }
+    if (!MR::isExistMario()) {
         return;
+    }
+    {
+        // Form to form directly (say spring to boo) is not a path the game
+        // takes, and it overruns the old form model's material display
+        // lists during the transform flicker (MarioActor::calcAnim diffs the
+        // displayed form model with the base model's material flags):
+        // heap corruption, crashing later.  Go back to normal first.
+        MarioActor* actor = MarioAccess::getPlayerActor();
+        bool settled = actor->_3D8 == 0 && actor->mCurrModel == 0;
+        if (mode != 0 && actor->mPlayerMode != 0 && actor->mPlayerMode != mode) {
+            sPending = mode;
+            mode = 0;
+        } else if (mode != 0 && actor->mPlayerMode == 0 && !settled) {
+            sPending = mode;  // still flickering back to normal: wait
+            return;
+        } else {
+            sPending = -1;
+        }
+        if (mode == (int)actor->mPlayerMode) {
+            return;
+        }
     }
     MarioActor* actor = MarioAccess::getPlayerActor();
     // setPlayerMode uses the form's model holder unchecked.

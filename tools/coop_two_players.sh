@@ -51,6 +51,7 @@ launch() {  # name, window x, tint, luigi, input, shots subdir, debug modes
   PIDS+=($!)
 }
 launch Alice 0 "${SMG_TINT_A:-0}" "${LUIGI_A:-0}" "$INPUT_A" a "$MODES_A"
+sleep 1  # usually Alice joins first (player 1, left window)
 launch Bob 725 "${SMG_TINT_B:-0}" "${LUIGI_B:-0}" "$INPUT_B" b "$MODES_B"
 echo "two clients starting in $GALAXY; close both windows (or Ctrl-C here) to stop"
 wait "${PIDS[1]}" "${PIDS[2]}"

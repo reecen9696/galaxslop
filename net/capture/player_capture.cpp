@@ -94,11 +94,13 @@ extern "C" void port_net_capture_player(void) {
     sCount++;
     snprintf(sAnimName, sizeof(sAnimName), "%s", anim != nullptr ? anim : "");
 
-    // PETARI_CAPLOG=1: one line a second (positions, animation hash/frame).
-    static const bool capLog = getenv("PETARI_CAPLOG") != nullptr;
-    if (capLog && c.frame % 60 == 0) {
-        port_log("capture: frame %u pos %.1f %.1f %.1f up %.2f %.2f %.2f anim %08x @%.1f x%.2f stage %08x/%d flags %x", c.frame, c.pos[0],
-                 c.pos[1], c.pos[2], c.up[0], c.up[1], c.up[2], c.animHash, c.animFrame, c.animRate, c.stageHash, (int)c.scenario, c.flags);
+    // PETARI_CAPLOG=<frames>: a line every that many frames (1 = 60), with
+    // positions, animation (name, hash, frame, rate, weights).
+    static const int capLog = getenv("PETARI_CAPLOG") != nullptr ? atoi(getenv("PETARI_CAPLOG")) : 0;
+    if (capLog > 0 && c.frame % (capLog == 1 ? 60 : capLog) == 0) {
+        port_log("capture: frame %u pos %.1f %.1f %.1f anim '%s' %08x @%.1f x%.2f w %.2f %.2f %.2f %.2f stage %08x/%d flags %x", c.frame, c.pos[0],
+                 c.pos[1], c.pos[2], sAnimName, c.animHash, c.animFrame, c.animRate, c.animWeights[0], c.animWeights[1], c.animWeights[2],
+                 c.animWeights[3], c.stageHash, (int)c.scenario, c.flags);
     }
 }
 
