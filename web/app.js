@@ -248,6 +248,18 @@ function store(key, value) {
   return null;
 }
 
+// The relay: on this origin when the page is served by it (server/,
+// STATIC_DIR; it answers config.json), else a local relay on 8787 (dev).
+let defaultRelay = `${location.protocol === "https:" ? "wss" : "ws"}://${location.hostname}:8787`;
+fetch("config.json")
+  .then((r) => (r.ok ? r.json() : null))
+  .then((c) => {
+    if (c && c.relay === "same-origin") defaultRelay = `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/`;
+    const relay = document.getElementById("relay");
+    if (relay && !store("smg.relay")) relay.value = defaultRelay;
+  })
+  .catch(() => {});
+
 function showLobby() {
   const lobby = document.getElementById("lobby");
   const name = document.getElementById("name");
@@ -255,7 +267,7 @@ function showLobby() {
   const relay = document.getElementById("relay");
   name.value = store("smg.name") || "";
   room.value = params.get("room") || "";
-  relay.value = store("smg.relay") || `${location.protocol === "https:" ? "wss" : "ws"}://${location.hostname}:8787`;
+  relay.value = store("smg.relay") || defaultRelay;
   lobby.style.display = "block";
   say("");
   return new Promise((resolve) => {

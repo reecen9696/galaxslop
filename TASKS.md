@@ -478,14 +478,15 @@ observatory state.
 
 ### P3-05 Deploy the relay
 - lane: B
-- status: open
-- owner:
+- status: in_progress
+- owner: A
 - blocked_by: P3-01
 - touches: server/
 - flags:
 - what: Per D-010. Dockerfile for the Node relay. Deploy to Fly.io or Railway (or any VPS) with TLS. Env for allowed origins and port. Health endpoint. Same code as local dev. Document deploy in `server/README.md` with the monthly cost.
 - done when: a room works on the deployed `wss://` URL.
 - log:
+  - 2026-10-13 (A): deployable: the relay serves the bundled page (STATIC_DIR, COOP/COEP, /config.json -> same-origin relay), tools/web/bundle.mjs, server/Dockerfile (not built here: no Docker on this machine). Tested end to end on localhost: import, lobby create, room code shown. Waiting on a human to pick a host/domain (account and cost).
 
 ### P3-06 Playtest: 5 players, 2 hours
 - lane: shared

@@ -64,6 +64,26 @@ variables, for example `?PETARI_INPUT=28000:A|300:-` or `?PETARI_PERFLOG=1`.
 `?PETARI_TIMER=1` paces frames with `setTimeout`: Chrome pauses
 `requestAnimationFrame` in hidden tabs.
 
+## Deploy
+
+One process is the whole site: the relay (`server/`) also serves the bundled
+page when `STATIC_DIR` is set, sends the COOP/COEP headers, and tells the page
+(via `/config.json`) that the relay is on the same origin, so the lobby needs
+no address.
+
+```sh
+ninja -C build/web smg && node tools/web/bundle.mjs        # -> dist/web (no game data)
+cd server && PORT=8787 STATIC_DIR=../dist/web npm start   # http://localhost:8787/
+docker build -f server/Dockerfile -t smg-coop .            # or as a container
+```
+
+Off localhost the page needs HTTPS (a secure context for threads and OPFS):
+put the container behind a TLS proxy or a host that terminates TLS; the
+WebSocket then becomes `wss://` on the same origin automatically. `dist/web`
+also works on a static host that can set headers (`_headers` is included for
+Netlify / Cloudflare Pages), with the relay elsewhere (enter its address
+under "Server" in the lobby). Choosing and paying for the host is P3-05.
+
 ## Smoke test
 
 ```sh
