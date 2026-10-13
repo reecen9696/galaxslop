@@ -428,8 +428,13 @@ function onNetLine(t) {
     players.add(m[1]);
   } else if ((m = /^net: (.+) left$/.exec(t))) {
     players.delete(m[1]);
-  } else if (/^net: connection lost/.test(t)) {
+  } else if (/^net: connected to /.test(t)) {
+    roombar.dataset.state = "joining…";
+  } else if (/^net: connection lost/.test(t) || (m = /^net: relay closed the connection/.exec(t))) {
     roombar.dataset.room = "";
+    roombar.dataset.state = "reconnecting…";
+  } else if ((m = /^net: relay error \d+: (.+)$/.exec(t))) {
+    roombar.dataset.state = "!" + m[1];
   } else {
     return;
   }
@@ -458,9 +463,16 @@ function readRemotes() {
 function renderRoomBar() {
   const code = roombar.dataset.room;
   if (!code) {
-    if (roombar.style.display === "block") roombar.innerHTML = `<div class="rb-head"><span class="rb-label">Room</span> reconnecting…</div>`;
+    // In co-op the panel shows from the start: connecting, joining, errors.
+    if (!roombar.dataset.mode) return;
+    roombar.style.display = "block";
+    const st = roombar.dataset.state || "connecting…";
+    const html = `<div class="rb-head"><span class="rb-label">Room</span>${roombar.dataset.want ? `<b>${roombar.dataset.want}</b>` : ""}</div>`
+      + `<span class="rb-who${st[0] === "!" ? " rb-bad" : ""}">${st.replace(/^!/, "").replace(/[<&"]/g, "")}</span>`;
+    if (roombar.innerHTML !== html) roombar.innerHTML = html;
     return;
   }
+  roombar.dataset.state = "";
   roombar.style.display = "block";
   const remotes = readRemotes();
   const esc = (t) => t.replace(/[<&"]/g, "");
@@ -511,6 +523,11 @@ function boot(args, env = {}) {
   importPanel.style.display = "none";
   stopMenuMusic();
   document.body.classList.add("playing");
+  if (env.SMG_RELAY) {
+    roombar.dataset.mode = "net";
+    roombar.dataset.want = (env.SMG_ROOM || "").replace(/[^A-Z0-9]/g, "");
+    renderRoomBar();
+  }
   const canvas = document.getElementById("canvas");
   canvas.style.display = "block";
   document.getElementById("stage").style.display = "block";
@@ -651,6 +668,25 @@ function setupSettings() {
     store("smg.scale", scale.value);
     if (window.Module && Module._web_request_scale) Module._web_request_scale(Number(scale.value));
   };
+  // Picture: 16:9 (the game's own shape) or stretched over the window, and
+  // browser full screen (Esc leaves it).
+  const picture = document.getElementById("picture");
+  picture.value = store("smg.picture") === "stretch" ? "stretch" : "wide";
+  const applyPicture = () => document.body.classList.toggle("stretch", picture.value === "stretch");
+  picture.onchange = () => {
+    store("smg.picture", picture.value);
+    applyPicture();
+  };
+  applyPicture();
+  const fs = document.getElementById("fullscreen");
+  fs.onclick = () => {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen?.().catch(() => {});
+  };
+  document.addEventListener("fullscreenchange", () => {
+    fs.textContent = document.fullscreenElement ? "Leave full screen" : "Full screen";
+    document.getElementById("canvas").focus();
+  });
   const perf = document.getElementById("perf"), perfbox = document.getElementById("perfbox");
   perf.checked = store("smg.perf") === "1";
   const showPerf = () => {
