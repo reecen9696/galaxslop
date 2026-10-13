@@ -132,5 +132,5 @@ extern "C" const char* port_net_player_name(uint8_t id) {
         const net::RemoteView& v = net::netRemote(i);
         if (v.present && v.id == id) return v.name;
     }
-    return "you";
+    return "a player";  // left the room since (or this is our own echo, which is never applied)
 }

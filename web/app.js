@@ -315,12 +315,51 @@ function onNetLine(t) {
   } else {
     return;
   }
-  const code = roombar.dataset.room;
-  roombar.style.display = "block";
-  roombar.innerHTML = code
-    ? `Room <b>${code}</b> · ${players.size ? "with " + [...players].map((p) => p.replace(/[<&]/g, "")).join(", ") : "waiting for friends"}`
-    : "reconnecting…";
+  renderRoomBar();
 }
+
+// Room bar: the code and each friend with where they are; Follow takes you
+// to their galaxy and star (P3-04, present_web.cpp's player list).
+const pretty = (stage) => stage.replace(/([a-z])([A-Z0-9])/g, "$1 $2");
+function readRemotes() {
+  if (!window.Module || !Module._web_remote_list || !Module.HEAPU8) return [];
+  const ptr = Module._web_remote_list() >>> 0;
+  const v = new DataView(Module.HEAPU8.buffer, ptr, 4 + 96 * 4);
+  const str = (o, n) => {
+    const b = new Uint8Array(Module.HEAPU8.buffer, ptr + o, n).slice();
+    const z = b.indexOf(0);
+    return new TextDecoder().decode(z < 0 ? b : b.subarray(0, z));
+  };
+  const out = [];
+  for (let i = 0; i < v.getUint32(0, true); i++) {
+    const o = 4 + 96 * i;
+    out.push({ slot: v.getInt32(o, true), scenario: v.getInt32(o + 4, true), same: v.getUint32(o + 8, true) === 1, name: str(o + 12, 36), stage: str(o + 48, 48) });
+  }
+  return out;
+}
+function renderRoomBar() {
+  const code = roombar.dataset.room;
+  if (!code) {
+    if (roombar.style.display === "block") roombar.textContent = "reconnecting…";
+    return;
+  }
+  roombar.style.display = "block";
+  const remotes = readRemotes();
+  const esc = (t) => t.replace(/[<&"]/g, "");
+  const who = remotes.length
+    ? remotes.map((r) => `${esc(r.name)}${r.same ? " (here)" : r.stage ? ` in ${esc(pretty(r.stage))} ${r.scenario} <button class="ghost follow" data-slot="${r.slot}">Follow</button>` : ""}`).join(" · ")
+    : players.size ? "with " + [...players].map(esc).join(", ") : "waiting for friends";
+  const html = `Room <b>${code}</b> · ${who}`;
+  if (roombar.innerHTML !== html) roombar.innerHTML = html;
+}
+roombar.addEventListener("click", (e) => {
+  const b = e.target.closest(".follow");
+  if (b && window.Module && Module._web_follow) {
+    Module._web_follow(Number(b.dataset.slot));
+    b.textContent = "Going…";
+  }
+});
+setInterval(renderRoomBar, 1000);
 
 // Name tags over remote players (P2-07), from present_web.cpp's projection.
 const kTagColors = ["#ffffff", "#ff6b6b", "#6bc5ff", "#7ee081", "#ffd166", "#c792ea", "#ff9f43", "#f78fb3"];

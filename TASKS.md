@@ -484,14 +484,15 @@ observatory state.
 
 ### P3-04 Follow-host warp
 - lane: B
-- status: open
-- owner:
+- status: review
+- owner: A (lane B task; B inactive, galaxydecomp-05 not taking it)
 - blocked_by: P3-03
 - touches: net/warp, web/src/overlay, decomp/src/Game/Scene (scene change hook; name file in log)
 - flags:
 - what: Overlay button: go to the host's galaxy and scenario if it's unlocked locally. Uses the game's own scene change path.
 - done when: pressing it lands you next to the host.
 - log:
+  - 2026-10-13 (A): "follow anyone", not host-only: the page's room bar lists each friend's galaxy and star with a Follow button (desktop: F key); the game warps with MR::requestChangeStageInGameMoving during gameplay (GameDataFunction.cpp, stage hash -> name from the save's galaxy list). Verified in Chrome both ways (Good Egg <-> Honeybee Kingdom): the follower arrives and both see each other. Needed a fix in net/capture: the stage hash was cached by name pointer, so after any stage change clients sent the old galaxy (everyone "not here").
 
 ### P3-05 Deploy the relay
 - lane: B

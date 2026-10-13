@@ -45,7 +45,7 @@ int port_net_progress_poll(PortNetProgress* out);
 // The game is applying a logged event (its hooks must not send it again).
 void port_net_progress_applying(int on);
 int port_net_progress_is_applying(void);
-// A player's name by relay id ("you" for the local player).
+// A player's name by relay id ("a player" if not in the room now).
 const char* port_net_player_name(uint8_t id);
 
 #ifdef __cplusplus

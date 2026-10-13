@@ -360,4 +360,38 @@ static void updateNameTags() {
     sTags = out;
 }
 
+// Player list (P3-04): where each remote player is, for the page's Follow
+// buttons.  Stage names come from the game's galaxy table.
+extern "C" const char* port_net_stage_name(uint32_t hash);  // GameDataFunction.cpp
+extern "C" void port_net_request_follow(int slot);
+struct RemoteEntry {
+    int32_t slot;
+    int32_t scenario;
+    uint32_t sameStage;
+    char name[36];
+    char stage[48];
+};
+struct RemoteList {
+    uint32_t count;
+    RemoteEntry e[net::kMaxRemotes];
+};
+static RemoteList sRemotes;
+extern "C" EMSCRIPTEN_KEEPALIVE RemoteList* web_remote_list(void) {
+    RemoteList out{};
+    for (int i = 0; i < net::kMaxRemotes && net::netEnabled(); i++) {
+        const net::RemoteView& v = net::netRemote(i);
+        if (!v.present) continue;
+        RemoteEntry& r = out.e[out.count++];
+        r.slot = i;
+        r.scenario = v.pose.scenario;
+        r.sameStage = v.visible ? 1 : 0;
+        snprintf(r.name, sizeof(r.name), "%s", v.name);
+        const char* stage = v.pose.stageHash ? port_net_stage_name(v.pose.stageHash) : nullptr;
+        snprintf(r.stage, sizeof(r.stage), "%s", stage ? stage : "");
+    }
+    sRemotes = out;
+    return &sRemotes;
+}
+extern "C" EMSCRIPTEN_KEEPALIVE void web_follow(int slot) { port_net_request_follow(slot); }
+
 unsigned long long web_present_frame_number() { return gpu::renderer().frameNumber(); }

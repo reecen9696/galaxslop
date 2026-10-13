@@ -14,6 +14,9 @@
 #include <vector>
 
 #include "../gx/gl_renderer.h"
+#include "net/client/net_client.h"
+
+extern "C" void port_net_request_follow(int slot);  // GameDataFunction.cpp
 #include "../gx/gx_record.h"
 #include "port/input.h"
 #include "port/port.h"
@@ -117,6 +120,16 @@ static void readInput(PortPadState* pad, bool* quit) {
     while (SDL_PollEvent(&e)) {
         if (e.type == SDL_EVENT_QUIT || (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_F12)) {
             *quit = true;
+        }
+        // F: follow the first friend who is in another galaxy (P3-04).
+        if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat && e.key.scancode == SDL_SCANCODE_F && net::netEnabled()) {
+            for (int i = 0; i < net::kMaxRemotes; i++) {
+                const net::RemoteView& v = net::netRemote(i);
+                if (v.present && !v.visible && v.pose.stageHash != 0) {
+                    port_net_request_follow(i);
+                    break;
+                }
+            }
         }
         if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat && e.key.key >= SDLK_F1 && e.key.key <= SDLK_F8) {
             port_net_debug_request_mode((int)(e.key.key - SDLK_F1));  // F1 normal, F2 rainbow, F3 fire...

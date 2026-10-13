@@ -37,7 +37,10 @@
 // so every file named in manifest.json (tools/cook/manifest.py) is created
 // up front.
 static bool mountGameOverFetch(const char* mountPoint) {
-    backend_t fetch = wasmfs_create_fetch_backend("game", 1 << 20);
+    // Whole files (the largest is 31 MB): with 1 MB chunks, reads that span a
+    // chunk boundary came back corrupted (Emscripten 6.0.12's fetch backend),
+    // which crashed loading Honeybee Kingdom's collision.
+    backend_t fetch = wasmfs_create_fetch_backend("game", 32 << 20);
     if (wasmfs_create_directory(mountPoint, 0777, fetch) != 0) {
         port_log("web: cannot mount %s", mountPoint);
         return false;

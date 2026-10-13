@@ -16,7 +16,11 @@
 #ifdef TARGET_PC
 #include "Game/Util/HashUtil.hpp"
 #include "net/client/progress.h"
+#include "Game/Util/SceneUtil.hpp"
+#include "Game/Util/SequenceUtil.hpp"
+#include "net/client/net_client.h"
 #include "port/port.h"
+#include <atomic>
 #include <cstdlib>
 #include <cstring>
 #endif
@@ -520,5 +524,72 @@ extern "C" void port_net_apply_progress() {
         }
         port_net_progress_applying(0);
     }
+}
+#endif
+
+#ifdef TARGET_PC
+// Follow (P3-04): the page (or a key) asks to go where a remote player is.
+// Players carry MR::getHashCode(stage name); the galaxy list of the loaded
+// save turns that back into a name.  The table is built on the game thread
+// and read by the browser presenter for the player list.
+namespace {
+    const s32 kMaxStages = 128;
+    u32 sStageHashes[kMaxStages];
+    const char* sStageNames[kMaxStages];
+    std::atomic<s32> sStageCount{0};
+    std::atomic<s32> sFollowSlot{-1};
+
+    void buildStageTable(GameDataHolder* holder) {
+        if (sStageCount.load() > 0 || holder == nullptr) {
+            return;
+        }
+        GameDataAllGalaxyStorage* all = holder->mAllGalaxyStorage;
+        s32 n = 0;
+        for (s32 i = 0; i < all->getGalaxyNum() && n < kMaxStages; i++) {
+            const char* name = all->getGalaxyStorage(i)->mGalaxyName;
+            sStageNames[n] = name;
+            sStageHashes[n] = MR::getHashCode(name);
+            n++;
+        }
+        sStageCount.store(n);
+    }
+}  // namespace
+
+extern "C" const char* port_net_stage_name(u32 hash) {
+    s32 n = sStageCount.load();
+    for (s32 i = 0; i < n; i++) {
+        if (sStageHashes[i] == hash) return sStageNames[i];
+    }
+    return nullptr;
+}
+
+extern "C" void port_net_request_follow(int slot) { sFollowSlot.store(slot); }
+
+// GameScene, during gameplay.
+extern "C" void port_net_follow_update() {
+    buildStageTable(GameDataFunction::getCurrentGameDataHolder());
+    static u32 sLastStage = 0;
+    static s32 sLastScenario = -1;
+    u32 here = MR::getHashCode(MR::getCurrentStageName());
+    if (here != sLastStage || MR::getCurrentScenarioNo() != sLastScenario) {
+        sLastStage = here;
+        sLastScenario = MR::getCurrentScenarioNo();
+        port_log("net: now in %s %d", MR::getCurrentStageName(), (int)sLastScenario);
+    }
+    s32 slot = sFollowSlot.exchange(-1);
+    if (slot < 0 || slot >= net::kMaxRemotes) {
+        return;
+    }
+    const net::RemoteView& v = net::netRemote(slot);
+    const char* stage = v.present ? port_net_stage_name(v.pose.stageHash) : nullptr;
+    if (stage == nullptr) {
+        port_log("net: cannot follow slot %d (no galaxy known)", slot);
+        return;
+    }
+    if (v.pose.stageHash == MR::getHashCode(MR::getCurrentStageName()) && v.pose.scenario == MR::getCurrentScenarioNo()) {
+        return;  // already there
+    }
+    port_log("net: following %s to %s %d", v.name, stage, (int)v.pose.scenario);
+    MR::requestChangeStageInGameMoving(stage, v.pose.scenario);
 }
 #endif

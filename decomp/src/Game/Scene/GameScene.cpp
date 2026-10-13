@@ -33,6 +33,7 @@
 #include "net/capture/player_capture.h"
 #include "net/puppet/remote_player_puppet.hpp"
 extern "C" void port_net_apply_progress();  // GameDataFunction.cpp
+extern "C" void port_net_follow_update();   // GameDataFunction.cpp
 #include "Game/Camera/CameraHolder.hpp"
 #include "Game/Camera/CameraManEvent.hpp"
 #include "Game/Camera/CameraManGame.hpp"
@@ -313,6 +314,7 @@ void GameScene::update() {
             port_net_capture_player();
             port_net_puppets_update(this);
             port_net_apply_progress();  // stars from the room (P3-02)
+            port_net_follow_update();   // go where a friend is (P3-04)
         }
     }
     {
