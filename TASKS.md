@@ -268,6 +268,7 @@ Chromium, with sound, on a gamepad, at 60 fps on the reference machine.
 - what: Lock to 60 fps with rAF on the worker. Internal render scale setting (0.5x to 2x). Frame time overlay (p50/p95). Vsync drift handling.
 - done when: 60 fps p95 under 16 ms in Good Egg at 1x on the reference machine.
 - log:
+  - 2026-10-13 (A): lag report ("lots of stars on screen"). Measured: game thread ~3 ms/frame unloaded in Honeybee (38k draws), the tab ~27% CPU in total (no spinning), CPU handoffs ~600-870/s at 7-60 us; slow runs tracked machine load (two native clients, builds, kernel_task 66%). -msimd128 A/B: no difference, not kept. Added Auto render scale (default): steps down after 3 late seconds while the game keeps up (GPU-bound), back up after 20 steady ones; loads do not trigger it. smoke.mjs --cpuprofile samples every worker; PETARI_PERFLOG adds handoff stats.
   - 2026-10-13 (A): rAF-paced frame callback on the worker (setTimeout with ?PETARI_TIMER=1). Render scale 1x-4x of 640x456 in settings, applied live; frame-time overlay (present CPU and interval p50/p95, fps). Headless Good Egg (quick start): 60 fps, present 0.4/1.3 ms, interval 16.7/17.9 ms p50/p95. Reference-machine numbers still wanted (human).
 
 ### P1-08 Bench and CI baseline

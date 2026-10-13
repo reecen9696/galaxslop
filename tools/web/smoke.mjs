@@ -185,8 +185,41 @@ async function oneRun(n) {
     const [t, name] = k.split(":");
     return { t: Number(t), up: name.startsWith("-"), code: name.replace(/^-/, "") };
   });
+  const prof = args.cpuprofile ? args.cpuprofile.split(":").map(Number) : null;
+  let profStarted = false, profDone = false;
   while (Date.now() - start < seconds * 1000) {
     const now = Date.now() - start;
+    if (prof && !profStarted && now >= prof[0]) {
+      profStarted = true;
+      for (const w of workers) {
+        await c.send("Profiler.enable", {}, w).catch(() => {});
+        await c.send("Profiler.setSamplingInterval", { interval: 200 }, w).catch(() => {});
+        await c.send("Profiler.start", {}, w).catch(() => {});
+      }
+    }
+    if (prof && profStarted && !profDone && now >= prof[0] + prof[1]) {
+      profDone = true;
+      const self = new Map();
+      let total = 0;
+      for (const w of workers) {
+        const r = await c.send("Profiler.stop", {}, w, 60000).catch(() => null);
+        if (!r) continue;
+        const pr = r.profile, byId = new Map(pr.nodes.map((n) => [n.id, n]));
+        const counts = new Map();
+        for (const sid of pr.samples) counts.set(sid, (counts.get(sid) || 0) + 1);
+        let busy = 0;
+        for (const [id, n] of counts) {
+          const name = byId.get(id).callFrame.functionName || "(anon)";
+          if (/^\(idle\)|^\(program\)|futex_wait|emscripten_futex|__timedwait|Atomics|condition_variable::wait|cond_timedwait|cond_wait|nanosleep|js-to-wasm|wasm-to-js|setTimeout/.test(name)) continue;
+          busy += n;
+          self.set(name, (self.get(name) || 0) + n);
+        }
+        total += busy;
+      }
+      const top = [...self].sort((a, b) => b[1] - a[1]).slice(0, Number(args.top ?? 30));
+      console.log(`cpu profile: ${total} busy samples (200 us) over ${workers.size} workers`);
+      for (const [name, n] of top) console.log(`  ${(100 * n / total).toFixed(1).padStart(5)}%  ${name.slice(0, 110)}`);
+    }
     if (!stacksDumped && args.stacks !== "0" && log.some((l) => l.includes("no new game frame"))) {
       await dumpStacks();
     }

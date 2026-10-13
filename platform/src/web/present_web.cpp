@@ -103,6 +103,7 @@ extern "C" pthread_t web_event_thread(void) { return sEventThread; }
 
 static void applyScale();
 static void recordTiming(double presentMs);
+static std::atomic<int> sAutoMax{0};  // auto render scale: highest scale, 0 = off (see recordTiming)
 static void updateNameTags();
 
 bool web_present_init(int scale) {
@@ -128,8 +129,16 @@ bool web_present_init(int scale) {
     }
     int s = scale > 0 ? scale : 2;
     if (const char* env = getenv("SMG_SCALE")) {
-        int v = atoi(env);
-        if (v >= 1 && v <= 4) s = v;
+        // "auto" or "auto:N": start at N (default 2) and adapt (see recordTiming).
+        if (strncmp(env, "auto", 4) == 0) {
+            int max = env[4] == ':' ? atoi(env + 5) : 2;
+            if (max < 1 || max > 4) max = 2;
+            s = max;
+            sAutoMax.store(max);
+        } else {
+            int v = atoi(env);
+            if (v >= 1 && v <= 4) s = v;
+        }
     }
     sEfb = gpu::renderer().createTarget(kEfbW * s, kEfbH * s);
     emscripten_set_canvas_element_size("#canvas", kEfbW * s, kEfbH * s);
@@ -265,7 +274,14 @@ void web_read_input(PortPadState* pad) {
 // Render scale (P1-07): the page asks for a new EFB size (settings);
 // applied between frames on this thread, which owns the GL context.
 static std::atomic<int> sWantScale{0};
-extern "C" EMSCRIPTEN_KEEPALIVE void web_request_scale(int scale) { sWantScale.store(scale); }
+// Auto scale: 0 = off (fixed scale), else the highest scale allowed.  Frames
+// that come late (the GPU is behind: a screen full of blended particles at
+// 2x) step the resolution down; steady frames step it back up.
+extern "C" EMSCRIPTEN_KEEPALIVE void web_request_scale(int scale) {
+    sAutoMax.store(0);
+    sWantScale.store(scale);
+}
+extern "C" EMSCRIPTEN_KEEPALIVE void web_set_auto_scale(int maxScale) { sAutoMax.store(maxScale); }
 
 static void applyScale() {
     int want = sWantScale.exchange(0);
@@ -309,6 +325,31 @@ static void recordTiming(double presentMs) {
     float intervalMax = interval.empty() ? 0.0f : interval.back();  // sorted by pct()
     float presentMax = present.empty() ? 0.0f : present.back();
     sStats.gameFrame = (uint32_t)gpu::renderer().frameNumber();
+    // Auto scale: three late seconds in a row step down, twenty steady
+    // seconds step up (late: p95 interval over 19 ms, a missed vsync in ~20).
+    // Only seconds in which the game itself kept up count as late: during a
+    // load or a CPU stall a lower resolution would not help.
+    static int sLate = 0, sSteady = 0;
+    static uint32_t sLastGameFrame = 0;
+    uint32_t gameDelta = sStats.gameFrame - sLastGameFrame;
+    sLastGameFrame = sStats.gameFrame;
+    int autoMax = sAutoMax.load();
+    if (autoMax > 0) {
+        int cur = sEfb.width / kEfbW;
+        sLate = (sStats.intervalP95 > 19.0f && gameDelta >= 55) ? sLate + 1 : 0;
+        sSteady = sStats.intervalP95 < 17.5f ? sSteady + 1 : 0;
+        if (sLate >= 3 && cur > 1) {
+            sWantScale.store(cur - 1);
+            port_log("present: auto scale down to %dx (frame interval p95 %.1f ms)", cur - 1, sStats.intervalP95);
+            sLate = sSteady = 0;
+        } else if (sSteady >= 20 && cur < autoMax) {
+            sWantScale.store(cur + 1);
+            port_log("present: auto scale up to %dx", cur + 1);
+            sLate = sSteady = 0;
+        } else if (cur > autoMax) {
+            sWantScale.store(autoMax);
+        }
+    }
     static const bool log = getenv("PETARI_PERFLOG") != nullptr;
     if (log) {
         port_log("web: %u fps, present %.1f/%.1f/%.1f ms, interval %.1f/%.1f/%.1f ms (p50/p95/max)", sStats.fps, sStats.presentP50,

@@ -268,10 +268,38 @@ static void startHostThread(OSThread* t, HostThread* h) {
     h->started = true;
 }
 
+// PETARI_PERFLOG: how often the virtual CPU changes hands and how long the
+// woken host thread takes to run (each handoff is a futex wake + wait).
+static int64_t sHandoffAt;  // guarded by sCpuMutex
+static uint64_t sSwitches, sWakeNsTotal;
+static int64_t sWakeNsMax;
+
+static void noteWake() {
+    if (sHandoffAt != 0) {
+        int64_t ns = port_host_time_ns() - sHandoffAt;
+        sWakeNsTotal += (uint64_t)ns;
+        if (ns > sWakeNsMax) sWakeNsMax = ns;
+        sHandoffAt = 0;
+    }
+    static const bool log = getenv("PETARI_PERFLOG") != nullptr;
+    static int64_t reportAt = 0;
+    int64_t now = port_host_time_ns();
+    if (log && now >= reportAt) {
+        if (reportAt != 0 && sSwitches) {
+            port_log("threads: %llu switches in 10 s, wake latency avg %.0f us max %.0f us", (unsigned long long)sSwitches,
+                     sWakeNsTotal / 1000.0 / sSwitches, sWakeNsMax / 1000.0);
+        }
+        sSwitches = sWakeNsTotal = 0;
+        sWakeNsMax = 0;
+        reportAt = now + 10000000000ll;
+    }
+}
+
 // Waits (with sCpuMutex held via lk) until `self` owns the CPU again.
 static void waitForCpu(std::unique_lock<std::mutex>& lk, OSThread* self, HostThread* h) {
     port_debug_where("waitForCpu");
     h->cv.wait(lk, [&] { return sCpuOwner == self || h->cancelled; });
+    noteWake();
     port_debug_where("has cpu");
     if (h->cancelled && sCpuOwner != self) {
         lk.unlock();
@@ -298,6 +326,8 @@ static void switchTo(OSThread* next, bool callerExiting) {
         hs->intEnabled = sIntEnabled;
     }
     sCpuOwner = next;
+    sSwitches++;
+    sHandoffAt = port_host_time_ns();
     if (!hn->started) {
         startHostThread(next, hn);
     } else {

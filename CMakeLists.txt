@@ -125,6 +125,7 @@ set(PORT_COMMON_FLAGS
 set(PORT_CXX_FLAGS -fno-exceptions -fno-rtti)
 if(EMSCRIPTEN)
   # Shared-memory threads: every object must be built with atomics.
+  # (-msimd128 was measured 2026-10-13 and made no difference.)
   list(APPEND PORT_COMMON_FLAGS -pthread)
 endif()
 set(PORT_C_FLAGS)

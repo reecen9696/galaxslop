@@ -614,7 +614,7 @@ function drawTags() {
 }
 
 function boot(args, env = {}) {
-  window.smgEnv = { SMG_SCALE: store("smg.scale") || "2", ...env }; // read by browser_env.js in preRun
+  window.smgEnv = { SMG_SCALE: store("smg.scale") || "auto", ...env }; // read by browser_env.js in preRun
   importPanel.style.display = "none";
   stopMenuMusic();
   document.body.classList.add("playing");
@@ -638,7 +638,7 @@ function boot(args, env = {}) {
       smgLog.push(t);
       if (t.startsWith("net: ")) onNetLine(t);
       if (smgLog.length > 2000) smgLog.shift();
-      if (/joined room|present:|disc:|web:/.test(t)) say(t);
+      if (/joined room|present:|disc:|web:/.test(t) && !/display frames|fps,/.test(t)) say(t);
     },
     onAbort: (e) => say("aborted: " + e),
     onRuntimeInitialized: () => {
@@ -759,10 +759,12 @@ function setupSettings() {
   };
   // Render scale (applied live by present_web.cpp) and the frame-time overlay.
   const scale = document.getElementById("scale");
-  scale.value = store("smg.scale") || "2";
+  scale.value = store("smg.scale") || "auto";
   scale.onchange = () => {
     store("smg.scale", scale.value);
-    if (window.Module && Module._web_request_scale) Module._web_request_scale(Number(scale.value));
+    if (!window.Module || !Module._web_request_scale) return;
+    if (scale.value === "auto") Module._web_set_auto_scale(2);
+    else Module._web_request_scale(Number(scale.value));
   };
   // Picture: 16:9 (the game's own shape) or stretched over the window, and
   // browser full screen (Esc leaves it).
