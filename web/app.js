@@ -17,6 +17,9 @@ var smgLog = []; // recent game log lines, for automated checks
 // While the game runs the status line floats over the bottom of the canvas
 // and fades a few seconds after each message.
 function say(text) {
+  // In game only problems reach the screen; progress lines (present:,
+  // disc:, web:, joined room) stay in the console and the room panel.
+  if (document.body.classList.contains("playing") && text && !/abort|fail|error|lost|could not|can't/i.test(text)) return;
   status.textContent = text;
   status.classList.remove("faded");
   clearTimeout(say.timer);
@@ -548,6 +551,7 @@ function boot(args, env = {}) {
   importPanel.style.display = "none";
   stopMenuMusic();
   document.body.classList.add("playing");
+  status.textContent = "";
   if (env.SMG_RELAY) {
     roombar.dataset.mode = "net";
     roombar.dataset.want = (env.SMG_ROOM || "").replace(/[^A-Z0-9]/g, "");
