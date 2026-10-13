@@ -205,6 +205,10 @@
       <main><div class="body">
         <p>This page runs Super Mario Galaxy from your own disc. Nothing is uploaded: the files are copied
           into this browser's private storage once, then the game starts from there.</p>
+        <div id="serverRetry" hidden>
+          <p id="serverError"></p>
+          <div class="btn-row"><button id="retryServer" class="wii-btn primary">Try again</button></div>
+        </div>
         <ol class="hint">
           <li>Dump your disc and extract it in Dolphin (right-click the game, Properties, Filesystem,
             Extract Entire Disc).</li>

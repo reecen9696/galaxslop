@@ -43,14 +43,25 @@ async function importedManifestText() {
 
 // Pre-loaded game (GAME_DIR on the server, SMG_GAME on the dev server): the
 // page copies the server's cooked folder into OPFS by itself on the first
-// visit, and again only when the server's manifest changes.
+// visit, and again only when the server's manifest changes.  pending.json
+// holds the manifest being downloaded: a download cut short (a reload, a
+// failed file) resumes with the files it already has, which OPFS only shows
+// once complete (createWritable writes to a swap file until close).
 async function importFromServer(base, manifestText) {
   const manifest = JSON.parse(manifestText);
   navigator.storage.persist?.().catch(() => {});
   const root = await navigator.storage.getDirectory();
   const smg = await root.getDirectoryHandle("smg", { create: true });
-  await smg.removeEntry("game", { recursive: true }).catch(() => {});
-  const game = await smg.getDirectoryHandle("game", { create: true });
+  let game = await smg.getDirectoryHandle("game", { create: true });
+  const pending = await game.getFileHandle("pending.json").then((h) => h.getFile()).then((f) => f.text()).catch(() => null);
+  const resuming = pending === manifestText;
+  if (!resuming) {
+    await smg.removeEntry("game", { recursive: true }).catch(() => {});
+    game = await smg.getDirectoryHandle("game", { create: true });
+    const pw = await (await game.getFileHandle("pending.json", { create: true })).createWritable();
+    await pw.write(manifestText);
+    await pw.close();
+  }
   const total = manifest.files.reduce((n, e) => n + e.size, 0);
   let done = 0;
   const started = performance.now();
@@ -66,17 +77,41 @@ async function importFromServer(base, manifestText) {
     }
     return dir;
   }
+  // A big download over many connections loses the odd request; each file
+  // gets a few tries before the whole import gives up.
+  async function download(e) {
+    const url = base + e.path.split("/").map(encodeURIComponent).join("/");
+    for (let attempt = 1; ; attempt++) {
+      try {
+        const r = await fetch(url);
+        if (!r.ok) throw new Error(`${e.path}: HTTP ${r.status}`);
+        const bytes = new Uint8Array(await r.arrayBuffer());
+        if (bytes.byteLength !== e.size) throw new Error(`${e.path}: ${bytes.byteLength} bytes, manifest says ${e.size}`);
+        return bytes;
+      } catch (err) {
+        if (attempt === 4) throw err;
+        console.log(`web: ${err.message}, trying again`);
+        await new Promise((r) => setTimeout(r, 1000 * 3 ** (attempt - 1)));
+      }
+    }
+  }
+  async function have(e) {
+    try {
+      return (await (await (await dirFor(e.path)).getFileHandle(e.path.split("/").pop())).getFile()).size === e.size;
+    } catch {
+      return false;
+    }
+  }
   const queue = manifest.files.slice();
   await Promise.all(Array.from({ length: 6 }, async () => {
     while (queue.length) {
       const e = queue.shift();
-      const r = await fetch(base + e.path.split("/").map(encodeURIComponent).join("/"));
-      if (!r.ok) throw new Error(`${e.path}: HTTP ${r.status}`);
-      const bytes = new Uint8Array(await r.arrayBuffer());
-      if (bytes.byteLength !== e.size) throw new Error(`${e.path}: ${bytes.byteLength} bytes, manifest says ${e.size}`);
-      const w = await (await (await dirFor(e.path)).getFileHandle(e.path.split("/").pop(), { create: true })).createWritable();
-      if (bytes.byteLength) await w.write(bytes);
-      await w.close();
+      if (!(resuming && (await have(e)))) {
+        const bytes = await download(e);
+        const w = await (await (await dirFor(e.path)).getFileHandle(e.path.split("/").pop(), { create: true })).createWritable();
+        if (bytes.byteLength) await w.write(bytes);
+        await w.close();
+      }
       done += e.size;
       progress.value = done / total;
       say(`loading the game ${(done / 2 ** 20).toFixed(0)} / ${(total / 2 ** 20).toFixed(0)} MB`);
@@ -85,6 +120,7 @@ async function importFromServer(base, manifestText) {
   const mw = await (await game.getFileHandle("manifest.json", { create: true })).createWritable();
   await mw.write(manifestText);
   await mw.close();
+  await game.removeEntry("pending.json").catch(() => {});
   progress.style.display = "none";
   console.log(`web: game pre-loaded from the server: ${manifest.files.length} files in ${((performance.now() - started) / 1000).toFixed(1)} s`);
 }
@@ -212,10 +248,18 @@ async function cookFolder(files) {
   }
 }
 
-function showImport() {
+// serverError: why loading the game from the server failed; the screen then
+// offers to try again (which resumes the download) above the folder picker.
+function showImport(serverError) {
   importPanel.style.display = "block";
   startMenuMusic();
   say("");
+  const retry = document.getElementById("serverRetry");
+  retry.hidden = !serverError;
+  if (serverError) {
+    document.getElementById("serverError").textContent = serverError;
+    document.getElementById("retryServer").onclick = () => location.replace(location.href.replace(/[?&]reimport=1/, ""));
+  }
   const input = document.getElementById("pickInput");
   // The chosen folder is copied or converted under the loading screen; on a
   // problem the import screen comes back with the message.
@@ -907,6 +951,7 @@ setupSettings();
     const smg = await root.getDirectoryHandle("smg", { create: true });
     await smg.removeEntry("game", { recursive: true }).catch(() => {});
   }
+  let serverError = null;
   const config = await fetch("config.json").then((r) => (r.ok ? r.json() : null)).catch(() => null);
   if (config && config.game) {
     let serverManifest = null;
@@ -923,12 +968,12 @@ setupSettings();
         console.log("web: pre-loading the game failed: " + e.message);
         hideLoading();
         progress.style.display = "none";
-        say("Loading the game from the server failed (" + e.message + "). You can load it from a folder instead.");
+        serverError = "Loading the game from the server failed (" + e.message + "). Try again to carry on where it stopped, or load it from a folder.";
       }
     }
   }
   if (!(await importedManifest())) {
-    await showImport();
+    await showImport(serverError);
     // Start the game in a fresh page: the import leaves a gigabyte of file
     // data behind in this one.
     location.replace(location.href.replace(/[?&]reimport=1/, ""));
