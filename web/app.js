@@ -289,8 +289,18 @@ function showLobby() {
 // Room bar under the canvas, fed by the game's net: log lines.
 const roombar = document.getElementById("roombar");
 const players = new Set();
+function toast(text) {
+  const el = document.createElement("div");
+  el.className = "toast";
+  el.textContent = text;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 5000);
+}
+
 function onNetLine(t) {
   let m;
+  if ((m = /^net: power star (\S+) (\d+) from (.+)$/.exec(t))) return toast(`${m[3]} got a Power Star (${m[1].replace(/Galaxy$/, " Galaxy")}, star ${m[2]})`);
+  if ((m = /^net: grand star (\d+) from (.+)$/.exec(t))) return toast(`${m[2]} got Grand Star ${m[1]}`);
   if ((m = /^net: joined room (\S+) as player/.exec(t))) {
     roombar.dataset.room = m[1];
   } else if ((m = /^net: (.+) joined \(player/.exec(t))) {

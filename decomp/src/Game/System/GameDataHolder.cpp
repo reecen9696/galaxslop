@@ -12,6 +12,12 @@
 #include "Game/Util/JMapInfo.hpp"
 #include "Game/Util/MathUtil.hpp"
 #include <cstdio>
+#ifdef TARGET_PC
+#include "Game/Util/HashUtil.hpp"
+#include "net/client/progress.h"
+#include <cstdlib>
+#include <cstring>
+#endif
 
 extern const u8 StoryEventBCSV[];
 
@@ -73,7 +79,16 @@ bool GameDataHolder::isOnGameEventFlag(const char* pFlagName) const {
 }
 
 void GameDataHolder::tryOnGameEventFlag(const char* pFlagName) {
+#ifdef TARGET_PC
+    bool had = isOnGameEventFlag(pFlagName);
+#endif
     mEventFlagChecker->tryOn(pFlagName);
+#ifdef TARGET_PC
+    // Co-op: grand stars are event flags SpecialStarGrand<n>.
+    if (!had && strncmp(pFlagName, "SpecialStarGrand", 16) == 0 && isOnGameEventFlag(pFlagName) && !port_net_progress_is_applying()) {
+        port_net_progress_send(net::kProgressGrandStar, 0, 0, (u16)atoi(pFlagName + 16));
+    }
+#endif
 }
 
 s32 GameDataHolder::getGameEventValue(const char* pName) const {
@@ -189,7 +204,16 @@ bool GameDataHolder::hasGrandStar(int index) const {
 }
 
 void GameDataHolder::setPowerStar(const char* pGalaxyName, s32 scenarioNum, bool set) {
+#ifdef TARGET_PC
+    bool had = hasPowerStar(pGalaxyName, scenarioNum);
+#endif
     makeGalaxyScenarioAccessor(pGalaxyName, scenarioNum).setPowerStarFlag(set);
+#ifdef TARGET_PC
+    // Co-op (P3-02, D-022): a star got here is shared with the room.
+    if (set && !had && !port_net_progress_is_applying()) {
+        port_net_progress_send(net::kProgressStar, MR::getHashCode(pGalaxyName), (u8)scenarioNum, 0);
+    }
+#endif
 }
 
 s32 GameDataHolder::getPowerStarNumOwned(const char* pGalaxyName) const {

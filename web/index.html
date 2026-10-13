@@ -37,6 +37,7 @@
   #stage canvas { display: block; }
   #tags { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
   #tags span { position: absolute; transform: translate(-50%, -100%); font: 600 13px system-ui, sans-serif; color: #fff; background: #0008; padding: 1px 6px; border-radius: 6px; white-space: nowrap; }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--panel); color: var(--fg); border: 1px solid var(--accent); padding: 8px 14px; border-radius: 10px; z-index: 3; }
   #perfbox { position: fixed; top: 12px; left: 12px; font: 12px ui-monospace, monospace; color: #9fe39f; background: #000a; padding: 6px 8px; border-radius: 6px; display: none; white-space: pre; }
 </style>
 </head>
@@ -66,7 +67,7 @@
     <h1>Super Mario Galaxy co-op</h1>
     <label for="name">Your name</label>
     <input id="name" maxlength="32" autocomplete="nickname">
-    <label for="room">Room code (to join a friend)</label>
+    <label for="room">Room code (to join a friend). Stars anyone in the room gets are added to your save.</label>
     <input id="room" maxlength="8" placeholder="e.g. K7QF">
     <div class="row">
       <button id="join">Join room</button>

@@ -447,7 +447,7 @@ observatory state.
 
 ### P3-02 Star-get event capture and merge
 - lane: A
-- status: in_progress
+- status: review
 - owner: A
 - blocked_by: P2-08, P3-00, P3-01
 - touches: decomp/src/Game/System (save data hooks; name files in log), net/progress
@@ -455,6 +455,7 @@ observatory state.
 - what: Hook the star-get commit path to emit StarGet. On incoming StarGet not in local save, set the bit. Toast via bridge. Never clear. Verify the save writes.
 - done when: two clients, one gets a star, the other sees it in their save after reload.
 - log:
+  - 2026-10-13 (A): done per D-022. Capture in GameDataHolder::setPowerStar / tryOnGameEventFlag(SpecialStarGrand<n>) (TARGET_PC) -> net/client/progress.cpp (ProgressEvent until logged, ack, replay-safe) -> relay log -> port_net_apply_progress (GameScene) sets what the save lacks; toast on the page. PETARI_FAKESTAR=Galaxy:scenario fakes a star for tests. Verified in Chrome: client A fakes Good Egg star 2, client B joining 25 s later gets it ("power star EggStarGalaxy 2 from StarA"). Grand stars wired the same way, not yet exercised.
 
 ### P3-03 Story flags, unlocks, Observatory state
 - lane: A

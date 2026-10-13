@@ -13,6 +13,13 @@
 #include "Game/System/UserFile.hpp"
 #include "Game/Util/SingletonHolder.hpp"
 #include <cstdio>
+#ifdef TARGET_PC
+#include "Game/Util/HashUtil.hpp"
+#include "net/client/progress.h"
+#include "port/port.h"
+#include <cstdlib>
+#include <cstring>
+#endif
 
 namespace {
     SaveDataHandleSequence* getSaveDataHandleSequence() NO_INLINE {
@@ -444,3 +451,57 @@ namespace GameDataFunction {
         return greenStarNum;
     }
 };  // namespace GameDataFunction
+
+#ifdef TARGET_PC
+// Co-op (P3-02, D-022): applies what the room's progress log holds that this
+// save lacks.  Never clears anything.  Called from GameScene during gameplay.
+extern "C" void port_net_apply_progress() {
+    // Debug: PETARI_FAKESTAR=Galaxy:scenario marks a star as got through the
+    // game's own path once gameplay starts (tests the sync without playing).
+    static bool sFaked = false;
+    if (!sFaked) {
+        sFaked = true;
+        if (const char* fake = getenv("PETARI_FAKESTAR")) {
+            char galaxy[64];
+            int scenario = 1;
+            snprintf(galaxy, sizeof(galaxy), "%s", fake);
+            if (char* colon = strchr(galaxy, ':')) {
+                *colon = 0;
+                scenario = atoi(colon + 1);
+            }
+            GameDataFunction::setGameFlagPowerStarSuccess(galaxy, scenario, true);
+            port_log("net: PETARI_FAKESTAR %s %d", galaxy, scenario);
+        }
+    }
+    PortNetProgress p;
+    while (port_net_progress_poll(&p)) {
+        GameDataHolder* holder = GameDataFunction::getCurrentGameDataHolder();
+        if (holder == nullptr) {
+            continue;
+        }
+        port_net_progress_applying(1);
+        if (p.kind == net::kProgressStar) {
+            GameDataAllGalaxyStorage* all = holder->mAllGalaxyStorage;
+            for (s32 i = 0; i < all->getGalaxyNum(); i++) {
+                const char* galaxy = all->getGalaxyStorage(i)->mGalaxyName;
+                if (MR::getHashCode(galaxy) != p.stageHash) {
+                    continue;
+                }
+                if (!holder->hasPowerStar(galaxy, p.scenario)) {
+                    holder->setPowerStar(galaxy, p.scenario, true);
+                    port_log("net: power star %s %u from %s", galaxy, p.scenario, port_net_player_name(p.origin));
+                }
+                break;
+            }
+        } else if (p.kind == net::kProgressGrandStar) {
+            char flag[32];
+            snprintf(flag, sizeof(flag), "SpecialStarGrand%u", p.arg);
+            if (!holder->isOnGameEventFlag(flag)) {
+                holder->tryOnGameEventFlag(flag);
+                port_log("net: grand star %u from %s", p.arg, port_net_player_name(p.origin));
+            }
+        }
+        port_net_progress_applying(0);
+    }
+}
+#endif

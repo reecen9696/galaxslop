@@ -13,6 +13,7 @@
 #include <thread>
 #include <vector>
 
+#include "net/client/progress.h"
 #include "net/client/ws_client.h"
 #include "net/client/ws_web.h"
 #include "net/proto/player_state.h"
@@ -181,6 +182,9 @@ void handle(Session& s, const std::vector<uint8_t>& m) {
         port_log("net: relay error %u: %s", code, msg.c_str());
         break;
     }
+    case 0x21:  // ProgressLog (P3-02)
+        progressOnLog(m.data(), m.size());
+        break;
     default:
         break;
     }
@@ -342,6 +346,7 @@ bool netPump() {
 
     std::vector<uint8_t> m;
     while (s.transport->poll(m)) handle(s, m);
+    progressPump(*s.transport, port_host_time_ns());  // shared progress: send, resend, ack (P3-02)
     return true;
 }
 
