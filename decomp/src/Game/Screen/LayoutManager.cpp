@@ -27,6 +27,9 @@
 #include <nw4r/ut/RuntimeTypeInfo.h>
 #include <revolution/mtx.h>
 #include <revolution/types.h>
+#ifdef TARGET_PC
+#include "port/port.h"
+#endif
 
 namespace {
     namespace Local {
@@ -194,6 +197,9 @@ void LayoutManager::calcAnim() {
         nw4r::math::VEC2 scale;
         scale.x = 0.75f;
         scale.y = 1.0f;
+#ifdef TARGET_PC
+        scale.x /= port_screen_widen();  // 21:9 stretches more: squeeze more
+#endif
         mDrawInfo.SetLocationAdjustScale(scale);
     } else {
         nw4r::math::VEC2 scale;

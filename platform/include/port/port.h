@@ -127,6 +127,11 @@ int port_is_paused(void);
 // stays on screen for the same whole number of display refreshes.
 void port_vi_retrace(void);
 
+// How much wider than 16:9 the game draws: 1 for 16:9, 21/16 for 21:9.
+// Read once from SMG_ASPECT ("21:9"; stubs_misc.cpp, next to
+// SCGetAspectRatio), so it holds for the whole run.
+float port_screen_widen(void);
+
 // Cutscene skipping (platform/src/port/cutscene_skip.cpp; the game's side is
 // in port/compat.h).
 void port_skip_set_hold_seconds(float seconds);  // 0 turns skipping off

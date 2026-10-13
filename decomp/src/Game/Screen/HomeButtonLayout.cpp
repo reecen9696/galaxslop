@@ -16,6 +16,9 @@
 #include "Game/Util/StarPointerUtil.hpp"
 #include "Game/Util/SystemUtil.hpp"
 #include <JSystem/JUtility/JUTVideo.hpp>
+#ifdef TARGET_PC
+#include "port/port.h"
+#endif
 
 void HomeButtonLayout_FORCE_MATCH_SDATA2() {
     (void)1.0f;
@@ -73,6 +76,9 @@ void HomeButtonMenuContext::initHomeButtonInfo() {
     mHomeButtonInfo->backFlag = 0;
     mHomeButtonInfo->cursor = 0;
     mHomeButtonInfo->adjust.x = 832.0f / 608.0f;
+#ifdef TARGET_PC
+    mHomeButtonInfo->adjust.x = MR::getScreenWidth() / 608.0f;  // 21:9 and wider
+#endif
     mHomeButtonInfo->adjust.y = 1.0f;
     mHomeButtonInfo->frameDelta = 1.0f;
 }

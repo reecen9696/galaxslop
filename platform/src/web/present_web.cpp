@@ -28,7 +28,9 @@
 
 namespace {
 
-const int kEfbW = 640, kEfbH = 456;
+// 640 at 16:9; wider for 21:9 (port_screen_widen), the same pixel density.
+int sEfbW = 640;
+const int kEfbH = 456;
 EMSCRIPTEN_WEBGL_CONTEXT_HANDLE sCtx = 0;
 pthread_t sEventThread;  // runs the frame loop and html5/websocket callbacks
 gpu::EfbTarget sEfb;
@@ -130,6 +132,11 @@ bool web_present_init(int scale) {
         port_log("present: renderer init failed");
         return false;
     }
+    sEfbW = (int)(320.0f * port_screen_widen() + 0.5f) * 2;
+    // Holding A to skip cutscenes and dialogue (cutscene_skip.cpp) is off
+    // unless Settings turns it on: on the Wii a held A only speeds up text.
+    const char* skip = getenv("SMG_SKIP_HOLD");
+    port_skip_set_hold_seconds(skip ? (float)atof(skip) : 0.0f);
     int s = scale > 0 ? scale : 2;
     if (const char* env = getenv("SMG_SCALE")) {
         // "auto" or "auto:N": start at N (default 2) and adapt (see recordTiming).
@@ -143,8 +150,8 @@ bool web_present_init(int scale) {
             if (v >= 1 && v <= 4) s = v;
         }
     }
-    sEfb = gpu::renderer().createTarget(kEfbW * s, kEfbH * s);
-    emscripten_set_canvas_element_size("#canvas", kEfbW * s, kEfbH * s);
+    sEfb = gpu::renderer().createTarget(sEfbW * s, kEfbH * s);
+    emscripten_set_canvas_element_size("#canvas", sEfbW * s, kEfbH * s);
     port_log("present: WebGL2 ready, EFB %dx%d", sEfb.width, sEfb.height);
     loadShaderKeys();
 
@@ -201,9 +208,25 @@ void web_present_frame() {
     if (++sFrames % 300 == 0) saveShaderKeys();  // every ~5 s
 }
 
+// Touch controls (web/touch.js): the page's main thread writes its stick,
+// buttons and finger pointer straight into this struct.  `pressed` collects
+// presses since the last frame (Atomics.or) so a tap shorter than a frame
+// still lands; `rumbleFrames` counts frames the game ran the remote's motor
+// (the page turns them into haptics and zeroes it).
+struct TouchPad {
+    float stickX, stickY;      // -1..1, right / up positive
+    float pointerX, pointerY;  // -1..1 over the canvas, like the mouse
+    uint32_t held, pressed;    // Wii remote bits, plus kTouchSpin
+    int32_t active, pointerValid;
+    uint32_t rumbleFrames;
+};
+static TouchPad sTouch;
+static const uint32_t kTouchSpin = 0x10000;
+extern "C" EMSCRIPTEN_KEEPALIVE TouchPad* web_touch(void) { return &sTouch; }
+
 // Gamepad (standard mapping) on top of keyboard/mouse, per BUILD_SPEC
 // section 7.  The right stick moves a virtual pointer; once it moves, the
-// pointer follows the stick until the mouse moves again.
+// pointer follows the stick until the mouse moves or a finger aims again.
 static void readGamepad(PortPadState* pad) {
     static float sCursorX = 0, sCursorY = 0;
     if (emscripten_sample_gamepad_data() != EMSCRIPTEN_RESULT_SUCCESS) {
@@ -244,8 +267,8 @@ static void readGamepad(PortPadState* pad) {
         float rx = axis(2), ry = axis(3);
         if (rx != 0 || ry != 0) {
             if (!sCursorActive) {
-                sCursorX = sPointerIn ? sPointerX : 0.0f;
-                sCursorY = sPointerIn ? sPointerY : 0.0f;
+                sCursorX = sPointerIn ? sPointerX : sTouch.pointerValid ? sTouch.pointerX : 0.0f;
+                sCursorY = sPointerIn ? sPointerY : sTouch.pointerValid ? sTouch.pointerY : 0.0f;
                 sCursorActive = true;
             }
             const float kSpeed = 0.03f;  // screen half-widths per frame at full tilt (P1-09 makes it a setting)
@@ -260,22 +283,6 @@ static void readGamepad(PortPadState* pad) {
         break;  // first standard pad drives remote 0
     }
 }
-
-// Touch controls (web/touch.js): the page's main thread writes its stick,
-// buttons and finger pointer straight into this struct.  `pressed` collects
-// presses since the last frame (Atomics.or) so a tap shorter than a frame
-// still lands; `rumbleFrames` counts frames the game ran the remote's motor
-// (the page turns them into haptics and zeroes it).
-struct TouchPad {
-    float stickX, stickY;      // -1..1, right / up positive
-    float pointerX, pointerY;  // -1..1 over the canvas, like the mouse
-    uint32_t held, pressed;    // Wii remote bits, plus kTouchSpin
-    int32_t active, pointerValid;
-    uint32_t rumbleFrames;
-};
-static TouchPad sTouch;
-static const uint32_t kTouchSpin = 0x10000;
-extern "C" EMSCRIPTEN_KEEPALIVE TouchPad* web_touch(void) { return &sTouch; }
 
 static void readTouch(PortPadState* pad) {
     if (port_input_rumble(0)) __atomic_fetch_add(&sTouch.rumbleFrames, 1, __ATOMIC_RELAXED);
@@ -297,10 +304,20 @@ static void readTouch(PortPadState* pad) {
         pad->accX = a;
         pad->accY = a;
     }
-    if (sTouch.pointerValid) {
+    // The finger's pointer stays where it was lifted, so it only takes over
+    // from the gamepad's right stick when a finger aims anew (moves it), as
+    // the mouse does.
+    static float sLastX = 0, sLastY = 0;
+    float px = sTouch.pointerX, py = sTouch.pointerY;
+    if (px != sLastX || py != sLastY) {
+        sLastX = px;
+        sLastY = py;
+        sCursorActive = false;
+    }
+    if (sTouch.pointerValid && !sCursorActive) {
         pad->pointerValid = 1;
-        pad->pointerX = sTouch.pointerX;
-        pad->pointerY = sTouch.pointerY;
+        pad->pointerX = px;
+        pad->pointerY = py;
     }
 }
 
@@ -354,19 +371,22 @@ extern "C" EMSCRIPTEN_KEEPALIVE void web_request_scale(int scale) {
     sWantScale.store(scale);
 }
 extern "C" EMSCRIPTEN_KEEPALIVE void web_set_auto_scale(int maxScale) { sAutoMax.store(maxScale); }
+// Settings' "Hold A to skip": seconds, 0 = off.  Read on the game thread at
+// its next update; a float store is as good as atomic here.
+extern "C" EMSCRIPTEN_KEEPALIVE void web_set_skip_hold(float seconds) { port_skip_set_hold_seconds(seconds); }
 
 static void applyScale() {
     int want = sWantScale.exchange(0);
-    if (want < 1 || want > 4 || sEfb.width == kEfbW * want) {
+    if (want < 1 || want > 4 || sEfb.width == sEfbW * want) {
         return;
     }
     gpu::renderer().destroyTarget(sEfb);
-    sEfb = gpu::renderer().createTarget(kEfbW * want, kEfbH * want);
+    sEfb = gpu::renderer().createTarget(sEfbW * want, kEfbH * want);
     // The canvas only grows (a resize clears it, which showed as a black
     // flash on every auto switch); the blit scales the EFB to it.
     int cw = 0, ch = 0;
     emscripten_get_canvas_element_size("#canvas", &cw, &ch);
-    if (kEfbW * want > cw) emscripten_set_canvas_element_size("#canvas", kEfbW * want, kEfbH * want);
+    if (sEfbW * want > cw) emscripten_set_canvas_element_size("#canvas", sEfbW * want, kEfbH * want);
     sHold = 2;  // the new target's first frames may lack the EFB copies effects read
     port_log("present: render scale %dx (%dx%d)", want, sEfb.width, sEfb.height);
 }
@@ -412,7 +432,7 @@ static void recordTiming(double presentMs) {
     sLastGameFrame = sStats.gameFrame;
     int autoMax = sAutoMax.load();
     if (autoMax > 0) {
-        int cur = sEfb.width / kEfbW;
+        int cur = sEfb.width / sEfbW;
         sLate = (sStats.intervalP95 > 19.0f && gameDelta >= 55) ? sLate + 1 : 0;
         sSteady = sStats.intervalP95 < 17.5f ? sSteady + 1 : 0;
         if (sLate >= 3 && cur > 1) {

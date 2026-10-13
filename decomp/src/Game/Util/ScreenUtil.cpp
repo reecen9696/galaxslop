@@ -32,6 +32,9 @@
 #include "Game/Util/SingletonHolder.hpp"
 #include "Game/Util/SoundUtil.hpp"
 #include "Game/Util/SystemUtil.hpp"
+#ifdef TARGET_PC
+#include "port/port.h"
+#endif
 
 
 namespace {
@@ -109,6 +112,14 @@ namespace MR {
     }
 
     s32 getScreenWidth() {
+#ifdef TARGET_PC
+        // 21:9 and wider (port_screen_widen): layouts, the safety frame and
+        // the pointer spread over a wider screen; the even width keeps the
+        // centre on a whole pixel.
+        if (isScreen16Per9()) {
+            return static_cast< s32 >(416.0f * port_screen_widen() + 0.5f) * 2;
+        }
+#endif
         return isScreen16Per9() ? 832 : 608;
     }
 

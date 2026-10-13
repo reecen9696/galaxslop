@@ -8,6 +8,9 @@
 #include "Game/Util/ScreenUtil.hpp"
 #include "Game/Util/SystemUtil.hpp"
 #include <JSystem/JUtility/JUTTexture.hpp>
+#ifdef TARGET_PC
+#include "port/port.h"
+#endif
 
 namespace {
     void setTextureTrans(f32 x, f32 y) {
@@ -135,6 +138,11 @@ void ImageEffectLocalUtil::sendTextureVertex(s32 divisions, s32 tile) {
 #pragma global_optimizer off
 void ImageEffectLocalUtil::blurTexture(JUTTexture* pTexture, s32 divisions, s32 tile, u32 sampleCount, f32 radius, f32 intensity) {
     f32 aspect = MR::isScreen16Per9() ? 1.333f : 1.0f;
+#ifdef TARGET_PC
+    if (MR::isScreen16Per9()) {
+        aspect *= port_screen_widen();  // 21:9 and wider
+    }
+#endif
     f32 verticalRadius = radius * aspect;
     s32 sampleIntensity = 255.0f * intensity / sampleCount;
 

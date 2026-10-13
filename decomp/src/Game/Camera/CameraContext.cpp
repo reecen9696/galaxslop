@@ -2,6 +2,9 @@
 #include "Game/Util/MathUtil.hpp"
 #include "Game/Util/ScreenUtil.hpp"
 #include "Game/Util/SystemUtil.hpp"
+#ifdef TARGET_PC
+#include "port/port.h"
+#endif
 
 void CameraContext_FORCE_MATCH_SDATA2() {
     (void)1.0f;
@@ -44,6 +47,9 @@ const TPos3f& CameraContext::getInvViewMtx() const {
 
 f32 CameraContext::getAspect() const {
     if (MR::isScreen16Per9()) {
+#ifdef TARGET_PC
+        return 16.0f / 9.0f * port_screen_widen();  // 21:9 and wider
+#endif
         return 16.0f / 9.0f;
     } else {
         return static_cast< f32 >(MR::getScreenWidth()) / MR::getScreenHeight();

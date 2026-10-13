@@ -1,6 +1,7 @@
 // Wii services that have no meaningful equivalent on Quest: system config
 // (answered with fixed settings), WiiConnect24, Mii (RFL), dynamic modules,
 // the Wii remote speaker encoder, VF.
+#include <stdlib.h>
 #include <string.h>
 
 #include "port/port.h"
@@ -18,6 +19,26 @@ extern "C" {
 // SC (system configuration)
 // ---------------------------------------------------------------------------
 u8 SCGetAspectRatio(void) { return 1; }     // 16:9
+// Wider than 16:9 (SMG_ASPECT=21:9, the web page's Picture setting): the
+// game keeps its 16:9 path and widens the screen by this much (port.h).
+float port_screen_widen(void) {
+    static float sWiden = 0.0f;
+    if (sWiden == 0.0f) {
+        sWiden = 1.0f;
+        const char* env = getenv("SMG_ASPECT");
+        float w = 0.0f, h = 0.0f;
+        if (env != nullptr) {
+            char* end = nullptr;
+            w = strtof(env, &end);
+            h = end != nullptr && *end == ':' ? strtof(end + 1, nullptr) : 0.0f;
+        }
+        if (w > 0.0f && h > 0.0f) {
+            float f = (w / h) / (16.0f / 9.0f);
+            sWiden = f < 1.0f ? 1.0f : f > 2.0f ? 2.0f : f;
+        }
+    }
+    return sWiden;
+}
 u8 SCGetEuRgb60Mode(void) { return 1; }     // 60 Hz
 // A language the disc has texts in: the one of the `language` setting, or
 // the disc's own first one (dvd.cpp).

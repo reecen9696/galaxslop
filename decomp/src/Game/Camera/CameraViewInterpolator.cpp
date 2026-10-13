@@ -9,6 +9,9 @@
 #include "Game/Util/MapUtil.hpp"
 #include "Game/Util/MathUtil.hpp"
 #include "Game/Util/TriangleFilter.hpp"
+#ifdef TARGET_PC
+#include "port/port.h"
+#endif
 
 void CameraViewInterpolator_FORCE_MATCH_SDATA2() {
     (void)1.0f;
@@ -200,6 +203,9 @@ bool CameraViewInterpolator::calcBinder(TVec3f* pBindDir, const TVec3f& rTargetP
 
     f32 nearPlaneHeight = MR::tanDegree(MR::getFovy() * 0.5f) * ::sNearZ;
     f32 nearPlaneWidth = nearPlaneHeight * 16.0f / 9.0f;
+#ifdef TARGET_PC
+    nearPlaneWidth *= port_screen_widen();  // 21:9 and wider
+#endif
 
     mBinder->mRadius = MR::sqrt(::sCollisionBallRadius + nearPlaneHeight * nearPlaneHeight + nearPlaneWidth * nearPlaneWidth);
     *pBindDir = mBinder->bind(diff);

@@ -732,7 +732,10 @@ function drawTags() {
 
 function boot(args, env = {}) {
   // read by browser_env.js in preRun
-  window.smgEnv = { SMG_SCALE: store("smg.scale") || "auto", ...env };
+  window.smgEnv = { SMG_SCALE: store("smg.scale") || "auto", SMG_SKIP_HOLD: store("smg.skipHold") || "0", ...env };
+  // The game's shape is fixed for the run (port_screen_widen); the URL wins, as in browser_env.js.
+  boot.aspect = window.smgEnv.SMG_ASPECT = params.get("SMG_ASPECT") || window.smgEnv.SMG_ASPECT || (store("smg.picture") === "ultrawide" ? "21:9" : "16:9");
+  window.smgApplyPicture?.();
   importPanel.style.display = "none";
   stopMenuMusic();
   document.body.classList.add("playing");
@@ -891,16 +894,30 @@ function setupSettings() {
     if (scale.value === "auto") Module._web_set_auto_scale(2);
     else Module._web_request_scale(Number(scale.value));
   };
-  // Picture: 16:9 (the game's own shape) or stretched over the window, and
-  // browser full screen (Esc leaves it).
+  // Picture: 16:9 (the game's own shape), 21:9 (the game draws wider; set
+  // when it starts) or stretched over the window, and browser full screen
+  // (Esc leaves it).
   const picture = document.getElementById("picture");
-  picture.value = store("smg.picture") === "stretch" ? "stretch" : "wide";
-  const applyPicture = () => document.body.classList.toggle("stretch", picture.value === "stretch");
+  picture.value = ["stretch", "ultrawide"].includes(store("smg.picture")) ? store("smg.picture") : "wide";
+  const applyPicture = () => {
+    const ultrawide = boot.aspect ? boot.aspect === "21:9" : picture.value === "ultrawide";
+    document.body.classList.toggle("stretch", picture.value === "stretch");
+    document.body.classList.toggle("ultrawide", ultrawide);
+    document.getElementById("pictureNote").hidden = !boot.aspect || ultrawide === (picture.value === "ultrawide");
+  };
+  window.smgApplyPicture = applyPicture;
   picture.onchange = () => {
     store("smg.picture", picture.value);
     applyPicture();
   };
   applyPicture();
+  // Hold A to skip (cutscene_skip.cpp): off by default, applied live.
+  const skipHold = document.getElementById("skipHold");
+  skipHold.value = store("smg.skipHold") || "0";
+  skipHold.onchange = () => {
+    store("smg.skipHold", skipHold.value);
+    if (window.Module && Module._web_set_skip_hold) Module._web_set_skip_hold(Number(skipHold.value));
+  };
   const fs = document.getElementById("fullscreen");
   fs.onclick = () => {
     if (document.fullscreenElement) document.exitFullscreen();

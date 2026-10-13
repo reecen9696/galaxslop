@@ -18,6 +18,9 @@
 #include <JSystem/JKernel/JKRExpHeap.hpp>
 #include <JSystem/JUtility/JUTVideo.hpp>
 #include <revolution/gx/GXEnum.h>
+#ifdef TARGET_PC
+#include "port/port.h"
+#endif
 
 namespace {
     static const s16 sCinemaFrameHeightTop = 44;
@@ -81,6 +84,10 @@ void MoviePlayerSimple::draw() const {
 
         if (MR::isScreen16Per9()) {
             frameBufferWidth = MR::getFrameBufferWidth();
+#ifdef TARGET_PC
+            // 21:9 and wider: the 16:9 movie stays 16:9, pillarboxed.
+            frameBufferWidth = static_cast< u32 >(MR::getFrameBufferWidth() / port_screen_widen() + 0.5f) & ~1u;
+#endif
         } else {
             frameBufferWidth = 832;
         }
