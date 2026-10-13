@@ -2,6 +2,7 @@
 // GameScene::update; the ring is read from other threads under a lock.
 #include "player_capture.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -26,7 +27,9 @@ uint32_t sCount = 0;  // captures written
 std::mutex sLock;
 char sAnimName[64];
 
-const char* sStageName = nullptr;  // last stage name hashed
+// Last stage name hashed, by text: the game reuses the name's buffer across
+// stage changes, so the pointer alone stays the same.
+char sStageName[64] = {};
 uint32_t sStageHash = 0;
 
 }  // namespace
@@ -68,9 +71,12 @@ extern "C" void port_net_capture_player(void) {
     c.animHash = anim != nullptr ? MR::getHashCode(anim) : 0;
 
     const char* stage = MR::getCurrentStageName();
-    if (stage != sStageName) {
-        sStageName = stage;
-        sStageHash = stage != nullptr ? MR::getHashCode(stage) : 0;
+    if (stage == nullptr) {
+        sStageName[0] = 0;
+        sStageHash = 0;
+    } else if (strncmp(stage, sStageName, sizeof(sStageName)) != 0) {
+        snprintf(sStageName, sizeof(sStageName), "%s", stage);
+        sStageHash = MR::getHashCode(stage);
     }
     c.stageHash = sStageHash;
     c.scenario = MR::getCurrentScenarioNo();
