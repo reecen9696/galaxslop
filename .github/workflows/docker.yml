@@ -8,11 +8,12 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# One build at a time, newest wins: an older run finishing last must not
-# put an older build on :latest.
+# One build at a time, in push order, so an older build never lands on
+# :latest after a newer one.  The running build always finishes (pushes
+# come faster than a build takes); only the newest waiting push is kept.
 concurrency:
   group: docker-image
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: read
