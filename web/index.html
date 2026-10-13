@@ -5,31 +5,42 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SMG Co-op</title>
 <style>
-  :root { color-scheme: dark; }
-  html, body { margin: 0; height: 100%; background: #000; color: #ccc; font: 14px system-ui, sans-serif; }
-  #wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 8px; }
-  canvas { width: min(100vw, calc(100vh * 640 / 456)); aspect-ratio: 640 / 456; background: #000; }
-  #status { opacity: .7; }
+  :root { color-scheme: dark; --fg: #d8dbe6; --dim: #8a90a6; --accent: #f4c542; --panel: #141826; }
+  html, body { margin: 0; height: 100%; background: #000; color: var(--fg); font: 15px/1.5 system-ui, sans-serif; }
+  #wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100%; gap: 8px; padding: 0 16px; box-sizing: border-box; }
+  canvas { width: min(100vw, calc(100vh * 640 / 456)); aspect-ratio: 640 / 456; background: #000; display: none; outline: none; }
+  #status { color: var(--dim); font-size: 13px; text-align: center; }
+  #import { max-width: 560px; background: var(--panel); border-radius: 12px; padding: 24px; display: none; }
+  #import h1 { font-size: 20px; margin: 0 0 8px; }
+  #import ol { padding-left: 20px; color: var(--dim); }
+  #import code { color: var(--fg); }
+  button { font: inherit; padding: 8px 16px; border-radius: 8px; border: 0; background: var(--accent); color: #000; cursor: pointer; }
+  button.ghost { background: transparent; color: var(--dim); border: 1px solid #333a50; }
+  progress { width: 100%; height: 10px; display: none; margin-top: 12px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
 </style>
 </head>
 <body>
 <div id="wrap">
   <canvas id="canvas" tabindex="0" oncontextmenu="event.preventDefault()"></canvas>
+  <div id="import">
+    <h1>Load your game files</h1>
+    <p>This page runs Super Mario Galaxy from your own disc. Nothing is uploaded: the files are copied
+      into this browser's private storage once, then the game starts from there.</p>
+    <ol>
+      <li>Dump your disc and extract it in Dolphin (right-click the game, Properties, Filesystem,
+        Extract Entire Disc).</li>
+      <li>Convert it with <code>tools/cook/cook.py</code> (see docs/GETTING_YOUR_DISC.md).</li>
+      <li>Pick the converted folder (the one with <code>manifest.json</code> in it).</li>
+    </ol>
+    <div class="row">
+      <button id="pick">Choose folder…</button>
+      <label class="ghost" style="display:none"><input id="pickInput" type="file" webkitdirectory></label>
+    </div>
+    <progress id="progress" max="1" value="0"></progress>
+  </div>
   <div id="status">loading…</div>
 </div>
-<script>
-  // Development page (P0-08).  Needs cross-origin isolation for threads:
-  // serve with web/dev-server.mjs, which also serves the cooked game files.
-  const status = document.getElementById("status");
-  if (!crossOriginIsolated) status.textContent = "not cross-origin isolated: serve with web/dev-server.mjs";
-  var smgLog = [];  // recent game log lines, for automated checks
-  var Module = {
-    canvas: document.getElementById("canvas"),
-    print: (t) => console.log(t),
-    printErr: (t) => { console.log(t); smgLog.push(t); if (smgLog.length > 2000) smgLog.shift(); if (/joined room|present:|disc:|web:/.test(t)) status.textContent = t; },
-    onAbort: (e) => { status.textContent = "aborted: " + e; },
-  };
-</script>
-<script src="smg.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

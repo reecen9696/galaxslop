@@ -5,6 +5,11 @@
 //   node tools/web/smoke.mjs [--url http://localhost:8080/] [--seconds 20]
 //        [--runs N] [--params "PETARI_INPUT=..."] [--shot out.png]
 //        [--keys "5000:Space,5200:-Space"]
+//        [--import ~/smg/game] [--profile dir] [--eval "js expression"]
+//
+// By default the page reads the dev server's game folder (?source=server).
+// --import feeds the folder to the page's import screen instead (OPFS);
+// --profile keeps the Chrome profile, and so OPFS and saves, between runs.
 //
 // Needs web/dev-server.mjs running.  Exit status 1 if any run stalls (the
 // page logs "no new game frame") or never presents.
@@ -26,7 +31,7 @@ const chrome =
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function launch() {
-  const profile = mkdtempSync(join(tmpdir(), "smg-smoke-"));
+  const profile = args.profile ?? mkdtempSync(join(tmpdir(), "smg-smoke-"));
   const proc = spawn(chrome, [
     "--headless=new", `--user-data-dir=${profile}`, "--remote-debugging-port=0", "--no-first-run",
     "--ignore-gpu-blocklist", "--enable-unsafe-swiftshader", "about:blank",
@@ -88,8 +93,30 @@ async function oneRun(n) {
   });
   await c.send("Runtime.enable", {}, sessionId);
   await c.send("Page.enable", {}, sessionId);
-  const url = base + "?PETARI_TIMER=1" + (args.params ? "&" + args.params : "") + `&run=${n}`;
+  const source = args.import || args.profile ? "" : "&source=server";
+  const url = base + "?PETARI_TIMER=1" + source + (args.params ? "&" + args.params : "") + `&run=${n}`;
   await c.send("Page.navigate", { url }, sessionId);
+  if (args.import) {
+    // Wait for the import screen, then hand the folder to its <input webkitdirectory>.
+    await c.send("DOM.enable", {}, sessionId);
+    for (let i = 0; i < 100; i++) {
+      const { result } = await c.send("Runtime.evaluate", { expression: "getComputedStyle(document.getElementById('import')).display" }, sessionId);
+      if (result.value === "block") break;
+      if (i === 99) throw new Error("no import screen (already imported? use a fresh --profile)");
+      await sleep(100);
+    }
+    const { root } = await c.send("DOM.getDocument", {}, sessionId);
+    const { nodeId } = await c.send("DOM.querySelector", { nodeId: root.nodeId, selector: "#pickInput" }, sessionId);
+    await c.send("DOM.setFileInputFiles", { nodeId, files: [args.import] }, sessionId);
+    const t0 = Date.now();
+    for (;;) {
+      const { result } = await c.send("Runtime.evaluate", { expression: "document.getElementById('status').textContent" }, sessionId);
+      if (!/copying|reading/.test(result.value ?? "") && Date.now() - t0 > 2000) break;
+      if (Date.now() - t0 > 600000) throw new Error("import took over 10 min");
+      await sleep(500);
+    }
+    console.log(`import finished in ${((Date.now() - t0) / 1000).toFixed(0)} s`);
+  }
   const start = Date.now();
   const keys = (args.keys ?? "").split(",").filter(Boolean).map((k) => {
     const [t, name] = k.split(":");
@@ -103,6 +130,10 @@ async function oneRun(n) {
     }
     await sleep(100);
   }
+  if (args.eval) {
+    const { result } = await c.send("Runtime.evaluate", { expression: args.eval, awaitPromise: true, returnByValue: true }, sessionId);
+    console.log("eval:", JSON.stringify(result.value));
+  }
   if (args.shot) {
     const { data } = await c.send("Page.captureScreenshot", { format: "png" }, sessionId);
     const file = runs > 1 ? args.shot.replace(/\.png$/, `-${n}.png`) : args.shot;
@@ -111,7 +142,7 @@ async function oneRun(n) {
   c.close();
   proc.kill("SIGKILL");
   await sleep(300);
-  rmSync(profile, { recursive: true, force: true });
+  if (!args.profile) rmSync(profile, { recursive: true, force: true });
   const stalled = log.find((l) => l.includes("no new game frame"));
   const frames = log.filter((l) => l.includes("display frames")).pop();
   return { log, stalled, frames, ok: !stalled && !!frames };

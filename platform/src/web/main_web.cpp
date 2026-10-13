@@ -71,6 +71,25 @@ static bool mountGameOverFetch(const char* mountPoint) {
     port_log("web: %d game files available from the server", files);
     return files > 0;
 }
+
+// Origin-private file system (P0-07): the page copies the user's cooked game
+// folder to OPFS /smg/game once (web/app.js); saves live in /smg/save, so
+// they survive reloads.  WasmFS reads OPFS through sync access handles on
+// its own worker.
+static bool mountOpfs() {
+    static bool mounted = false;
+    if (mounted) {
+        return true;
+    }
+    backend_t opfs = wasmfs_create_opfs_backend();
+    if (wasmfs_create_directory("/opfs", 0777, opfs) != 0) {
+        port_log("web: cannot mount OPFS");
+        return false;
+    }
+    mkdir("/opfs/smg", 0777);
+    mounted = true;
+    return true;
+}
 #endif
 
 extern "C" void port_boot(const char* dataRoot, const char* saveRoot);
@@ -133,6 +152,9 @@ int main(int argc, char** argv) {
         }
     }
 #ifndef SMG_WEB_NODE
+    // web/app.js passes --game /opfs/smg/game once the folder is imported,
+    // or nothing for the dev server's copy (?source=server).
+    bool opfs = game.rfind("/opfs/", 0) == 0;
     if (game.empty()) {
         game = "/game";
         if (!mountGameOverFetch(game.c_str())) {
@@ -140,7 +162,11 @@ int main(int argc, char** argv) {
         }
     }
     if (save.empty()) {
-        save = "/save";  // in memory until P1-05 (IndexedDB)
+        // Saves persist in OPFS whatever the game files come from.
+        save = mountOpfs() ? "/opfs/smg/save" : "/save";
+    }
+    if (opfs && !mountOpfs()) {
+        return 1;
     }
     seconds = 0;  // the page runs until closed
 #endif
