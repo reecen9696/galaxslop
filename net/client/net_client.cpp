@@ -390,6 +390,17 @@ bool netPump() {
 
     std::vector<uint8_t> m;
     while (s.transport->poll(m)) handle(s, m);
+    // Who is in the room, also outside a stage (title, file select), where
+    // netTick does not run: the page's player count reads these.  Pose and
+    // visibility stay netTick's.
+    for (int i = 0; i < kMaxRemotes; i++) {
+        const Remote& r = s.remotes[i];
+        RemoteView& v = s.views[i];
+        v.present = r.present;
+        v.id = r.id;
+        snprintf(v.name, sizeof(v.name), "%s", r.name.c_str());
+        v.tint = r.tint;
+    }
     progressPump(*s.transport, port_host_time_ns());  // shared progress: send, resend, ack (P3-02)
     return true;
 }
