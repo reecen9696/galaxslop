@@ -33,6 +33,7 @@
 
 class J3DModelData;
 class J3DModelX;
+class ActorLightCtrl;
 class ModelHolder;
 class PartsModel;
 class XanimePlayer;
@@ -84,6 +85,7 @@ public:
     virtual void draw() const;
     // Ice is drawn in the refraction pass (MarioActor::drawIndirectModel).
     void drawIndirect() const;
+    void drawModels() const;
 
     void initAnimation();
     // Pose for this frame; `valid` false hides the puppet.  `solid`: the
@@ -123,6 +125,13 @@ public:
     u8 mRemoteId;
     bool mSolid;
     u8 mTrampleCooldown;   // frames
+    // Own light (MarioActor::calcFogLighting / updateLightDL, without the
+    // damage and item fog): the area light where the puppet stands, from its
+    // own ActorLightCtrl, rebuilt each draw; double-buffered like the player's.
+    u8* mLightDL[2];
+    u32 mLightDLSize;
+    u8 mLightDLIndex;
+    ActorLightCtrl* mPendingLight;
     bool mAirborne;
     // Expression and hand poses this frame (joint index - 1 in the face and
     // hand models), from the animation's PartsControl joint.
@@ -137,6 +146,7 @@ public:
     u8 mEyelid;
 
 private:
+    const u8* lightDL(u32* pSize) const;
     static int formForMode(u8 mode);
     void initForms();
     void showParts(bool wing, bool teresa);

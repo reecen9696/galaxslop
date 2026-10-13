@@ -11,6 +11,9 @@
 #include "Game/Animation/XanimeCore.hpp"
 #include "Game/Animation/XanimePlayer.hpp"
 #include "Game/LiveActor/ModelManager.hpp"
+#include "Game/Map/LightFunction.hpp"
+#include "Game/Util/LightUtil.hpp"
+#include "Game/LiveActor/ActorLightCtrl.hpp"
 #include "Game/LiveActor/PartsModel.hpp"
 #include "Game/Player/DrawAdaptor.hpp"
 #include "Game/Player/J3DModelX.hpp"
@@ -47,6 +50,8 @@
 #include <JSystem/JKernel/JKRHeap.hpp>
 #include <JSystem/JUtility/JUTTexture.hpp>
 #include <revolution/gd/GDBase.h>
+#include <revolution/gd/GDGeometry.h>
+#include <revolution/gd/GDLight.h>
 
 extern "C" {
 void GDSetTexImgPtr(GXTexMapID, void*);
@@ -192,9 +197,10 @@ struct HideFlags {
 RemotePlayerPuppet::RemotePlayerPuppet(const char* pName, bool luigi)
     : LiveActor(pName), mXanimePlayer(nullptr), mXanimePlayerUpper(nullptr), mAnimHash(0), mLuigi(luigi), mHidden(true), mFace(nullptr),
       mHandL(nullptr), mHandR(nullptr), mBeeWing(nullptr), mTeresa(nullptr), mMode(0), mRemoteId(0), mSolid(false), mTrampleCooldown(0),
-      mAirborne(false), mFacePose(0), mHandPoseL(0),
+      mAirborne(false), mLightDLSize(0), mLightDLIndex(0), mPendingLight(nullptr), mFacePose(0), mHandPoseL(0),
       mHandPoseR(0), mEyelidMaterial(0xFFFF), mEyelid(0) {
     PSMTXIdentity(mTargetRotationMtx);
+    mLightDL[0] = mLightDL[1] = nullptr;
     for (Form& f : mForms) {
         f.mBody = f.mHandL = f.mHandR = nullptr;
         f.mTinted = false;
@@ -265,6 +271,15 @@ void RemotePlayerPuppet::init(const JMapInfoIter&) {
     // The animation players need the player's animation table, and the player
     // does not exist yet during scene initialisation: initAnimation() runs on
     // the first frame with state (applyState).
+
+    // Lit where it stands (lightDL), not where the local player does.
+    // The light controller is allocated now and attached on the first shown
+    // frame (applyState): the area lights do not exist during scene init.
+    initActorLightCtrl();
+    mPendingLight = mActorLightCtrl;
+    mActorLightCtrl = nullptr;
+    mLightDL[0] = new (0x20) u8[0x80];
+    mLightDL[1] = new (0x20) u8[0x80];
 
     // GhostPlayer::init's sensor.
     initHitSensor(1);
@@ -349,6 +364,14 @@ void RemotePlayerPuppet::applyState(const NetPlayerCapture& rState, bool valid, 
         return;
     }
     mPosition.set(rState.pos[0], rState.pos[1], rState.pos[2]);
+    if (mPendingLight != nullptr) {
+        // MR::initLightCtrl looks the light type up in the actor's draw
+        // buffer, which a puppet has none of.  init(type) takes it directly
+        // (and skips the draw buffer's light sort): the local player's type.
+        mActorLightCtrl = mPendingLight;
+        mPendingLight = nullptr;
+        mActorLightCtrl->init(MarioAccess::getPlayerActor()->mActorLightCtrl->_4, false);
+    }
     mVelocity.set(rState.vel[0], rState.vel[1], rState.vel[2]);
     // Orientation straight from the sender's base matrix (columns: side, up,
     // front); on SMG's planets Euler angles would lose the gravity frame.
@@ -584,7 +607,7 @@ void RemotePlayerPuppet::drawPart(ModelHolder* pPart, u8 pose, u32 poses, bool l
     }
     J3DModelX* model = reinterpret_cast< J3DModelX* >(MR::getJ3DModel(pPart));
     u32 lightSize = 0;
-    const u8* light = lit ? playerLightDL(&lightSize) : nullptr;
+    const u8* light = lit ? lightDL(&lightSize) : nullptr;
     model->setDynamicDL(const_cast< u8* >(light), lightSize);
     model->directDraw(nullptr);
 }
@@ -605,7 +628,7 @@ void RemotePlayerPuppet::calcAndSetBaseMtx() {
 // shows its own face (ice, rainbow: MarioActor::updateFace hides the part).
 void RemotePlayerPuppet::drawBody(J3DModelX* pModel, bool ownFace, bool lit) const {
     u32 lightSize = 0;
-    const u8* light = lit ? playerLightDL(&lightSize) : nullptr;
+    const u8* light = lit ? lightDL(&lightSize) : nullptr;
     HideFlags keep(pModel->getModelData());
     if (ownFace) {
         MR::showJoint(pModel, "Face0");
@@ -620,6 +643,17 @@ void RemotePlayerPuppet::drawBody(J3DModelX* pModel, bool ownFace, bool lit) con
     GXInvalidateVtxCache();
     pModel->directDraw(nullptr);
     pModel->mFlags.clear();
+}
+
+// MarioActor::updateLightDL with the puppet's own area ambient colour and
+// white material colour (the directional lights are loaded by draw()).  The
+// player's display list until the puppet has an area light.
+const u8* RemotePlayerPuppet::lightDL(u32* pSize) const {
+    if (mActorLightCtrl == nullptr || mActorLightCtrl->mAreaLightInf == nullptr || mLightDLSize == 0) {
+        return playerLightDL(pSize);
+    }
+    *pSize = mLightDLSize;
+    return mLightDL[mLightDLIndex];
 }
 
 // A form's body on the puppet's base matrix.  The joints are the body's
@@ -657,6 +691,43 @@ void RemotePlayerPuppet::draw() const {
     if (MR::isDead(this) || mHidden) {
         return;
     }
+    // This puppet's light: its area's lights into GX (the scene loaded the
+    // local player's for the whole DrawType_Player list; restored below),
+    // and its ambient colour into a display list for the models.
+    bool ownLight = mActorLightCtrl != nullptr && mActorLightCtrl->mAreaLightInf != nullptr && mLightDL[0] != nullptr;
+    if (ownLight) {
+        RemotePlayerPuppet* self = const_cast< RemotePlayerPuppet* >(this);
+        u8 buffer[0x80] ATTRIBUTE_ALIGN(32);
+        u32 length;
+        {
+            MR::ProhibitSchedulerAndInterrupts lock(false);  // __GDCurrentDL is global
+            GDLObj dl;
+            GDInitGDLObj(&dl, buffer, sizeof(buffer));
+            __GDCurrentDL = &dl;
+            GDSetChanAmbColor(GX_COLOR0A0, *MR::getLightAmbientColor(this));
+            GXColor white = {255, 255, 255, 255};
+            GDSetChanMatColor(GX_COLOR0A0, white);
+            GDSetChanCtrl(GX_COLOR1, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+            GDPadCurr32();
+            length = (u32)(dl.ptr - dl.start);
+            __GDCurrentDL = nullptr;
+        }
+        self->mLightDLIndex = (u8)(1 - mLightDLIndex);
+        memcpy(self->mLightDL[mLightDLIndex], buffer, (length + 31) & ~31u);
+        self->mLightDLSize = length;
+        // Exactly the player's light set-up (area light + point lights),
+        // with this puppet's controller standing in for the player's.
+        LightFunction::registerPlayerLightCtrl(mActorLightCtrl);
+        MR::loadLightPlayer();
+    }
+    drawModels();
+    if (ownLight) {
+        LightFunction::registerPlayerLightCtrl(MarioAccess::getPlayerActor()->mActorLightCtrl);
+        MR::loadLightPlayer();
+    }
+}
+
+void RemotePlayerPuppet::drawModels() const {
     J3DModelX* body = reinterpret_cast< J3DModelX* >(MR::getJ3DModel(this));
     if (mMode == 6 && mTeresa != nullptr) {
         return;  // boo: only the Teresa part shows (MarioActor::isAllHidden)
