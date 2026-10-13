@@ -369,6 +369,12 @@ function showLobby() {
   name.value = store("smg.name") || "";
   document.getElementById("contact").checked = store("smg.contact") !== "0";
   room.value = params.get("room") || "";
+  const tintBox = document.getElementById("tint");
+  const savedTint = Number(store("smg.tint")) || 0;
+  tintBox.innerHTML = kTints
+    .map((t, i) => `<label class="swatch" title="${t.name}"><input type="radio" name="tint" value="${i}" aria-label="${t.name}"${i === savedTint ? " checked" : ""}>`
+      + `<span${t.hex ? ` style="background:${t.hex}"` : ""}></span></label>`)
+    .join("");
   relay.value = store("smg.relay") || defaultRelay;
   lobby.style.display = "block";
   startMenuMusic();
@@ -389,11 +395,13 @@ function showLobby() {
       const n = name.value.trim() || "Player";
       store("smg.name", n);
       store("smg.relay", relay.value.trim());
+      const tint = tintBox.querySelector("input:checked")?.value || "0";
+      store("smg.tint", tint);
       lobby.style.display = "none";
       if (mode === "solo") return resolve({});
       const contact = document.getElementById("contact").checked;
       store("smg.contact", contact ? "1" : "0");
-      resolve({ SMG_RELAY: relay.value.trim(), SMG_ROOM: mode === "join" ? room.value.trim().toUpperCase() : "", SMG_NAME: n, SMG_CONTACT: contact ? "1" : "0" });
+      resolve({ SMG_RELAY: relay.value.trim(), SMG_ROOM: mode === "join" ? room.value.trim().toUpperCase() : "", SMG_NAME: n, SMG_TINT: tint, SMG_CONTACT: contact ? "1" : "0" });
     };
     document.getElementById("join").onclick = () => (room.value.trim() ? go("join") : room.focus());
     document.getElementById("create").onclick = () => go("create");
@@ -492,7 +500,21 @@ roombar.addEventListener("click", (e) => {
 setInterval(renderRoomBar, 1000);
 
 // Name tags over remote players (P2-07), from present_web.cpp's projection.
-const kTagColors = ["#ffffff", "#ff6b6b", "#6bc5ff", "#7ee081", "#ffd166", "#c792ea", "#ff9f43", "#f78fb3"];
+// Player colours, indexed by tint (net/puppet/puppet_tint.h): the lobby's
+// swatches and the name tags.  Auto is by join order; the tag gets the
+// resolved tint.  Black's tag is grey to read on the dark label.
+const kTints = [
+  { name: "Auto (by join order)" },
+  { name: "Classic", hex: "#e3342f" },
+  { name: "Green (red on Luigi)", hex: "#3cb043" },
+  { name: "Pink", hex: "#ff85c0" },
+  { name: "Orange", hex: "#ff9a2e" },
+  { name: "Purple", hex: "#9b59d0" },
+  { name: "Cyan", hex: "#2ec4e6" },
+  { name: "Yellow", hex: "#ffd23f" },
+  { name: "White", hex: "#f4f4f4" },
+  { name: "Black", hex: "#2b2b2b", tag: "#a0a4aa" },
+];
 function drawTags() {
   requestAnimationFrame(drawTags);
   const box = document.getElementById("tags");
@@ -511,7 +533,8 @@ function drawTags() {
     const bytes = new Uint8Array(Module.HEAPU8.buffer, ptr + o + 12, 36);
     const name = new TextDecoder().decode(bytes.slice(0, bytes.indexOf(0) < 0 ? 36 : bytes.indexOf(0)));
     el.textContent = name;
-    el.style.color = kTagColors[v.getUint32(o + 8, true) % kTagColors.length];
+    const t = kTints[v.getUint32(o + 8, true)] || kTints[1];
+    el.style.color = t.tag || t.hex;
     el.style.left = ((v.getFloat32(o, true) + 1) * 50).toFixed(2) + "%";
     el.style.top = ((1 - v.getFloat32(o + 4, true)) * 50).toFixed(2) + "%";
     el.style.display = "block";

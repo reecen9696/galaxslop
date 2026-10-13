@@ -103,6 +103,14 @@
   .wii-check input::after { content: ""; width: .45em; height: .85em; border: solid var(--wii-blue-deep); border-width: 0 .2em .2em 0;
     transform: translateY(-.1em) rotate(45deg); opacity: 0; }
   .wii-check input:checked::after { opacity: 1; }
+  .swatches { display: flex; flex-wrap: wrap; gap: .55em; margin-left: .3em; }
+  .swatch { cursor: pointer; }
+  .swatch input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .swatch span { display: block; width: 2.1em; height: 2.1em; border-radius: 50%; border: .16em solid #c9ccd3;
+    box-shadow: 0 .1em .3em #0008, inset 0 -.25em .4em #0003; transition: box-shadow .12s, border-color .12s, transform .08s;
+    background: conic-gradient(#e3342f, #ffd23f, #3cb043, #2ec4e6, #9b59d0, #ff85c0, #e3342f); }
+  .swatch:hover span, .swatch input:focus-visible + span { border-color: var(--wii-blue); box-shadow: 0 0 .7em var(--wii-blue); }
+  .swatch input:checked + span { border-color: #fff; box-shadow: 0 0 0 .18em var(--wii-blue), 0 0 1em var(--wii-blue); transform: scale(1.08); }
   #serverBox { display: none; }
   #serverBox.open { display: block; }
 
@@ -175,6 +183,8 @@
       <main><div class="body">
         <label class="field" for="name">Your name</label>
         <input id="name" class="wii-input" maxlength="32" autocomplete="nickname">
+        <label class="field" id="tintLabel">Your colour</label>
+        <div id="tint" class="swatches" role="radiogroup" aria-labelledby="tintLabel"></div>
         <label class="field" for="room">Room code (to join a friend). Stars anyone in the room gets are added to your save.</label>
         <input id="room" class="wii-input" maxlength="8" placeholder="e.g. K7QF" autocomplete="off" spellcheck="false">
         <div class="btn-row">

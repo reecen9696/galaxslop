@@ -23,6 +23,7 @@
 
 #include "../gx/gl_renderer.h"
 #include "net/client/net_client.h"
+#include "net/puppet/puppet_tint.h"
 #include "port/port.h"
 
 namespace {
@@ -323,7 +324,7 @@ static void recordTiming(double presentMs) {
 // camera of the frame just drawn, so tags move with the picture.
 struct NameTag {
     float x, y;  // normalized device coordinates (-1..1, y up)
-    uint32_t tint;
+    uint32_t tint;  // net::kTint*, resolved (never auto)
     char name[36];
 };
 struct NameTags {
@@ -353,7 +354,7 @@ static void updateNameTags() {
             NameTag& tag = out.tags[out.count++];
             tag.x = vx / -vz / (t * aspect);
             tag.y = vy / -vz / t;
-            tag.tint = v.tint;
+            tag.tint = net::puppetTint(v.tint, v.id);
             snprintf(tag.name, sizeof(tag.name), "%s", v.name);
         }
     }

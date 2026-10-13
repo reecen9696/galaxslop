@@ -97,7 +97,7 @@ Phase 4 adds 100+ for objects.
   on every client including their own: 0 auto, 1 classic, 2 green (red on
   Luigi), 3 pink, 4 orange, 5 purple, 6 cyan, 7 yellow, 8 white, 9 black.
   Auto is by player id: 1 classic, 2 green, 3 pink, 4 orange, 5 purple.
-  The native client sends `SMG_TINT`.
+  Clients send `SMG_TINT`; the web lobby sets it from its colour swatches.
 
 ## Progress merge
 
