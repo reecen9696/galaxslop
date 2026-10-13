@@ -13,3 +13,8 @@ these `.arc` files in.
 | --- | --- |
 | `ObjectData/Barney.arc` | Barney, the NPC dog (model and animations). Source: `tools/mods/barney/`. |
 | `Sound/Bark.wav` | His bark (`platform/src/port/sfx.cpp`). |
+
+To update Barney: export from Blender (`tools/mods/barney/source/export_barney.py`)
+and copy the new `Barney.arc` over this one; the build cooks it again. GX
+treats clockwise triangles as front faces, which the exporter writes; an
+export with Blender's anticlockwise order shows the inside of the model.
