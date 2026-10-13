@@ -241,7 +241,11 @@ bool interpolate(const Remote& r, int64_t t, int64_t now, NetPlayerCapture* out)
     out->front[0] = out->baseMtx[0][2], out->front[1] = out->baseMtx[1][2], out->front[2] = out->baseMtx[2][2];
     // The animation changes with the newer sample; weights blend.
     out->animHash = b->animHash;
-    out->animFrame = b->animFrame;
+    // Frame: interpolated within one animation (packets come every 2nd
+    // frame; the newest alone makes slow animations like the idle sway step);
+    // across a loop wrap or an animation change, the newer one.
+    out->animFrame = a->animHash == b->animHash && b->animFrame >= a->animFrame ? a->animFrame + (b->animFrame - a->animFrame) * f
+                                                                                 : b->animFrame;
     out->animRate = 1.0f;
     for (int i = 0; i < 4; i++) out->animWeights[i] = a->animWeights[i] + (b->animWeights[i] - a->animWeights[i]) * f;
     out->stageHash = b->stageHash;
