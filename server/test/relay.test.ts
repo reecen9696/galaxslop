@@ -182,7 +182,7 @@ describe("relay logic", () => {
     expect(decodeWelcome(sent[0]).roomCode).toBe("PLAY22");
   });
 
-  it("drops clients silent for 15 s and rate-limits beyond 60 messages a second", () => {
+  it("drops clients silent for 15 s and rate-limits beyond 120 messages a second", () => {
     let t = 0;
     const relay = new Relay({ now: () => t });
     const sent: Uint8Array[][] = [[], []];
@@ -194,8 +194,8 @@ describe("relay logic", () => {
     relay.message(conns[1], hello("B", code));
     sent[0].length = 0;
 
-    for (let i = 0; i < 100; i++) relay.message(conns[1], state(i));
-    expect(sent[0].filter((m) => m[0] === Msg.PlayerState).length).toBe(60 - 1); // the Hello used one of B's 60
+    for (let i = 0; i < 200; i++) relay.message(conns[1], state(i));
+    expect(sent[0].filter((m) => m[0] === Msg.PlayerState).length).toBe(120 - 1); // the Hello used one of B's 120
 
     t = 16_000;
     relay.message(conns[0], Uint8Array.of(Msg.Ping, 0, 0, 0, 0));
@@ -246,6 +246,24 @@ describe("world events", () => {
     expect(Array.from(inbox[1][0])).toEqual(Array.from(ev));
     expect(Array.from(inbox[2][0])).toEqual(Array.from(ev));
     relay.message(conns[0], Uint8Array.of(Msg.WorldEvent, 1, 2));
+    expect(inbox[1].length).toBe(1);
+  });
+
+  it("forwards an ActorState from its sender only", () => {
+    const relay = new Relay({ fixedRooms: ["ROOM22"] });
+    const inbox: Uint8Array[][] = [[], []];
+    const conns: Conn[] = [0, 1].map((i) => ({ send: (b) => inbox[i].push(b), close: () => {} }));
+    conns.forEach((c, i) => {
+      relay.connect(c);
+      relay.message(c, hello("P" + i, "ROOM22"));
+    });
+    inbox.forEach((m) => (m.length = 0));
+    const st = new Uint8Array(12 + 32);
+    st.set([Msg.ActorState, 1, 1, 2, 3, 4, 1, 0, 0, 0, 0, 1]);
+    relay.message(conns[0], st);
+    expect(Array.from(inbox[1][0])).toEqual(Array.from(st));
+    st[1] = 2; // claims to be player 2
+    relay.message(conns[0], st);
     expect(inbox[1].length).toBe(1);
   });
 });

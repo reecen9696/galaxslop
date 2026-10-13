@@ -31,11 +31,18 @@ void port_world_actor_appeared(void* actor);
 // Coin and star bit spawns check this: nonzero while a remote defeat runs
 // the local copy's kill() (the defeater's drop event brings the loot).
 int port_world_suppress_loot(void);
+// The same for a drop from `source`: also while another player runs that
+// actor here (actor sync: the owner's drop event brings the loot).
+int port_world_suppress_loot_from(const void* source);
 // MR::appearCoinPop / appearStarPiece: a local drop (kind 0 coins, 1 star
 // bits), repeated on the other clients in this stage.
 void port_world_loot_dropped(const void* source, int kind, float x, float y, float z, int count, float a, float b);
 // Coin::noticeGetCoin (not purple coins), StarPiece::touchPlayer: picked up.
 void port_world_item_collected(void* actor);
+// The same, `purple`: a purple coin (counted for everyone).
+void port_world_item_collected2(void* actor, int purple);
+// Coin.cpp: count a purple coin another player took.
+void port_coin_count_purple(void);
 // Coin / StarPiece::makeActorAppeared: items to match pickups against.
 void port_world_item_appeared(void* actor);
 // Scene init: the NameObj remote drops are made for (declared coins and
@@ -70,12 +77,26 @@ void port_world_star_got(int id);
 int port_power_star_pull_to_player(void* star);
 // Debug (mode 103): beat the nearest event star host (as a boss's defeat does).
 void port_world_debug_event_star(float x, float y, float z);
+// Debug (mode 105): the local player hits the nearest boss.
+void port_world_debug_hit_boss(float x, float y, float z);
 // Debug: the local player grabs the nearest waiting power star.
 void port_world_debug_grab_star(void);
 // Debug (F11): drop coins and star bits over (x, y, z).
 void port_world_debug_drop(float x, float y, float z);
+// HitSensor::receiveMessage, after the receiver answered: a hit the local
+// player landed on a boss is replayed on the others' copy of the boss.
+void port_world_hit(uint32_t msg, void* senderSensor, void* receiverSensor, int accepted);
+// net/puppet: a puppet's body sensor, the sender of replayed hits.
+void* port_net_puppet_sensor(void);
 // Once per gameplay frame (net/puppet): apply received events.
 void port_world_update(void);
+// Actor sync: kill the local copy of an actor gone where its owner runs it
+// (no loot: the owner's drop brings it).
+void port_world_remote_kill(void* actor);
+// A coin or star bit (pickups are synced as events).
+int port_world_is_item(void* actor);
+// Has an enemy hit sensor (what counts as a defeat).
+int port_world_has_enemy_sensor(void* actor);
 // Debug (F10): defeat the registered enemy nearest (x, y, z); 0 if none.
 int port_world_debug_kill_nearest(float x, float y, float z);
 
@@ -96,6 +117,8 @@ enum : uint8_t {
     kWorldSwitch = 6,           // id = zone << 16 | switch no (zone 0xFFFF: global), a = on
     kWorldEventStar = 7,        // an event star appears (a boss beaten...): name hash, id = star id, pos, a = flags
     kWorldStarGot = 8,          // a player grabbed power star `id`: everyone in the level gets it
+    kWorldBossHit = 9,          // a hit on a boss: id = placement id or ordinal, pos = sender offset,
+                                // a = msg | sensor index << 16, b = sender sensor type | placed << 16
 };
 // Placement id: FNV-1a of the name and the position rounded to whole units.
 uint32_t worldPlacementId(const char* name, float x, float y, float z);

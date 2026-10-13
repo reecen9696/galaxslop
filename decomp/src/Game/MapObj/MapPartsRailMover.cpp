@@ -1,3 +1,6 @@
+#ifdef TARGET_PC
+#include "net/world/actor_sync.h"
+#endif
 #include "Game/MapObj/MapPartsRailMover.hpp"
 #include "Game/LiveActor/Nerve.hpp"
 #include "Game/MapObj/MapParts.hpp"
@@ -31,6 +34,9 @@ void MapPartsRailMover_FORCE_SDATA2() {
 
 MapPartsRailMover::MapPartsRailMover(LiveActor* pActor)
     : MapPartsFunction(pActor, "\x83\x8c\x83\x43\x83\x8b\x88\xda\x93\xae"), mRailPointPassChecker(), mMoveConditionType(), mMoveStopType(1), mSignMotionType(), _28(gZeroVec) {
+#ifdef TARGET_PC
+    port_actor_sync_part(pActor, 1, this);  // co-op actor sync (net/world)
+#endif
     _34 = 0.0f;
     mStopTime = 0;
     mSpeed = 0.0f;

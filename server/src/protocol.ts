@@ -12,6 +12,7 @@ export const Msg = {
   PlayerState: 0x10,
   Contact: 0x12,
   WorldEvent: 0x13,
+  ActorState: 0x14,
   ProgressEvent: 0x20,
   ProgressLog: 0x21,
   ProgressAck: 0x22,
@@ -224,6 +225,10 @@ export const CONTACT_SIZE = 9;
 // [u32 placement id or count][u32 name hash][f32 pos x3][f32 a][f32 b],
 // forwarded as is to everyone else in the room.  Unreliable.
 export const WORLD_EVENT_SIZE = 35;
+// ActorState (actor sync, net/world/actor_sync): [0x14][u8 sender][u32 stage]
+// [u8 scenario][u32 frame][u8 count] then entries.  Forwarded as is.
+export const ACTOR_STATE_MIN = 12;
+export const ACTOR_STATE_MAX = 4096;
 export function forwardContact(fromId: number, b: Uint8Array): Uint8Array {
   const out = b.slice(0, CONTACT_SIZE);
   out[1] = fromId;

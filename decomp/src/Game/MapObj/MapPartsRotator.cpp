@@ -1,3 +1,6 @@
+#ifdef TARGET_PC
+#include "net/world/actor_sync.h"
+#endif
 #include "Game/MapObj/MapPartsRotator.hpp"
 #include "Game/LiveActor/Nerve.hpp"
 #include "Game/LiveActor/Spine.hpp"
@@ -29,6 +32,9 @@ namespace NrvMapPartsRotator {
 };  // namespace NrvMapPartsRotator
 
 MapPartsRotator::MapPartsRotator(LiveActor* pActor) : MapPartsRotatorBase(pActor, "\x8e\xa9\x90\x67\x89\xf1\x93\x5d") {
+#ifdef TARGET_PC
+    port_actor_sync_part(pActor, 2, this);  // co-op actor sync (net/world)
+#endif
     _18 = 0.0f;
     mRotateAngle = 0.0f;
     mRotateStopTime = 0;

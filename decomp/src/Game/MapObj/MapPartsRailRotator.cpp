@@ -1,3 +1,6 @@
+#ifdef TARGET_PC
+#include "net/world/actor_sync.h"
+#endif
 #include "Game/MapObj/MapPartsRailRotator.hpp"
 #include "Game/LiveActor/LiveActor.hpp"
 #include "Game/LiveActor/Nerve.hpp"
@@ -23,6 +26,9 @@ namespace NrvMapPartsRailRotator {
 
 MapPartsRailRotator::MapPartsRailRotator(LiveActor* pHost)
     : MapPartsFunction(pHost, "\x83\x8c\x83\x43\x83\x8b\x89\xf1\x93\x5d"), mRotateAxis(), mRotateType(), mRotateSpeed(), mTargetAngle(), mAngle(), mHostRotateMtx() {
+#ifdef TARGET_PC
+    port_actor_sync_part(pHost, 3, this);  // co-op actor sync (net/world)
+#endif
     _2C.identity();
     _5C.identity();
 }

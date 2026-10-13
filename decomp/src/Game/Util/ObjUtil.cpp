@@ -751,7 +751,7 @@ void MR::appearCoinFix(const NameObj* pObj, const TVec3f& rParam2, s32 param3) {
 
 void MR::appearCoinPop(const NameObj* pObj, const TVec3f& rParam2, s32 param3) {
 #ifdef TARGET_PC
-    if (port_world_suppress_loot()) {
+    if (port_world_suppress_loot_from(pObj)) {
         return;  // co-op: an enemy defeated by another player (net/world)
     }
     port_world_loot_dropped(pObj, 0, rParam2.x, rParam2.y, rParam2.z, param3, 0.0f, 0.0f);  // shown to the room
@@ -761,7 +761,7 @@ void MR::appearCoinPop(const NameObj* pObj, const TVec3f& rParam2, s32 param3) {
 
 void MR::appearCoinPopToDirection(const NameObj* pObj, const TVec3f& rParam2, const TVec3f& rParam3, s32 param4) {
 #ifdef TARGET_PC
-    if (port_world_suppress_loot()) {
+    if (port_world_suppress_loot_from(pObj)) {
         return;
     }
     port_world_loot_dropped(pObj, 0, rParam2.x, rParam2.y, rParam2.z, param4, 0.0f, 0.0f);
@@ -803,7 +803,7 @@ void MR::hopStarPiece(const NameObj* pObj, const TVec3f& rVec1, const TVec3f& rV
 
 bool MR::appearStarPiece(const NameObj* pObj, const TVec3f& rVec1, s32 a1, f32 f1, f32 f2, bool a2) {
 #ifdef TARGET_PC
-    if (port_world_suppress_loot()) {
+    if (port_world_suppress_loot_from(pObj)) {
         return false;  // co-op: an enemy defeated by another player (net/world)
     }
     port_world_loot_dropped(pObj, 1, rVec1.x, rVec1.y, rVec1.z, a1, f1, f2);  // shown to the room
@@ -813,7 +813,7 @@ bool MR::appearStarPiece(const NameObj* pObj, const TVec3f& rVec1, s32 a1, f32 f
 
 bool MR::appearStarPieceToDirection(const NameObj* pObj, const TVec3f& rVec1, const TVec3f& rVec2, s32 a1, f32 f1, f32 f2, bool a2) {
 #ifdef TARGET_PC
-    if (port_world_suppress_loot()) {
+    if (port_world_suppress_loot_from(pObj)) {
         return false;  // co-op: an enemy defeated by another player (net/world)
     }
     port_world_loot_dropped(pObj, 1, rVec1.x, rVec1.y, rVec1.z, a1, f1, f2);  // shown to the room

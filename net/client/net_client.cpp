@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "net/client/progress.h"
+#include "net/world/actor_sync.h"
 #include "net/world/world_sync.h"
 #include "net/client/ws_client.h"
 #include "net/client/ws_web.h"
@@ -196,6 +197,9 @@ void handle(Session& s, const std::vector<uint8_t>& m) {
     }
     case kMsgWorldEvent:  // world sync (net/world)
         worldOnEvent(m.data(), m.size());
+        break;
+    case kMsgActorState:  // actor sync (net/world)
+        actorStateOnMessage(m.data(), (unsigned)m.size());
         break;
     case 0x21:  // ProgressLog (P3-02)
         progressOnLog(m.data(), m.size());

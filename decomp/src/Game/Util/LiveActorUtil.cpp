@@ -1,4 +1,5 @@
 #ifdef TARGET_PC
+#include "net/world/actor_sync.h"
 #include "net/world/world_sync.h"
 #endif
 #include "Game/Animation/BckCtrl.hpp"
@@ -578,6 +579,12 @@ namespace MR {
 #ifdef TARGET_PC
         // Co-op world sync: a placement id for this actor (net/world).
         port_world_register(pActor, pActor->mName, pActor->mPosition.x, pActor->mPosition.y, pActor->mPosition.z);
+        {
+            const char* objName = nullptr;
+            if (MR::getObjectName(&objName, rIter)) {
+                port_actor_sync_obj_name(pActor, objName);  // its kind (bosses)
+            }
+        }
 #endif
 
         pActor->mRotation.x = MR::repeat(pActor->mRotation.x, 0.0f, 360.0f);

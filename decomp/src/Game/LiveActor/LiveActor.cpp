@@ -1,4 +1,5 @@
 #ifdef TARGET_PC
+#include "net/world/actor_sync.h"
 #include "net/world/world_sync.h"
 #endif
 #include "Game/LiveActor/LiveActor.hpp"
@@ -165,6 +166,9 @@ void LiveActor::movement() {
         MR::updateLightCtrl(this);
     }
 
+#ifdef TARGET_PC
+    port_actor_sync_movement(this);  // co-op: a copy another player runs (net/world)
+#endif
     MR::tryUpdateHitSensorsAll(this);
     MR::actorSoundMovement(this);
     MR::requestCalcActorShadow(this);
@@ -191,6 +195,9 @@ void LiveActor::calcAnmMtx() {
 
     MR::getJ3DModel(this)->setBaseScale(mScale);
     calcAndSetBaseMtx();
+#ifdef TARGET_PC
+    port_actor_sync_mtx(this);  // co-op: drawn where its owner has it (net/world)
+#endif
     mModelManager->calcAnim();
 }
 

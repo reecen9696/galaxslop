@@ -120,12 +120,13 @@ SMG_RELAY=ws://<host-ip>:8787 SMG_ROOM=PLAY22 SMG_NAME=Reece ./build/native/smg 
   In a window F1-F8 switch your power-up form (normal, rainbow, fire, ice,
   bee, spring, boo, flying), F9 squashes you, F10 defeats the nearest
   enemy, F11 drops coins and star bits (PETARI_DEBUG_MODES `103` beats the nearest
-  boss so its star appears, `104` grabs the nearest waiting star) (world sync tests); `PETARI_DEBUG_MODES` schedules
+  boss so its star appears, `104` grabs the nearest waiting star, `105` hits the nearest boss) (world sync tests); `PETARI_DEBUG_MODES` schedules
   them. Ground-pound another player to squash them (one health); jumping on
   them just bounces you and makes them flinch.
   `PETARI_LOOPBACK=0 PETARI_LOOPBACK_SIDE=110` draws a copy of yourself
   beside you, for comparing the puppet with the real player. Nothing else is shared yet (no stars, no enemies).
 - `PETARI_NETLOG=1` logs the room, round-trip time and where the others are.
+- `PETARI_ACTORLOG=1` logs actor sync (moving actors near you twice a second, with owner and nerve, and traffic); `SMG_ACTOR_SYNC=0` turns it off; `PETARI_TEST_BOSS=<object name>` treats that kind of actor as a boss (hit replay tests).
   `PETARI_LOOPBACK=1` shows a copy of yourself 1 s behind, with no network
   (green, or by `SMG_TINT`).
 

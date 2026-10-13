@@ -2,6 +2,8 @@
 // See the header.
 #include "world_sync.h"
 
+#include "actor_sync.h"
+
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,7 +13,10 @@
 #include <unordered_set>
 #include <vector>
 
+#include "Game/LiveActor/AllLiveActorGroup.hpp"
 #include "Game/LiveActor/HitSensor.hpp"
+#include "Game/Player/MarioAccess.hpp"
+#include "Game/Player/MarioActor.hpp"
 #include "Game/LiveActor/HitSensorInfo.hpp"
 #include "Game/LiveActor/HitSensorKeeper.hpp"
 #include "Game/LiveActor/LiveActor.hpp"
@@ -102,6 +107,18 @@ struct World {
     std::unordered_set<uint32_t> appearedStars;           // name hash ^ id, appeared here
     bool applyingStar = false;
     std::vector<std::pair<void*, int>> powerStars;  // PowerStar, star id
+    // Boss hits other players landed, delivered to the local boss when it can
+    // take them (it may be in another phase here: tried for a while).
+    struct PendingHit {
+        LiveActor* actor;
+        int sensor;
+        uint32_t msg;
+        uint32_t senderType;
+        float offset[3];
+        uint32_t until;
+    };
+    std::vector<PendingHit> hits;
+    bool applyingHit = false;
     bool hasPendingGrab = false;
     int pendingGrab = 0;  // star id the others grabbed (-1: the scenario's star)
     uint32_t pendingGrabUntil = 0;
@@ -330,6 +347,7 @@ extern "C" void port_world_register(void* actor, const char* name, float x, floa
     }
     w.idOf[actor] = id;
     w.actorOf[id] = actor;
+    port_actor_sync_track(actor, id);
 }
 
 extern "C" void port_world_actor_appeared(void* actor) {
@@ -390,6 +408,8 @@ extern "C" void port_world_scene_reset(void) {
     w.powerStars.clear();
     w.hasPendingGrab = false;
     w.grabbedHere = false;
+    w.hits.clear();
+    port_actor_sync_reset();
 }
 
 namespace {
@@ -456,6 +476,28 @@ extern "C" int port_world_suppress_loot(void) {
     return 1;
 }
 
+extern "C" int port_world_suppress_loot_from(const void* source) {
+    if (port_world_suppress_loot()) {
+        return 1;
+    }
+    if (world().live && port_actor_sync_remote_owned(source)) {
+        if (logging()) port_log("world: loot from %s suppressed (another player runs it)", static_cast< const NameObj* >(source)->mName);
+        return 1;
+    }
+    return 0;
+}
+
+extern "C" void port_world_remote_kill(void* actor) {
+    World& w = world();
+    w.applyingDefeat = true;
+    static_cast< LiveActor* >(actor)->kill();
+    w.applyingDefeat = false;
+}
+
+extern "C" int port_world_is_item(void* actor) { return world().items.count(actor) != 0 ? 1 : 0; }
+
+extern "C" int port_world_has_enemy_sensor(void* actor) { return hasEnemySensor(static_cast< LiveActor* >(actor)) ? 1 : 0; }
+
 extern "C" void port_world_loot_dropped(const void* source, int kind, float x, float y, float z, int count, float a, float b) {
     World& w = world();
     if (!enabled() || !w.live || w.applyingDrop || w.applyingDefeat || w.ambientDrop || count <= 0) {
@@ -479,7 +521,9 @@ extern "C" void port_world_loot_dropped(const void* source, int kind, float x, f
                  source ? static_cast< const NameObj* >(source)->mName : "?");
 }
 
-extern "C" void port_world_item_collected(void* actorPtr) {
+extern "C" void port_world_item_collected(void* actorPtr) { port_world_item_collected2(actorPtr, 0); }
+
+extern "C" void port_world_item_collected2(void* actorPtr, int purple) {
     LiveActor* actor = static_cast< LiveActor* >(actorPtr);
     World& w = world();
     if (!enabled() || !w.live || w.applyingPickup) {
@@ -492,6 +536,7 @@ extern "C" void port_world_item_collected(void* actorPtr) {
     auto it = w.idOf.find(actorPtr);
     e.kind = kWorldItemCollected;
     e.id = it != w.idOf.end() ? it->second : 0;
+    e.a = purple ? 1.0f : 0.0f;
     e.nameHash = hashName(actor->mName);
     e.pos[0] = actor->mPosition.x;
     e.pos[1] = actor->mPosition.y;
@@ -718,6 +763,116 @@ extern "C" void port_world_star_got(int id) {
     if (logging()) port_log("world: grabbed power star %d, the others in the level get it too", id);
 }
 
+// ---- Boss hits ----
+
+namespace {
+int sensorIndex(LiveActor* a, HitSensor* sensor) {
+    HitSensorKeeper* k = a->mSensorKeeper;
+    for (int i = 0; k != nullptr && i < k->mSensorCount; i++) {
+        HitSensorInfo* info = k->getNthSensorInfo(i);
+        if (info != nullptr && info->mSensor == sensor) return i;
+    }
+    return -1;
+}
+
+// Actors made at scene set-up (boss parts) have no placement id: the n-th
+// actor of their name, in creation order (the same on every client).
+uint32_t ordinalOf(LiveActor* a) {
+    AllLiveActorGroup* all = MR::getAllLiveActorGroup();
+    uint32_t h = hashName(a->mName), n = 0;
+    for (int i = 0; i < all->getObjNum(); i++) {
+        LiveActor* o = all->getActor(i);
+        if (o == a) return n;
+        if (o != nullptr && hashName(o->mName) == h) n++;
+    }
+    return 0xFFFFFFFFu;
+}
+
+LiveActor* byOrdinal(uint32_t nameHash, uint32_t ordinal) {
+    AllLiveActorGroup* all = MR::getAllLiveActorGroup();
+    uint32_t n = 0;
+    for (int i = 0; i < all->getObjNum(); i++) {
+        LiveActor* o = all->getActor(i);
+        if (o != nullptr && hashName(o->mName) == nameHash && n++ == ordinal) return o;
+    }
+    return nullptr;
+}
+
+bool deliverHit(const World::PendingHit& h) {
+    World& w = world();
+    HitSensor* sender = static_cast< HitSensor* >(port_net_puppet_sensor());
+    HitSensorKeeper* k = h.actor->mSensorKeeper;
+    if (sender == nullptr || k == nullptr || h.sensor >= k->mSensorCount || MR::isDead(h.actor)) return false;
+    HitSensorInfo* info = k->getNthSensorInfo(h.sensor);
+    if (info == nullptr || info->mSensor == nullptr) return false;
+    HitSensor* receiver = info->mSensor;
+    // The puppet's sensor stands in for the attacker: where it was relative
+    // to the part it hit, and of its kind (the player, a thrown shell...).
+    TVec3f savedPos = sender->mPosition;
+    u32 savedType = sender->mType;
+    sender->mPosition.set(receiver->mPosition.x + h.offset[0], receiver->mPosition.y + h.offset[1], receiver->mPosition.z + h.offset[2]);
+    sender->mType = h.senderType;
+    w.applyingHit = true;
+    bool ok = receiver->receiveMessage(h.msg, sender);
+    w.applyingHit = false;
+    sender->mPosition = savedPos;
+    sender->mType = savedType;
+    return ok;
+}
+
+void updateHits() {
+    World& w = world();
+    for (size_t i = 0; i < w.hits.size();) {
+        World::PendingHit& h = w.hits[i];
+        bool done = deliverHit(h);
+        if (done || w.frame > h.until || MR::isDead(h.actor)) {
+            if (logging()) port_log("world: boss hit on %s %s", h.actor->mName, done ? "taken here too" : "never taken here (gave up)");
+            w.hits.erase(w.hits.begin() + (long)i);
+        } else {
+            i++;
+        }
+    }
+}
+}  // namespace
+
+extern "C" void port_world_hit(uint32_t msg, void* senderPtr, void* receiverPtr, int accepted) {
+    World& w = world();
+    if (!accepted || !enabled() || !w.live || w.applyingHit || senderPtr == nullptr) {
+        return;
+    }
+    HitSensor* sender = static_cast< HitSensor* >(senderPtr);
+    HitSensor* receiver = static_cast< HitSensor* >(receiverPtr);
+    LiveActor* boss = receiver->mHost;
+    if (boss == nullptr || !port_actor_is_boss(boss)) {
+        return;
+    }
+    // Hits of the local player: his own attacks, star bits he shot, what he
+    // threw.
+    bool byPlayer = (void*)sender->mHost == (void*)MarioAccess::getPlayerActor() && msg >= ACTMES_PLAYER_PUNCH && msg < ACTMES_PLAYER_ATTACK_END;
+    bool byStarBit = msg == ACTMES_STAR_PIECE_ATTACK;
+    if (!byPlayer && !byStarBit && !port_actor_recently_held(sender->mHost)) {
+        return;
+    }
+    int idx = sensorIndex(boss, receiver);
+    Event e{};
+    if (idx < 0 || !currentStage(&e.stage, &e.scenario)) {
+        return;
+    }
+    auto it = w.idOf.find(boss);
+    bool placed = it != w.idOf.end();
+    e.kind = kWorldBossHit;
+    e.id = placed ? it->second : ordinalOf(boss);
+    e.nameHash = hashName(boss->mName);
+    e.pos[0] = sender->mPosition.x - receiver->mPosition.x;
+    e.pos[1] = sender->mPosition.y - receiver->mPosition.y;
+    e.pos[2] = sender->mPosition.z - receiver->mPosition.z;
+    e.a = (float)(msg | (uint32_t)idx << 16);
+    e.b = (float)((sender->mType & 0xFFFF) | (placed ? 0x10000u : 0u));
+    PortHostAllocScope host;
+    send(e);
+    if (logging()) port_log("world: hit %s (message %u on sensor %d), told the room", boss->mName, msg, idx);
+}
+
 extern "C" void port_world_update(void) {
     if (!enabled()) {
         return;
@@ -732,6 +887,8 @@ extern "C" void port_world_update(void) {
     w.frame++;
     PortHostAllocScope host;
     updatePendingGrab();
+    port_actor_sync_update(stage, scenario);
+    updateHits();
 
     // Arrivals: a player newly in this stage and scenario hears this visit's
     // defeats and pickups, so their world matches ours.
@@ -778,6 +935,24 @@ extern "C" void port_world_update(void) {
             remember(e);
             continue;
         }
+        if (e.kind == kWorldBossHit) {
+            uint32_t a = (uint32_t)e.a, b = (uint32_t)e.b;
+            LiveActor* boss = nullptr;
+            if (b & 0x10000u) {
+                auto it = w.actorOf.find(e.id);
+                boss = it != w.actorOf.end() ? static_cast< LiveActor* >(it->second) : nullptr;
+            } else {
+                boss = byOrdinal(e.nameHash, e.id);
+            }
+            if (boss == nullptr || MR::isDead(boss)) {
+                if (logging()) port_log("world: a boss hit for an actor not here");
+                continue;
+            }
+            World::PendingHit h{boss, (int)(a >> 16), a & 0xFFFFu, b & 0xFFFFu, {e.pos[0], e.pos[1], e.pos[2]}, w.frame + 180};
+            if (logging()) port_log("world: another player hit %s (message %u)", boss->mName, h.msg);
+            w.hits.push_back(h);
+            continue;
+        }
         if (e.kind == kWorldStarGot) {
             if (!w.grabbedHere && !w.hasPendingGrab) {
                 if (logging()) port_log("world: another player grabbed power star %d: getting it here too", (int)e.id);
@@ -800,8 +975,11 @@ extern "C" void port_world_update(void) {
             if (logging()) port_log("world: %s defeated by another player", actor->mName);
             defeatLocally(actor);
         } else if (e.kind == kWorldItemCollected) {
-            if (logging()) port_log("world: %s collected by another player", actor->mName);
+            if (logging()) port_log("world: %s collected by another player%s", actor->mName, e.a != 0.0f ? " (purple: counted here too)" : "");
             collectLocally(actor);
+            if (e.a != 0.0f) {
+                port_coin_count_purple();
+            }
         }
         remember(e);
     }
@@ -891,4 +1069,52 @@ extern "C" void port_world_debug_grab_star(void) {
         }
     }
     if (!pulled) port_log("world: debug: no power star waiting (%d in the scene)", (int)w.powerStars.size());
+}
+
+extern "C" const char* port_actor_nerve_name(void*, int*);
+
+// Debug (mode 105): the local player hits the nearest boss (spin, stomp or
+// ground pound, whichever its sensors take first), through the game's own
+// message path, as a real hit would.
+extern "C" void port_world_debug_hit_boss(float x, float y, float z) {
+    AllLiveActorGroup* all = MR::getAllLiveActorGroup();
+    LiveActor* mario = MarioAccess::getPlayerActor();
+    HitSensor* body = mario != nullptr ? mario->getSensor("body") : nullptr;
+    LiveActor* best = nullptr;
+    float bestD = 1e12f;
+    for (int i = 0; i < all->getObjNum(); i++) {
+        LiveActor* a = all->getActor(i);
+        if (a == nullptr || MR::isDead(a) || !port_actor_is_boss(a) || a->mSensorKeeper == nullptr) continue;
+        float dx = a->mPosition.x - x, dy = a->mPosition.y - y, dz = a->mPosition.z - z;
+        float d = dx * dx + dy * dy + dz * dz;
+        if (d < bestD) {
+            bestD = d;
+            best = a;
+        }
+    }
+    if (best == nullptr || body == nullptr) {
+        port_log("world: debug: no boss near");
+        static int once = 0;
+        if (once++ == 0) {
+            for (int i = 0; i < all->getObjNum(); i++) {
+                LiveActor* a = all->getActor(i);
+                int fam;
+                const char* nn = a ? port_actor_nerve_name(a, &fam) : "";
+                if (a && (fam == 4 || strstr(nn, "Koopa") || strstr(nn, "Dino") || strstr(nn, "unregistered")))
+                    port_log("world: debug: actor %s nerve %s family %d dead %d", a->mName, nn, fam, MR::isDead(a) ? 1 : 0);
+            }
+        }
+        return;
+    }
+    static const u32 kMsgs[] = {ACTMES_PLAYER_PUNCH, ACTMES_PLAYER_TRAMPLE, ACTMES_PLAYER_HIP_DROP};
+    for (u32 m : kMsgs) {
+        for (int i = 0; i < best->mSensorKeeper->mSensorCount; i++) {
+            HitSensor* r = best->mSensorKeeper->getNthSensorInfo(i)->mSensor;
+            if (r != nullptr && r->receiveMessage(m, body)) {
+                port_log("world: debug: hit %s with message %u on sensor %d", best->mName, m, i);
+                return;
+            }
+        }
+    }
+    port_log("world: debug: %s took no hit", best->mName);
 }

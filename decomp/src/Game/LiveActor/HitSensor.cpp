@@ -1,3 +1,7 @@
+#ifdef TARGET_PC
+#include "net/world/actor_sync.h"
+#include "net/world/world_sync.h"
+#endif
 #include "Game/LiveActor/HitSensor.hpp"
 #include "Game/LiveActor/LiveActor.hpp"
 #include "Game/LiveActor/SensorHitChecker.hpp"
@@ -17,7 +21,16 @@ HitSensor::HitSensor(u32 type, u16 groupSize, f32 radius, LiveActor* pHost)
 }
 
 bool HitSensor::receiveMessage(u32 msg, HitSensor* pSender) {
+#ifdef TARGET_PC
+    if (pSender != nullptr) {
+        port_actor_sync_message(mHost, pSender->mHost);  // co-op: the local player touched it (net/world)
+    }
+    bool accepted = mHost->receiveMessage(msg, pSender, this);
+    port_world_hit(msg, pSender, this, accepted);  // co-op: a hit on a boss, for the others' boss (net/world)
+    return accepted;
+#else
     return mHost->receiveMessage(msg, pSender, this);
+#endif
 }
 
 void HitSensor::setType(u32 type) {

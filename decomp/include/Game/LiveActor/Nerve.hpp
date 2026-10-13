@@ -22,6 +22,15 @@ public:
 #define NERVE_DEF inline
 #endif
 
+#ifdef TARGET_PC
+/* Co-op actor sync (net/world/actor_sync): nerves named across builds. */
+extern "C" int port_nerve_register(const void* nerve, const char* name, const char* file);
+#define PORT_NERVE_REG(name, parent_class)                                                                                                           \
+    [[maybe_unused]] static const int name##PortNerveReg = port_nerve_register(&name::sInstance, #parent_class "::" #name, __FILE__);
+#else
+#define PORT_NERVE_REG(name, parent_class)
+#endif
+
 #define NEW_NERVE(name, parent_class, executor_name)                                                                                                 \
     class name : public Nerve {                                                                                                                      \
     public:                                                                                                                                          \
@@ -31,7 +40,8 @@ public:
         };                                                                                                                                           \
         static name sInstance;                                                                                                                       \
     };                                                                                                                                               \
-    NERVE_DEF name name::sInstance NERVE_WEAK;
+    NERVE_DEF name name::sInstance NERVE_WEAK;                                                                                                       \
+    PORT_NERVE_REG(name, parent_class)
 
 #define NEW_NERVE_ONEND(name, parent_class, executor_name, executorOnEnd_name)                                                                       \
     class name : public Nerve {                                                                                                                      \
@@ -46,7 +56,8 @@ public:
         };                                                                                                                                           \
         static name sInstance;                                                                                                                       \
     };                                                                                                                                               \
-    NERVE_DEF name name::sInstance NERVE_WEAK;
+    NERVE_DEF name name::sInstance NERVE_WEAK;                                                                                                       \
+    PORT_NERVE_REG(name, parent_class)
 
 /* easy alternative to get a nerve instance (in the standard format) */
 #define GET_NERVE(cls, nerve) (&Nrv##cls::nerve::sInstance)

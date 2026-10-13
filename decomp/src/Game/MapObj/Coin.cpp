@@ -146,9 +146,7 @@ void Coin::setShadowAndPoseModeFromJMapIter(const JMapInfoIter& rIter) {
 
 void Coin::makeActorAppeared() {
 #ifdef TARGET_PC
-    if (!mIsPurpleCoin) {
-        port_world_item_appeared(this);
-    }
+    port_world_item_appeared(this);  // co-op: picked up by anyone, gone for all (net/world)
 #endif
     MR::offCalcGravity(this);
 
@@ -549,9 +547,9 @@ bool Coin::requestHide() {
 
 void Coin::noticeGetCoin() {
 #ifdef TARGET_PC
-    if (!mIsPurpleCoin) {
-        port_world_item_collected(this);  // co-op: gone for the others too (purple coins stay per player)
-    }
+    // Co-op: gone for the others too; a purple coin counts for everyone
+    // (one shared count of the comet's coins).
+    port_world_item_collected2(this, mIsPurpleCoin ? 1 : 0);
 #endif
     if (mIsNeedBubble) {
         MR::emitEffect(mAirBubble, "RecoveryBubbleBreak");
@@ -697,3 +695,11 @@ namespace MR {
         return coin;
     }
 };  // namespace MR
+
+#ifdef TARGET_PC
+// net/world: another player took this purple coin: it counts here too.
+extern "C" void port_coin_count_purple(void) {
+    MR::incPurpleCoin();
+    MR::startSystemSE("SE_SY_PURPLE_COIN");
+}
+#endif

@@ -1032,6 +1032,12 @@ void applyDebugModes() {
     if (!MR::isExistMario()) {
         return;
     }
+    if (mode == 105) {  // hit the nearest boss (world sync test)
+        sPending = -1;
+        const TVec3f& p = *MR::getPlayerPos();
+        port_world_debug_hit_boss(p.x, p.y, p.z);
+        return;
+    }
     if (mode == 103) {  // beat the nearest event star host (boss) (world sync test)
         sPending = -1;
         const TVec3f& p = *MR::getPlayerPos();
@@ -1146,6 +1152,12 @@ extern "C" void port_net_puppets_create_for_scene(void) {
     sSpawnWaitFrames = 0;
     port_log("puppet: %d Mario + %d Luigi created for the new scene: %d KB of the current heap, %d KB left", count, count,
              (int)((freeBefore - heap->getTotalFreeSize()) / 1024), (int)(heap->getTotalFreeSize() / 1024));
+}
+
+// World sync: the sender of replayed boss hits (net/world).
+extern "C" void* port_net_puppet_sensor(void) {
+    RemotePlayerPuppet* p = sPuppets[0][0];
+    return p != nullptr ? p->getSensor("body") : nullptr;
 }
 
 extern "C" void port_net_puppets_update(void* pScene) {
