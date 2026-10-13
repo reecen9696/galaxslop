@@ -122,6 +122,9 @@
   #roombar { display: none; position: fixed; top: 12px; right: 66px; z-index: 3; max-width: min(520px, calc(100vw - 90px));
     padding: 6px 14px; min-height: 44px; font-size: 14px; line-height: 1.35; color: var(--ink);
     background: var(--face); border: 2px solid var(--wii-blue); border-radius: 22px; box-shadow: 0 0 10px var(--wii-glow), 0 2px 6px #000a; }
+  /* Panels read like Wii UI, not a web page: no text selection (fields still allow it). */
+  #roombar, .screen, #settings, .toast, #tags { -webkit-user-select: none; user-select: none; }
+  .wii-input { -webkit-user-select: text; user-select: text; }
   #roombar .rb-head { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
   #roombar .rb-label { color: var(--ink-dim); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
   #roombar b { color: var(--wii-blue-deep); letter-spacing: .15em; font-size: 17px; }
@@ -185,7 +188,7 @@
         <input id="name" class="wii-input" maxlength="32" autocomplete="nickname">
         <label class="field" id="tintLabel">Your colour</label>
         <div id="tint" class="swatches" role="radiogroup" aria-labelledby="tintLabel"></div>
-        <label class="field" for="room">Room code (to join a friend). Stars anyone in the room gets are added to your save.</label>
+        <label class="field" for="room">Room code</label>
         <input id="room" class="wii-input" maxlength="8" placeholder="e.g. K7QF" autocomplete="off" spellcheck="false">
         <div class="btn-row">
           <button id="join" class="wii-btn primary">Join room</button>
