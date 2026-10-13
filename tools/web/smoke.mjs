@@ -161,7 +161,7 @@ async function oneRun(n) {
     const t0 = Date.now();
     for (;;) {
       const { result } = await c.send("Runtime.evaluate", { expression: "document.getElementById('status').textContent" }, sessionId);
-      if (!/copying|reading/.test(result.value ?? "") && Date.now() - t0 > 2000) break;
+      if (!/copying|reading|cooking|converter/.test(result.value ?? "") && Date.now() - t0 > 2000) break;
       if (Date.now() - t0 > 600000) throw new Error("import took over 10 min");
       await sleep(500);
     }

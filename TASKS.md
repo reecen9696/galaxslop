@@ -199,25 +199,27 @@ Chromium, with sound, on a gamepad, at 60 fps on the reference machine.
 
 ### P1-02 In-browser cooker (TypeScript, Web Workers)
 - lane: B
-- status: open
-- owner:
+- status: review
+- owner: A (taken 2026-10-13, B inactive)
 - blocked_by: P0-05, P0-07
 - touches: tools/cook-ts (new, published to web/ as a package), web/src/import
 - flags: parallel-ok
 - what: Per D-009. Port `tools/cook/*.py` module by module (`rarc_swap`, `bcsv`, `bmg`, `j3d`, `kcl`, `collision`, `lyt`, `jpa`, `jaudio`, `thp`, `dol_data`) to TypeScript on `DataView`. Input: a Dolphin-extracted folder via `showDirectoryPicker()`; no disc images (see P5-01). A pool of workers, one file per job, writing straight to OPFS with sync access handles; `manifest.json` last. Progress events to the UI. `navigator.storage.persist()` before writing. Movies off by default. Tests: (a) vitest with small synthetic fixtures per format, (b) `tools/cook/compare.py` that diffs a cook.py output tree against a TS output tree byte for byte; a human runs (b) once per release on a real disc and pastes the result in the log.
 - done when: an EUR extracted disc imports in under 10 min on the reference machine, `compare.py` reports zero differences, manifest verifies.
 - log:
+  - 2026-10-13 (A): done per D-021 (cook.py under Pyodide in workers, not a TS port). EUR disc: 36 s with 6 workers, byte-identical to cook.py for all 2,375 files and manifest.json. web/cook/, served Python from /pycook/ by the dev server.
 
 ### P1-03 Import screen UI
 - lane: A
-- status: open
-- owner:
+- status: review
+- owner: A
 - blocked_by: P1-02
 - touches: web/src/screens/import
 - flags:
 - what: Folder picker (extracted disc), with the Dolphin extract steps shown on screen (right-click game, Properties, Filesystem, Extract Entire Disc), requirements check (Chromium, cross-origin isolated, OPFS quota), run cooker, progress bar, errors in plain words, "movies on/off" toggle, storage quota display. Re-import and delete options in settings.
 - done when: a non-technical person can import without reading docs.
 - log:
+  - 2026-10-13 (A): the import screen takes an extracted disc (converted in the page) or a cooked folder; Dolphin steps on screen, size/manifest checks, quota check, progress bar, errors in words; ?reimport=1 starts over. Left for P1-09: re-import/delete buttons, movies toggle.
 
 ### P1-04 Gamepad and mouse input
 - lane: B

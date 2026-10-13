@@ -291,3 +291,19 @@ to 3,584 MB, writes at 0x80000000 / 0x90000000 / 0xE0000000, malloc at
 no RAM; D-013's budget is resident memory, measured at P0-09.
 Revisit: if a browser refuses a 3.5 GB memory, move the arenas lower; the
 GX/renderer assumptions about >= 0x80000000 would need the same change.
+
+## D-021 (2026-10-13, lane A): The browser cooker runs cook.py itself under Pyodide. Supersedes D-009
+What: P1-02 does not port `tools/cook/*.py` to TypeScript. `web/cook/` runs
+the real `cook.py` in a pool of Web Workers, each with Pyodide 0.26.4 (from
+jsDelivr), one disc file per job through `cook.process()`. Yaz0 is decoded
+in JS; plain copies, OPFS writes and `manifest.json` (same bytes as
+`manifest.py`) are done on the page. Numbered D-021 because an unrelated
+D-020 draft exists in another working tree.
+Why: D-009 assumed Pyodide would blow the 10-minute budget. Measured: the
+EUR disc converts in 36 s with 6 workers in headless Chrome (the CLI takes
+10 s), and the output is byte-identical to `cook.py`'s for all 2,375 files,
+manifest included. That reverses the trade-off: one cooker to maintain
+instead of two kept in lockstep. The only native hot path was Yaz0, now in
+JS. Cost: a ~10 MB Pyodide download on first import (cached by the browser).
+Revisit: if the jsDelivr dependency matters for a deployed site, serve the
+same Pyodide files from our own origin; nothing else changes.

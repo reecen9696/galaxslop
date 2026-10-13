@@ -58,7 +58,8 @@ async function importFolder(source) {
   const files = await listPicked(source);
   const manifestEntry = files.find((f) => f.path === "manifest.json");
   if (!manifestEntry) {
-    say("That folder has no manifest.json. Pick the folder cook.py wrote.");
+    if (files.some((f) => /(^|\/)sys\/fst\.bin$/.test(f.path))) return cookFolder(files);
+    say("That folder is neither an extracted disc (sys/, files/) nor a converted one (manifest.json).");
     return false;
   }
   const manifest = JSON.parse(await manifestEntry.file.text());
@@ -115,6 +116,33 @@ async function importFolder(source) {
   progress.style.display = "none";
   console.log(`web: imported ${manifest.files.length} files in ${((performance.now() - started) / 1000).toFixed(1)} s`);
   return true;
+}
+
+// A Dolphin-extracted disc: convert it in the browser (web/cook/cooker.js,
+// tools/cook/cook.py under Pyodide) straight into OPFS.
+async function cookFolder(files) {
+  if (navigator.storage.persist) await navigator.storage.persist();
+  const root = await navigator.storage.getDirectory();
+  const smg = await root.getDirectoryHandle("smg", { create: true });
+  await smg.removeEntry("game", { recursive: true }).catch(() => {});
+  const game = await smg.getDirectoryHandle("game", { create: true });
+  progress.style.display = "block";
+  say("starting the converter…");
+  try {
+    const r = await cookDisc(files, game, (fraction, text) => {
+      progress.value = fraction;
+      say(text);
+    });
+    console.log(`web: converted the disc: ${r.files} files in ${r.seconds.toFixed(0)} s`);
+    return true;
+  } catch (e) {
+    console.log("web: conversion failed: " + e.message);
+    say("Conversion failed: " + e.message);
+    await smg.removeEntry("game", { recursive: true }).catch(() => {});
+    return false;
+  } finally {
+    progress.style.display = "none";
+  }
 }
 
 function showImport() {

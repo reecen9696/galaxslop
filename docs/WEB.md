@@ -32,11 +32,18 @@ node web/dev-server.mjs 8080           # page only
 # open http://localhost:8080/
 ```
 
-The first visit shows an import screen: pick the folder `tools/cook/cook.py`
-wrote (it must contain `manifest.json`; your own disc, never committed). The
-page checks every file against the manifest and copies the folder into the
-browser's origin-private file system (OPFS, about 6 s for 1 GB); after that
-the game starts straight from OPFS on every visit. Saves are written to OPFS
+The first visit shows an import screen. Pick either
+
+- the folder Dolphin extracted your disc to (`sys/` and `files/`, possibly
+  under `DATA/`): the page converts it itself, running `tools/cook/cook.py`
+  under Pyodide in 6 workers (about 40 s, output byte-identical to the CLI;
+  D-021), or
+- a folder `tools/cook/cook.py` already wrote (with `manifest.json`): it is
+  checked against the manifest and copied (about 6 s for 1 GB).
+
+Either way the result lands in the browser's origin-private file system
+(OPFS) and the game starts straight from there on every visit. Your own
+disc only; nothing is uploaded. Saves are written to OPFS
 too (`/smg/save`), so they survive reloads. `?reimport=1` forgets the files
 and asks again.
 
@@ -81,8 +88,12 @@ breadcrumbs are how a hang is located.
   pool (D-019).
 - Game files and saves: WasmFS with the OPFS backend mounted at `/opfs`
   (`web/app.js` does the import on the page's main thread).
-- Still to do: audio worklet, gamepad, the WebSocket transport for co-op
-  (P2-03 web half), save export/import, the in-browser cooker (P1-02).
+- Audio: an AudioWorklet reads the AI ring from wasm memory
+  (`platform/src/web/audio_web.cpp`); it starts on the first key or click.
+- Co-op: `net/client/ws_web.cpp` (the page's WebSocket); the lobby on the
+  page sets the relay, room and name.
+- Still to do: save export/import and settings (P1-09), frame pacing and
+  render scale (P1-07), pipeline cache (P1-06).
 
 ## Lessons
 

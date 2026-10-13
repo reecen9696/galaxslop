@@ -38,8 +38,8 @@
     <ol>
       <li>Dump your disc and extract it in Dolphin (right-click the game, Properties, Filesystem,
         Extract Entire Disc).</li>
-      <li>Convert it with <code>tools/cook/cook.py</code> (see docs/GETTING_YOUR_DISC.md).</li>
-      <li>Pick the converted folder (the one with <code>manifest.json</code> in it).</li>
+      <li>Pick the extracted folder. The page converts it for the port (a few minutes, once).
+        A folder already converted with <code>tools/cook/cook.py</code> works too.</li>
     </ol>
     <div class="row">
       <button id="pick">Choose folder…</button>
@@ -67,6 +67,7 @@
   <div id="roombar"></div>
   <div id="status">loading…</div>
 </div>
+<script src="cook/cooker.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
