@@ -382,12 +382,16 @@ let luma = null;
 function showLoading() {
   document.body.classList.add("loading");
   startMenuMusic("loading");
+  // A spinner holds Luma's place while three.js and the model download.
+  const holder = document.getElementById("luma");
+  if (!luma) holder.classList.add("waiting");
   luma ??= import("./luma.js")
-    .then((m) => m.startLuma(document.getElementById("luma")))
+    .then((m) => m.startLuma(holder))
     .catch((e) => {
       console.log("web: no dancing Luma: " + e.message);
       return null;
-    });
+    })
+    .finally(() => holder.classList.remove("waiting"));
 }
 function hideLoading() {
   document.body.classList.remove("loading");
