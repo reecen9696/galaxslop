@@ -49,7 +49,7 @@ bool sCursorActive = false;  // the gamepad's virtual pointer, until the mouse m
 
 bool isGameKey(const char* code) {
     static const char* const kKeys[] = {"KeyW", "KeyA", "KeyS", "KeyD", "Space", "KeyK", "ControlLeft", "ControlRight", "KeyC", "Enter",
-                                        "Escape", "Backspace", "Digit1", "Digit2", "KeyH", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
+                                        "Backspace", "Digit1", "Digit2", "KeyH", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
                                         "KeyJ", "ShiftLeft"};
     for (const char* k : kKeys) {
         if (strcmp(code, k) == 0) return true;
@@ -273,7 +273,7 @@ void web_read_input(PortPadState* pad) {
     if (held("KeyK") || sMouseR) pad->buttons |= kB;
     if (held("ControlLeft") || held("ControlRight")) pad->buttons |= kZ;
     if (held("KeyC")) pad->buttons |= kC;
-    if (held("Enter") || held("Escape")) pad->buttons |= kPlus;
+    if (held("Enter")) pad->buttons |= kPlus;  // Esc is the page's: it shows the cursor
     if (held("Backspace")) pad->buttons |= kMinus;
     if (held("Digit1")) pad->buttons |= kOne;
     if (held("Digit2")) pad->buttons |= kTwo;

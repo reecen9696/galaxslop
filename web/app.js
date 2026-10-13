@@ -785,6 +785,28 @@ function setupSettings() {
     fs.textContent = document.fullscreenElement ? "Leave full screen" : "Full screen";
     document.getElementById("canvas").focus();
   });
+  // The controls legend, top left at low opacity (on unless turned off).
+  const showKeys = document.getElementById("showKeys");
+  showKeys.checked = store("smg.keys") !== "0";
+  const applyKeys = () => document.body.classList.toggle("show-keys", showKeys.checked);
+  showKeys.onchange = () => {
+    store("smg.keys", showKeys.checked ? "1" : "0");
+    applyKeys();
+  };
+  applyKeys();
+  // Esc brings the system cursor back over the game (the game hides it and
+  // draws its own pointer) so the gear can be reached; a click on the game
+  // hides it again, and that click is not passed to the game.
+  window.addEventListener("keydown", (e) => {
+    if (e.code === "Escape" && document.body.classList.contains("playing")) document.body.classList.add("free-cursor");
+  }, true);
+  window.addEventListener("mousedown", (e) => {
+    if (e.target.id !== "canvas" || !document.body.classList.contains("free-cursor")) return;
+    document.body.classList.remove("free-cursor");
+    panel.style.display = "none";
+    gear.setAttribute("aria-expanded", "false");
+    e.stopPropagation();
+  }, true);
   const perf = document.getElementById("perf"), perfbox = document.getElementById("perfbox");
   perf.checked = store("smg.perf") === "1";
   const showPerf = () => {

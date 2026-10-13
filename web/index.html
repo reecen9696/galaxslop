@@ -153,7 +153,13 @@
   .toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 6; max-width: calc(100vw - 32px);
     padding: 10px 18px; font-size: 15px; font-weight: 600; color: var(--ink); background: var(--face);
     border: 2px solid var(--wii-blue); border-radius: 14px; box-shadow: 0 0 12px var(--wii-glow), 0 4px 14px #000b; }
-  #perfbox { position: fixed; top: 12px; left: 12px; z-index: 3; font: 12px ui-monospace, monospace; color: #9fe39f; background: #000a; padding: 6px 8px; border-radius: 6px; display: none; white-space: pre; }
+  /* top left while playing: the controls legend (settings "Show controls") and the frame times */
+  #topleft { position: fixed; top: 12px; left: 12px; z-index: 3; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; pointer-events: none; }
+  #perfbox { font: 12px ui-monospace, monospace; color: #9fe39f; background: #000a; padding: 6px 8px; border-radius: 6px; display: none; white-space: pre; }
+  #keys { display: none; grid-template-columns: auto auto; gap: 2px 10px; font-size: 12px; color: #fff; background: #0008; padding: 6px 10px; border-radius: 8px; opacity: .45; }
+  body.playing.show-keys #keys { display: grid; }
+  #keys kbd { font: 600 11px ui-monospace, monospace; text-align: right; color: #cfe8ff; }
+  body.free-cursor canvas { cursor: default; }  /* Esc: the system pointer back, to reach settings */
 
   /* ---- first-visit loading screen: Luma over the bar, in space ---- */
   #luma, #loadingTitle { display: none; }
@@ -240,7 +246,21 @@
   <div id="status">loading…</div>
 </div>
 <div id="roombar"></div>
-<div id="perfbox"></div>
+<div id="topleft">
+  <div id="keys">
+    <kbd>W A S D</kbd><span>move</span>
+    <kbd>Space</kbd><span>jump (A)</span>
+    <kbd>Shift / click</kbd><span>spin</span>
+    <kbd>K / right click</kbd><span>B</span>
+    <kbd>Ctrl</kbd><span>crouch (Z)</span>
+    <kbd>C</kbd><span>camera (C)</span>
+    <kbd>Mouse</kbd><span>pointer</span>
+    <kbd>Arrows</kbd><span>D-pad</span>
+    <kbd>Enter</kbd><span>pause (+)</span>
+    <kbd>Esc</kbd><span>show cursor</span>
+  </div>
+  <div id="perfbox"></div>
+</div>
 <button id="gear" aria-label="Settings" title="Settings" aria-expanded="false">⚙</button>
 <div id="settings">
   <h2>Settings</h2>
@@ -252,6 +272,7 @@
   <div class="row"><button id="fullscreen" class="wii-btn">Full screen</button></div>
   <label for="scale">Render scale</label>
   <select id="scale"><option value="auto">Auto (up to 2x, lower when frames run late)</option><option value="1">1x (640×456)</option><option value="2">2x (1280×912)</option><option value="3">3x (1920×1368)</option><option value="4">4x (2560×1824)</option></select>
+  <label class="inline"><input id="showKeys" type="checkbox"> Show controls</label>
   <label class="inline"><input id="perf" type="checkbox"> Show frame times</label>
   <div class="row"><button id="exportSave" class="wii-btn">Export save</button><button id="importSave" class="wii-btn">Import save</button></div>
   <input id="importSaveInput" type="file" accept=".zip" style="display:none">
