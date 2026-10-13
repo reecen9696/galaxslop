@@ -62,10 +62,15 @@ u8   scenario
 | kind | meaning | galaxy | scenario | arg |
 |---|---|---|---|---|
 | 1 | StarGet | galaxy | scenario | star index |
-| 2 | StoryFlag | 0 | 0 | flag id |
-| 3 | GalaxyUnlock | galaxy | 0 | 0 |
-| 4 | DomeUnlock | 0 | 0 | dome id |
-| 5 | GrandStar | galaxy | 0 | 0 |
+| 2 | StoryFlag | 0 | 0 | index into GameEventFlagTable |
+| 3 | GalaxyUnlock | galaxy | 0 | 0 (unused) |
+| 4 | DomeUnlock | 0 | 0 | dome id (unused) |
+| 5 | GrandStar | galaxy | 0 | 0 (unused; still applied if received) |
+
+StoryFlag is sent only for stored flags (mSaveFlag bit 0 clear) of the
+types SpecialStar, EventFlag, StoryEvent and Galaxy. Computed flags such as
+grand stars, galaxy and dome unlocks follow from the shared stars and send
+nothing, so kinds 3-5 go unused (P3-03).
 
 Phase 4 adds 100+ for objects.
 
