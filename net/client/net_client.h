@@ -29,8 +29,12 @@ struct RemoteView {
 
 // Whether a relay is configured (SMG_RELAY).
 bool netEnabled();
-// Once per gameplay frame on the game thread: connects on first use (from a
-// helper thread), sends, receives, interpolates.
+// Once per frame on the game thread, in every scene (title and menus too,
+// so the room is joined and its code known before gameplay): connects on
+// first use (from a helper thread) and receives.  True while connected.
+bool netPump();
+// Once per gameplay frame on the game thread: netPump, then sends the local
+// player and interpolates the others.
 void netTick(const NetPlayerCapture* local);
 // Slot i (0..kMaxRemotes-1) as of the last netTick.
 const RemoteView& netRemote(int slot);
@@ -40,3 +44,5 @@ const char* netRoomCode();
 uint8_t netLocalId();
 
 }  // namespace net
+
+extern "C" void port_net_pump(void);  // net::netPump, for GameSystem::frameLoop

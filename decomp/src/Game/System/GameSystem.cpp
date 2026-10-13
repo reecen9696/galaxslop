@@ -1,4 +1,7 @@
 #include "Game/System/GameSystem.hpp"
+#ifdef TARGET_PC
+extern "C" void port_net_pump(void);  // net/client/net_client.cpp
+#endif
 #include "Game/LiveActor/Nerve.hpp"
 #include "Game/NameObj/NameObjRegister.hpp"
 #include "Game/Screen/HomeButtonLayout.hpp"
@@ -201,6 +204,7 @@ bool GameSystem::isPreparedReset() const {
 void GameSystem::frameLoop() {
 #ifdef TARGET_PC
     port_perf_frame_begin();
+    port_net_pump();  // co-op: join the room from the title on (net/client)
     if (port_skip_fast_forwarding()) {
         // A cutscene being skipped: nothing is drawn (the headset view is
         // dimmed), and the game logic runs as often as fits in a frame.  The

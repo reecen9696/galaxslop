@@ -285,8 +285,8 @@ const char* netRoomCode() { return session().room.c_str(); }
 
 uint8_t netLocalId() { return session().you; }
 
-void netTick(const NetPlayerCapture* local) {
-    if (!netEnabled()) return;
+bool netPump() {
+    if (!netEnabled()) return false;
     PortHostAllocScope host;  // the session's containers are not the game's to pay for
     Session& s = session();
 
@@ -324,7 +324,7 @@ void netTick(const NetPlayerCapture* local) {
         });
         s.connector.detach();
     }
-    if (s.state.load() != 2) return;
+    if (s.state.load() != 2) return false;
     if (!s.transport->isOpen()) {
         // Dropped (relay restart, network): forget the room and join again.
         port_log("net: connection lost; reconnecting");
@@ -333,11 +333,18 @@ void netTick(const NetPlayerCapture* local) {
         for (RemoteView& v : s.views) v = RemoteView();
         s.you = 0;
         s.state = 0;
-        return;
+        return false;
     }
 
     std::vector<uint8_t> m;
     while (s.transport->poll(m)) handle(s, m);
+    return true;
+}
+
+void netTick(const NetPlayerCapture* local) {
+    if (!netPump()) return;
+    PortHostAllocScope host;
+    Session& s = session();
 
     int64_t now = port_host_time_ns();
     if (local != nullptr && s.you != 0 && (s.frames++ & 1) == 0) {  // every second frame: 30 Hz
@@ -381,3 +388,5 @@ void netTick(const NetPlayerCapture* local) {
 }
 
 }  // namespace net
+
+extern "C" void port_net_pump(void) { net::netPump(); }
