@@ -1032,12 +1032,10 @@ setupSettings();
   boot(["--game", "/opfs/smg/game"], wantsLobby ? await showLobby() : {});
 })();
 
-// Settings, Cutscenes: adds the movies to the game already in this browser,
-// from the server when it has them, else from the disc folder; or removes
-// them.
+// Settings, Cutscenes: downloads the movies from the server into the game
+// already in this browser, or removes them.
 function setupMovies() {
   const note = document.getElementById("moviesNote"), btn = document.getElementById("moviesBtn");
-  const input = document.getElementById("moviesInput");
   const mb = (n) => (n / 2 ** 20).toFixed(0);
   const gb = (n) => (n / 2 ** 30).toFixed(1);
   let busy = false, serverMovies = null, base = null;
@@ -1080,15 +1078,12 @@ function setupMovies() {
       return;
     }
     const server = await serverMovieList();
-    if (server.length) {
-      note.textContent = "The prologue and ending movies, added to the game you already have.";
-      btn.textContent = `Download cutscenes (${gb(server.reduce((n, e) => n + e.size, 0))} GB)`;
-      btn.onclick = () => run(fromServer);
-    } else {
-      note.textContent = "The prologue and ending movies. Pick the folder Dolphin extracted your disc to (or a converted one); only its MovieData is read.";
-      btn.textContent = "Add cutscenes from your disc folder…";
-      btn.onclick = pickFolder;
-    }
+    btn.textContent = server.length ? `Download cutscenes (${gb(server.reduce((n, e) => n + e.size, 0))} GB)` : "Download cutscenes";
+    btn.onclick = () => run(fromServer);
+    btn.disabled = !server.length;
+    note.textContent = server.length
+      ? "The prologue and ending movies, added to the game you already have."
+      : "This server has no cutscenes to download.";
   }
 
   async function run(work) {
@@ -1156,40 +1151,6 @@ function setupMovies() {
       done += e.size;
     }
     return list;
-  }
-
-  function pickFolder() {
-    if (window.showDirectoryPicker) {
-      showDirectoryPicker({ id: "smg-game" }).then((dir) => run(() => fromFolder(dir)), () => {});
-    } else {
-      input.click();
-    }
-  }
-  input.onchange = () => input.files.length && run(() => fromFolder([...input.files]));
-
-  // An extracted disc's movies are big-endian and get cookThp(); a
-  // converted folder's are copied as they are.  One at a time: each is read
-  // whole (up to 400 MB).
-  async function fromFolder(source) {
-    note.textContent = "Reading the folder…";
-    const movies = (await listPicked(source)).filter((f) => /(^|\/)files\/MovieData\/[^/]+\.thp$/i.test(f.path));
-    if (!movies.length) throw new Error("no files/MovieData/*.thp in that folder");
-    const game = await gameDir(false);
-    const added = [];
-    for (const [i, f] of movies.entries()) {
-      const name = f.path.split("/").pop();
-      note.textContent = `Adding ${name} (${i + 1} / ${movies.length})…`;
-      const bytes = new Uint8Array(await f.file.arrayBuffer());
-      const v = new DataView(bytes.buffer);
-      if (bytes.byteLength >= 8 && v.getUint32(4, false) === 0x00011000) cookThp(bytes, name);
-      else if (!(bytes.byteLength >= 8 && v.getUint32(4, true) === 0x00011000)) throw new Error(`${name}: not a THP movie`);
-      const w = await (await movieFile(game, name, true)).createWritable();
-      await w.write(bytes);
-      await w.close();
-      const sha1 = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-1", bytes)), (b) => b.toString(16).padStart(2, "0")).join("");
-      added.push({ path: "files/MovieData/" + name, size: bytes.byteLength, sha1 });
-    }
-    return added;
   }
 
   async function remove() {
