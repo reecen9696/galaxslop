@@ -33,16 +33,5 @@ Every push to `main` builds the wasm, bundles the page and pushes
 `.github/workflows/docker.yml`).
 
 With HTTPS (what players need): `deploy/compose.yml` runs the image behind
-Caddy, which gets the certificate itself. On a machine with Docker and ports
-80 and 443 reachable from the internet:
-
-```
-curl -O https://raw.githubusercontent.com/reecen9696/galaxslop/main/deploy/compose.yml
-DOMAIN=smg.example.com docker compose up -d     # a domain pointing at it
-DOMAIN=203-0-113-7.sslip.io docker compose up -d # or no domain: the public IP
-```
-
-Players open `https://<DOMAIN>/`. Update to the latest build with
-`docker compose pull && DOMAIN=... docker compose up -d`. `/healthz` answers
-`ok`. Without the compose file, `docker run -p 8787:8787
+Caddy; setup and updates are in `deploy/README.md`. Without the compose file, `docker run -p 8787:8787
 ghcr.io/reecen9696/galaxslop:latest` serves plain HTTP for localhost only.
