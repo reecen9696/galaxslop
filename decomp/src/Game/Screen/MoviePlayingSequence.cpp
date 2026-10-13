@@ -297,8 +297,8 @@ void MoviePlayingSequence::exePlayWait() {
 namespace {
     // A game folder cooked without --with-movies still lists the movies in
     // its fst.bin, but the files are absent (size 0).  The player would wait
-    // in its Open state forever, leaving the screen black.  SMG_MOVIES=0 (the
-    // page's Cutscenes setting, off) skips them even when they are there.
+    // in its Open state forever, leaving the screen black.  SMG_MOVIES=0 skips
+    // them even when they are there.
     bool isMovieAvailable(const char* pName) {
         const char* setting = getenv("SMG_MOVIES");
         if (setting && strcmp(setting, "0") == 0) {

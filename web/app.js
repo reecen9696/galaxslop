@@ -41,19 +41,26 @@ async function importedManifestText() {
   }
 }
 
-// The Cutscenes setting: the prologue and ending movies are 2.2 GB, so they
-// are left out of the copy in this browser (and skipped by the game) unless
-// it is on.
-function moviesWanted() {
-  return store("smg.movies") === "1";
+// Cutscenes: the prologue and ending movies are 2.2 GB, so the first load
+// leaves them out (the game skips a movie it doesn't have) and Settings adds
+// them to the copy in this browser later (setupMovies).
+const isMovie = (e) => e.path.startsWith("files/MovieData/");
+const byPathOrder = (a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0); // manifest.py's sorted()
+
+function withoutMovies(manifestText) {
+  return manifestJson(JSON.parse(manifestText).files.filter((e) => !isMovie(e)));
 }
 
-// A cooked folder's manifest text as this browser should copy it: without
-// the movies when the setting is off.
-function wantedManifest(text) {
-  if (moviesWanted()) return text;
-  const files = JSON.parse(text).files.filter((e) => !e.path.startsWith("files/MovieData/"));
-  return manifestJson(files);
+// The server's manifest text as this browser should copy it: no movies,
+// unless they were added here; then the server's (or, if it has none, the
+// ones added from a folder) stay.
+async function wantedManifest(serverText) {
+  const all = JSON.parse(serverText).files;
+  const local = await importedManifest();
+  const localMovies = local ? local.files.filter(isMovie) : [];
+  if (!localMovies.length) return withoutMovies(serverText);
+  const serverMovies = all.filter(isMovie);
+  return manifestJson([...all.filter((e) => !isMovie(e)), ...(serverMovies.length ? serverMovies : localMovies)].sort(byPathOrder));
 }
 
 // Pre-loaded game (GAME_DIR on the server, SMG_GAME on the dev server): the
@@ -198,7 +205,7 @@ async function importFolder(source) {
     say("That folder is neither an extracted disc (sys/, files/) nor a converted one (manifest.json).");
     return false;
   }
-  const manifestText = wantedManifest(await manifestEntry.file.text());
+  const manifestText = withoutMovies(await manifestEntry.file.text());
   const manifest = JSON.parse(manifestText);
   const byPath = new Map(files.map((f) => [f.path, f.file]));
   const missing = manifest.files.filter((e) => !byPath.has(e.path) || byPath.get(e.path).size !== e.size);
@@ -271,7 +278,7 @@ async function cookFolder(files) {
     const r = await cookDisc(files, game, (fraction, text) => {
       progress.value = fraction;
       say(text);
-    }, { movies: moviesWanted() });
+    });
     console.log(`web: converted the disc: ${r.files} files in ${r.seconds.toFixed(0)} s`);
     return true;
   } catch (e) {
@@ -297,12 +304,6 @@ function showImport(serverError) {
     document.getElementById("retryServer").onclick = () => location.replace(location.href.replace(/[?&]reimport=1/, ""));
   }
   const input = document.getElementById("pickInput");
-  const movies = document.getElementById("importMovies");
-  movies.checked = moviesWanted();
-  movies.onchange = () => {
-    store("smg.movies", movies.checked ? "1" : "0");
-    syncMovieSetting();
-  };
   // The chosen folder is copied or converted under the loading screen; on a
   // problem the import screen comes back with the message.
   async function load(source) {
@@ -731,7 +732,7 @@ function drawTags() {
 
 function boot(args, env = {}) {
   // read by browser_env.js in preRun
-  window.smgEnv = { SMG_SCALE: store("smg.scale") || "auto", SMG_MOVIES: moviesWanted() ? "1" : "0", ...env };
+  window.smgEnv = { SMG_SCALE: store("smg.scale") || "auto", ...env };
   importPanel.style.display = "none";
   stopMenuMusic();
   document.body.classList.add("playing");
@@ -941,12 +942,7 @@ function setupSettings() {
     gear.setAttribute("aria-expanded", "false");
     e.stopPropagation();
   }, true);
-  const movies = document.getElementById("movies");
-  movies.checked = moviesWanted();
-  movies.onchange = () => {
-    store("smg.movies", movies.checked ? "1" : "0");
-    syncMovieSetting();
-  };
+  setupMovies();
   const perf = document.getElementById("perf"), perfbox = document.getElementById("perfbox");
   perf.checked = store("smg.perf") === "1";
   const showPerf = () => {
@@ -1012,7 +1008,7 @@ setupSettings();
       const r = await fetch(config.game + "manifest.json", { cache: "no-cache" });
       if (r.ok) serverManifest = await r.text();
     } catch {}
-    if (serverManifest) serverManifest = wantedManifest(serverManifest);
+    if (serverManifest) serverManifest = await wantedManifest(serverManifest);
     if (serverManifest && serverManifest !== (await importedManifestText())) {
       try {
         await importFromServer(config.game, serverManifest);
@@ -1036,7 +1032,181 @@ setupSettings();
   boot(["--game", "/opfs/smg/game"], wantsLobby ? await showLobby() : {});
 })();
 
-// The two Cutscenes checkboxes (import screen, settings) show one setting.
-function syncMovieSetting() {
-  for (const id of ["movies", "importMovies"]) document.getElementById(id).checked = moviesWanted();
+// Settings, Cutscenes: adds the movies to the game already in this browser,
+// from the server when it has them, else from the disc folder; or removes
+// them.
+function setupMovies() {
+  const note = document.getElementById("moviesNote"), btn = document.getElementById("moviesBtn");
+  const input = document.getElementById("moviesInput");
+  const mb = (n) => (n / 2 ** 20).toFixed(0);
+  const gb = (n) => (n / 2 ** 30).toFixed(1);
+  let busy = false, serverMovies = null, base = null;
+
+  async function serverMovieList() {
+    if (serverMovies) return serverMovies;
+    try {
+      const config = await fetch("config.json").then((r) => (r.ok ? r.json() : null));
+      if (!config?.game) return [];
+      const m = await fetch(config.game + "manifest.json", { cache: "no-cache" }).then((r) => r.json());
+      base = config.game;
+      serverMovies = m.files.filter(isMovie);
+    } catch {
+      return [];
+    }
+    return serverMovies;
+  }
+
+  async function refresh() {
+    if (busy) return;
+    btn.hidden = false;
+    btn.disabled = false;
+    delete btn.dataset.armed;
+    if (params.get("source") === "server") {
+      note.textContent = "This page reads the game straight from the server's folder: the cutscenes play if it has them.";
+      btn.hidden = true;
+      return;
+    }
+    const local = await importedManifest();
+    if (!local) {
+      note.textContent = "Load the game first, then add the cutscenes here.";
+      btn.hidden = true;
+      return;
+    }
+    const have = local.files.filter(isMovie);
+    if (have.length) {
+      note.textContent = `Downloaded (${gb(have.reduce((n, e) => n + e.size, 0))} GB).`;
+      btn.textContent = "Remove cutscenes";
+      btn.onclick = remove;
+      return;
+    }
+    const server = await serverMovieList();
+    if (server.length) {
+      note.textContent = "The prologue and ending movies, added to the game you already have.";
+      btn.textContent = `Download cutscenes (${gb(server.reduce((n, e) => n + e.size, 0))} GB)`;
+      btn.onclick = () => run(fromServer);
+    } else {
+      note.textContent = "The prologue and ending movies. Pick the folder Dolphin extracted your disc to (or a converted one); only its MovieData is read.";
+      btn.textContent = "Add cutscenes from your disc folder…";
+      btn.onclick = pickFolder;
+    }
+  }
+
+  async function run(work) {
+    busy = true;
+    btn.disabled = true;
+    try {
+      const added = await work();
+      const game = await gameDir(false);
+      const local = await importedManifest();
+      const files = [...local.files.filter((e) => !isMovie(e)), ...added].sort(byPathOrder);
+      const w = await (await game.getFileHandle("manifest.json")).createWritable();
+      await w.write(manifestJson(files));
+      await w.close();
+      console.log(`web: added ${added.length} cutscenes`);
+      busy = false;
+      await refresh();
+      note.textContent = "Cutscenes added. They play from the next time the game loads.";
+    } catch (e) {
+      console.log("web: adding the cutscenes failed: " + e.message);
+      busy = false;
+      await refresh();
+      note.textContent = `That failed (${e.message}). Try again to carry on.`;
+    }
+  }
+
+  async function movieFile(game, name, create) {
+    const files = await game.getDirectoryHandle("files", { create });
+    const dir = await files.getDirectoryHandle("MovieData", { create });
+    return dir.getFileHandle(name, { create });
+  }
+
+  // Each movie streams straight into OPFS; one already complete (a download
+  // cut short earlier) is kept.
+  async function fromServer() {
+    const game = await gameDir(false);
+    const list = await serverMovieList();
+    const total = list.reduce((n, e) => n + e.size, 0);
+    let done = 0;
+    for (const e of list) {
+      const name = e.path.split("/").pop();
+      const have = await movieFile(game, name, false).then((h) => h.getFile()).then((f) => f.size).catch(() => -1);
+      if (have !== e.size) {
+        for (let attempt = 1; ; attempt++) {
+          try {
+            const r = await fetch(base + e.path.split("/").map(encodeURIComponent).join("/"));
+            if (!r.ok) throw new Error(`${name}: HTTP ${r.status}`);
+            const handle = await movieFile(game, name, true);
+            let got = 0;
+            const count = new TransformStream({
+              transform(chunk, c) {
+                got += chunk.byteLength;
+                note.textContent = `Downloading ${mb(done + got)} / ${mb(total)} MB…`;
+                c.enqueue(chunk);
+              },
+            });
+            await r.body.pipeThrough(count).pipeTo(await handle.createWritable());
+            if (got !== e.size) throw new Error(`${name}: ${got} bytes, manifest says ${e.size}`);
+            break;
+          } catch (err) {
+            if (attempt === 3) throw err;
+            await new Promise((r) => setTimeout(r, 2000 * attempt));
+          }
+        }
+      }
+      done += e.size;
+    }
+    return list;
+  }
+
+  function pickFolder() {
+    if (window.showDirectoryPicker) {
+      showDirectoryPicker({ id: "smg-game" }).then((dir) => run(() => fromFolder(dir)), () => {});
+    } else {
+      input.click();
+    }
+  }
+  input.onchange = () => input.files.length && run(() => fromFolder([...input.files]));
+
+  // An extracted disc's movies are big-endian and get cookThp(); a
+  // converted folder's are copied as they are.  One at a time: each is read
+  // whole (up to 400 MB).
+  async function fromFolder(source) {
+    note.textContent = "Reading the folder…";
+    const movies = (await listPicked(source)).filter((f) => /(^|\/)files\/MovieData\/[^/]+\.thp$/i.test(f.path));
+    if (!movies.length) throw new Error("no files/MovieData/*.thp in that folder");
+    const game = await gameDir(false);
+    const added = [];
+    for (const [i, f] of movies.entries()) {
+      const name = f.path.split("/").pop();
+      note.textContent = `Adding ${name} (${i + 1} / ${movies.length})…`;
+      const bytes = new Uint8Array(await f.file.arrayBuffer());
+      const v = new DataView(bytes.buffer);
+      if (bytes.byteLength >= 8 && v.getUint32(4, false) === 0x00011000) cookThp(bytes, name);
+      else if (!(bytes.byteLength >= 8 && v.getUint32(4, true) === 0x00011000)) throw new Error(`${name}: not a THP movie`);
+      const w = await (await movieFile(game, name, true)).createWritable();
+      await w.write(bytes);
+      await w.close();
+      const sha1 = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-1", bytes)), (b) => b.toString(16).padStart(2, "0")).join("");
+      added.push({ path: "files/MovieData/" + name, size: bytes.byteLength, sha1 });
+    }
+    return added;
+  }
+
+  async function remove() {
+    if (btn.dataset.armed !== "1") {
+      btn.dataset.armed = "1";
+      btn.textContent = "Click again to remove the cutscenes";
+      return;
+    }
+    const game = await gameDir(false);
+    const local = await importedManifest();
+    const w = await (await game.getFileHandle("manifest.json")).createWritable();
+    await w.write(manifestJson(local.files.filter((e) => !isMovie(e))));
+    await w.close();
+    await (await game.getDirectoryHandle("files")).removeEntry("MovieData", { recursive: true }).catch(() => {});
+    await refresh();
+  }
+
+  document.getElementById("gear").addEventListener("click", refresh);
+  refresh();
 }

@@ -8,6 +8,7 @@
 //        [--import ~/smg/game] [--profile dir] [--eval "js expression"]
 //        [--log full-log.txt] [--stacks 0] [--at "2000:document.getElementById('solo').click()"]
 //        [--mobile] [--touch "5000:start:0:120:300,5100:move:0:160:300,5600:end:0"]
+//        [--files "9000:#moviesInput:/path/to/folder"]
 //
 // The lobby is skipped (?solo=1) unless --params mentions SMG_RELAY or lobby.
 //
@@ -193,6 +194,11 @@ async function oneRun(n) {
   const shotSizes = [];
   // --at "1500:js expression;9000:js expression" runs page script at times.
   const ats = (args.at ?? "").split(";").filter(Boolean).map((e) => ({ t: Number(e.slice(0, e.indexOf(":"))), js: e.slice(e.indexOf(":") + 1) }));
+  // --files "ms:selector:path,...": hands a file or folder to an <input type=file> at that time.
+  const picks = (args.files ?? "").split(",").filter(Boolean).map((e) => {
+    const [t, selector, ...path] = e.split(":");
+    return { t: Number(t), selector, path: path.join(":") };
+  });
   const keys = (args.keys ?? "").split(",").filter(Boolean).map((k) => {
     const [t, name] = k.split(":");
     return { t: Number(t), up: name.startsWith("-"), code: name.replace(/^-/, "") };
@@ -258,6 +264,17 @@ async function oneRun(n) {
         if (result.subtype === "error") console.log("at: " + result.description);
       } catch (e) {
         console.log("at: " + e.message);
+      }
+    }
+    while (picks.length && picks[0].t <= now) {
+      const p = picks.shift();
+      try {
+        await c.send("DOM.enable", {}, sessionId);
+        const { root } = await c.send("DOM.getDocument", {}, sessionId);
+        const { nodeId } = await c.send("DOM.querySelector", { nodeId: root.nodeId, selector: p.selector }, sessionId);
+        await c.send("DOM.setFileInputFiles", { nodeId, files: [p.path] }, sessionId);
+      } catch (e) {
+        console.log("files: " + e.message);
       }
     }
     while (keys.length && keys[0].t <= now) {

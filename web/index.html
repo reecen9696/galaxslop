@@ -141,7 +141,8 @@
   .field-err { color: #c0392b; font-weight: 600; min-height: 1.3em; margin-top: .3em; }
   #roombar .follow { font-size: 12px; padding: 1px 10px; min-height: 0; margin-left: 4px; border-width: 2px; border-radius: 10px; }
   #settings { position: fixed; top: 64px; right: 12px; z-index: 5; width: min(340px, calc(100vw - 24px)); display: none;
-    padding: 0 16px 16px; background: var(--stripes); border: 2px solid #f4f5f7; border-radius: 16px; box-shadow: 0 6px 24px #000c; }
+    padding: 0 16px 16px; background: var(--stripes); border: 2px solid #f4f5f7; border-radius: 16px; box-shadow: 0 6px 24px #000c;
+    max-height: calc(100vh - 76px); overflow-y: auto; }
   #settings h2 { margin: 0 -16px 8px; padding: 8px 16px; font-size: 18px; font-weight: 600; color: var(--ink);
     background: linear-gradient(#ffffff, #e9ebef); border-radius: 13px 13px 0 0; }
   #settings label { display: block; color: var(--dim); font-size: 13px; margin-top: 10px; }
@@ -150,6 +151,8 @@
   #settings input[type=checkbox] { accent-color: var(--wii-blue); }
   #settings select { width: 100%; padding: 6px; border-radius: 10px; color: var(--ink); background: var(--face); border: 2px solid var(--wii-blue); font-size: 14px; }
   #settings .row { display: flex; gap: 8px; margin-top: 10px; }
+  #settings .note { margin: 4px 0 0; color: var(--fg); font-size: 12px; line-height: 1.35; }
+  #settings .row .wii-btn[hidden] { display: none; }
   #settings .row .wii-btn { flex: 1; font-size: 13px; padding: 6px 8px; min-height: 0; border-width: 2px; }
   .toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 6; max-width: calc(100vw - 32px);
     padding: 10px 18px; font-size: 15px; font-weight: 600; color: var(--ink); background: var(--face);
@@ -253,7 +256,7 @@
           <li>Pick the extracted folder. The page converts it for the port (a few minutes, once).
             A folder already converted with <code>tools/cook/cook.py</code> works too.</li>
         </ol>
-        <label class="wii-check"><input id="importMovies" type="checkbox"> Include the cutscenes (2.2 GB more)</label>
+        <p class="hint">The cutscenes (2.2 GB) are left out to keep this quick. Add them later from Settings (⚙).</p>
         <div class="btn-row"><button id="pick" class="wii-btn primary">Choose folder…</button></div>
         <input id="pickInput" type="file" webkitdirectory hidden>
       </div></main>
@@ -322,7 +325,10 @@
   <label class="inline"><input id="showKeys" type="checkbox"> Show controls</label>
   <label class="inline"><input id="touchCtl" type="checkbox"> Touch controls</label>
   <label class="inline"><input id="perf" type="checkbox"> Show frame times</label>
-  <label class="inline" title="The prologue and ending movies: 2.2 GB more, copied the next time the game loads. A disc loaded from a folder needs loading again."><input id="movies" type="checkbox"> Cutscenes (2.2 GB, from the next load)</label>
+  <label>Cutscenes</label>
+  <p id="moviesNote" class="note"></p>
+  <div class="row"><button id="moviesBtn" class="wii-btn">Download cutscenes</button></div>
+  <input id="moviesInput" type="file" webkitdirectory hidden>
   <div class="row"><button id="exportSave" class="wii-btn">Export save</button><button id="importSave" class="wii-btn">Import save</button></div>
   <input id="importSaveInput" type="file" accept=".zip" style="display:none">
   <div class="row"><button id="reimport" class="wii-btn">Load the disc again</button></div>
