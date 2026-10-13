@@ -109,6 +109,10 @@
   .swatch span { display: block; width: 2.1em; height: 2.1em; border-radius: 50%; border: .16em solid #c9ccd3;
     box-shadow: 0 .1em .3em #0008, inset 0 -.25em .4em #0003; transition: box-shadow .12s, border-color .12s, transform .08s;
     background: conic-gradient(#e3342f, #ffd23f, #3cb043, #2ec4e6, #9b59d0, #ff85c0, #e3342f); }
+  /* Auto (random by join order) has no colour of its own: a ? on a white button. */
+  .swatch span:not([style]) { background: var(--face); display: grid; place-items: center; }
+  .swatch span:not([style])::after { content: "?"; color: #6d717b; font-weight: 700; font-size: 1.25em; line-height: 1; }
+  .swatch input:checked + span:not([style])::after { color: var(--wii-blue-deep); }
   .swatch:hover span, .swatch input:focus-visible + span { border-color: var(--wii-blue); box-shadow: 0 0 .7em var(--wii-blue); }
   .swatch input:checked + span { border-color: #fff; box-shadow: 0 0 0 .18em var(--wii-blue), 0 0 1em var(--wii-blue); transform: scale(1.08); }
   #serverBox { display: none; }
