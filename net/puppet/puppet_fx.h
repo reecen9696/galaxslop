@@ -18,7 +18,8 @@
 //
 // PlayerEffect 0x15 (docs/NETCODE.md), sent once per frame with anything
 // queued: u8 type, u8 sender id, u8 count, then per effect u8 op (1 play,
-// 2 stop, 3 force stop), u16 index, u8 mask (1 translation, 2 rotation,
+// 2 stop, 3 force stop), u16 index, u16 name hash of the emitter as played
+// (picks the same emitter on the puppet: puppet_fx.cpp findEmitter), u8 mask (1 translation, 2 rotation,
 // 4 scale, 8 follow off), u8 name length, the name (Shift-JIS), then
 // f32 t[3], f32 r[3] (degrees), f32 scale for the bits set.
 #pragma once
@@ -49,5 +50,6 @@ void fxStopAll(LiveActor* pPuppet);
 extern "C" {
 // Decomp hooks (TARGET_PC).
 void port_net_fx_note(LiveActor* pActor, const char* pName, int op);
+void port_net_fx_emitter(LiveActor* pActor, const void* pEmitter, int op);
 void port_net_fx_transform(LiveActor* pActor, const void* pEmitter, const float* pTrans, const float* pRotDeg, float scale, int followOff);
 }

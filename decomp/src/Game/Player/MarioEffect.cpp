@@ -1188,6 +1188,9 @@ void MarioActor::stopCommonEffect(const char* pName) {
         SmokeEffectEntry* entry = &cSmokeTable[i];
         if (entry->mHash == hash) {
             if (entry->mEmitter != nullptr) {
+#ifdef TARGET_PC
+                port_net_fx_emitter(this, entry->mEmitter, 2);  // the others' copy stops too
+#endif
                 entry->mEmitter->deleteEmitter();
                 entry->mEmitter = nullptr;
             }

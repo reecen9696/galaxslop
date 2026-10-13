@@ -26,6 +26,7 @@ struct Fx {
     uint8_t op;
     uint8_t mask;
     uint16_t index;
+    uint16_t hash;  // the emitter's name hash as played (renamed, floor variant)
     float trans[3];
     float rot[3];
     float scale;
@@ -51,6 +52,32 @@ s32 emitterIndex(const EffectKeeper* pKeeper, const MultiEmitter* pEmitter) {
         }
     }
     return -1;
+}
+
+// The puppet's emitter for one the sender played.  The same emitter is the
+// one with the same name hash (as played: MarioActor's renames, the floor
+// variant of an attribute effect), first at the same index (MarioActor's
+// effect group, built in the same order), else anywhere (the effects
+// MarioActor adds after the group).  An emitter MarioActor renamed keeps its
+// original name on the puppet: then the index alone; the name is the last
+// resort.
+MultiEmitter* findEmitter(const EffectKeeper* pKeeper, const Fx& f) {
+    s32 count = pKeeper->_C.size();
+    if (f.index < count && pKeeper->getEmitter((s32)f.index)->isEqualName(f.hash)) {
+        return pKeeper->getEmitter((s32)f.index);
+    }
+    for (s32 i = 0; i < count; i++) {
+        if (pKeeper->getEmitter(i)->isEqualName(f.hash)) {
+            return pKeeper->getEmitter(i);
+        }
+    }
+    if (f.index < count) {
+        return pKeeper->getEmitter((s32)f.index);
+    }
+    if (f.name[0] != 0 && pKeeper->isRegisteredEmitter(f.name)) {
+        return pKeeper->getEmitter(f.name);
+    }
+    return nullptr;
 }
 
 void putF(std::vector<uint8_t>& b, const float* v, int n) {
@@ -83,6 +110,8 @@ void fxSend() {
             b.push_back(f.op);
             b.push_back((uint8_t)f.index);
             b.push_back((uint8_t)(f.index >> 8));
+            b.push_back((uint8_t)f.hash);
+            b.push_back((uint8_t)(f.hash >> 8));
             b.push_back(f.mask);
             uint8_t nameLen = (uint8_t)strlen(f.name);
             b.push_back(nameLen);
@@ -102,14 +131,15 @@ void fxOnMessage(const uint8_t* m, size_t len) {
     std::deque<Fx>& q = sIn[m[1]];
     size_t o = 3;
     for (uint8_t i = 0; i < m[2]; i++) {
-        if (o + 5 > len) return;
+        if (o + 7 > len) return;
         Fx f = {};
         f.atNs = port_host_time_ns();
         f.op = m[o];
         f.index = (uint16_t)(m[o + 1] | m[o + 2] << 8);
-        f.mask = m[o + 3];
-        size_t nameLen = m[o + 4];
-        o += 5;
+        f.hash = (uint16_t)(m[o + 3] | m[o + 4] << 8);
+        f.mask = m[o + 5];
+        size_t nameLen = m[o + 6];
+        o += 7;
         if (o + nameLen > len) return;
         if (nameLen < sizeof(f.name)) memcpy(f.name, m + o, nameLen);
         o += nameLen;
@@ -138,21 +168,14 @@ void fxApply(uint8_t remoteId, LiveActor* pPuppet, int64_t delayNs) {
         if (keeper == nullptr) {
             continue;  // not shown here
         }
-        // By name where the puppet has it (the effects MarioActor adds after
-        // its effect group: landing smoke rings, splashes...), else by index
-        // (the group, which MarioActor renamed in part).
-        MultiEmitter* e = nullptr;
-        if (f.name[0] != 0 && keeper->isRegisteredEmitter(f.name)) {
-            e = keeper->getEmitter(f.name);
-        } else if (f.index < keeper->_C.size()) {
-            e = keeper->getEmitter((s32)f.index);
-        }
+        MultiEmitter* e = findEmitter(keeper, f);
         if (e == nullptr) {
             continue;  // an effect the puppet does not have
         }
         static const bool sLog = getenv("PETARI_FXLOG") != nullptr;  // debug: what puppets play
         if (sLog) {
-            port_log("fx: player %u op %u emitter %u mask %x %s", remoteId, f.op, f.index, f.mask, f.name[0] && keeper->isRegisteredEmitter(f.name) ? "by name" : "by index");
+            s32 got = e != nullptr ? emitterIndex(keeper, e) : -1;
+            port_log("fx: player %u op %u emitter %u (%04x) -> %d%s", remoteId, f.op, f.index, f.hash, (int)got, got == (s32)f.index ? "" : " (moved)");
         }
         if (f.op == kOpPlay) {
             e->createEmitter();
@@ -179,26 +202,44 @@ void fxStopAll(LiveActor* pPuppet) {
 
 }  // namespace net
 
-extern "C" void port_net_fx_note(LiveActor* pActor, const char* pName, int op) {
-    if (!net::isLocalPlayer(pActor) || pActor->mEffectKeeper == nullptr || !pActor->mEffectKeeper->isRegisteredEmitter(pName)) {
-        return;
-    }
-    s32 index = net::emitterIndex(pActor->mEffectKeeper, pActor->mEffectKeeper->getEmitter(pName));
+namespace net {
+namespace {
+void note(LiveActor* pActor, const MultiEmitter* pEmitter, const char* pName, int op) {
+    s32 index = emitterIndex(pActor->mEffectKeeper, pEmitter);
     if (index < 0) {
         return;
     }
     PortHostAllocScope hostAlloc;
-    if (net::sOut.size() >= 256) {
+    if (sOut.size() >= 256) {
         return;
     }
-    net::Fx f = {};
+    Fx f = {};
     f.op = (uint8_t)op;
     f.index = (uint16_t)index;
-    if (strlen(pName) < sizeof(f.name)) {
+    f.hash = pEmitter->mHash;
+    if (pName != nullptr && strlen(pName) < sizeof(f.name)) {
         strcpy(f.name, pName);
     }
-    net::sOut.push_back(f);
-    net::sLastPlayed = op == net::kOpPlay ? pActor->mEffectKeeper->getEmitter(pName) : nullptr;
+    sOut.push_back(f);
+    sLastPlayed = op == kOpPlay ? pEmitter : nullptr;
+}
+}  // namespace
+}  // namespace net
+
+extern "C" void port_net_fx_note(LiveActor* pActor, const char* pName, int op) {
+    if (!net::isLocalPlayer(pActor) || pActor->mEffectKeeper == nullptr || !pActor->mEffectKeeper->isRegisteredEmitter(pName)) {
+        return;
+    }
+    net::note(pActor, pActor->mEffectKeeper->getEmitter(pName), pName, op);
+}
+
+// An emitter the game starts or stops directly rather than by name
+// (MarioActor::stopCommonEffect: the running dust and other loops).
+extern "C" void port_net_fx_emitter(LiveActor* pActor, const void* pEmitter, int op) {
+    if (!net::isLocalPlayer(pActor) || pActor->mEffectKeeper == nullptr || pEmitter == nullptr) {
+        return;
+    }
+    net::note(pActor, static_cast< const MultiEmitter* >(pEmitter), nullptr, op);
 }
 
 // MarioActor::playEffectTrans / RT / RTZ / SRT, after their playEffect: the
