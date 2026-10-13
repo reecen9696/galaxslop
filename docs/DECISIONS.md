@@ -307,3 +307,17 @@ instead of two kept in lockstep. The only native hot path was Yaz0, now in
 JS. Cost: a ~10 MB Pyodide download on first import (cached by the browser).
 Revisit: if the jsDelivr dependency matters for a deployed site, serve the
 same Pyodide files from our own origin; nothing else changes.
+
+## D-022 (2026-10-13, lane A, decided by the user): Co-op progress merges into the save file you play on. Settles P3-00
+What: in a room, power stars, grand stars and the shared story flags that
+any player gets are applied to the save file each player has loaded, and
+saved with it as usual. No separate co-op save. Progress only ever adds
+(a star is never removed by sync).
+Why: the user's choice (asked 2026-10-13; the alternatives were a separate
+co-op save, or no shared progress yet). One save keeps solo and co-op play
+continuous.
+Consequence: joining a room can permanently add progress to a solo file.
+The lobby says so before joining. Export a save first (settings) to keep
+a copy.
+Revisit: if players ask to keep solo files untouched, a per-room save slot
+is a small change in the launcher (save directory), not in the sync.

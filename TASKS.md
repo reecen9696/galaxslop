@@ -423,7 +423,7 @@ observatory state.
 
 ### P3-00 Co-op save policy
 - lane: shared
-- status: open
+- status: done
 - owner:
 - blocked_by: P2-08
 - touches: docs/DECISIONS.md, platform/src/nand (read only), decomp/src/Game/System (read only)
@@ -431,6 +431,7 @@ observatory state.
 - what: Turn D-012 from proposal into decision. Read how the save layer picks a NAND file and slot. Decide: per-room save namespace, one shared "co-op" save, or merge into the chosen slot with an explicit warning. Write the D entry with the file paths involved. No code.
 - done when: D-012 is superseded by a decision entry and P3-02 knows which file to hook.
 - log:
+  - 2026-10-13: decided by the user: progress merges into the save you play on (D-022).
 
 ### P3-01 Progress log on the server
 - lane: B
@@ -446,8 +447,8 @@ observatory state.
 
 ### P3-02 Star-get event capture and merge
 - lane: A
-- status: open
-- owner:
+- status: in_progress
+- owner: A
 - blocked_by: P2-08, P3-00, P3-01
 - touches: decomp/src/Game/System (save data hooks; name files in log), net/progress
 - flags:
