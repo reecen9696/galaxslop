@@ -1,3 +1,6 @@
+#ifdef TARGET_PC
+#include "net/world/world_sync.h"
+#endif
 #include "Game/Map/StageSwitch.hpp"
 #include "Game/Scene/SceneObjHolder.hpp"
 #include "Game/Util/JMapIdInfo.hpp"
@@ -189,6 +192,9 @@ void StageSwitchFunction::onSwitchBySwitchIdInfo(const SwitchIdInfo& rSwitchId) 
 
     if (!pZoneSwitch->get(switchNo)) {
         pZoneSwitch->set(switchNo, true);
+#ifdef TARGET_PC
+        port_world_switch_changed(rSwitchId.mIsGlobal ? 0xFFFF : rSwitchId.mIDInfo->mZoneID, switchNo, 1);  // co-op (net/world)
+#endif
     }
 }
 
@@ -200,6 +206,9 @@ void StageSwitchFunction::offSwitchBySwitchIdInfo(const SwitchIdInfo& rSwitchId)
 
     if (pZoneSwitch->get(switchNo)) {
         pZoneSwitch->set(switchNo, false);
+#ifdef TARGET_PC
+        port_world_switch_changed(rSwitchId.mIsGlobal ? 0xFFFF : rSwitchId.mIDInfo->mZoneID, switchNo, 0);
+#endif
     }
 }
 

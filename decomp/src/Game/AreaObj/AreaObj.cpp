@@ -1,3 +1,6 @@
+#ifdef TARGET_PC
+#include "net/world/world_sync.h"
+#endif
 #include "Game/AreaObj/AreaObj.hpp"
 #include "Game/AreaObj/AreaForm.hpp"
 #include "Game/AreaObj/AreaObjFollower.hpp"
@@ -66,10 +69,22 @@ bool AreaObj::isInVolume(const TVec3f& rPos) const {
 }
 
 void AreaObj::onSwitchA() {
+#ifdef TARGET_PC
+    port_world_local_switch(1);  // co-op: driven by where the local player is, not shared
+    mSwitchCtrl->onSwitchA();
+    port_world_local_switch(0);
+    return;
+#endif
     mSwitchCtrl->onSwitchA();
 }
 
 void AreaObj::offSwitchA() {
+#ifdef TARGET_PC
+    port_world_local_switch(1);
+    mSwitchCtrl->offSwitchA();
+    port_world_local_switch(0);
+    return;
+#endif
     mSwitchCtrl->offSwitchA();
 }
 

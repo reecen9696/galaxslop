@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -17,7 +18,13 @@
 #include "Game/NameObj/NameObj.hpp"
 #include "Game/Util/ActorSensorUtil.hpp"
 #include "Game/Util/EffectUtil.hpp"
+#include "Game/Map/StageSwitch.hpp"
+#include "Game/NPC/EventDirector.hpp"
+#include "Game/Scene/SceneObjHolder.hpp"
+#include "Game/Util/DemoUtil.hpp"
 #include "Game/Util/LiveActorUtil.hpp"
+#include "Game/Util/PlayerUtil.hpp"
+#include "Game/Util/SceneUtil.hpp"
 #include "Game/Util/ObjUtil.hpp"
 #include "Game/Util/SoundUtil.hpp"
 #include "net/capture/player_capture.h"
@@ -84,6 +91,21 @@ struct World {
     const void* pendingHost = nullptr;  // to declare once placement starts
     std::unordered_set<void*> shootSignals;  // shooting stars told to fire
     bool ambientDrop = false;
+    // Switches.
+    int localSwitch = 0;     // inside a player-driven switch (areas)
+    bool applyingSwitch = false;
+    uint32_t frame = 0;
+    std::unordered_map<uint32_t, std::pair<uint32_t, int>> switchRate;  // key -> (window start, changes)
+    std::unordered_set<uint32_t> noisySwitches;                         // flip too often: kept local
+    // Event stars and grabbing stars.
+    std::unordered_map<uint32_t, std::string> starNames;  // name hash -> declared name
+    std::unordered_set<uint32_t> appearedStars;           // name hash ^ id, appeared here
+    bool applyingStar = false;
+    std::vector<std::pair<void*, int>> powerStars;  // PowerStar, star id
+    bool hasPendingGrab = false;
+    int pendingGrab = 0;  // star id the others grabbed (-1: the scenario's star)
+    uint32_t pendingGrabUntil = 0;
+    bool grabbedHere = false;
 };
 
 World& world() {
@@ -168,13 +190,23 @@ bool currentStage(uint32_t* pStage, uint8_t* pScenario) {
 // (stable ids) are worth repeating to an arrival.
 void remember(const Event& e) {
     World& w = world();
-    if (e.id == 0 || (e.kind != kWorldEnemyDefeated && e.kind != kWorldItemCollected)) {
+    bool byId = e.kind == kWorldEnemyDefeated || e.kind == kWorldItemCollected;
+    if ((byId && e.id == 0) || (!byId && e.kind != kWorldSwitch && e.kind != kWorldEventStar)) {
         return;
     }
     if (e.stage != w.historyStage || e.scenario != w.historyScenario) {
         w.history.clear();
         w.historyStage = e.stage;
         w.historyScenario = e.scenario;
+    }
+    if (e.kind == kWorldSwitch) {
+        // A switch's latest state only.
+        for (size_t i = 0; i < w.history.size(); i++) {
+            if (w.history[i].kind == kWorldSwitch && w.history[i].id == e.id) {
+                w.history.erase(w.history.begin() + (long)i);
+                break;
+            }
+        }
     }
     w.history.push_back(e);
 }
@@ -350,6 +382,14 @@ extern "C" void port_world_scene_reset(void) {
     w.pendingHost = nullptr;
     w.shootSignals.clear();
     w.ambientDrop = false;
+    w.localSwitch = 0;
+    w.switchRate.clear();
+    w.noisySwitches.clear();
+    w.starNames.clear();
+    w.appearedStars.clear();
+    w.powerStars.clear();
+    w.hasPendingGrab = false;
+    w.grabbedHere = false;
 }
 
 namespace {
@@ -489,6 +529,195 @@ extern "C" void port_world_actor_dead(void* actorPtr) {
     if (logging()) port_log("world: defeated %s (%s %08x), told the room", actor->mName, placed ? "id" : "spawned", e.id);
 }
 
+// ---- Switches ----
+
+namespace {
+void applySwitch(const Event& e) {
+    if (!MR::isExistSceneObj(SceneObj_StageSwitchContainer)) {
+        return;
+    }
+    StageSwitchContainer* c = MR::getSceneObj< StageSwitchContainer >(SceneObj_StageSwitchContainer);
+    int zone = (int)(e.id >> 16), no = (int)(e.id & 0xFFFF);
+    ZoneSwitch* z = zone == 0xFFFF ? c->getGlobalSwitches() : c->getZoneSwitches(zone);
+    bool on = e.a != 0.0f;
+    if (z == nullptr || no >= 128 || z->get(no) == on) {
+        return;
+    }
+    if (logging()) port_log("world: switch %d/%d %s by another player", zone, no, on ? "on" : "off");
+    z->set(no, on);  // watchers (doors, bridges, appearing objects) react next frame
+}
+
+// The event star of `name` and `id` appeared here (or is about to).
+uint32_t starKey(uint32_t nameHash, int32_t id) { return nameHash ^ ((uint32_t)id * 0x9E3779B9u); }
+}  // namespace
+
+extern "C" void port_world_local_switch(int enter) { world().localSwitch += enter ? 1 : -1; }
+
+extern "C" void port_world_switch_changed(int zone, int switchNo, int on) {
+    World& w = world();
+    if (!enabled() || !w.live || w.applyingSwitch || w.localSwitch > 0) {
+        return;
+    }
+    Event e{};
+    if (!currentStage(&e.stage, &e.scenario)) {
+        return;
+    }
+    e.kind = kWorldSwitch;
+    e.id = (uint32_t)(zone & 0xFFFF) << 16 | (uint32_t)(switchNo & 0xFFFF);
+    e.a = on ? 1.0f : 0.0f;
+    PortHostAllocScope host;
+    // A switch that flips all the time (a timer, a cycle) is the same on
+    // every client already, or not worth the traffic: kept local.
+    if (w.noisySwitches.count(e.id) != 0) {
+        return;
+    }
+    auto& r = w.switchRate[e.id];
+    if (w.frame - r.first > 120) {
+        r = {w.frame, 0};
+    }
+    if (++r.second > 6) {
+        w.noisySwitches.insert(e.id);
+        if (logging()) port_log("world: switch %d/%d flips too often, kept local", zone, switchNo);
+        return;
+    }
+    send(e);
+    remember(e);
+    if (logging()) port_log("world: switch %d/%d %s, told the room", zone, switchNo, on ? "on" : "off");
+}
+
+// ---- Event stars (a boss beaten, a reward) and grabbing a star ----
+
+extern "C" void port_world_event_star_declared(const char* name) {
+    if (!enabled() || name == nullptr) {
+        return;
+    }
+    PortHostAllocScope host;
+    world().starNames[hashName(name)] = name;
+}
+
+extern "C" void port_world_event_star_appear(const char* name, int id, const void* pos, int continueDemo, int withoutDemo) {
+    World& w = world();
+    if (!enabled() || name == nullptr) {
+        return;
+    }
+    PortHostAllocScope host;
+    uint32_t h = hashName(name);
+    w.starNames[h] = name;
+    bool fresh = w.appearedStars.insert(starKey(h, id)).second;
+    if (w.applyingStar || !w.live || !fresh) {
+        return;
+    }
+    Event e{};
+    if (!currentStage(&e.stage, &e.scenario)) {
+        return;
+    }
+    e.kind = kWorldEventStar;
+    e.id = (uint32_t)id;
+    e.nameHash = h;
+    if (pos != nullptr) {
+        const TVec3f* v = static_cast< const TVec3f* >(pos);
+        e.pos[0] = v->x;
+        e.pos[1] = v->y;
+        e.pos[2] = v->z;
+    }
+    e.a = (float)((pos != nullptr ? 1 : 0) | (continueDemo ? 2 : 0) | (withoutDemo ? 4 : 0));
+    send(e);
+    remember(e);
+    if (logging()) port_log("world: event star of %s (%d) appears, told the room", name, id);
+}
+
+namespace {
+// Another player beat what this event star rewards (a boss): the boss is
+// beaten here too (its own kill(), as for any defeated enemy), and the star
+// appears the way it did for them.
+void applyEventStar(const Event& e) {
+    World& w = world();
+    auto n = w.starNames.find(e.nameHash);
+    if (n == w.starNames.end() || w.appearedStars.count(starKey(e.nameHash, (int32_t)e.id)) != 0) {
+        return;  // not declared here, or it appeared here already
+    }
+    std::string name = n->second;
+    LiveActor* boss = nullptr;
+    for (auto& kv : w.idOf) {
+        LiveActor* a = static_cast< LiveActor* >(kv.first);
+        if (!MR::isDead(a) && hashName(a->mName) == e.nameHash && hasEnemySensor(a)) {
+            boss = a;
+            break;
+        }
+    }
+    if (boss == nullptr) {
+        for (void* p : w.unplaced) {
+            LiveActor* a = static_cast< LiveActor* >(p);
+            if (!MR::isDead(a) && hashName(a->mName) == e.nameHash && hasEnemySensor(a)) {
+                boss = a;
+                break;
+            }
+        }
+    }
+    if (logging()) port_log("world: %s beaten by another player, its star appears%s", name.c_str(), boss ? " (defeated here)" : "");
+    w.applyingStar = true;
+    if (boss != nullptr) {
+        defeatLocally(boss);
+    }
+    if (w.appearedStars.insert(starKey(e.nameHash, (int32_t)e.id)).second) {
+        TVec3f pos(e.pos[0], e.pos[1], e.pos[2]);
+        int flags = (int)e.a;
+        MR::appearEventPowerStar(name.c_str(), (s32)e.id, (flags & 1) ? &pos : nullptr, (flags & 2) != 0, (flags & 4) != 0);
+    }
+    w.applyingStar = false;
+}
+
+// The star another player grabbed comes to the local player, who grabs it
+// too: both see the star-get and leave the level together.
+void updatePendingGrab() {
+    World& w = world();
+    if (!w.hasPendingGrab) {
+        return;
+    }
+    if (w.grabbedHere || w.frame > w.pendingGrabUntil) {
+        if (!w.grabbedHere && logging()) port_log("world: star %d never became grabbable here, gave up", w.pendingGrab);
+        w.hasPendingGrab = false;
+        return;
+    }
+    for (auto& s : w.powerStars) {
+        if (s.second != w.pendingGrab) {
+            continue;
+        }
+        int r = port_power_star_pull_to_player(s.first);
+        if (r == 2) {
+            w.hasPendingGrab = false;  // being grabbed
+            return;
+        }
+    }
+}
+}  // namespace
+
+extern "C" void port_world_power_star_register(void* star, int id) {
+    if (!enabled()) {
+        return;
+    }
+    PortHostAllocScope host;
+    world().powerStars.push_back({star, id});
+}
+
+extern "C" void port_world_star_got(int id) {
+    World& w = world();
+    if (!enabled()) {
+        return;
+    }
+    bool first = !w.grabbedHere;
+    w.grabbedHere = true;
+    Event e{};
+    if (!first || !currentStage(&e.stage, &e.scenario)) {
+        return;
+    }
+    e.kind = kWorldStarGot;
+    e.id = (uint32_t)id;
+    PortHostAllocScope host;
+    send(e);
+    if (logging()) port_log("world: grabbed power star %d, the others in the level get it too", id);
+}
+
 extern "C" void port_world_update(void) {
     if (!enabled()) {
         return;
@@ -500,7 +729,9 @@ extern "C" void port_world_update(void) {
         return;
     }
     w.live = true;
+    w.frame++;
     PortHostAllocScope host;
+    updatePendingGrab();
 
     // Arrivals: a player newly in this stage and scenario hears this visit's
     // defeats and pickups, so their world matches ours.
@@ -532,6 +763,27 @@ extern "C" void port_world_update(void) {
             auto it = w.actorOf.find(e.id);
             if (it != w.actorOf.end()) {
                 w.shootSignals.insert(it->second);
+            }
+            continue;
+        }
+        if (e.kind == kWorldSwitch) {
+            w.applyingSwitch = true;
+            applySwitch(e);
+            w.applyingSwitch = false;
+            remember(e);
+            continue;
+        }
+        if (e.kind == kWorldEventStar) {
+            applyEventStar(e);
+            remember(e);
+            continue;
+        }
+        if (e.kind == kWorldStarGot) {
+            if (!w.grabbedHere && !w.hasPendingGrab) {
+                if (logging()) port_log("world: another player grabbed power star %d: getting it here too", (int)e.id);
+                w.hasPendingGrab = true;
+                w.pendingGrab = (int)e.id;
+                w.pendingGrabUntil = w.frame + 60 * 30;
             }
             continue;
         }
@@ -600,4 +852,43 @@ extern "C" void port_world_debug_drop(float x, float y, float z) {
     TVec3f pos(x, y + 200.0f, z);
     MR::appearCoinPop(static_cast< const NameObj* >(w.lootHost), pos, 3);
     MR::appearStarPiece(static_cast< const NameObj* >(w.lootHost), pos, 5, 10.0f, 40.0f, false);
+}
+
+// Debug (F12): the nearest declared event star host (a boss) is beaten: its
+// star appears, as its defeat would request.
+extern "C" void port_world_debug_event_star(float x, float y, float z) {
+    World& w = world();
+    LiveActor* best = nullptr;
+    float bestD = 1e12f;
+    for (auto& kv : w.idOf) {
+        LiveActor* a = static_cast< LiveActor* >(kv.first);
+        if (MR::isDead(a) || w.starNames.count(hashName(a->mName)) == 0) {
+            continue;
+        }
+        float dx = a->mPosition.x - x, dy = a->mPosition.y - y, dz = a->mPosition.z - z;
+        float d = dx * dx + dy * dy + dz * dz;
+        if (d < bestD) {
+            bestD = d;
+            best = a;
+        }
+    }
+    port_log("world: debug: %d event star names, nearest host %s", (int)w.starNames.size(), best ? best->mName : "-");
+    if (best != nullptr) {
+        best->kill();
+        MR::requestAppearPowerStar(best, best->mPosition);
+    }
+}
+
+// Debug: grab the nearest power star that waits to be grabbed.
+extern "C" void port_world_debug_grab_star(void) {
+    World& w = world();
+    int pulled = 0;
+    for (auto& s : w.powerStars) {
+        if (port_power_star_pull_to_player(s.first) == 1) {
+            port_log("world: debug: pulled power star %d to the player", s.second);
+            pulled = 1;
+            break;
+        }
+    }
+    if (!pulled) port_log("world: debug: no power star waiting (%d in the scene)", (int)w.powerStars.size());
 }

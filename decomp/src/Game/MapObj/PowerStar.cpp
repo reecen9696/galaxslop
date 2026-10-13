@@ -1,3 +1,6 @@
+#ifdef TARGET_PC
+#include "net/world/world_sync.h"
+#endif
 #include "Game/MapObj/PowerStar.hpp"
 #include "Game/Camera/CameraTargetArg.hpp"
 #include "Game/LiveActor/LiveActorGroup.hpp"
@@ -154,7 +157,29 @@ void PowerStar::init(const JMapInfoIter& rIter) {
     } else {
         makeActorAppeared();
     }
+#ifdef TARGET_PC
+    port_world_power_star_register(this, mPowerStarId);
+#endif
 }
+
+#ifdef TARGET_PC
+extern "C" int port_power_star_pull_to_player(void* pStar) {
+    PowerStar* star = static_cast< PowerStar* >(pStar);
+    if (MR::isDead(star)) {
+        return 0;
+    }
+    if (star->isNerve(GET_NERVE(PowerStar, PowerStarNrvStageClearDemo))) {
+        return 2;
+    }
+    if (!star->isNerve(GET_NERVE(PowerStar, PowerStarNrvWait)) || MR::isDemoActive() || MR::isPlayerDead()) {
+        return 0;
+    }
+    // Onto the player: his body touches its sensor and he grabs it.
+    star->mPosition.set(*MR::getPlayerCenterPos());
+    MR::invalidateClipping(star);
+    return 1;
+}
+#endif
 
 void PowerStar::initAfterPlacement() {
 }
@@ -347,6 +372,9 @@ bool PowerStar::receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pReceive
             MR::stopSoundPlayer("SE_PV_NEEDLE_DAMAGE_RUN", 0);
             MR::makeMtxTR((MtxPtr)&mBaseMtx, *MR::getPlayerPos(), *MR::getPlayerRotate());
             setNerve(GET_NERVE(PowerStar, PowerStarNrvStageClearDemo));
+#ifdef TARGET_PC
+            port_world_star_got(mPowerStarId);  // co-op: everyone in the level gets it
+#endif
             return true;
         }
         break;

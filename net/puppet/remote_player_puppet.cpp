@@ -1032,6 +1032,17 @@ void applyDebugModes() {
     if (!MR::isExistMario()) {
         return;
     }
+    if (mode == 103) {  // F12: beat the nearest event star host (boss) (world sync test)
+        sPending = -1;
+        const TVec3f& p = *MR::getPlayerPos();
+        port_world_debug_event_star(p.x, p.y, p.z);
+        return;
+    }
+    if (mode == 104) {  // grab the nearest waiting power star (world sync test)
+        sPending = -1;
+        port_world_debug_grab_star();
+        return;
+    }
     if (mode == 102) {  // F11: drop coins and star bits (world sync test)
         sPending = -1;
         const TVec3f& p = *MR::getPlayerPos();

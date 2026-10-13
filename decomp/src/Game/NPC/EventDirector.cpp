@@ -1,3 +1,6 @@
+#ifdef TARGET_PC
+#include "net/world/world_sync.h"
+#endif
 #include "Game/NPC/EventDirector.hpp"
 #include "Game/LiveActor/Nerve.hpp"
 #include "Game/MapObj/PowerStarHolder.hpp"
@@ -23,6 +26,9 @@ void EventDirector::init(const JMapInfoIter& rIter) {
 }
 
 void MR::declareEventPowerStar(const char* pParam1, s32 param2, bool param3) {
+#ifdef TARGET_PC
+    port_world_event_star_declared(pParam1);  // co-op (net/world)
+#endif
     EventFunction::getPowerStarEventKeeper()->declareStar(pParam1, "\x83\x5d\x81\x5b\x83\x93\x96\xb3\x82\xb5", param2, param3);
 }
 
@@ -67,6 +73,9 @@ namespace MR {
 
     void declareEventPowerStar(const NameObj* pParam1, s32 param2, bool param3) {
         const char* pVar1 = pParam1->mName;
+#ifdef TARGET_PC
+        port_world_event_star_declared(pVar1);
+#endif
 
         EventFunction::getPowerStarEventKeeper()->declareStar(pVar1, nullptr, param2, param3);
     }
@@ -88,6 +97,9 @@ namespace MR {
     }
 
     void appearEventPowerStar(const char* pParam1, s32 param2, const TVec3f* pParam3, bool param4, bool param5) {
+#ifdef TARGET_PC
+        port_world_event_star_appear(pParam1, param2, pParam3, param4, param5);  // co-op: a boss beaten here is beaten for all
+#endif
         EventFunction::getPowerStarEventKeeper()->requestAppearPowerStar(pParam1, param2, pParam3, param4, param5);
     }
 

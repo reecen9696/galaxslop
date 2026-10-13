@@ -52,6 +52,26 @@ int port_world_shooting_star_signalled(void* actor);
 // Around a drop every client makes by itself (a synced shooting star's
 // burst): not announced.
 void port_world_ambient_drop(int on);
+// StageSwitchFunction::on/offSwitchBySwitchIdInfo: a switch changed
+// (zone 0xFFFF: global).  Shared unless inside port_world_local_switch.
+void port_world_switch_changed(int zone, int switchNo, int on);
+// Around switches only the local player drives (areas he stands in).
+void port_world_local_switch(int enter);
+// MR::declareEventPowerStar: names event stars are requested by.
+void port_world_event_star_declared(const char* name);
+// MR::appearEventPowerStar: an event star appears (a boss beaten, a reward).
+void port_world_event_star_appear(const char* name, int id, const void* pos, int continueDemo, int withoutDemo);
+// PowerStar::init: the stars of the scene; PowerStar (Wait -> grab): the
+// local player grabbed star `id`.
+void port_world_power_star_register(void* star, int id);
+void port_world_star_got(int id);
+// PowerStar.cpp: pulls a waiting star onto the local player so he grabs it
+// (1), 2 if it is being grabbed already, 0 if it cannot be yet.
+int port_power_star_pull_to_player(void* star);
+// Debug (F12): beat the nearest event star host (as a boss's defeat does).
+void port_world_debug_event_star(float x, float y, float z);
+// Debug: the local player grabs the nearest waiting power star.
+void port_world_debug_grab_star(void);
 // Debug (F11): drop coins and star bits over (x, y, z).
 void port_world_debug_drop(float x, float y, float z);
 // Once per gameplay frame (net/puppet): apply received events.
@@ -73,6 +93,9 @@ enum : uint8_t {
     kWorldCoinsDropped = 3,     // id = count
     kWorldStarBitsDropped = 4,  // id = count, a/b = launch speeds
     kWorldShootingStar = 5,     // a shooting star (id) fires now (stage host)
+    kWorldSwitch = 6,           // id = zone << 16 | switch no (zone 0xFFFF: global), a = on
+    kWorldEventStar = 7,        // an event star appears (a boss beaten...): name hash, id = star id, pos, a = flags
+    kWorldStarGot = 8,          // a player grabbed power star `id`: everyone in the level gets it
 };
 // Placement id: FNV-1a of the name and the position rounded to whole units.
 uint32_t worldPlacementId(const char* name, float x, float y, float z);
