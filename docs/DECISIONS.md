@@ -409,3 +409,7 @@ The lobby says so before joining. Export a save first (settings) to keep
 a copy.
 Revisit: if players ask to keep solo files untouched, a per-room save slot
 is a small change in the launcher (save directory), not in the sync.
+
+## D-023 (2026-10-13, lane A, asked for by the user): Wii menu look for the page, M PLUS 1p as its font, menu music kept out of git
+Why: the user wanted the opening screens to look like the Wii menu in the Wii font. That font, Rodin NTLG, is commercial, so the page uses it only when installed and otherwise ships M PLUS 1p (SIL OFL 1.1, the closest open lookalike, Latin subset, 11 KB a weight, `web/fonts/`). OFL is outside AGENTS.md's MIT/BSD/Unlicense/CC0 list, as Inter already was; it allows bundling with the license file. The Wii Menu theme is Nintendo's, so `web/music/*.mp3` is git-ignored: each player drops their own copy there and the page is silent without it.
+Revisit: if a permissively licensed Rodin lookalike turns up, or the server should serve the music (server/src/static.ts has no .mp3 or .woff2 type yet).

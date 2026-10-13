@@ -14,8 +14,13 @@ const progress = document.getElementById("progress");
 const params = new URLSearchParams(location.search);
 var smgLog = []; // recent game log lines, for automated checks
 
+// While the game runs the status line floats over the bottom of the canvas
+// and fades a few seconds after each message.
 function say(text) {
   status.textContent = text;
+  status.classList.remove("faded");
+  clearTimeout(say.timer);
+  if (document.body.classList.contains("playing")) say.timer = setTimeout(() => status.classList.add("faded"), 4000);
 }
 
 async function gameDir(create) {
@@ -205,6 +210,7 @@ async function cookFolder(files) {
 
 function showImport() {
   importPanel.style.display = "block";
+  startMenuMusic();
   say("");
   const input = document.getElementById("pickInput");
   return new Promise((resolve) => {
@@ -296,6 +302,43 @@ async function startAudio() {
 }
 for (const ev of ["keydown", "pointerdown"]) addEventListener(ev, startAudio, { capture: true });
 
+// Menu music: the Wii Menu theme loops on the opening screens (import,
+// lobby) and fades out when the game starts.  web/music/wii-menu.mp3 is not
+// in git (copyrighted); without it the page is silent.  Browsers block
+// autoplay until the first click or key, so a blocked start retries then.
+const bgm = document.getElementById("bgm");
+const musicOn = () => store("smg.music") !== "0";
+const musicVolume = () => 0.6 * Number(store("smg.volume") ?? 0.8);
+function startMenuMusic() {
+  if (!musicOn() || bgm.dataset.state === "done" || bgm.dataset.state === "missing") return;
+  bgm.volume = musicVolume();
+  bgm.play().then(() => (bgm.dataset.state = "playing")).catch(() => {
+    if (bgm.dataset.state === "waiting") return;
+    bgm.dataset.state = "waiting";
+    const retry = () => {
+      removeEventListener("pointerdown", retry, true);
+      removeEventListener("keydown", retry, true);
+      bgm.dataset.state = "";
+      startMenuMusic();
+    };
+    addEventListener("pointerdown", retry, true);
+    addEventListener("keydown", retry, true);
+  });
+}
+function stopMenuMusic(fadeMs = 800) {
+  bgm.dataset.state = "done";
+  if (bgm.paused) return;
+  const v0 = bgm.volume, t0 = performance.now();
+  const step = () => {
+    const t = Math.min(1, (performance.now() - t0) / fadeMs);
+    bgm.volume = v0 * (1 - t);
+    if (t < 1) requestAnimationFrame(step);
+    else bgm.pause();
+  };
+  requestAnimationFrame(step);
+}
+bgm.addEventListener("error", () => (bgm.dataset.state = "missing"));
+
 // Lobby (P2-06): name, room code and relay, remembered in localStorage.
 // Skipped when the URL already says (?SMG_RELAY=... or ?solo=1).
 function store(key, value) {
@@ -328,7 +371,19 @@ function showLobby() {
   room.value = params.get("room") || "";
   relay.value = store("smg.relay") || defaultRelay;
   lobby.style.display = "block";
+  startMenuMusic();
   say("");
+  const serverBtn = document.getElementById("serverBtn"), serverBox = document.getElementById("serverBox");
+  serverBtn.onclick = () => {
+    const open = serverBox.classList.toggle("open");
+    serverBtn.setAttribute("aria-expanded", String(open));
+    if (open) relay.focus();
+  };
+  if (!name.value) name.focus();
+  else if (room.value) document.getElementById("join").focus();
+  name.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") room.focus();
+  });
   return new Promise((resolve) => {
     const go = (mode) => {
       const n = name.value.trim() || "Player";
@@ -351,7 +406,8 @@ function showLobby() {
   });
 }
 
-// Room bar under the canvas, fed by the game's net: log lines.
+// Room panel, floating top right next to the settings gear, fed by the
+// game's net: log lines.
 const roombar = document.getElementById("roombar");
 const players = new Set();
 function toast(text) {
@@ -402,16 +458,16 @@ function readRemotes() {
 function renderRoomBar() {
   const code = roombar.dataset.room;
   if (!code) {
-    if (roombar.style.display === "block") roombar.textContent = "reconnecting…";
+    if (roombar.style.display === "block") roombar.innerHTML = `<div class="rb-head"><span class="rb-label">Room</span> reconnecting…</div>`;
     return;
   }
   roombar.style.display = "block";
   const remotes = readRemotes();
   const esc = (t) => t.replace(/[<&"]/g, "");
   const who = remotes.length
-    ? remotes.map((r) => `${esc(r.name)}${r.same ? " (here)" : r.stage ? ` in ${esc(pretty(r.stage))} ${r.scenario} <button class="ghost follow" data-slot="${r.slot}">Follow</button>` : ""}`).join(" · ")
+    ? remotes.map((r) => `<span>${esc(r.name)}${r.same ? " (here)" : r.stage ? ` in ${esc(pretty(r.stage))} ${r.scenario} <button class="wii-btn follow" data-slot="${r.slot}">Follow</button>` : ""}</span>`).join("<br>")
     : players.size ? "with " + [...players].map(esc).join(", ") : "waiting for friends";
-  const html = `Room <b>${code}</b> · ${who}`;
+  const html = `<div class="rb-head"><span class="rb-label">Room</span><b>${code}</b></div><span class="rb-who">${who}</span>`;
   if (roombar.innerHTML !== html) roombar.innerHTML = html;
 }
 roombar.addEventListener("click", (e) => {
@@ -453,6 +509,8 @@ function drawTags() {
 function boot(args, env = {}) {
   window.smgEnv = { SMG_SCALE: store("smg.scale") || "2", ...env }; // read by browser_env.js in preRun
   importPanel.style.display = "none";
+  stopMenuMusic();
+  document.body.classList.add("playing");
   const canvas = document.getElementById("canvas");
   canvas.style.display = "block";
   document.getElementById("stage").style.display = "block";
@@ -567,12 +625,24 @@ async function importSave(file) {
 }
 function setupSettings() {
   const gear = document.getElementById("gear"), panel = document.getElementById("settings");
-  gear.onclick = () => (panel.style.display = panel.style.display === "block" ? "none" : "block");
+  gear.onclick = () => {
+    const open = panel.style.display !== "block";
+    panel.style.display = open ? "block" : "none";
+    gear.setAttribute("aria-expanded", String(open));
+  };
   const vol = document.getElementById("volume");
   vol.value = store("smg.volume") ?? 0.8;
   vol.oninput = () => {
     store("smg.volume", vol.value);
     if (smgGain) smgGain.gain.value = Number(vol.value);
+    if (bgm.dataset.state !== "done") bgm.volume = musicVolume();
+  };
+  const music = document.getElementById("music");
+  music.checked = musicOn();
+  music.onchange = () => {
+    store("smg.music", music.checked ? "1" : "0");
+    if (!music.checked) bgm.pause();
+    else if (bgm.dataset.state !== "done") startMenuMusic();
   };
   // Render scale (applied live by present_web.cpp) and the frame-time overlay.
   const scale = document.getElementById("scale");

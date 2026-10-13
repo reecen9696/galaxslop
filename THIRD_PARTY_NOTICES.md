@@ -12,3 +12,4 @@ Read for approach, nothing copied (GPL-3, incompatible with this repo's Unlicens
 Add an entry for every new dependency, and a DECISIONS.md line explaining why.
 
 Super Mario Galaxy and Mario are trademarks of Nintendo. This project contains no Nintendo game data.
+- M PLUS 1p (The M+ Project Authors): SIL Open Font License 1.1. Latin subset in `web/fonts/`, license in `web/fonts/OFL.txt` (D-023).

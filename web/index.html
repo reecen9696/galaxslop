@@ -5,41 +5,138 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SMG Co-op</title>
 <style>
-  :root { color-scheme: dark; --fg: #d8dbe6; --dim: #8a90a6; --accent: #f4c542; --panel: #141826; }
-  html, body { margin: 0; height: 100%; background: #000; color: var(--fg); font: 15px/1.5 system-ui, sans-serif; }
-  #wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100%; gap: 8px; padding: 0 16px; box-sizing: border-box; }
-  canvas { width: min(100vw, calc(100vh * 640 / 456)); aspect-ratio: 640 / 456; background: #000; display: none; outline: none; }
-  #status { color: var(--dim); font-size: 13px; text-align: center; }
-  #import { max-width: 560px; background: var(--panel); border-radius: 12px; padding: 24px; display: none; }
-  #import h1 { font-size: 20px; margin: 0 0 8px; }
-  #import ol { padding-left: 20px; color: var(--dim); }
-  #import code { color: var(--fg); }
-  button { font: inherit; padding: 8px 16px; border-radius: 8px; border: 0; background: var(--accent); color: #000; cursor: pointer; }
-  button.ghost { background: transparent; color: var(--dim); border: 1px solid #333a50; }
-  progress { width: 100%; height: 10px; display: none; margin-top: 12px; }
-  .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; align-items: center; }
-  #lobby { max-width: 560px; width: 100%; background: var(--panel); border-radius: 12px; padding: 24px; display: none; box-sizing: border-box; }
-  #lobby h1 { font-size: 20px; margin: 0 0 12px; }
-  #lobby label { display: block; color: var(--dim); font-size: 13px; margin-top: 10px; }
-  #lobby input { font: inherit; width: 100%; box-sizing: border-box; padding: 8px 10px; border-radius: 8px; border: 1px solid #333a50; background: #0b0e18; color: var(--fg); }
-  #lobby input#room { text-transform: uppercase; letter-spacing: .15em; }
-  #lobby details { margin-top: 12px; color: var(--dim); }
-  #roombar { display: none; color: var(--dim); font-size: 13px; }
-  #roombar b { color: var(--accent); letter-spacing: .15em; }
-  #roombar .follow { padding: 2px 10px; font-size: 12px; margin-left: 4px; }
-  #gear { position: fixed; top: 12px; right: 12px; background: transparent; color: var(--dim); font-size: 20px; padding: 4px 10px; border: 1px solid #333a50; }
-  #settings { position: fixed; top: 56px; right: 12px; width: min(320px, calc(100vw - 24px)); background: var(--panel); border-radius: 12px; padding: 16px; display: none; box-sizing: border-box; z-index: 2; }
-  #settings h2 { font-size: 16px; margin: 0 0 8px; }
-  #settings .row button { flex: 1; }
-  #settings input[type=range], #settings select { width: 100%; }
-  #settings select { font: inherit; padding: 6px; border-radius: 8px; background: #0b0e18; color: var(--fg); border: 1px solid #333a50; }
-  #settings label { display: block; color: var(--dim); font-size: 13px; margin-top: 10px; }
+  /* The Wii menu's typeface is Rodin NTLG (Fontworks, commercial): used when
+     installed, otherwise M PLUS 1p (OFL 1.1, web/fonts/OFL.txt), the closest
+     open lookalike, subset to Latin. */
+  @font-face { font-family: "WiiUI"; font-weight: 400; font-display: swap;
+    src: local("FOT-RodinNTLG Pro M"), local("FOT-RodinNTLG Pro"), local("RodinNTLG"), url(fonts/wii-Regular.woff2) format("woff2"); }
+  @font-face { font-family: "WiiUI"; font-weight: 500 700; font-display: swap;
+    src: local("FOT-RodinNTLG Pro DB"), local("FOT-RodinNTLG Pro"), local("RodinNTLG"), url(fonts/wii-Medium.woff2) format("woff2"); }
+
+  :root {
+    color-scheme: dark;
+    --wii-blue: #34bdef;
+    --wii-blue-deep: #0f9ad8;
+    --wii-glow: rgba(52, 189, 239, .55);
+    --ink: #2b2d33;        /* text on white controls */
+    --ink-dim: #8b8f99;
+    --fg: #eef0f4;          /* text on the dark screen */
+    --dim: #a9adb8;
+    --face: linear-gradient(#ffffff 0%, #f4f5f8 46%, #dfe2e8 54%, #eceef2 100%);
+    --face-hot: linear-gradient(#e8f8ff 0%, #c4ecff 46%, #8fd8fb 54%, #b5e6fd 100%);
+    --stripes: repeating-linear-gradient(#141416 0 2px, #0b0b0c 2px 4px);
+    --ui: "WiiUI", "Helvetica Neue", Arial, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #000; color: var(--fg); font: 15px/1.45 var(--ui); }
+  body { overflow: hidden; }
+  button, input, select { font-family: inherit; }
+
+  #wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 10px; }
+  canvas { width: min(100vw, calc(100dvh * 640 / 456)); aspect-ratio: 640 / 456; background: #000; display: none; outline: none; }
   #stage { position: relative; display: none; }
   #stage canvas { display: block; }
   #tags { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-  #tags span { position: absolute; transform: translate(-50%, -100%); font: 600 13px system-ui, sans-serif; color: #fff; background: #0008; padding: 1px 6px; border-radius: 6px; white-space: nowrap; }
-  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--panel); color: var(--fg); border: 1px solid var(--accent); padding: 8px 14px; border-radius: 10px; z-index: 3; }
-  #perfbox { position: fixed; top: 12px; left: 12px; font: 12px ui-monospace, monospace; color: #9fe39f; background: #000a; padding: 6px 8px; border-radius: 6px; display: none; white-space: pre; }
+  #tags span { position: absolute; transform: translate(-50%, -100%); font: 600 13px var(--ui); color: #fff; background: #0008; padding: 1px 8px; border-radius: 8px; white-space: nowrap; }
+
+  #status { color: var(--dim); font-size: 14px; text-align: center; padding: 0 16px; transition: opacity .6s; }
+  #progress { appearance: none; width: min(420px, 38vw); height: 14px; display: none; border: 2px solid var(--wii-blue); border-radius: 999px; background: #1c1d21; overflow: hidden; box-shadow: 0 0 8px var(--wii-glow); }
+  #progress::-webkit-progress-bar { background: #1c1d21; }
+  #progress::-webkit-progress-value { background: var(--face-hot); border-radius: 999px; }
+  #progress::-moz-progress-bar { background: var(--face-hot); border-radius: 999px; }
+  /* A menu screen is up: status and progress sit in its footer bar. */
+  .screen[style*="block"] ~ #status { position: fixed; right: max(16px, 2em); left: auto; bottom: 0; height: calc(clamp(14px, min(2.3vw, 3.4dvh), 30px) * 4.6); display: flex; align-items: center; z-index: 2; max-width: 34vw; text-align: right; color: var(--fg); }
+  .screen[style*="block"] ~ #progress { position: fixed; left: 50%; bottom: calc(clamp(14px, min(2.3vw, 3.4dvh), 30px) * 2.3 - 7px); transform: translateX(-50%); z-index: 2; }
+  body.playing #status { position: fixed; left: 50%; bottom: 10px; transform: translateX(-50%); background: #000a; border-radius: 10px; padding: 4px 12px; pointer-events: none; z-index: 3; }
+  body.playing #status:empty, body.playing #status.faded { opacity: 0; }
+
+  /* ---- Wii menu screens (import, lobby) ---- */
+  .screen { position: fixed; inset: 0; display: none; z-index: 1; background: var(--stripes); color: var(--fg);
+    font-size: clamp(14px, min(2.3vw, 3.4dvh), 30px); }
+  .screen-inner { display: flex; flex-direction: column; height: 100%; }
+  .screen header { flex: 0 0 auto; height: 4.7em; position: relative; border-bottom: .22em solid #f4f5f7; }
+  .tab { position: absolute; bottom: 0; left: max(16px, 2.6em); padding: .55em 1.6em .4em 1.1em; min-width: min(60vw, 22em);
+    background: linear-gradient(#ffffff, #e9ebef); color: var(--ink); border-radius: .9em .9em 0 0;
+    font-size: 1.55em; font-weight: 600; letter-spacing: -.01em; white-space: nowrap; box-shadow: inset 0 -.1em .2em #0002; }
+  .tab::before { content: ""; position: absolute; left: -.75em; bottom: 0; width: 1.4em; height: 72%; z-index: -1;
+    background: linear-gradient(#d6d8dd, #b9bcc3); border-radius: .5em .5em 0 0; }
+  .screen main { flex: 1 1 auto; overflow-y: auto; display: flex; flex-direction: column; padding: 1.2em 16px; }
+  .body { width: min(100%, 44em); margin: auto; }
+  .screen footer { flex: 0 0 auto; height: 4.6em; border-top: .22em solid #f4f5f7; display: flex; align-items: center; gap: 1em;
+    padding: 0 max(16px, 2em); background: linear-gradient(#1e1f22, #060607); }
+  .screen p, .screen li { color: var(--fg); }
+  .screen .hint { color: var(--dim); }
+  .screen code { color: #fff; }
+  .screen ol { padding-left: 1.3em; }
+  .screen label.field { display: block; margin: 1em 0 .35em .4em; font-size: 1.05em; }
+
+  .wii-input { display: block; width: 100%; height: 2.6em; padding: 0 .9em; font-size: 1.25em; color: var(--ink);
+    background: var(--face); border: .16em solid var(--wii-blue); border-radius: .6em; outline: none;
+    box-shadow: 0 0 .5em var(--wii-glow), inset 0 .12em .2em #0001; }
+  .wii-input::placeholder { color: var(--ink-dim); font-style: italic; letter-spacing: .08em; }
+  .wii-input:focus { box-shadow: 0 0 .9em var(--wii-blue), inset 0 .12em .2em #0001; }
+  #room { text-transform: uppercase; letter-spacing: .15em; }
+
+  .wii-btn { font-size: 1.2em; font-weight: 600; color: var(--ink); cursor: pointer; padding: .55em 1em; min-height: 2.3em;
+    background: var(--face); border: .16em solid var(--wii-blue); border-radius: .6em; outline: none;
+    box-shadow: 0 0 .45em var(--wii-glow), inset 0 -.15em .3em #0001; transition: transform .08s, box-shadow .12s; }
+  .wii-btn:hover, .wii-btn:focus-visible { background: var(--face-hot); box-shadow: 0 0 1em var(--wii-blue); }
+  .wii-btn:active { transform: scale(.97); }
+  .wii-btn.primary { background: var(--face-hot); }
+  .btn-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(9em, 1fr)); gap: .7em; margin-top: 1.3em; }
+  .btn-row .wii-btn { width: 100%; }
+
+  .pill { font-size: 1.35em; font-weight: 600; color: var(--ink); cursor: pointer; height: 2.3em; min-width: 9em; padding: 0 1.4em;
+    background: var(--face); border: .1em solid #c9ccd3; border-radius: 999px; outline: none;
+    box-shadow: 0 .15em .4em #0008, inset 0 -.15em .3em #0002; transition: box-shadow .12s, border-color .12s; }
+  .pill:hover, .pill:focus-visible { border-color: var(--wii-blue); box-shadow: 0 0 .8em var(--wii-blue); }
+  .pill.right { margin-left: auto; }
+
+  .wii-check { display: flex; align-items: center; gap: .8em; margin: 1.2em 0 0 .3em; cursor: pointer; font-size: 1.1em; }
+  .wii-check input { font-size: inherit; appearance: none; flex: 0 0 auto; width: 1.6em; height: 1.6em; margin: 0; cursor: pointer; border-radius: .35em;
+    background: var(--face); border: .14em solid var(--wii-blue); box-shadow: 0 0 .4em var(--wii-glow); display: grid; place-content: center; }
+  .wii-check input::after { content: ""; width: .45em; height: .85em; border: solid var(--wii-blue-deep); border-width: 0 .2em .2em 0;
+    transform: translateY(-.1em) rotate(45deg); opacity: 0; }
+  .wii-check input:checked::after { opacity: 1; }
+  #serverBox { display: none; }
+  #serverBox.open { display: block; }
+
+  /* ---- floating chrome: gear, room panel, settings, toasts ---- */
+  #gear { position: fixed; top: 12px; right: 12px; z-index: 4; width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
+    font-size: 22px; line-height: 1; color: #6d717b; background: var(--face); border: 2px solid #c9ccd3;
+    box-shadow: 0 2px 6px #000a; }
+  #gear:hover, #gear[aria-expanded="true"] { border-color: var(--wii-blue); box-shadow: 0 0 10px var(--wii-blue); color: var(--wii-blue-deep); }
+  #roombar { display: none; position: fixed; top: 12px; right: 66px; z-index: 3; max-width: min(520px, calc(100vw - 90px));
+    padding: 6px 14px; min-height: 44px; font-size: 14px; line-height: 1.35; color: var(--ink);
+    background: var(--face); border: 2px solid var(--wii-blue); border-radius: 22px; box-shadow: 0 0 10px var(--wii-glow), 0 2px 6px #000a; }
+  #roombar .rb-head { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
+  #roombar .rb-label { color: var(--ink-dim); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+  #roombar b { color: var(--wii-blue-deep); letter-spacing: .15em; font-size: 17px; }
+  #roombar .rb-who { display: block; color: var(--ink); }
+  #roombar .rb-who:empty { display: none; }
+  #roombar .follow { font-size: 12px; padding: 1px 10px; min-height: 0; margin-left: 4px; border-width: 2px; border-radius: 10px; }
+  #settings { position: fixed; top: 64px; right: 12px; z-index: 5; width: min(340px, calc(100vw - 24px)); display: none;
+    padding: 0 16px 16px; background: var(--stripes); border: 2px solid #f4f5f7; border-radius: 16px; box-shadow: 0 6px 24px #000c; }
+  #settings h2 { margin: 0 -16px 8px; padding: 8px 16px; font-size: 18px; font-weight: 600; color: var(--ink);
+    background: linear-gradient(#ffffff, #e9ebef); border-radius: 13px 13px 0 0; }
+  #settings label { display: block; color: var(--dim); font-size: 13px; margin-top: 10px; }
+  #settings label.inline { display: flex; align-items: center; gap: 8px; color: var(--fg); }
+  #settings input[type=range] { width: 100%; accent-color: var(--wii-blue); }
+  #settings input[type=checkbox] { accent-color: var(--wii-blue); }
+  #settings select { width: 100%; padding: 6px; border-radius: 10px; color: var(--ink); background: var(--face); border: 2px solid var(--wii-blue); font-size: 14px; }
+  #settings .row { display: flex; gap: 8px; margin-top: 10px; }
+  #settings .row .wii-btn { flex: 1; font-size: 13px; padding: 6px 8px; min-height: 0; border-width: 2px; }
+  .toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 6; max-width: calc(100vw - 32px);
+    padding: 10px 18px; font-size: 15px; font-weight: 600; color: var(--ink); background: var(--face);
+    border: 2px solid var(--wii-blue); border-radius: 14px; box-shadow: 0 0 12px var(--wii-glow), 0 4px 14px #000b; }
+  #perfbox { position: fixed; top: 12px; left: 12px; z-index: 3; font: 12px ui-monospace, monospace; color: #9fe39f; background: #000a; padding: 6px 8px; border-radius: 6px; display: none; white-space: pre; }
+
+  @media (max-width: 560px) {
+    .screen { font-size: 15px; }
+    .tab { font-size: 1.15em; min-width: 0; left: 24px; padding-right: 1.2em; }
+    .btn-row { grid-template-columns: 1fr; }
+    #roombar { font-size: 13px; }
+  }
 </style>
 </head>
 <body>
@@ -48,57 +145,66 @@
     <canvas id="canvas" tabindex="0" oncontextmenu="event.preventDefault()"></canvas>
     <div id="tags"></div>
   </div>
-  <div id="import">
-    <h1>Load your game files</h1>
-    <p>This page runs Super Mario Galaxy from your own disc. Nothing is uploaded: the files are copied
-      into this browser's private storage once, then the game starts from there.</p>
-    <ol>
-      <li>Dump your disc and extract it in Dolphin (right-click the game, Properties, Filesystem,
-        Extract Entire Disc).</li>
-      <li>Pick the extracted folder. The page converts it for the port (a few minutes, once).
-        A folder already converted with <code>tools/cook/cook.py</code> works too.</li>
-    </ol>
-    <div class="row">
-      <button id="pick">Choose folder…</button>
-      <label class="ghost" style="display:none"><input id="pickInput" type="file" webkitdirectory></label>
+  <section id="import" class="screen">
+    <div class="screen-inner">
+      <header><div class="tab">Load your game files</div></header>
+      <main><div class="body">
+        <p>This page runs Super Mario Galaxy from your own disc. Nothing is uploaded: the files are copied
+          into this browser's private storage once, then the game starts from there.</p>
+        <ol class="hint">
+          <li>Dump your disc and extract it in Dolphin (right-click the game, Properties, Filesystem,
+            Extract Entire Disc).</li>
+          <li>Pick the extracted folder. The page converts it for the port (a few minutes, once).
+            A folder already converted with <code>tools/cook/cook.py</code> works too.</li>
+        </ol>
+        <div class="btn-row"><button id="pick" class="wii-btn primary">Choose folder…</button></div>
+        <input id="pickInput" type="file" webkitdirectory hidden>
+      </div></main>
+      <footer></footer>
     </div>
-    <progress id="progress" max="1" value="0"></progress>
-  </div>
-  <div id="lobby">
-    <h1>Super Mario Galaxy co-op</h1>
-    <label for="name">Your name</label>
-    <input id="name" maxlength="32" autocomplete="nickname">
-    <label for="room">Room code (to join a friend). Stars anyone in the room gets are added to your save.</label>
-    <input id="room" maxlength="8" placeholder="e.g. K7QF">
-    <div class="row">
-      <button id="join">Join room</button>
-      <button id="create" class="ghost">Create a room</button>
-      <button id="solo" class="ghost">Play solo</button>
+  </section>
+  <section id="lobby" class="screen">
+    <div class="screen-inner">
+      <header><div class="tab">Super Mario Galaxy co-op</div></header>
+      <main><div class="body">
+        <label class="field" for="name">Your name</label>
+        <input id="name" class="wii-input" maxlength="32" autocomplete="nickname">
+        <label class="field" for="room">Room code (to join a friend). Stars anyone in the room gets are added to your save.</label>
+        <input id="room" class="wii-input" maxlength="8" placeholder="e.g. K7QF" autocomplete="off" spellcheck="false">
+        <div class="btn-row">
+          <button id="join" class="wii-btn primary">Join room</button>
+          <button id="create" class="wii-btn">Create a room</button>
+          <button id="solo" class="wii-btn">Play solo</button>
+        </div>
+        <label class="wii-check"><input id="contact" type="checkbox" checked> Players can bump and stomp each other</label>
+        <div id="serverBox">
+          <label class="field" for="relay">Relay address</label>
+          <input id="relay" class="wii-input" spellcheck="false">
+        </div>
+      </div></main>
+      <footer><button id="serverBtn" class="pill" aria-controls="serverBox" aria-expanded="false">Server</button></footer>
     </div>
-    <label><input id="contact" type="checkbox" checked style="width:auto"> Players can bump and stomp each other</label>
-    <details>
-      <summary>Server</summary>
-      <label for="relay">Relay address</label>
-      <input id="relay" spellcheck="false">
-    </details>
-  </div>
-  <div id="roombar"></div>
-  <div id="perfbox"></div>
-  <button id="gear" aria-label="Settings" title="Settings">⚙</button>
-  <div id="settings">
-    <h2>Settings</h2>
-    <label for="volume">Volume</label>
-    <input id="volume" type="range" min="0" max="1" step="0.05">
-    <label for="scale">Render scale</label>
-    <select id="scale"><option value="1">1x (640×456)</option><option value="2">2x (1280×912)</option><option value="3">3x (1920×1368)</option><option value="4">4x (2560×1824)</option></select>
-    <label><input id="perf" type="checkbox"> Show frame times</label>
-    <div class="row"><button id="exportSave" class="ghost">Export save</button><button id="importSave" class="ghost">Import save</button></div>
-    <input id="importSaveInput" type="file" accept=".zip" style="display:none">
-    <div class="row"><button id="reimport" class="ghost">Load the disc again</button></div>
-    <div class="row"><button id="deleteAll" class="ghost">Delete all data</button></div>
-  </div>
+  </section>
+  <progress id="progress" max="1" value="0"></progress>
   <div id="status">loading…</div>
 </div>
+<div id="roombar"></div>
+<div id="perfbox"></div>
+<button id="gear" aria-label="Settings" title="Settings" aria-expanded="false">⚙</button>
+<div id="settings">
+  <h2>Settings</h2>
+  <label for="volume">Volume</label>
+  <input id="volume" type="range" min="0" max="1" step="0.05">
+  <label class="inline"><input id="music" type="checkbox"> Menu music</label>
+  <label for="scale">Render scale</label>
+  <select id="scale"><option value="1">1x (640×456)</option><option value="2">2x (1280×912)</option><option value="3">3x (1920×1368)</option><option value="4">4x (2560×1824)</option></select>
+  <label class="inline"><input id="perf" type="checkbox"> Show frame times</label>
+  <div class="row"><button id="exportSave" class="wii-btn">Export save</button><button id="importSave" class="wii-btn">Import save</button></div>
+  <input id="importSaveInput" type="file" accept=".zip" style="display:none">
+  <div class="row"><button id="reimport" class="wii-btn">Load the disc again</button></div>
+  <div class="row"><button id="deleteAll" class="wii-btn">Delete all data</button></div>
+</div>
+<audio id="bgm" src="music/wii-menu.mp3" loop preload="auto"></audio>
 <script src="cook/cooker.js"></script>
 <script src="app.js"></script>
 </body>

@@ -13,7 +13,7 @@ const repo = resolve(fileURLToPath(import.meta.url), "../..");
 const game = process.env.SMG_GAME;
 const port = Number(process.argv[2] ?? 8080);
 // SMG_GAME (optional): a cooked folder served at /game/ for ?source=server.
-const types = { ".html": "text/html", ".js": "text/javascript", ".wasm": "application/wasm", ".json": "application/json", ".py": "text/plain" };
+const types = { ".html": "text/html", ".js": "text/javascript", ".wasm": "application/wasm", ".json": "application/json", ".py": "text/plain", ".mp3": "audio/mpeg", ".woff2": "font/woff2", ".txt": "text/plain" };
 
 function resolveUrl(url) {
   const path = decodeURIComponent(new URL(url, "http://x").pathname);

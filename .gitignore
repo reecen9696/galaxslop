@@ -56,3 +56,6 @@ __pycache__/
 *.dylib
 *.so
 *.dll
+
+# web/: the Wii Menu theme is Nintendo's; each player drops their own copy here
+/web/music/*.mp3
