@@ -156,8 +156,11 @@
   /* top left while playing: the controls legend (settings "Show controls") and the frame times */
   #topleft { position: fixed; top: 12px; left: 12px; z-index: 3; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; pointer-events: none; }
   #perfbox { font: 12px ui-monospace, monospace; color: #9fe39f; background: #000a; padding: 6px 8px; border-radius: 6px; display: none; white-space: pre; }
-  #keys { display: none; grid-template-columns: auto auto; gap: 2px 10px; font-size: 12px; color: #fff; background: #0008; padding: 6px 10px; border-radius: 8px; opacity: .45; }
+  #keys { display: none; grid-template-columns: auto auto; gap: 2px 10px; font-size: 12px; color: #fff; background: #000c; padding: 6px 10px; border-radius: 8px; opacity: .9; }
   body.playing.show-keys #keys { display: grid; }
+  #keyHint { display: none; position: fixed; right: 12px; bottom: 10px; z-index: 3; font-size: 12px; color: #fff; background: #0008; padding: 4px 10px; border-radius: 8px; opacity: .45; cursor: pointer; -webkit-user-select: none; user-select: none; }
+  body.playing #keyHint { display: block; }
+  #keyHint:hover { opacity: .8; }
   #keys kbd { font: 600 11px ui-monospace, monospace; text-align: right; color: #cfe8ff; }
   body.free-cursor canvas { cursor: default; }  /* Esc: the system pointer back, to reach settings */
 
@@ -180,9 +183,6 @@
   body.loading #luma canvas { display: block; width: 100%; height: 100%; background: transparent; cursor: default; }
   body.loading #progress { width: min(460px, 80vw); height: 16px; }
   body.loading #status { color: var(--fg); font-size: 1em; }
-  #musicHint { position: fixed; left: 16px; bottom: 16px; z-index: 6; padding: 6px 14px; font-size: 13px; font-weight: 600; color: var(--ink);
-    background: var(--face); border: 2px solid var(--wii-blue); border-radius: 16px; box-shadow: 0 0 10px var(--wii-glow); pointer-events: none; }
-  #musicHint[hidden] { display: none; }
 
   @media (max-width: 560px) {
     .screen { font-size: 14px; }
@@ -246,6 +246,7 @@
   <div id="status">loading…</div>
 </div>
 <div id="roombar"></div>
+<div id="keyHint" role="button"></div>
 <div id="topleft">
   <div id="keys">
     <kbd>W A S D</kbd><span>move</span>
@@ -258,6 +259,7 @@
     <kbd>Arrows</kbd><span>D-pad</span>
     <kbd>Enter</kbd><span>pause (+)</span>
     <kbd>Esc</kbd><span>show cursor</span>
+    <kbd>M</kbd><span>hide this</span>
   </div>
   <div id="perfbox"></div>
 </div>
@@ -280,7 +282,6 @@
   <div class="row"><button id="deleteAll" class="wii-btn">Delete all data</button></div>
 </div>
 <audio id="bgm" loop preload="auto"></audio>
-<div id="musicHint" hidden>♪ Click anywhere for music</div>
 <script type="importmap">{ "imports": { "three": "./vendor/three/build/three.module.min.js" } }</script>
 <script src="cook/cooker.js"></script>
 <script src="app.js"></script>

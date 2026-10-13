@@ -321,10 +321,8 @@ for (const ev of ["keydown", "pointerdown"]) addEventListener(ev, startAudio, { 
 // Comet Observatory, a little quieter, on the first-visit loading screen;
 // both fade out when the game starts.  The files (web/music/) are not in git
 // (copyrighted); without them the page is silent.  Browsers block autoplay
-// until the first click or key, so a blocked start shows a hint and retries
-// then.
+// until the first click or key, so a blocked start retries then.
 const bgm = document.getElementById("bgm");
-const musicHint = document.getElementById("musicHint");
 const kTracks = { menu: { src: "music/wii-menu.mp3", level: 0.6 }, loading: { src: "music/comet-observatory.mp3", level: 0.35 } };
 const missingTracks = new Set();
 let track = "";
@@ -341,15 +339,12 @@ function startMenuMusic(name = "menu") {
   bgm.volume = musicVolume();
   bgm.play().then(() => {
     bgm.dataset.state = "playing";
-    musicHint.hidden = true;
   }).catch(() => {
     if (bgm.dataset.state === "waiting" || missingTracks.has(track)) return;
     bgm.dataset.state = "waiting";
-    musicHint.hidden = false;
     const retry = () => {
       removeEventListener("pointerdown", retry, true);
       removeEventListener("keydown", retry, true);
-      musicHint.hidden = true;
       bgm.dataset.state = "";
       startMenuMusic(track);
     };
@@ -359,7 +354,6 @@ function startMenuMusic(name = "menu") {
 }
 function stopMenuMusic(fadeMs = 800) {
   bgm.dataset.state = "done";
-  musicHint.hidden = true;
   if (bgm.paused) return;
   const v0 = bgm.volume, t0 = performance.now();
   const step = () => {
@@ -372,7 +366,6 @@ function stopMenuMusic(fadeMs = 800) {
 }
 bgm.addEventListener("error", () => {
   missingTracks.add(track);
-  musicHint.hidden = true;
 });
 
 // First-visit loading screen: Luma dances above the bar (web/luma.js, which
@@ -785,14 +778,24 @@ function setupSettings() {
     fs.textContent = document.fullscreenElement ? "Leave full screen" : "Full screen";
     document.getElementById("canvas").focus();
   });
-  // The controls legend, top left at low opacity (on unless turned off).
-  const showKeys = document.getElementById("showKeys");
-  showKeys.checked = store("smg.keys") !== "0";
-  const applyKeys = () => document.body.classList.toggle("show-keys", showKeys.checked);
-  showKeys.onchange = () => {
+  // The controls legend, top left at low opacity: M (or the hint bottom
+  // right, or settings) opens and closes it.
+  const showKeys = document.getElementById("showKeys"), keyHint = document.getElementById("keyHint");
+  showKeys.checked = store("smg.keys") === "1";
+  const applyKeys = () => {
     store("smg.keys", showKeys.checked ? "1" : "0");
+    document.body.classList.toggle("show-keys", showKeys.checked);
+    keyHint.textContent = `Press M to ${showKeys.checked ? "hide" : "see"} controls`;
+  };
+  const toggleKeys = () => {
+    showKeys.checked = !showKeys.checked;
     applyKeys();
   };
+  showKeys.onchange = applyKeys;
+  keyHint.onclick = toggleKeys;
+  window.addEventListener("keydown", (e) => {
+    if (e.code === "KeyM" && !e.repeat && document.body.classList.contains("playing") && !e.target.closest?.("input, select, textarea")) toggleKeys();
+  }, true);
   applyKeys();
   // Esc brings the system cursor back over the game (the game hides it and
   // draws its own pointer) so the gear can be reached; a click on the game
