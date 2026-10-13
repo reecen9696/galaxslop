@@ -33,7 +33,9 @@ enum : uint16_t {
     NET_STATE_GROUNDED = 0x0002,
     NET_STATE_HIDDEN = 0x0004,
     NET_STATE_IN_DEMO = 0x0008,
+    NET_STATE_EYELID_MASK = 0x0030,  // eyelid frame 0 (open) .. 3 (closed)
 };
+constexpr int kNetStateEyelidShift = 4;
 
 struct PlayerState {
     uint32_t tick = 0;

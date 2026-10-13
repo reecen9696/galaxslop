@@ -20,7 +20,7 @@ unless marked f16.
 
 | type | name | dir | reliable | payload |
 |---|---|---|---|---|
-| 0x01 | Hello | c->s | yes | u8 proto_ver, u8 name_len, name utf8, u8 character (0 Mario, 1 Luigi), u8 tint (palette index), u8 room_code_len, room_code ascii (0 len = create) |
+| 0x01 | Hello | c->s | yes | u8 proto_ver, u8 name_len, name utf8, u8 character (0 Mario, 1 Luigi), u8 tint (see Client behaviour), u8 room_code_len, room_code ascii (0 len = create) |
 | 0x02 | Welcome | s->c | yes | u8 player_id, u8 room_code_len, room_code, u8 player_count, then per player: u8 id, u8 name_len, name, u8 character, u8 tint |
 | 0x03 | PlayerJoined | s->c | yes | u8 id, u8 name_len, name, u8 character, u8 tint |
 | 0x04 | PlayerLeft | s->c | yes | u8 id |
@@ -50,7 +50,7 @@ u32  anim_hash      MR::getHashCode(current animation name); the receiver
                     calls XanimePlayer::changeAnimationByHash (D-018)
 u8   anim_weight[4] track blend weights x255 (locomotion group, D-018)
 f16  anim_frame
-u16  flags          bit0 luigi, bit1 grounded, bit2 hidden, bit3 in_cutscene
+u16  flags          bit0 luigi, bit1 grounded, bit2 hidden, bit3 in_cutscene, bits4-5 eyelid (0 open..3 closed)
 u32  stage_hash     MR::getHashCode(stage name): same galaxy check
 u8   scenario
 ```
@@ -79,6 +79,14 @@ Phase 4 adds 100+ for objects.
 - No bracketing sample for 500 ms: freeze. 3 s: hide. New sample: show.
 - Draw puppet only if `galaxy_id` and `scenario_id` match local.
 - `in_cutscene` flag: hide puppet (they're in a demo we aren't in).
+- Puppets use the player models (Mario.arc / Luigi.arc). The character
+  comes from the `PlayerState` Luigi flag (what the save plays), falling
+  back to Hello's `character` before any state arrives.
+- `tint` recolours a player's shirt and cap (`net/puppet/puppet_tint.h`),
+  on every client including their own: 0 auto, 1 classic, 2 green (red on
+  Luigi), 3 pink, 4 orange, 5 purple, 6 cyan, 7 yellow, 8 white, 9 black.
+  Auto is by player id: 1 classic, 2 green, 3 pink, 4 orange, 5 purple.
+  The native client sends `SMG_TINT`.
 
 ## Progress merge
 

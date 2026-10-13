@@ -32,6 +32,10 @@ typedef struct NetPlayerCapture {
 #define NET_CAPTURE_GROUNDED 0x0002
 #define NET_CAPTURE_HIDDEN 0x0004
 #define NET_CAPTURE_IN_DEMO 0x0008
+// Eyelid texture 0 (open) .. 3 (closed): MarioActor's blink and eye
+// animations (sleeping), which the animation itself does not carry.
+#define NET_CAPTURE_EYELID_MASK 0x0030
+#define NET_CAPTURE_EYELID_SHIFT 4
 
 // Called by game code once per gameplay frame (Mario exists, scene in play).
 void port_net_capture_player(void);

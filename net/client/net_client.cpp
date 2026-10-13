@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include <atomic>
+#include <chrono>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -38,12 +39,13 @@ struct Remote {
     uint8_t id = 0;
     std::string name;
     bool luigi = false;
+    uint8_t tint = 0;
     Sample ring[kRing];
     uint32_t count = 0;  // samples received
 };
 
 struct Session {
-    std::unique_ptr<Transport> transport;
+    std::shared_ptr<Transport> transport;  // shared with the keepalive thread
     std::atomic<int> state{0};  // 0 idle, 1 connecting, 2 open, 3 failed
     std::thread connector;
     uint8_t you = 0;
@@ -77,7 +79,7 @@ void sendHello(Session& s) {
     b.push_back((uint8_t)std::min<size_t>(name.size(), 32));
     b.insert(b.end(), name.begin(), name.begin() + std::min<size_t>(name.size(), 32));
     b.push_back(0);  // character: P2-06's lobby chooses; Mario for now
-    b.push_back(0);  // tint
+    b.push_back((uint8_t)atoi(envOr("SMG_TINT", "0")));  // tint
     b.push_back((uint8_t)room.size());
     b.insert(b.end(), room.begin(), room.end());
     s.transport->send(b.data(), b.size());
@@ -122,11 +124,12 @@ void handle(Session& s, const std::vector<uint8_t>& m) {
             uint8_t id = *p++;
             std::string name = readStr(p, end);
             uint8_t character = p < end ? *p++ : 0;
-            if (p < end) p++;  // tint
+            uint8_t tint = p < end ? *p++ : 0;
             if (id == s.you) continue;
             if (Remote* r = remoteById(s, id, true)) {
                 r->name = name;
                 r->luigi = character == 1;
+                r->tint = tint;
             }
         }
         port_log("net: joined room %s as player %u (%u others)", s.room.c_str(), s.you, n ? n - 1 : 0);
@@ -137,9 +140,11 @@ void handle(Session& s, const std::vector<uint8_t>& m) {
         uint8_t id = *p++;
         std::string name = readStr(p, end);
         uint8_t character = p < end ? *p++ : 0;
+        uint8_t tint = p < end ? *p++ : 0;
         if (Remote* r = remoteById(s, id, true)) {
             r->name = name;
             r->luigi = character == 1;
+            r->tint = tint;
             port_log("net: %s joined (player %u)", name.c_str(), id);
         }
         break;
@@ -241,7 +246,8 @@ bool interpolate(const Remote& r, int64_t t, int64_t now, NetPlayerCapture* out)
     out->stageHash = b->stageHash;
     out->scenario = b->scenario;
     out->flags = (b->flags & NET_STATE_LUIGI ? NET_CAPTURE_LUIGI : 0) | (b->flags & NET_STATE_GROUNDED ? NET_CAPTURE_GROUNDED : 0) |
-                 (b->flags & NET_STATE_HIDDEN ? NET_CAPTURE_HIDDEN : 0) | (b->flags & NET_STATE_IN_DEMO ? NET_CAPTURE_IN_DEMO : 0);
+                 (b->flags & NET_STATE_HIDDEN ? NET_CAPTURE_HIDDEN : 0) | (b->flags & NET_STATE_IN_DEMO ? NET_CAPTURE_IN_DEMO : 0) |
+                 (((b->flags & NET_STATE_EYELID_MASK) >> kNetStateEyelidShift) << NET_CAPTURE_EYELID_SHIFT);
     return true;
 }
 
@@ -256,7 +262,8 @@ PlayerState toState(const NetPlayerCapture& c) {
     memcpy(s.animWeights, c.animWeights, sizeof(s.animWeights));
     s.animFrame = c.animFrame;
     s.flags = (c.flags & NET_CAPTURE_LUIGI ? NET_STATE_LUIGI : 0) | (c.flags & NET_CAPTURE_GROUNDED ? NET_STATE_GROUNDED : 0) |
-              (c.flags & NET_CAPTURE_HIDDEN ? NET_STATE_HIDDEN : 0) | (c.flags & NET_CAPTURE_IN_DEMO ? NET_STATE_IN_DEMO : 0);
+              (c.flags & NET_CAPTURE_HIDDEN ? NET_STATE_HIDDEN : 0) | (c.flags & NET_CAPTURE_IN_DEMO ? NET_STATE_IN_DEMO : 0) |
+              (((c.flags & NET_CAPTURE_EYELID_MASK) >> NET_CAPTURE_EYELID_SHIFT) << kNetStateEyelidShift);
     s.stageHash = c.stageHash;
     s.scenario = (uint8_t)c.scenario;
     return s;
@@ -272,6 +279,8 @@ bool netEnabled() {
 const RemoteView& netRemote(int slot) { return session().views[slot]; }
 
 const char* netRoomCode() { return session().room.c_str(); }
+
+uint8_t netLocalId() { return session().you; }
 
 void netTick(const NetPlayerCapture* local) {
     if (!netEnabled()) return;
@@ -290,21 +299,42 @@ void netTick(const NetPlayerCapture* local) {
             s.state = 3;
             return;
 #else
-            auto ws = std::make_unique<WsClient>();
+            auto ws = std::make_shared<WsClient>();
             if (!ws->connect(url, &error)) {
                 port_log("net: %s", error.c_str());
                 s.state = 3;
                 return;
             }
-            s.transport = std::move(ws);
+            s.transport = ws;
 #endif
             sendHello(s);
             port_log("net: connected to %s", url.c_str());
             s.state = 2;
+            // Keepalive: netTick only runs during gameplay, and a long load,
+            // cutscene or the prologue's story pages would otherwise go
+            // silent past the relay's idle drop (15 s).
+            std::shared_ptr<Transport> t = s.transport;
+            while (t->isOpen()) {
+                std::this_thread::sleep_for(std::chrono::seconds(2));
+                uint8_t ping[5] = {kMsgPing};
+                uint32_t ms = (uint32_t)(port_host_time_ns() / 1000000);
+                memcpy(ping + 1, &ms, 4);
+                t->send(ping, sizeof(ping));
+            }
         });
         s.connector.detach();
     }
     if (s.state.load() != 2) return;
+    if (!s.transport->isOpen()) {
+        // Dropped (relay restart, network): forget the room and join again.
+        port_log("net: connection lost; reconnecting");
+        s.transport.reset();
+        for (Remote& r : s.remotes) r.present = false;
+        for (RemoteView& v : s.views) v = RemoteView();
+        s.you = 0;
+        s.state = 0;
+        return;
+    }
 
     std::vector<uint8_t> m;
     while (s.transport->poll(m)) handle(s, m);
@@ -329,7 +359,10 @@ void netTick(const NetPlayerCapture* local) {
         v.present = r.present;
         v.id = r.id;
         snprintf(v.name, sizeof(v.name), "%s", r.name.c_str());
-        v.luigi = r.luigi;
+        // The state packets say what the save actually plays; Hello's
+        // character is a lobby choice (P2-06) and 0 until then.
+        v.luigi = r.count ? (r.ring[(r.count - 1) % kRing].s.flags & NET_STATE_LUIGI) != 0 : r.luigi;
+        v.tint = r.tint;
         v.visible = r.present && interpolate(r, now - kRenderDelayNs, now, &v.pose) && local != nullptr &&
                     v.pose.stageHash == local->stageHash && v.pose.scenario == local->scenario &&
                     !(v.pose.flags & (NET_CAPTURE_HIDDEN | NET_CAPTURE_IN_DEMO));

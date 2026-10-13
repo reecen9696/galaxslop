@@ -196,7 +196,7 @@ if(NOT ANDROID)
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
   FetchContent_MakeAvailable(SDL3)
 
-  # Unit tests for code with no game dependency (net/proto).  doctest (MIT).
+  # Unit tests for code with no game dependency (net/proto, net/puppet/puppet_tint).  doctest (MIT).
   FetchContent_Declare(doctest
     URL https://github.com/doctest/doctest/archive/refs/tags/v2.4.11.tar.gz
     DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
@@ -204,7 +204,8 @@ if(NOT ANDROID)
   if(NOT doctest_POPULATED)
     FetchContent_Populate(doctest)
   endif()
-  add_executable(net_tests net/tests/player_state_test.cpp net/proto/player_state.cpp)
+  add_executable(net_tests net/tests/player_state_test.cpp net/proto/player_state.cpp
+    net/tests/puppet_tint_test.cpp net/puppet/puppet_tint.cpp)
   target_include_directories(net_tests PRIVATE ${CMAKE_SOURCE_DIR} ${doctest_SOURCE_DIR})
   enable_testing()
   add_test(NAME net_tests COMMAND net_tests)

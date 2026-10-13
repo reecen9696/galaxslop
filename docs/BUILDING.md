@@ -90,7 +90,7 @@ pointer arrives before the cursor is over the button.
 
 ## Co-op (native, early)
 
-Two or more desktop builds can already see each other as ghost Marios
+Two or more desktop builds can already see each other as Mario or Luigi
 (P2-01..P2-05; the browser version comes later). One machine runs the
 relay; everyone points their game at it and joins the same room.
 
@@ -110,10 +110,14 @@ SMG_RELAY=ws://<host-ip>:8787 SMG_ROOM=PLAY22 SMG_NAME=Reece ./build/native/smg 
   makes a room and the game logs `net: joined room ABC123`; the others use
   that code.
 - Others appear only when you are in the same stage and scenario, and not
-  during cutscenes. They are drawn 100 ms in the past, as the race-ghost
-  model. Nothing else is shared yet (no stars, no enemies).
+  during cutscenes. They are drawn 100 ms in the past, as the character
+  their save plays, in a shirt/cap colour fixed by player number (1 normal,
+  2 green, 3 pink, 4 orange, 5 purple), the same on every screen including
+  your own; `SMG_TINT=<n>` picks yours (values in `docs/NETCODE.md`).
+  `tools/coop_two_players.sh` runs two clients side by side on one Mac. Nothing else is shared yet (no stars, no enemies).
 - `PETARI_NETLOG=1` logs the room, round-trip time and where the others are.
-  `PETARI_LOOPBACK=1` shows a ghost of yourself 1 s behind, with no network.
+  `PETARI_LOOPBACK=1` shows a copy of yourself 1 s behind, with no network
+  (green, or by `SMG_TINT`).
 
 ## 3. Linux
 
@@ -123,9 +127,7 @@ Not tried.
 
 ## 4. Web
 
-Not yet. P0-06 (Emscripten link), P0-07 (OPFS disc reader), P0-08 (WebGL2
-title screen). The renderer is already WebGL2-shaped (`#version 300 es`
-path in `port/gl.h`).
+See [`docs/WEB.md`](WEB.md) for building and running the browser version.
 
 ## 5. What the build is made of
 

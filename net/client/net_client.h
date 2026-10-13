@@ -6,6 +6,7 @@
 //   SMG_RELAY  ws://host:port of the relay (unset: no networking)
 //   SMG_ROOM   room code to join; unset or empty creates a room
 //   SMG_NAME   player name (default "Player")
+//   SMG_TINT   puppet colour others see you in (net::kTint*; default auto)
 #pragma once
 
 #include <stdint.h>
@@ -20,7 +21,8 @@ struct RemoteView {
     bool present = false;   // in the room
     uint8_t id = 0;
     char name[33] = {};
-    bool luigi = false;
+    bool luigi = false;     // from their state packets once any arrived, else Hello
+    uint8_t tint = 0;       // requested in Hello (net::kTint*)
     bool visible = false;   // has fresh state for the local stage
     NetPlayerCapture pose;  // interpolated, in capture terms (baseMtx, weights...)
 };
@@ -34,5 +36,7 @@ void netTick(const NetPlayerCapture* local);
 const RemoteView& netRemote(int slot);
 // The room code once joined (empty before).
 const char* netRoomCode();
+// This client's player id in the room (1-based; 0 before joining).
+uint8_t netLocalId();
 
 }  // namespace net

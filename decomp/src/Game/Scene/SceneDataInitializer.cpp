@@ -1,4 +1,5 @@
 #ifdef TARGET_PC
+#include "Game/Util/EventUtil.hpp"
 #include "net/puppet/remote_player_puppet.hpp"
 #endif
 #include "Game/Scene/SceneDataInitializer.hpp"
@@ -30,11 +31,11 @@ void SceneDataInitializer::startStageFileLoadAfterScenarioSelected() {
 
     LuigiLetter::makeArchiveListForMenu(&collector, JMapInfoIter());
 #ifdef TARGET_PC
-    // Co-op: remote players are drawn with the race ghost's models; load them
-    // with the stage like GhostPlayer::makeArchiveList does (net/puppet).
+    // Co-op: remote players are drawn with the player models (net/puppet).
+    // The save's own character is stationed; load the other with the stage.
     if (port_net_wants_puppets() && !MR::isStageFileSelect()) {
-        collector.addArchive("GhostMario");
-        collector.addArchive("GhostLuigi");
+        collector.addArchive(MR::isPlayerLuigi() ? "Mario" : "Luigi");
+        collector.addArchive(MR::isPlayerLuigi() ? "MarioFace" : "LuigiFace");
     }
 #endif
 
