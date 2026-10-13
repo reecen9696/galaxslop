@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "net/client/ws_client.h"
+#include "net/client/ws_web.h"
 #include "net/proto/player_state.h"
 #include "port/heap_routing.h"
 #include "port/port.h"
@@ -294,19 +295,16 @@ void netTick(const NetPlayerCapture* local) {
             PortHostAllocScope scope;
             std::string error, url = getenv("SMG_RELAY");
 #if defined(__EMSCRIPTEN__)
-            // The browser build talks through the page's WebSocket (P2-03 web half).
-            port_log("net: no WebSocket transport in this build yet");
-            s.state = 3;
-            return;
+            auto ws = std::make_shared<WebWsClient>();  // the page's WebSocket (P2-03 web half)
 #else
             auto ws = std::make_shared<WsClient>();
+#endif
             if (!ws->connect(url, &error)) {
                 port_log("net: %s", error.c_str());
                 s.state = 3;
                 return;
             }
             s.transport = ws;
-#endif
             sendHello(s);
             port_log("net: connected to %s", url.c_str());
             s.state = 2;

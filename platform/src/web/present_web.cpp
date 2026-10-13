@@ -8,7 +8,9 @@
 #include "present_web.h"
 
 #include <emscripten/html5.h>
+#include <pthread.h>
 #include <stdio.h>
+#include <math.h>
 #include <string.h>
 
 #include <string>
@@ -21,6 +23,7 @@ namespace {
 
 const int kEfbW = 640, kEfbH = 456;
 EMSCRIPTEN_WEBGL_CONTEXT_HANDLE sCtx = 0;
+pthread_t sEventThread;  // runs the frame loop and html5/websocket callbacks
 gpu::EfbTarget sEfb;
 
 // Wii remote buttons (same bits as platform/src/native/present.cpp).
@@ -35,6 +38,7 @@ std::unordered_set<std::string> sKeys;  // KeyboardEvent.code values held
 bool sPointerIn = false;
 float sPointerX = 0, sPointerY = 0;  // -1..1 over the canvas
 bool sMouseL = false, sMouseR = false;
+bool sCursorActive = false;  // the gamepad's virtual pointer, until the mouse moves
 
 bool isGameKey(const char* code) {
     static const char* const kKeys[] = {"KeyW", "KeyA", "KeyS", "KeyD", "Space", "KeyK", "ControlLeft", "ControlRight", "KeyC", "Enter",
@@ -71,6 +75,7 @@ bool onMouse(int type, const EmscriptenMouseEvent* e, void*) {
         sPointerIn = false;
     } else if (cw > 0 && ch > 0) {
         sPointerIn = true;
+        sCursorActive = false;
         sPointerX = (float)(e->targetX / cw * 2.0 - 1.0);
         sPointerY = (float)(e->targetY / ch * 2.0 - 1.0);
     }
@@ -86,7 +91,11 @@ bool held(const char* code) { return sKeys.count(code) != 0; }
 
 }  // namespace
 
+// The thread that receives html5 and websocket callbacks (net/client/ws_web.cpp).
+extern "C" pthread_t web_event_thread(void) { return sEventThread; }
+
 bool web_present_init(int scale) {
+    sEventThread = pthread_self();
     EmscriptenWebGLContextAttributes attrs;
     emscripten_webgl_init_context_attributes(&attrs);
     attrs.majorVersion = 2;
@@ -138,6 +147,66 @@ void web_present_frame() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+// Gamepad (standard mapping) on top of keyboard/mouse, per BUILD_SPEC
+// section 7.  The right stick moves a virtual pointer; once it moves, the
+// pointer follows the stick until the mouse moves again.
+static void readGamepad(PortPadState* pad) {
+    static float sCursorX = 0, sCursorY = 0;
+    if (emscripten_sample_gamepad_data() != EMSCRIPTEN_RESULT_SUCCESS) {
+        return;
+    }
+    int n = emscripten_get_num_gamepads();
+    for (int i = 0; i < n; i++) {
+        EmscriptenGamepadEvent g;
+        if (emscripten_get_gamepad_status(i, &g) != EMSCRIPTEN_RESULT_SUCCESS || !g.connected || strcmp(g.mapping, "standard") != 0) {
+            continue;
+        }
+        auto btn = [&](int b) { return b < g.numButtons && g.digitalButton[b]; };
+        auto axis = [&](int a) {
+            float v = a < g.numAxes ? (float)g.axis[a] : 0.0f;
+            return fabsf(v) < 0.15f ? 0.0f : v;  // dead zone
+        };
+        if (axis(0) != 0 || axis(1) != 0) {
+            pad->stickX = axis(0);
+            pad->stickY = -axis(1);
+        }
+        if (btn(0)) pad->buttons |= kA;
+        if (btn(7)) pad->buttons |= kB;
+        if (btn(6)) pad->buttons |= kZ;
+        if (btn(4)) pad->buttons |= kC;
+        if (btn(9)) pad->buttons |= kPlus;
+        if (btn(8)) pad->buttons |= kMinus;
+        if (btn(12)) pad->buttons |= kUp;
+        if (btn(13)) pad->buttons |= kDown;
+        if (btn(14)) pad->buttons |= kLeft;
+        if (btn(15)) pad->buttons |= kRight;
+        if (btn(16)) pad->buttons |= kHome;
+        if (btn(1) || btn(2)) {
+            static unsigned sFlip = 0;
+            float a = (++sFlip & 1) ? 2.5f : -2.5f;
+            pad->accX = a;
+            pad->accY = a;
+        }
+        float rx = axis(2), ry = axis(3);
+        if (rx != 0 || ry != 0) {
+            if (!sCursorActive) {
+                sCursorX = sPointerIn ? sPointerX : 0.0f;
+                sCursorY = sPointerIn ? sPointerY : 0.0f;
+                sCursorActive = true;
+            }
+            const float kSpeed = 0.03f;  // screen half-widths per frame at full tilt (P1-09 makes it a setting)
+            sCursorX = fminf(1.0f, fmaxf(-1.0f, sCursorX + rx * kSpeed));
+            sCursorY = fminf(1.0f, fmaxf(-1.0f, sCursorY + ry * kSpeed));
+        }
+        if (sCursorActive) {
+            pad->pointerValid = 1;
+            pad->pointerX = sCursorX;
+            pad->pointerY = sCursorY;
+        }
+        break;  // first standard pad drives remote 0
+    }
+}
+
 // Keyboard/mouse -> one Wii remote + Nunchuk, the desktop mapping
 // (docs/BUILDING.md "Controls").
 void web_read_input(PortPadState* pad) {
@@ -171,6 +240,7 @@ void web_read_input(PortPadState* pad) {
         pad->pointerX = sPointerX;
         pad->pointerY = sPointerY;
     }
+    readGamepad(pad);
 }
 
 unsigned long long web_present_frame_number() { return gpu::renderer().frameNumber(); }

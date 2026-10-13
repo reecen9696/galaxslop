@@ -171,7 +171,7 @@ if(EMSCRIPTEN)
     # Browser: WebGL2 on the canvas, transferred to the proxied main thread;
     # WasmFS for the fetch (dev) and OPFS (P0-07) backends.
     target_link_options(smg PRIVATE -sENVIRONMENT=web,worker -sWASMFS -sOFFSCREENCANVAS_SUPPORT
-      -sOFFSCREENCANVASES_TO_PTHREAD=\#canvas -sEXPORTED_RUNTIME_METHODS=ENV
+      -sOFFSCREENCANVASES_TO_PTHREAD=\#canvas -sEXPORTED_RUNTIME_METHODS=ENV,HEAPU8 -lwebsocket.js
       --pre-js ${CMAKE_SOURCE_DIR}/platform/src/web/browser_env.js)
   endif()
   return()
