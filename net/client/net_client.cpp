@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "net/client/progress.h"
+#include "net/puppet/puppet_fx.h"
 #include "net/world/actor_sync.h"
 #include "net/world/world_sync.h"
 #include "net/client/ws_client.h"
@@ -204,6 +205,9 @@ void handle(Session& s, const std::vector<uint8_t>& m) {
         break;
     case 0x21:  // ProgressLog (P3-02)
         progressOnLog(m.data(), m.size());
+        break;
+    case net::kMsgPlayerEffect:  // the sender's particle effects (net/puppet/puppet_fx.h)
+        fxOnMessage(m.data(), m.size());
         break;
     case 0x23:  // ProgressSnapshot: the host's progress (P3-07)
         progressOnSnapshot(m.data(), m.size());
@@ -444,7 +448,7 @@ void netTick(const NetPlayerCapture* local) {
         v.tint = r.tint;
         v.visible = r.present && interpolate(r, now - kRenderDelayNs, now, &v.pose) && local != nullptr &&
                     v.pose.stageHash == local->stageHash && v.pose.scenario == local->scenario &&
-                    !(v.pose.flags & (NET_CAPTURE_HIDDEN | NET_CAPTURE_IN_DEMO));
+                    !(v.pose.flags & NET_CAPTURE_HIDDEN);  // shown in their cutscenes too: talking to an NPC is one
         v.frozen = r.count == 0 || now - r.ring[(r.count - 1) % kRing].recvNs > kFreezeNs;
     }
     static const bool sLog = getenv("PETARI_NETLOG") != nullptr;

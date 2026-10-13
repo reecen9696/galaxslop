@@ -40,6 +40,7 @@
 #include "Game/Util/PlayerUtil.hpp"
 #include "Game/Util/SchedulerUtil.hpp"
 #include "net/client/net_client.h"
+#include "net/puppet/puppet_fx.h"
 #include "net/puppet/puppet_tint.h"
 #include "net/world/world_sync.h"
 #include "port/port.h"
@@ -271,6 +272,9 @@ void RemotePlayerPuppet::init(const JMapInfoIter&) {
     mHandL = initPart("MarioHandL", "HandL0", 0);
     mHandR = initPart("MarioHandR", "HandR0", 0);
     initForms();
+    // MarioActor::initEffect's group, in its order: the sender's effects come
+    // by index (puppet_fx.h).
+    initEffectKeeper(0xB8, "Mario", true);
     MR::connectToScene(this, MR::MovementType_Player, MR::CalcAnimType_Player, MR::DrawBufferType_None, MR::DrawType_Player);
     mVelocity.zero();
     // The animation players need the player's animation table, and the player
@@ -383,8 +387,12 @@ void RemotePlayerPuppet::applyState(const NetPlayerCapture& rState, bool valid, 
         }
         initAnimation();
     }
+    bool wasHidden = mHidden;
     mHidden = !valid || (rState.flags & NET_CAPTURE_HIDDEN) != 0;
     if (mHidden) {
+        if (!wasHidden) {
+            net::fxStopAll(this);
+        }
         showParts(false, false);
         return;
     }
@@ -976,7 +984,7 @@ void applyContacts() {
     }
 }
 
-void showSlot(int slot, bool luigi, const NetPlayerCapture& pose, bool visible, u8 tint, bool solid, u8 remoteId) {
+void showSlot(int slot, bool luigi, const NetPlayerCapture& pose, bool visible, u8 tint, bool solid, u8 remoteId, int64_t fxDelayNs) {
     for (int c = 0; c < 2; c++) {
         RemotePlayerPuppet* p = sPuppets[slot][c];
         if (p == nullptr) {
@@ -988,6 +996,9 @@ void showSlot(int slot, bool luigi, const NetPlayerCapture& pose, bool visible, 
         }
         p->applyState(pose, mine && visible, mine && solid, remoteId);
     }
+    // The effects that player played, on the puppet showing them.
+    RemotePlayerPuppet* shown = sPuppets[slot][luigi ? 1 : 0];
+    net::fxApply(remoteId, visible ? shown : nullptr, fxDelayNs);
 }
 }  // namespace
 
@@ -1175,6 +1186,7 @@ extern "C" void port_net_puppets_update(void* pScene) {
     applyDebugModes();
     NetPlayerCapture now;
     bool haveLocal = net_capture_latest(&now) != 0;
+    net::fxSend();  // the local player's effects this frame
 
     if (net::netEnabled()) {
         net::netTick(haveLocal ? &now : nullptr);
@@ -1184,7 +1196,8 @@ extern "C" void port_net_puppets_update(void* pScene) {
         updateLocalTint();
         for (int i = 0; i < net::kMaxRemotes; i++) {
             const net::RemoteView& v = net::netRemote(i);
-            showSlot(i, v.luigi, v.pose, v.visible, net::puppetTint(v.tint, v.id), contactEnabled() && !v.frozen, v.id);
+            showSlot(i, v.luigi, v.pose, v.visible, net::puppetTint(v.tint, v.id), contactEnabled() && !v.frozen, v.id,
+                     100000000);  // net_client.cpp's kRenderDelayNs: drawn 100 ms behind
         }
         return;
     }
@@ -1211,6 +1224,6 @@ extern "C" void port_net_puppets_update(void* pScene) {
         // The copy is solid only with a delay (a copy inside the player would
         // push him forever).
         showSlot(0, (past.flags & NET_CAPTURE_LUIGI) != 0, past, valid, net::puppetTint(tint ? (u8)atoi(tint) : 0, 2),
-                 contactEnabled() && delayNs > 0, 0);
+                 contactEnabled() && delayNs > 0, 0, delayNs);
     }
 }

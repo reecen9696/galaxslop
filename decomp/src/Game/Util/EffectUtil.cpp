@@ -10,6 +10,9 @@
 #include "Game/Util/ActorSensorUtil.hpp"
 #include "Game/Util/MapUtil.hpp"
 #include "Game/Util/MtxUtil.hpp"
+#ifdef TARGET_PC
+#include "net/puppet/puppet_fx.h"
+#endif
 
 namespace {
     EffectKeeper* getEffectKeeper(const LiveActor* pActor) {
@@ -51,6 +54,9 @@ namespace MR {
     }
 
     MultiEmitter* emitEffect(LiveActor* pActor, const char* pEffectName) {
+#ifdef TARGET_PC
+        port_net_fx_note(pActor, pEffectName, 1);  // the local player's, for the others (net/puppet/puppet_fx.h)
+#endif
         return ::getEffectKeeper(pActor)->createEmitter(pEffectName);
     }
 
@@ -100,10 +106,16 @@ namespace MR {
     }
 
     void deleteEffect(LiveActor* pActor, const char* pEffectName) {
+#ifdef TARGET_PC
+        port_net_fx_note(pActor, pEffectName, 2);
+#endif
         ::getEffectKeeper(pActor)->deleteEmitter(pEffectName);
     }
 
     void forceDeleteEffect(LiveActor* pActor, const char* pEffectName) {
+#ifdef TARGET_PC
+        port_net_fx_note(pActor, pEffectName, 3);
+#endif
         ::getEffectKeeper(pActor)->forceDeleteEmitter(pEffectName);
     }
 

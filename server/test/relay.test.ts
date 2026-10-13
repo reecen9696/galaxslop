@@ -410,3 +410,20 @@ describe("host snapshot (P3-07)", () => {
     expect(snaps(guest)).toEqual([]);
   });
 });
+
+describe("player effects", () => {
+  it("forwards a player's effects to the others, only under their own id", () => {
+    const relay = new Relay({ fixedRooms: ["ROOM22"] });
+    const inbox: Uint8Array[][] = [[], []];
+    const conns: Conn[] = [0, 1].map((i) => ({ send: (b: Uint8Array) => inbox[i].push(b), close: () => {} }));
+    conns.forEach((c, i) => {
+      relay.connect(c);
+      relay.message(c, hello(i ? "B" : "A", "ROOM22"));
+    });
+    const fx = (sender: number) => Uint8Array.from([Msg.PlayerEffect, sender, 1, 1, 7, 0, 0]);
+    relay.message(conns[0], fx(1));
+    relay.message(conns[0], fx(2)); // not A's id: dropped
+    expect(inbox[1].filter((m) => m[0] === Msg.PlayerEffect).map((m) => m[1])).toEqual([1]);
+    expect(inbox[0].filter((m) => m[0] === Msg.PlayerEffect)).toEqual([]);
+  });
+});

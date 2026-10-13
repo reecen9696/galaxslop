@@ -54,7 +54,8 @@
   body.stretch canvas { width: 100vw; height: 100dvh; aspect-ratio: auto; }
   #stage { position: relative; display: none; }
   #stage canvas { display: block; }
-  #tags { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  #tags { position: absolute; inset: 0; pointer-events: none; overflow: hidden; display: none; }
+  body.names #tags { display: block; }  /* Settings: Show player names (off by default) */
   #tags span { position: absolute; transform: translate(-50%, -100%); font: 600 13px var(--ui); color: #fff; background: #0008; padding: 1px 8px; border-radius: 8px; white-space: nowrap; }
 
   #status { color: var(--dim); font-size: 14px; text-align: center; padding: 0 16px; transition: opacity .6s; }
@@ -344,6 +345,7 @@
   <select id="skipHold"><option value="0">Off (holding A only speeds up text, as on the Wii)</option><option value="1">After 1 second</option><option value="2">After 2 seconds</option></select>
   <label class="inline"><input id="showKeys" type="checkbox"> Show controls</label>
   <label class="inline"><input id="touchCtl" type="checkbox"> Touch controls</label>
+  <label class="inline"><input id="names" type="checkbox"> Show player names</label>
   <label class="inline"><input id="perf" type="checkbox"> Show frame times</label>
   <label>Cutscenes</label>
   <p id="moviesNote" class="note"></p>

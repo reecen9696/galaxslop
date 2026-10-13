@@ -22,6 +22,9 @@
 #include <JSystem/JParticle/JPAMath.hpp>
 #include <cstdio>
 #include <cstring>
+#ifdef TARGET_PC
+#include "net/puppet/puppet_fx.h"
+#endif
 
 struct MaterialEffectEntry {
     union FlagWord {
@@ -950,6 +953,9 @@ void MarioActor::playEffectTrans(const char* pName, const TVec3f& rTrans) {
     if (emitter != nullptr) {
         emitter->setGlobalTranslation(rTrans, -1);
     }
+#ifdef TARGET_PC
+    port_net_fx_transform(this, emitter, &rTrans.x, nullptr, 0.0f, 0);
+#endif
 }
 
 void MarioActor::playEffectRT(const char* pName, const TVec3f& rDir, const TVec3f& rTrans) {
@@ -968,6 +974,9 @@ void MarioActor::playEffectRT(const char* pName, const TVec3f& rDir, const TVec3
         emitter->setGlobalTranslation(rTrans, -1);
         emitter->setGlobalRotationDegree(rot, -1);
     }
+#ifdef TARGET_PC
+    port_net_fx_transform(this, emitter, &rTrans.x, &rot.x, 0.0f, 1);
+#endif
 }
 
 void MarioActor::playEffectRTZ(const char* pName, const TVec3f& rDir, const TVec3f& rTrans) {
@@ -986,6 +995,9 @@ void MarioActor::playEffectRTZ(const char* pName, const TVec3f& rDir, const TVec
         emitter->setGlobalTranslation(rTrans, -1);
         emitter->setGlobalRotationDegree(rot, -1);
     }
+#ifdef TARGET_PC
+    port_net_fx_transform(this, emitter, &rTrans.x, &rot.x, 0.0f, 1);
+#endif
 }
 
 void MarioActor::playEffectRTW(const char* pName, const TVec3f& rDir, const TVec3f& rTrans) {
@@ -1025,6 +1037,9 @@ void MarioActor::playEffectSRT(const char* pName, f32 scale, const TVec3f& rDir,
     if (emitter != nullptr) {
         emitter->setGlobalRotationDegree(rot, -1);
     }
+#ifdef TARGET_PC
+    port_net_fx_transform(this, emitter, &rTrans.x, &rot.x, scale, 0);
+#endif
 }
 
 void MarioActor::stopCommonEffect(const char* pName) {

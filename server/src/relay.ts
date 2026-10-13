@@ -132,6 +132,12 @@ export class Relay {
           for (const other of c.room.players.values()) if (other !== c) other.conn.send(data);
         }
         break;
+      case Msg.PlayerEffect:
+        // The sender's particle effects: forwarded like ActorState.
+        if (c.room && c.info && data.length >= 3 && data.length <= ACTOR_STATE_MAX && data[1] === c.info.id) {
+          for (const other of c.room.players.values()) if (other !== c) other.conn.send(data);
+        }
+        break;
       case Msg.Ping:
         // Echo the client's timestamp back.
         if (data.length >= 5) {

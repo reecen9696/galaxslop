@@ -13,6 +13,7 @@ export const Msg = {
   Contact: 0x12,
   WorldEvent: 0x13,
   ActorState: 0x14,
+  PlayerEffect: 0x15,
   ProgressEvent: 0x20,
   ProgressLog: 0x21,
   ProgressAck: 0x22,

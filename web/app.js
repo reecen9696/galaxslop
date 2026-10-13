@@ -1003,6 +1003,15 @@ function setupSettings() {
     e.stopPropagation();
   }, true);
   setupMovies();
+  // Name tags over the other players: off unless Settings turns them on.
+  const names = document.getElementById("names");
+  names.checked = store("smg.names") === "1";
+  const applyNames = () => document.body.classList.toggle("names", names.checked);
+  names.onchange = () => {
+    store("smg.names", names.checked ? "1" : "0");
+    applyNames();
+  };
+  applyNames();
   const perf = document.getElementById("perf"), perfbox = document.getElementById("perfbox");
   perf.checked = store("smg.perf") === "1";
   const showPerf = () => {

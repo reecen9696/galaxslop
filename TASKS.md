@@ -383,6 +383,7 @@ with no desync complaints at 100 ms delay.
   - 2026-10-13 (A): networked: two desktop clients in relay room PLAY22, each drawing the other as a GhostMario puppet (screenshot: Bob idle at the courtyard spawn inside Alice's game). Remaining: Luigi model per remote (Hello character), tint, heap budget measurement.
   - 2026-10-12: loopback milestone works natively: PETARI_LOOPBACK=1 draws a GhostMario puppet replaying the local player 1 s late in the prologue courtyard (screenshot: blue ghost trailing Mario). Lessons: (1) create puppets during scene init (SceneDataInitializer::initAfterScenarioSelected), never from the frame update: ModelManager::init waits on a main-thread job and deadlocks there; (2) add GhostMario/GhostLuigi to the stage's archive list (startStageFileLoadAfterScenarioSelected); (3) build the XanimePlayers on the first frame the player exists (the table is the player's); (4) skip the file-select stage. Next: animation sync check (does the hash map to the right motion?), then drive it from P2-03 instead of the loopback.
   - 2026-10-12 (A): model it on GhostPlayer (Cosmic Mario ghost): XanimePlayer + upper-body player, changeAnimationByHash, receiveGhostPacket's apply logic. First milestone: a loopback puppet that replays the local player's captured state ~1 s late, no network.
+  - 2026-10-14 (A): the player's particle effects reach the others (net/puppet/puppet_fx: PlayerEffect 0x15, by EffectKeeper index; MR::emitEffect / deleteEffect hooks, MarioActor::playEffectTrans/RT/RTZ/SRT positions), played 100 ms late like the pose. Verified: spin sparkles on the PETARI_LOOPBACK copy; 2 web clients, 295 effects played on the watcher's puppet. Puppets in a cutscene stay shown (NPC talks are demos; a friend talking vanished). PETARI_FXLOG=1 logs what puppets play.
 
 ### P2-09 Player contact (push, stomp)
 - lane: A
@@ -422,6 +423,7 @@ with no desync complaints at 100 ms delay.
 - done when: tags track puppets with no visible lag.
 - log:
   - 2026-10-13 (A): browser: present_web.cpp projects each visible remote (head + 210 along their up) with the drawn frame's camera; the page draws HTML labels over the canvas (colour by tint). Player list = room bar under the canvas. Verified headless with two quick-start clients in Good Egg (tag above the walking puppet, none for a player behind the camera). Native build has no tags yet.
+  - 2026-10-14 (A): name tags off by default (Settings: Show player names).
 
 ### P2-08 Playtest: 3 players over the internet
 - lane: shared
