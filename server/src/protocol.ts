@@ -10,6 +10,7 @@ export const Msg = {
   PlayerJoined: 0x03,
   PlayerLeft: 0x04,
   PlayerState: 0x10,
+  Contact: 0x12,
   ProgressEvent: 0x20,
   ProgressLog: 0x21,
   ProgressAck: 0x22,
@@ -212,6 +213,16 @@ export function encodePlayerLeft(id: number): Uint8Array {
 
 export function encodeError(code: number, msg: string): Uint8Array {
   return new Writer().u8(Msg.Error).u8(code).str(msg).bytes();
+}
+
+// Contact (D-020): client -> server [0x12][u8 target_id][u8 kind][f16 dir x3];
+// server -> target only, the same bytes with the target id replaced by the
+// sender's.  Unreliable, not inspected beyond length and target.
+export const CONTACT_SIZE = 9;
+export function forwardContact(fromId: number, b: Uint8Array): Uint8Array {
+  const out = b.slice(0, CONTACT_SIZE);
+  out[1] = fromId;
+  return out;
 }
 
 // Server -> others: [0x10][player_id][the sender's payload after its type byte].

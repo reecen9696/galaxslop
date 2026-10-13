@@ -53,6 +53,22 @@ struct PlayerState {
     uint8_t scenario = 0;
 };
 
+// Contact (D-020): one player touched another's puppet.  Client -> server
+// [0x12][u8 target_id][u8 kind][f16 dir[3]]; the server forwards it to the
+// target only, with the sender's id in place of the target's.
+constexpr uint8_t kMsgContact = 0x12;
+constexpr size_t kContactSize = 9;
+enum : uint8_t {
+    kContactTrample = 1,  // stomped on (the target flinches)
+};
+struct Contact {
+    uint8_t playerId = 0;  // target when sending, sender when received
+    uint8_t kind = 0;
+    float dir[3] = {};     // from the toucher towards the touched, unit length
+};
+void encodeContact(const Contact& c, uint8_t* out);           // kContactSize bytes
+bool decodeContact(const uint8_t* in, size_t len, Contact* c);  // false if malformed
+
 uint16_t floatToHalf(float f);
 float halfToFloat(uint16_t h);
 

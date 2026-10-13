@@ -17,6 +17,8 @@ import {
   encodePlayerLeft,
   encodeWelcome,
   forwardPlayerState,
+  forwardContact,
+  CONTACT_SIZE,
   type PlayerInfo,
 } from "./protocol.ts";
 
@@ -109,6 +111,9 @@ export class Relay {
         break;
       case Msg.PlayerState:
         this.onPlayerState(c, data);
+        break;
+      case Msg.Contact:
+        this.onContact(c, data);
         break;
       case Msg.Ping:
         // Echo the client's timestamp back.
@@ -206,6 +211,14 @@ export class Relay {
     if (data.length < PLAYER_STATE_MIN || data.length > PLAYER_STATE_MAX) return;
     const out = forwardPlayerState(c.info.id, data);
     for (const other of room.players.values()) if (other !== c) other.conn.send(out);
+  }
+
+  private onContact(c: Client, data: Uint8Array): void {
+    const room = c.room;
+    if (!room || !c.info || data.length !== CONTACT_SIZE) return;
+    const target = room.players.get(data[1]);
+    if (!target || target === c) return;
+    target.conn.send(forwardContact(c.info.id, data));
   }
 
   private onProgressEvent(c: Client, data: Uint8Array): void {

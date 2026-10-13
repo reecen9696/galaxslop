@@ -12,6 +12,7 @@
 #include <stdint.h>
 
 #include "net/capture/player_capture.h"
+#include "net/proto/player_state.h"
 
 namespace net {
 
@@ -24,6 +25,7 @@ struct RemoteView {
     bool luigi = false;     // from their state packets once any arrived, else Hello
     uint8_t tint = 0;       // requested in Hello (net::kTint*)
     bool visible = false;   // has fresh state for the local stage
+    bool frozen = false;    // visible, but no new state for a while (held pose)
     NetPlayerCapture pose;  // interpolated, in capture terms (baseMtx, weights...)
 };
 
@@ -38,6 +40,11 @@ bool netPump();
 void netTick(const NetPlayerCapture* local);
 // Slot i (0..kMaxRemotes-1) as of the last netTick.
 const RemoteView& netRemote(int slot);
+// Contact (D-020): tell player `targetId` this client touched them.
+void netSendContact(uint8_t targetId, uint8_t kind, const float dir[3]);
+// Contacts other players made with the local player, oldest first; false
+// when none are waiting.
+bool netPollContact(Contact* out);
 // The room code once joined (empty before).
 const char* netRoomCode();
 // This client's player id in the room (1-based; 0 before joining).

@@ -203,4 +203,25 @@ void quatToMatrix(const float qin[4], float m[3][4]) {
     m[2][2] = 1 - 2 * (x * x + y * y);
 }
 
+void encodeContact(const Contact& c, uint8_t* out) {
+    out[0] = kMsgContact;
+    out[1] = c.playerId;
+    out[2] = c.kind;
+    for (int i = 0; i < 3; i++) {
+        uint16_t h = floatToHalf(c.dir[i]);
+        out[3 + 2 * i] = (uint8_t)h;
+        out[4 + 2 * i] = (uint8_t)(h >> 8);
+    }
+}
+
+bool decodeContact(const uint8_t* in, size_t len, Contact* c) {
+    if (len != kContactSize || in[0] != kMsgContact) return false;
+    c->playerId = in[1];
+    c->kind = in[2];
+    for (int i = 0; i < 3; i++) {
+        c->dir[i] = halfToFloat((uint16_t)(in[3 + 2 * i] | in[4 + 2 * i] << 8));
+    }
+    return true;
+}
+
 }  // namespace net

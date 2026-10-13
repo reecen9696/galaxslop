@@ -14,11 +14,13 @@
 #include "Game/LiveActor/PartsModel.hpp"
 #include "Game/Player/DrawAdaptor.hpp"
 #include "Game/Player/J3DModelX.hpp"
+#include "Game/Player/Mario.hpp"
 #include "Game/Player/MarioAccess.hpp"
 #include "Game/Player/MarioActor.hpp"
 #include "Game/Player/ModelHolder.hpp"
 #include "Game/Scene/SceneFunction.hpp"
 #include "Game/System/GameDataFunction.hpp"
+#include "Game/Util/ActorSensorUtil.hpp"
 #include "Game/Util/ActorShadowUtil.hpp"
 #include "Game/Util/EventUtil.hpp"
 #include "Game/Util/FileUtil.hpp"
@@ -189,7 +191,8 @@ struct HideFlags {
 
 RemotePlayerPuppet::RemotePlayerPuppet(const char* pName, bool luigi)
     : LiveActor(pName), mXanimePlayer(nullptr), mXanimePlayerUpper(nullptr), mAnimHash(0), mLuigi(luigi), mHidden(true), mFace(nullptr),
-      mHandL(nullptr), mHandR(nullptr), mBeeWing(nullptr), mTeresa(nullptr), mMode(0), mAirborne(false), mFacePose(0), mHandPoseL(0),
+      mHandL(nullptr), mHandR(nullptr), mBeeWing(nullptr), mTeresa(nullptr), mMode(0), mRemoteId(0), mSolid(false), mTrampleCooldown(0),
+      mAirborne(false), mFacePose(0), mHandPoseL(0),
       mHandPoseR(0), mEyelidMaterial(0xFFFF), mEyelid(0) {
     PSMTXIdentity(mTargetRotationMtx);
     for (Form& f : mForms) {
@@ -263,9 +266,50 @@ void RemotePlayerPuppet::init(const JMapInfoIter&) {
     // does not exist yet during scene initialisation: initAnimation() runs on
     // the first frame with state (applyState).
 
+    // GhostPlayer::init's sensor.
+    initHitSensor(1);
+    MR::addHitSensorRide(this, "body", 4, 40.0f, TVec3f(0.0f, 80.0f, 0.0f));
+    MR::invalidateHitSensors(this);
+
     MR::initShadowVolumeSphere(this, 50.0f);
     MR::invalidateClipping(this);
     makeActorAppeared();
+}
+
+// GhostPlayer::attackSensor, racing branch: push the local Mario out.
+void RemotePlayerPuppet::attackSensor(HitSensor* pSender, HitSensor* pReceiver) {
+    if (mSolid && MR::isSensorPlayer(pReceiver) && MR::sendMsgPush(pReceiver, pSender)) {
+        static const bool sLog = getenv("PETARI_PUPPETLOG") != nullptr;
+        static u32 sN = 0;
+        if (sLog && (sN++ % 30) == 0) {
+            port_log("puppet: pushing the local player (player %u)", mRemoteId);
+        }
+    }
+}
+
+// GhostPlayer::receiveMsgPlayerAttack without the star bits: the stomping
+// Mario bounces (returning true), and the stomped player is told.
+bool RemotePlayerPuppet::receiveMsgPlayerAttack(u32 msg, HitSensor* pSender, HitSensor* pReceiver) {
+    if (!mSolid) {
+        return false;
+    }
+    if (MR::isMsgPlayerTrample(msg) || MR::isMsgPlayerHipDrop(msg)) {
+        if (mTrampleCooldown == 0 && mRemoteId != 0 && MR::isExistMario()) {
+            const TVec3f& front = MarioAccess::getPlayerActor()->mMario->mFrontVec;
+            float dir[3] = {front.x, front.y, front.z};
+            net::netSendContact(mRemoteId, net::kContactTrample, dir);
+        }
+        if (mTrampleCooldown == 0) {
+            port_log("puppet: local player stomped player %u", mRemoteId);
+        }
+        mTrampleCooldown = 20;
+        return true;
+    }
+    return false;
+}
+
+bool RemotePlayerPuppet::receiveOtherMsg(u32, HitSensor*, HitSensor*) {
+    return mSolid;  // GhostPlayer: everything else is swallowed
 }
 
 // GhostPlayer::initAnimation: the player's own animation table, so the
@@ -281,7 +325,17 @@ void RemotePlayerPuppet::initAnimation() {
     mXanimePlayerUpper->changeAnimation(kBasicAnim);
 }
 
-void RemotePlayerPuppet::applyState(const NetPlayerCapture& rState, bool valid) {
+void RemotePlayerPuppet::applyState(const NetPlayerCapture& rState, bool valid, bool solid, u8 remoteId) {
+    mRemoteId = remoteId;
+    solid = solid && valid && (rState.flags & NET_CAPTURE_HIDDEN) == 0 && mXanimePlayer != nullptr;
+    if (solid != mSolid) {
+        mSolid = solid;
+        if (solid) {
+            MR::validateHitSensors(this);
+        } else {
+            MR::invalidateHitSensors(this);
+        }
+    }
     if (mXanimePlayer == nullptr) {
         if (!MR::isExistMario()) {
             mHidden = true;
@@ -380,7 +434,11 @@ void RemotePlayerPuppet::applyState(const NetPlayerCapture& rState, bool valid) 
     }
 }
 
-void RemotePlayerPuppet::control() {}
+void RemotePlayerPuppet::control() {
+    if (mTrampleCooldown != 0) {
+        mTrampleCooldown--;
+    }
+}
 
 int RemotePlayerPuppet::formForMode(u8 mode) {
     switch (mode) {
@@ -691,7 +749,29 @@ void updateLocalTint() {
 }
 
 // Shows the slot's puppet for `luigi` posed by `pose`, hides the other.
-void showSlot(int slot, bool luigi, const NetPlayerCapture& pose, bool visible, u8 tint) {
+// SMG_CONTACT=0: puppets are ghosts again (no push, no stomp, no flinch).
+bool contactEnabled() {
+    static const char* sContact = getenv("SMG_CONTACT");
+    return !(sContact != nullptr && sContact[0] == '0');
+}
+
+// Contacts from other players: a stomp on the local Mario makes him flinch
+// (Mario::doFlipWeak: knocked back, no damage; refused while invincible
+// after a hit or in a state that cannot be pushed).
+void applyContacts() {
+    net::Contact c;
+    while (net::netPollContact(&c)) {
+        if (!contactEnabled() || !MR::isExistMario() || c.kind != net::kContactTrample) {
+            continue;
+        }
+        MarioActor* actor = MarioAccess::getPlayerActor();
+        TVec3f dir(c.dir[0], c.dir[1], c.dir[2]);
+        bool flinched = actor->mMario->doFlipWeak(dir);
+        port_log("puppet: stomped by player %u%s", c.playerId, flinched ? "" : " (no reaction in this state)");
+    }
+}
+
+void showSlot(int slot, bool luigi, const NetPlayerCapture& pose, bool visible, u8 tint, bool solid, u8 remoteId) {
     for (int c = 0; c < 2; c++) {
         RemotePlayerPuppet* p = sPuppets[slot][c];
         if (p == nullptr) {
@@ -701,7 +781,7 @@ void showSlot(int slot, bool luigi, const NetPlayerCapture& pose, bool visible, 
         if (mine) {
             p->setTint(tint, ModelTint::suitForMode((u8)((pose.flags & NET_CAPTURE_MODE_MASK) >> NET_CAPTURE_MODE_SHIFT)));
         }
-        p->applyState(pose, mine && visible);
+        p->applyState(pose, mine && visible, mine && solid, remoteId);
     }
 }
 }  // namespace
@@ -782,7 +862,10 @@ extern "C" void port_net_puppets_create_for_scene(void) {
     s32 freeBefore = heap->getTotalFreeSize();
     for (int i = 0; i < count; i++) {
         for (int c = 0; c < 2; c++) {
-            sPuppets[i][c] = new RemotePlayerPuppet(c ? "RemoteLuigiPuppet" : "RemoteMarioPuppet", c == 1);
+            // The name keeps the race ghost's (ゴーストマリオ): see the header.
+            sPuppets[i][c] = new RemotePlayerPuppet(c ? "\x83\x53\x81\x5b\x83\x58\x83\x67\x83\x7d\x83\x8a\x83\x49 (co-op Luigi)"
+                                                      : "\x83\x53\x81\x5b\x83\x58\x83\x67\x83\x7d\x83\x8a\x83\x49 (co-op Mario)",
+                                                    c == 1);
             sPuppets[i][c]->initWithoutIter();
         }
     }
@@ -814,10 +897,11 @@ extern "C" void port_net_puppets_update(void* pScene) {
 
     if (net::netEnabled()) {
         net::netTick(haveLocal ? &now : nullptr);
+        applyContacts();
         updateLocalTint();
         for (int i = 0; i < net::kMaxRemotes; i++) {
             const net::RemoteView& v = net::netRemote(i);
-            showSlot(i, v.luigi, v.pose, v.visible, net::puppetTint(v.tint, v.id));
+            showSlot(i, v.luigi, v.pose, v.visible, net::puppetTint(v.tint, v.id), contactEnabled() && !v.frozen, v.id);
         }
         return;
     }
@@ -841,6 +925,9 @@ extern "C" void port_net_puppets_update(void* pScene) {
         }
         // SMG_TINT picks the copy's colour, otherwise as player 2 (green).
         const char* tint = getenv("SMG_TINT");
-        showSlot(0, (past.flags & NET_CAPTURE_LUIGI) != 0, past, valid, net::puppetTint(tint ? (u8)atoi(tint) : 0, 2));
+        // The copy is solid only with a delay (a copy inside the player would
+        // push him forever).
+        showSlot(0, (past.flags & NET_CAPTURE_LUIGI) != 0, past, valid, net::puppetTint(tint ? (u8)atoi(tint) : 0, 2),
+                 contactEnabled() && delayNs > 0, 0);
     }
 }

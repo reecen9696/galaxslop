@@ -206,6 +206,29 @@ describe("relay logic", () => {
   });
 });
 
+describe("contact (D-020)", () => {
+  it("forwards a Contact to its target only, with the sender's id", () => {
+    const relay = new Relay({ fixedRooms: ["ROOM22"] });
+    const inbox: Uint8Array[][] = [[], [], []];
+    const conns: Conn[] = [0, 1, 2].map((i) => ({ send: (b) => inbox[i].push(b), close: () => {} }));
+    conns.forEach((c, i) => {
+      relay.connect(c);
+      relay.message(c, hello("P" + i, "ROOM22"));
+    });
+    inbox.forEach((m) => (m.length = 0));
+    // Player 1 tramples player 3.
+    relay.message(conns[0], Uint8Array.of(Msg.Contact, 3, 1, 0, 0x3c, 0, 0, 0, 0));
+    expect(inbox[1].length).toBe(0);
+    expect(inbox[2].length).toBe(1);
+    expect(Array.from(inbox[2][0])).toEqual([Msg.Contact, 1, 1, 0, 0x3c, 0, 0, 0, 0]);
+    // Malformed (wrong size) and self-targeted contacts are dropped.
+    relay.message(conns[0], Uint8Array.of(Msg.Contact, 3, 1));
+    relay.message(conns[0], Uint8Array.of(Msg.Contact, 1, 1, 0, 0, 0, 0, 0, 0));
+    expect(inbox[2].length).toBe(1);
+    expect(inbox[0].length).toBe(0);
+  });
+});
+
 describe("progress log (P3-01)", () => {
   function setup() {
     let t = 0;

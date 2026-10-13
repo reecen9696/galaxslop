@@ -292,6 +292,94 @@ no RAM; D-013's budget is resident memory, measured at P0-09.
 Revisit: if a browser refuses a 3.5 GB memory, move the arenas lower; the
 GX/renderer assumptions about >= 0x80000000 would need the same change.
 
+## D-020 (2026-10-13, lane A): Players touching each other (push, bounce off heads): option C, adopted 2026-10-13 at the user's request
+Status: adopted, option C (the user asked for player interaction before
+P2-08). Built: the puppet carries the ghost's Ride sensor (on only while
+shown and receiving), pushes the local Mario (mutual repulsion), lets him
+bounce on a stomp or hip drop, and sends Contact 0x12 (NETCODE.md) so the
+stomped player flinches (Mario::doFlipWeak, no damage). No star bits.
+`SMG_CONTACT=0` turns it off; the lobby toggle (P2-06) is still to do.
+Original proposal text follows. The spec (BUILD_SPEC.md §1, §6 Phase 2) says players
+"see each other"; nothing says they can touch. This entry argues for a
+small, local-authority version after the Phase 2 gate, and against
+anything more.
+
+What SMG already does: the puppet's model, `GhostPlayer`, is not
+touch-free. It has a Ride sensor (`addHitSensorRide("body", radius 40,
++80 up)`, GhostPlayer.cpp:181) and three behaviours: while racing it
+pushes Mario (`attackSensor`: `MR::sendMsgPush`, plus one star bit, 5-frame
+cooldown); Mario can trample it (`receiveMsgPlayerAttack`:
+`isMsgPlayerTrample`, 5 star bits, 10-frame cooldown; Mario bounces via
+`doTrampleJump`); everything else is swallowed (`receiveOtherMsg` true).
+Mario's side does the actual work: `MarioActor::receiveMsgPush`
+(MarioActorDefensiveMsg.cpp:264) moves Mario out of the sensor's cylinder
+himself (`cylinderHitCheck`, `mMario->push(push * 1.1f)`), tries a trample
+first, and has a hard-coded exemption for the actor named "ゴーストマリオ"
+while jumping or hanging. D-018 left all of this out; the puppet header
+says "interacting with nothing". So "can players touch" is not "write
+player collision", it is "re-enable the ghost's sensor and decide what the
+network does about it".
+
+Why it is not a one-liner:
+- Each client sees the others 100 ms late plus half the RTT (NETCODE.md
+  "Client behaviour": render at now-100 ms). At any running speed that is
+  more than the 40-unit sensor radius, so A touching B's puppet and B
+  touching A's puppet are different events at different places and times.
+  There is no authority to reconcile them and the spec forbids adding one
+  before Phase 4 (SKILL.md §9).
+- Pushing works without messages: both clients move their own Mario out
+  of the other's puppet (mutual repulsion). It is soft and late, and the
+  "pusher" visibly overlaps first. Pushing someone off a ledge works, and
+  so does griefing with it: a death costs a life.
+- Bouncing is one-sided: A lands on B's puppet, A bounces (own client,
+  already correct), B feels nothing unless told. Telling B is a new,
+  unreliable message with no game effect beyond a reaction.
+- The ghost's trample drops 5 star bits. On a puppet that is a free star
+  bit farm (stomp a friend forever). Must go.
+- A frozen puppet (no data 0.5 s) would be a solid stale obstacle; a
+  hidden one (cutscene, other galaxy) must not push. Sensors must follow
+  the visible/frozen state (`validateHitSensors`/`invalidateHitSensors`).
+- Standing on someone's head is a different feature. SMG stands Mario on
+  collision (KCL `CollisionParts`), never on a sensor; the ghost has none.
+  A collision body following a 30 Hz interpolated pose is moving-platform
+  work with a stale target. Not for Phase 2 or 3.
+- Mario's "scouter" (MarioActorSensor.cpp:374) treats Ride sensors as
+  things to look at; check it does not make Mario stare at puppets.
+
+Options:
+A. Nothing. Ghosts stay ghosts. Zero desync surface. Matches the spec and
+   the "ghost co-op" name. Feels lifeless in a room of five.
+B. Local-only touch: the ghost's sensor back on the puppet (push +
+   trample, star bits removed, sensor off when frozen/hidden, keep Mario's
+   jump/hang exemption by giving the puppet the ghost's actor name or by
+   adding our own check under TARGET_PC). No protocol change. ~1-2 days.
+   Bounce is one-sided; push is mutual repulsion.
+C. B plus a `Contact` message (type 0x12: target_id, kind {trample,
+   push}, f16 dir[3]; forwarded to the target only; unreliable; one per
+   10 frames per pair). The target's client plays a reaction (a flinch
+   animation or a small `mMario->push`, no damage, nothing that changes
+   progress). Server stays a relay. ~1 week with tests.
+D. Real physics between players (stand on heads, carry, throw, damage).
+   Needs collision on puppets, authority and reconciliation. Rejected for
+   the same reason as a fully synced world (BUILD_SPEC §2).
+
+Recommendation: do not touch Phase 2's gate with this. Run P2-08 as
+specified (ghosts), then ask the three players whether they missed
+touching. If yes, take C as a parallel-ok task after P2-08 (P2-09), with
+a per-room "contact" toggle in the lobby (P2-06) defaulting on, so a room
+that gets griefed can turn it off. B is C's first milestone and is
+testable alone with PETARI_LOOPBACK (you push and stomp your own
+1-second-old ghost). If no, A, and this entry closes.
+
+Why: the game already contains player-on-actor touch, so the cost is
+small, but every touch is a desync visible to both players at once, and
+Phase 2's gate is "no desync complaints". Adding touch before the gate
+makes the gate measure the wrong thing.
+Revisit: when Phase 4 gives the room a host with authority over objects,
+C's reactions could become authoritative (host decides who bounced on
+whom); and if P5-05 (two players on one machine) ever lands, those two
+have zero latency and D is possible for them alone.
+
 ## D-021 (2026-10-13, lane A): The browser cooker runs cook.py itself under Pyodide. Supersedes D-009
 What: P1-02 does not port `tools/cook/*.py` to TypeScript. `web/cook/` runs
 the real `cook.py` in a pool of Web Workers, each with Pyodide 0.26.4 (from

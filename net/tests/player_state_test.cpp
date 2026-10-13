@@ -112,3 +112,23 @@ TEST_CASE("fuzz: random bytes never crash the decoder") {
     }
     CHECK(true);
 }
+
+TEST_CASE("Contact round-trips") {
+    Contact c;
+    c.playerId = 3;
+    c.kind = kContactTrample;
+    c.dir[0] = 0.6f;
+    c.dir[1] = -0.8f;
+    c.dir[2] = 0.0f;
+    uint8_t wire[kContactSize];
+    encodeContact(c, wire);
+    CHECK(wire[0] == kMsgContact);
+    Contact d;
+    REQUIRE(decodeContact(wire, sizeof(wire), &d));
+    CHECK(d.playerId == 3);
+    CHECK(d.kind == kContactTrample);
+    for (int i = 0; i < 3; i++) CHECK(fabsf(d.dir[i] - c.dir[i]) <= halfStep(c.dir[i]));
+    CHECK_FALSE(decodeContact(wire, sizeof(wire) - 1, &d));
+    wire[0] = 0x10;
+    CHECK_FALSE(decodeContact(wire, sizeof(wire), &d));
+}

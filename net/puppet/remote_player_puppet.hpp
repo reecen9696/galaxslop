@@ -18,6 +18,14 @@
 // animated joints (J3DModelX::copyAnmMtxBuffer, as MarioActor does for its
 // ice and rainbow models), with the form's own hands and extras (rainbow
 // colour cycle, bee wings); boo draws the Teresa model instead.
+//
+// Touch (D-020, option C): the race ghost's Ride sensor, active only while
+// the puppet is shown and receiving.  It pushes the local Mario out (each
+// client pushes its own Mario, so pushing is mutual), and the local Mario
+// bounces off it when stomping, which also sends a Contact so the other
+// player flinches.  The ghost's star bits are left out.  The actor name
+// contains the ghost's (ゴーストマリオ) so MarioActor::receiveMsgPush keeps
+// its exemption for a jumping or hanging Mario.  SMG_CONTACT=0 turns it off.
 #pragma once
 
 #include "Game/LiveActor/LiveActor.hpp"
@@ -70,13 +78,18 @@ public:
     virtual void init(const JMapInfoIter& rIter);
     virtual void control();
     virtual void calcAndSetBaseMtx();
+    virtual void attackSensor(HitSensor* pSender, HitSensor* pReceiver);
+    virtual bool receiveMsgPlayerAttack(u32 msg, HitSensor* pSender, HitSensor* pReceiver);
+    virtual bool receiveOtherMsg(u32 msg, HitSensor* pSender, HitSensor* pReceiver);
     virtual void draw() const;
     // Ice is drawn in the refraction pass (MarioActor::drawIndirectModel).
     void drawIndirect() const;
 
     void initAnimation();
-    // Pose for this frame; `valid` false hides the puppet.
-    void applyState(const NetPlayerCapture& rState, bool valid);
+    // Pose for this frame; `valid` false hides the puppet.  `solid`: the
+    // sensor is on (shown, fresh data, contact enabled).  `remoteId`: the
+    // player it shows (0: loopback).
+    void applyState(const NetPlayerCapture& rState, bool valid, bool solid = false, u8 remoteId = 0);
     // Clothes colour (net::kTint*); cheap when unchanged.
     void setTint(u8 tint, u8 suit);
 
@@ -107,6 +120,9 @@ public:
     PartsModel* mBeeWing;
     PartsModel* mTeresa;  // boo
     u8 mMode;              // sender's PlayerMode
+    u8 mRemoteId;
+    bool mSolid;
+    u8 mTrampleCooldown;   // frames
     bool mAirborne;
     // Expression and hand poses this frame (joint index - 1 in the face and
     // hand models), from the animation's PartsControl joint.

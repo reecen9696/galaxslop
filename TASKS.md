@@ -379,6 +379,19 @@ with no desync complaints at 100 ms delay.
   - 2026-10-12: loopback milestone works natively: PETARI_LOOPBACK=1 draws a GhostMario puppet replaying the local player 1 s late in the prologue courtyard (screenshot: blue ghost trailing Mario). Lessons: (1) create puppets during scene init (SceneDataInitializer::initAfterScenarioSelected), never from the frame update: ModelManager::init waits on a main-thread job and deadlocks there; (2) add GhostMario/GhostLuigi to the stage's archive list (startStageFileLoadAfterScenarioSelected); (3) build the XanimePlayers on the first frame the player exists (the table is the player's); (4) skip the file-select stage. Next: animation sync check (does the hash map to the right motion?), then drive it from P2-03 instead of the loopback.
   - 2026-10-12 (A): model it on GhostPlayer (Cosmic Mario ghost): XanimePlayer + upper-body player, changeAnimationByHash, receiveGhostPacket's apply logic. First milestone: a loopback puppet that replays the local player's captured state ~1 s late, no network.
 
+### P2-09 Player contact (push, stomp)
+- lane: A
+- status: review
+- owner: A
+- started: 2026-10-13
+- blocked_by:
+- touches: net/puppet, net/client, net/proto, server/src (Contact forward), docs/NETCODE.md, docs/DECISIONS.md
+- flags: parallel-ok
+- what: D-020 option C. Puppet sensor (push, stomp bounce, no star bits, off while hidden/frozen), Contact 0x12 forwarded to the target, stomped player flinches (doFlipWeak, no damage). SMG_CONTACT=0 disables. Lobby toggle later (P2-06).
+- done when: two clients: walking into each other pushes, landing on the other bounces and the other flinches.
+- log:
+  - 2026-10-13 (A): done natively: two headless clients, mutual push at the spawn, Alice stomps Bob's puppet and bounces, Bob's log "stomped by player 2" and his Mario flinches. Relay test for Contact forwarding, C++ round-trip test. Puppet names contain ゴーストマリオ so Mario's jump/hang exemption applies.
+
 ### P2-06 Lobby screen
 - lane: A
 - status: review

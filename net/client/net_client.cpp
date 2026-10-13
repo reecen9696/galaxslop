@@ -46,6 +46,8 @@ struct Remote {
     uint32_t count = 0;  // samples received
 };
 
+constexpr int kContactQueue = 8;
+
 struct Session {
     std::shared_ptr<Transport> transport;  // shared with the keepalive thread
     std::atomic<int> state{0};  // 0 idle, 1 connecting, 2 open, 3 failed
@@ -57,6 +59,8 @@ struct Session {
     uint32_t frames = 0;
     int64_t lastPingNs = 0;
     float rttMs = -1.0f;
+    Contact contacts[kContactQueue];  // received, not yet polled
+    int contactCount = 0;
 };
 
 Session& session() {
@@ -166,6 +170,13 @@ void handle(Session& s, const std::vector<uint8_t>& m) {
         if (Remote* r = remoteById(s, id, true)) {
             r->ring[r->count % kRing] = {port_host_time_ns(), st};
             r->count++;
+        }
+        break;
+    }
+    case kMsgContact: {
+        Contact c;
+        if (decodeContact(m.data(), m.size(), &c) && s.contactCount < kContactQueue) {
+            s.contacts[s.contactCount++] = c;
         }
         break;
     }
@@ -293,6 +304,27 @@ const char* netRoomCode() { return session().room.c_str(); }
 
 uint8_t netLocalId() { return session().you; }
 
+void netSendContact(uint8_t targetId, uint8_t kind, const float dir[3]) {
+    Session& s = session();
+    if (s.state.load() != 2 || !s.transport || s.you == 0) return;
+    Contact c;
+    c.playerId = targetId;
+    c.kind = kind;
+    memcpy(c.dir, dir, sizeof(c.dir));
+    uint8_t wire[kContactSize];
+    encodeContact(c, wire);
+    s.transport->send(wire, sizeof(wire));
+}
+
+bool netPollContact(Contact* out) {
+    Session& s = session();
+    if (s.contactCount == 0) return false;
+    *out = s.contacts[0];
+    memmove(s.contacts, s.contacts + 1, sizeof(Contact) * (size_t)(s.contactCount - 1));
+    s.contactCount--;
+    return true;
+}
+
 bool netPump() {
     if (!netEnabled()) return false;
     PortHostAllocScope host;  // the session's containers are not the game's to pay for
@@ -382,6 +414,7 @@ void netTick(const NetPlayerCapture* local) {
         v.visible = r.present && interpolate(r, now - kRenderDelayNs, now, &v.pose) && local != nullptr &&
                     v.pose.stageHash == local->stageHash && v.pose.scenario == local->scenario &&
                     !(v.pose.flags & (NET_CAPTURE_HIDDEN | NET_CAPTURE_IN_DEMO));
+        v.frozen = r.count == 0 || now - r.ring[(r.count - 1) % kRing].recvNs > kFreezeNs;
     }
     static const bool sLog = getenv("PETARI_NETLOG") != nullptr;
     static uint32_t sN = 0;
