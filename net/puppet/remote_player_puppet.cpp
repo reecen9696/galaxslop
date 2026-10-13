@@ -32,6 +32,8 @@
 #include "Game/Util/SceneUtil.hpp"
 #include "Game/Util/LiveActorUtil.hpp"
 #include "Game/Util/MathUtil.hpp"
+#include "Game/Util/DemoUtil.hpp"
+#include "Game/Util/MapUtil.hpp"
 #include "Game/Util/ModelUtil.hpp"
 #include "Game/Util/MtxUtil.hpp"
 #include "Game/Util/ObjUtil.hpp"
@@ -819,6 +821,68 @@ void updateLocalTint() {
                     ModelTint::suitForMode((u8)MarioAccess::getPlayerActor()->mPlayerMode));
 }
 
+// Spawn spacing: players arriving at the same start point would stand
+// inside each other.  On the first grounded, cutscene-free frame of each
+// scene, when anyone else is in the room, the local Mario steps aside by a
+// slot fixed by player id (1: stays, 2: +1, 3: -1, 4: +2, 5: -2, times
+// kSpawnSpacing along his side vector), so simultaneous arrivals never pick
+// the same spot.  Only onto floor within reach and with no wall in between
+// (else the mirrored slot, else stay).
+const f32 kSpawnSpacing = 100.0f;
+bool sSpawnPending = false;
+int sSpawnWaitFrames = 0;
+
+bool trySpawnAt(const TVec3f& rFrom, const TVec3f& rUp, const TVec3f& rTo) {
+    TVec3f hit;
+    // A wall between the spawn point and the slot, at knee height.
+    TVec3f knee = rFrom + rUp * 50.0f;
+    if (MR::getFirstPolyOnLineToMap(&hit, nullptr, knee, (rTo + rUp * 50.0f) - knee)) {
+        return false;
+    }
+    // Floor under the slot, within 150 units up or down.
+    TVec3f top = rTo + rUp * 150.0f;
+    if (!MR::getFirstPolyOnLineToMap(&hit, nullptr, top, rUp * -300.0f)) {
+        return false;
+    }
+    MR::setPlayerPos(hit);
+    return true;
+}
+
+void trySpawnSpacing() {
+    if (!sSpawnPending) {
+        return;
+    }
+    if (++sSpawnWaitFrames > 60 * 30) {
+        sSpawnPending = false;  // never settled (falling, swimming): leave it
+        return;
+    }
+    if (!MR::isExistMario() || !MR::isOnGroundPlayer() || MR::isDemoActive() || net::netLocalId() == 0) {
+        return;
+    }
+    sSpawnPending = false;
+    bool others = false;
+    for (int i = 0; i < net::kMaxRemotes; i++) {
+        others |= net::netRemote(i).present;
+    }
+    int id = net::netLocalId();
+    int slot = id <= 1 ? 0 : (id % 2 == 0 ? id / 2 : -(id / 2));
+    if (!others || slot == 0) {
+        return;
+    }
+    TVec3f pos = *MR::getPlayerPos();
+    TVec3f up, side;
+    MR::getPlayerUpVec(&up);
+    MR::getPlayerSideVec(&side);
+    for (int attempt = 0; attempt < 2; attempt++) {
+        f32 offset = kSpawnSpacing * (attempt == 0 ? slot : -slot);
+        if (trySpawnAt(pos, up, pos + side * offset)) {
+            port_log("puppet: spawn spacing: player %d moved %.0f to the side", id, offset);
+            return;
+        }
+    }
+    port_log("puppet: spawn spacing: player %d has no room to the side; staying", id);
+}
+
 // Shows the slot's puppet for `luigi` posed by `pose`, hides the other.
 // SMG_CONTACT=0: puppets are ghosts again (no push, no stomp, no flinch).
 bool contactEnabled() {
@@ -946,6 +1010,11 @@ extern "C" void port_net_puppets_create_for_scene(void) {
         sLocalTint->init(MR::getJ3DModelData(sPuppets[0][MR::isPlayerLuigi() ? 1 : 0]), MR::isPlayerLuigi());
     }
     sAdoptOnNextScene = true;
+    {
+        const char* spacing = getenv("SMG_SPAWN_SPACING");  // "0": off
+        sSpawnPending = net::netEnabled() && !(spacing != nullptr && spacing[0] == '0');
+    }
+    sSpawnWaitFrames = 0;
     port_log("puppet: %d Mario + %d Luigi created for the new scene: %d KB of the current heap, %d KB left", count, count,
              (int)((freeBefore - heap->getTotalFreeSize()) / 1024), (int)(heap->getTotalFreeSize() / 1024));
 }
@@ -969,6 +1038,7 @@ extern "C" void port_net_puppets_update(void* pScene) {
     if (net::netEnabled()) {
         net::netTick(haveLocal ? &now : nullptr);
         applyContacts();
+        trySpawnSpacing();
         updateLocalTint();
         for (int i = 0; i < net::kMaxRemotes; i++) {
             const net::RemoteView& v = net::netRemote(i);

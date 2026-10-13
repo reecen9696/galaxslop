@@ -85,6 +85,11 @@ Phase 4 adds 100+ for objects.
 - No bracketing sample for 500 ms: freeze. 3 s: hide. New sample: show.
 - Draw puppet only if `galaxy_id` and `scenario_id` match local.
 - `in_cutscene` flag: hide puppet (they're in a demo we aren't in).
+- Spawn spacing: on each scene's first grounded, cutscene-free frame, if
+  anyone else is in the room, the local Mario steps aside by a slot fixed
+  by player id (1 stays, 2 right, 3 left, 4 further right, 5 further left;
+  100 units each), only onto floor and not through a wall.
+  `SMG_SPAWN_SPACING=0` turns it off.
 - Puppets use the player models (Mario.arc / Luigi.arc). The character
   comes from the `PlayerState` Luigi flag (what the save plays), falling
   back to Hello's `character` before any state arrives.
