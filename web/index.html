@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>SMG Co-op</title>
 <style>
   /* The Wii menu's typeface is Rodin NTLG (Fontworks, commercial): used when
@@ -185,6 +185,41 @@
   body.loading #progress { width: min(460px, 80vw); height: 16px; }
   body.loading #status { color: var(--fg); font-size: 1em; }
 
+  /* ---- touch controls (touch.js): stick bottom left, buttons bottom right, the rest aims ---- */
+  #touch { display: none; position: fixed; inset: 0; z-index: 2; touch-action: none; -webkit-user-select: none; user-select: none;
+    -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
+    --pad: max(14px, env(safe-area-inset-left)); --padr: max(14px, env(safe-area-inset-right)); --padb: max(12px, env(safe-area-inset-bottom));
+    --stick: clamp(96px, 26vmin, 140px); --btn: clamp(48px, 14vmin, 66px); }
+  body.playing.touch #touch { display: block; }
+  body.playing.touch #keyHint, body.playing.touch #keys { display: none; }
+  #touch .t-stick { position: absolute; left: var(--pad); bottom: calc(var(--padb) + 8px); width: var(--stick); height: var(--stick); border-radius: 50%;
+    background: radial-gradient(circle, #ffffff14 0 55%, #ffffff26 56% 100%); border: 2px solid #ffffff55; opacity: .55; pointer-events: none; }
+  #touch .t-stick.live { opacity: .9; }
+  #touch .t-knob { position: absolute; left: 50%; top: 50%; width: 46%; height: 46%; margin: -23% 0 0 -23%; border-radius: 50%;
+    background: var(--face); border: 2px solid var(--wii-blue); box-shadow: 0 0 10px var(--wii-glow); }
+  #touch .t-btn { position: absolute; width: var(--btn); height: var(--btn); border-radius: 50%; display: grid; place-items: center;
+    font: 700 calc(var(--btn) * .36)/1 var(--ui); color: var(--ink); background: var(--face); border: 2px solid #c9ccd3;
+    box-shadow: 0 2px 6px #0008; opacity: .55; pointer-events: none; transition: transform .06s, opacity .06s; }
+  #touch .t-btn.down { opacity: .95; transform: scale(.92); border-color: var(--wii-blue); box-shadow: 0 0 12px var(--wii-blue); background: var(--face-hot); }
+  /* A under the thumb, B and Spin either side of it, Z and C above the stick, - and + at the top */
+  #touch #tA { right: var(--padr); bottom: calc(var(--padb) + var(--btn) * .55); width: calc(var(--btn) * 1.3); height: calc(var(--btn) * 1.3); font-size: calc(var(--btn) * .5); }
+  #touch #tB { right: calc(var(--padr) + var(--btn) * 1.45); bottom: var(--padb); }
+  #touch #tSpin { right: calc(var(--padr) + var(--btn) * .15); bottom: calc(var(--padb) + var(--btn) * 2.05); font-size: calc(var(--btn) * .26); }
+  #touch #tZ { left: var(--pad); bottom: calc(var(--padb) + var(--stick) + 22px); width: calc(var(--btn) * .8); height: calc(var(--btn) * .8); }
+  #touch #tC { left: calc(var(--pad) + var(--btn) * .95); bottom: calc(var(--padb) + var(--stick) + 22px); width: calc(var(--btn) * .8); height: calc(var(--btn) * .8); }
+  #touch #tMinus, #touch #tPlus { top: max(12px, env(safe-area-inset-top)); width: 40px; height: 40px; font-size: 20px; }
+  #touch #tMinus { left: calc(50% - 72px); }
+  #touch #tPlus { left: calc(50% - 20px); }
+  /* Held sideways: the gear joins - and + at the top centre, clear of the thumbs and the notch,
+     and the settings open under it, scrolling on a short screen. */
+  body.playing.touch #gear { top: max(12px, env(safe-area-inset-top)); right: auto; left: calc(50% + 32px); width: 40px; height: 40px; font-size: 20px; opacity: .8; }
+  body.playing.touch #settings { top: calc(max(12px, env(safe-area-inset-top)) + 48px); right: auto; left: 50%; transform: translateX(-50%);
+    max-height: calc(100dvh - max(12px, env(safe-area-inset-top)) - 56px); overflow-y: auto; overscroll-behavior: contain; }
+  body.playing.touch #roombar { right: max(12px, env(safe-area-inset-right)); }
+  #t-rotate { display: none; position: absolute; left: 50%; top: 18%; transform: translateX(-50%); padding: 8px 16px; border-radius: 12px;
+    background: #000b; color: #fff; font-size: 15px; white-space: nowrap; pointer-events: none; }
+  @media (orientation: portrait) { #t-rotate { display: block; } }
+
   @media (max-width: 560px) {
     .screen { font-size: 14px; }
     .tab { font-size: 1.15em; min-width: 0; left: 24px; padding-right: 1.2em; }
@@ -281,6 +316,7 @@
   <label for="scale">Render scale</label>
   <select id="scale"><option value="auto">Auto (up to 2x, lower when frames run late)</option><option value="1">1x (640×456)</option><option value="2">2x (1280×912)</option><option value="3">3x (1920×1368)</option><option value="4">4x (2560×1824)</option></select>
   <label class="inline"><input id="showKeys" type="checkbox"> Show controls</label>
+  <label class="inline"><input id="touchCtl" type="checkbox"> Touch controls</label>
   <label class="inline"><input id="perf" type="checkbox"> Show frame times</label>
   <div class="row"><button id="exportSave" class="wii-btn">Export save</button><button id="importSave" class="wii-btn">Import save</button></div>
   <input id="importSaveInput" type="file" accept=".zip" style="display:none">
@@ -291,5 +327,6 @@
 <script type="importmap">{ "imports": { "three": "./vendor/three/build/three.module.min.js" } }</script>
 <script src="cook/cooker.js"></script>
 <script src="app.js"></script>
+<script src="touch.js"></script>
 </body>
 </html>

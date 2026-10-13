@@ -938,7 +938,11 @@ setupSettings();
 (async () => {
   if (params.get("demo") === "loading") return runLoadingDemo();
   if (!crossOriginIsolated) {
-    say("This page needs cross-origin isolation (COOP/COEP headers): serve it with web/dev-server.mjs.");
+    // Browsers only isolate secure pages: https, or localhost.  A phone on
+    // http://<LAN address> gets the headers but not the isolation.
+    say(isSecureContext
+      ? "This page needs cross-origin isolation (COOP/COEP headers): serve it with web/dev-server.mjs."
+      : "This page needs https (or localhost) to run the game: browsers ignore its isolation headers over plain http.");
     return;
   }
   const wantsLobby = !params.get("solo") && !params.get("SMG_RELAY");

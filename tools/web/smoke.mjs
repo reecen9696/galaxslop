@@ -7,12 +7,15 @@
 //        [--keys "5000:Space,5200:-Space"]
 //        [--import ~/smg/game] [--profile dir] [--eval "js expression"]
 //        [--log full-log.txt] [--stacks 0] [--at "2000:document.getElementById('solo').click()"]
+//        [--mobile] [--touch "5000:start:0:120:300,5100:move:0:160:300,5600:end:0"]
 //
 // The lobby is skipped (?solo=1) unless --params mentions SMG_RELAY or lobby.
 //
 // By default the page reads the dev server's game folder (?source=server).
 // --import feeds the folder to the page's import screen instead (OPFS);
 // --profile keeps the Chrome profile, and so OPFS and saves, between runs.
+// --mobile emulates a landscape phone (844x390, touch); --touch then sends
+// finger events at times: "ms:start|move|end:finger:x:y" in CSS pixels.
 //
 // Needs web/dev-server.mjs running.  Exit status 1 if any run stalls (the
 // page logs "no new game frame") or never presents.
@@ -129,6 +132,11 @@ async function oneRun(n) {
       paused.get(m.sessionId)(m.params.callFrames.map((f) => f.functionName || "?"));
     }
   });
+  if (args.mobile !== undefined) {
+    await c.send("Emulation.setDeviceMetricsOverride", { width: 844, height: 390, deviceScaleFactor: 2, mobile: true, screenOrientation: { type: "landscapePrimary", angle: 90 } }, sessionId);
+    await c.send("Emulation.setTouchEmulationEnabled", { enabled: true, maxTouchPoints: 5 }, sessionId);
+    await c.send("Emulation.setEmitTouchEventsForMouse", { enabled: true, configuration: "mobile" }, sessionId);
+  }
   await c.send("Target.setAutoAttach", { autoAttach: true, waitForDebuggerOnStart: false, flatten: true }, sessionId);
   let stacksDumped = false;
   async function dumpStacks() {
@@ -187,6 +195,11 @@ async function oneRun(n) {
     const [t, name] = k.split(":");
     return { t: Number(t), up: name.startsWith("-"), code: name.replace(/^-/, "") };
   });
+  const touches = (args.touch ?? "").split(",").filter(Boolean).map((e) => {
+    const [t, type, id, x, y] = e.split(":");
+    return { t: Number(t), type, id: Number(id), x: Number(x), y: Number(y) };
+  });
+  const fingersDown = new Map();
   const prof = args.cpuprofile ? args.cpuprofile.split(":").map(Number) : null;
   let profStarted = false, profDone = false;
   while (Date.now() - start < seconds * 1000) {
@@ -248,6 +261,14 @@ async function oneRun(n) {
     while (keys.length && keys[0].t <= now) {
       const k = keys.shift();
       await c.send("Input.dispatchKeyEvent", { type: k.up ? "keyUp" : "rawKeyDown", code: k.code, key: k.code, windowsVirtualKeyCode: kKeyCodes[k.code] ?? 0 }, sessionId).catch(() => {});
+    }
+    while (touches.length && touches[0].t <= now) {
+      const e = touches.shift();
+      if (e.type === "end") fingersDown.delete(e.id);
+      else fingersDown.set(e.id, { x: e.x, y: e.y, id: e.id });
+      // CDP diffs the points by id: a lifted finger is one missing from the list.
+      const type = e.type === "start" ? "touchStart" : fingersDown.size ? "touchMove" : "touchEnd";
+      await c.send("Input.dispatchTouchEvent", { type, touchPoints: [...fingersDown.values()] }, sessionId).catch((err) => console.log("touch: " + err.message));
     }
     await sleep(100);
   }

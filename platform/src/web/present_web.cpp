@@ -261,6 +261,49 @@ static void readGamepad(PortPadState* pad) {
     }
 }
 
+// Touch controls (web/touch.js): the page's main thread writes its stick,
+// buttons and finger pointer straight into this struct.  `pressed` collects
+// presses since the last frame (Atomics.or) so a tap shorter than a frame
+// still lands; `rumbleFrames` counts frames the game ran the remote's motor
+// (the page turns them into haptics and zeroes it).
+struct TouchPad {
+    float stickX, stickY;      // -1..1, right / up positive
+    float pointerX, pointerY;  // -1..1 over the canvas, like the mouse
+    uint32_t held, pressed;    // Wii remote bits, plus kTouchSpin
+    int32_t active, pointerValid;
+    uint32_t rumbleFrames;
+};
+static TouchPad sTouch;
+static const uint32_t kTouchSpin = 0x10000;
+extern "C" EMSCRIPTEN_KEEPALIVE TouchPad* web_touch(void) { return &sTouch; }
+
+static void readTouch(PortPadState* pad) {
+    if (port_input_rumble(0)) __atomic_fetch_add(&sTouch.rumbleFrames, 1, __ATOMIC_RELAXED);
+    if (!__atomic_load_n(&sTouch.active, __ATOMIC_RELAXED)) return;
+    uint32_t bits = __atomic_load_n(&sTouch.held, __ATOMIC_RELAXED) | __atomic_exchange_n(&sTouch.pressed, 0, __ATOMIC_RELAXED);
+    float sx = sTouch.stickX, sy = sTouch.stickY;
+    if (sx != 0 || sy != 0) {
+        pad->stickX = sx;
+        pad->stickY = sy;
+    }
+    pad->buttons |= bits & 0xffff;
+    // Spin: a shake, as with the keyboard; a tap shakes for a few frames.
+    static int sSpin = 0;
+    if (bits & kTouchSpin) sSpin = 6;
+    if (sSpin > 0) {
+        sSpin--;
+        static unsigned sFlip = 0;
+        float a = (++sFlip & 1) ? 2.5f : -2.5f;
+        pad->accX = a;
+        pad->accY = a;
+    }
+    if (sTouch.pointerValid) {
+        pad->pointerValid = 1;
+        pad->pointerX = sTouch.pointerX;
+        pad->pointerY = sTouch.pointerY;
+    }
+}
+
 // Keyboard/mouse -> one Wii remote + Nunchuk, the desktop mapping
 // (docs/BUILDING.md "Controls").
 void web_read_input(PortPadState* pad) {
@@ -297,6 +340,7 @@ void web_read_input(PortPadState* pad) {
         pad->pointerY = sPointerY;
     }
     readGamepad(pad);
+    readTouch(pad);
 }
 
 // Render scale (P1-07): the page asks for a new EFB size (settings);
