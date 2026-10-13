@@ -179,6 +179,8 @@ async function oneRun(n) {
     console.log(`import finished in ${((Date.now() - t0) / 1000).toFixed(0)} s`);
   }
   const start = Date.now();
+  let nextShot = null;
+  const shotSizes = [];
   // --at "1500:js expression;9000:js expression" runs page script at times.
   const ats = (args.at ?? "").split(";").filter(Boolean).map((e) => ({ t: Number(e.slice(0, e.indexOf(":"))), js: e.slice(e.indexOf(":") + 1) }));
   const keys = (args.keys ?? "").split(",").filter(Boolean).map((k) => {
@@ -223,6 +225,18 @@ async function oneRun(n) {
     if (!stacksDumped && args.stacks !== "0" && log.some((l) => l.includes("no new game frame"))) {
       await dumpStacks();
     }
+    // --shots "every_ms:dir": periodic screenshots; mostly-black frames
+    // compress to a few KB, so their sizes flag black flashes.
+    if (args.shots && now >= (nextShot ?? 0)) {
+      const [every, dir] = args.shots.split(":");
+      nextShot = now + Number(every);
+      try {
+        const { data } = await c.send("Page.captureScreenshot", { format: "png" }, sessionId, 5000);
+        const buf = Buffer.from(data, "base64");
+        shotSizes.push([now, buf.length]);
+        writeFileSync(join(dir, `shot-${n}-${String(now).padStart(6, "0")}.png`), buf);
+      } catch {}
+    }
     while (ats.length && ats[0].t <= now) {
       try {
         const { result } = await c.send("Runtime.evaluate", { expression: ats.shift().js, returnByValue: true }, sessionId);
@@ -250,6 +264,12 @@ async function oneRun(n) {
   proc.kill("SIGKILL");
   await sleep(300);
   if (!args.profile) rmSync(profile, { recursive: true, force: true });
+  if (shotSizes.length) {
+    const sizes = shotSizes.map((x) => x[1]).sort((a, b) => a - b);
+    const median = sizes[sizes.length >> 1];
+    const dark = shotSizes.filter(([, b]) => b < median * 0.25);
+    console.log(`shots: ${shotSizes.length}, median ${(median / 1024).toFixed(0)} KB, suspect black: ${dark.map(([t, b]) => `${(t / 1000).toFixed(1)}s(${(b / 1024).toFixed(0)}KB)`).join(" ") || "none"}`);
+  }
   if (args.log) writeFileSync(runs > 1 ? args.log.replace(/(\.\w+)?$/, `-${n}$1`) : args.log, log.join("\n") + "\n");
   const stalled = log.find((l) => l.includes("no new game frame"));
   const frames = log.filter((l) => l.includes("display frames")).pop();

@@ -104,6 +104,7 @@ extern "C" pthread_t web_event_thread(void) { return sEventThread; }
 static void applyScale();
 static void recordTiming(double presentMs);
 static std::atomic<int> sAutoMax{0};  // auto render scale: highest scale, 0 = off (see recordTiming)
+static int sHold = 0;                  // frames to keep the previous picture for
 static void updateNameTags();
 
 bool web_present_init(int scale) {
@@ -161,6 +162,20 @@ void web_present_frame() {
     gpu::Renderer& r = gpu::renderer();
     r.update();
     r.render(sEfb, nullptr, nullptr);
+    // Keep the last complete picture on screen rather than show one with
+    // draws missing (a program still compiling: a skipped full-screen pass
+    // turned the whole frame black) or a just-recreated target.  Not
+    // touching the canvas leaves its previous frame up.  At most ~0.5 s.
+    static int sHeld = 0;
+    bool incomplete = r.lastSkippedDraws() > 0 || sHold > 0;
+    if (sHold > 0) sHold--;
+    if (incomplete && sHeld < 30) {
+        sHeld++;
+        recordTiming(emscripten_get_now() - t0);
+        updateNameTags();
+        return;
+    }
+    sHeld = 0;
     int cw = 0, ch = 0;
     emscripten_get_canvas_element_size("#canvas", &cw, &ch);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -290,7 +305,12 @@ static void applyScale() {
     }
     gpu::renderer().destroyTarget(sEfb);
     sEfb = gpu::renderer().createTarget(kEfbW * want, kEfbH * want);
-    emscripten_set_canvas_element_size("#canvas", kEfbW * want, kEfbH * want);
+    // The canvas only grows (a resize clears it, which showed as a black
+    // flash on every auto switch); the blit scales the EFB to it.
+    int cw = 0, ch = 0;
+    emscripten_get_canvas_element_size("#canvas", &cw, &ch);
+    if (kEfbW * want > cw) emscripten_set_canvas_element_size("#canvas", kEfbW * want, kEfbH * want);
+    sHold = 2;  // the new target's first frames may lack the EFB copies effects read
     port_log("present: render scale %dx (%dx%d)", want, sEfb.width, sEfb.height);
 }
 

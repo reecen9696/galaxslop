@@ -396,6 +396,7 @@ struct Renderer::Impl {
         GLuint prog, vs, fs;
     };
     std::unordered_map<ShaderUid, AsyncProgram, ShaderUidHash> asyncPrograms;
+    int skippedDraws = 0;  // draws the last execute() left out for want of a program
     GLuint programAsync(const ShaderUid& uid);
     std::deque<ShaderUid> compileQueue;
     std::condition_variable compileCv;
@@ -1977,6 +1978,7 @@ void Renderer::Impl::doCopy(const Item& it, EfbTarget& src, Renderer& r, bool vr
 }
 
 void Renderer::Impl::execute(EfbTarget& efb, const EyeView* eye, EfbTarget* hud, HudMode hudMode, Renderer& r) {
+    skippedDraws = 0;
     const std::vector<Item>& items = cur->items;
     const std::vector<std::shared_ptr<TexImage>>& textures = cur->frame->textures;
     u32 nativeW = cur->nativeW, nativeH = cur->nativeH;
@@ -2243,6 +2245,7 @@ void Renderer::Impl::execute(EfbTarget& efb, const EyeView* eye, EfbTarget* hud,
             continue;
         }
         if (!it.program || !it.idxCount) {
+            if (it.idxCount) skippedDraws++;  // program still compiling (parallel compile)
             continue;
         }
         EfbTarget& t = *cur;
@@ -2510,6 +2513,8 @@ bool Renderer::update() {
 }
 
 bool Renderer::hasFrame() const { return sImpl && sImpl->cur; }
+
+int Renderer::lastSkippedDraws() const { return sImpl ? sImpl->skippedDraws : 0; }
 
 uint64_t Renderer::frameNumber() const { return hasFrame() ? sImpl->cur->number : 0; }
 
