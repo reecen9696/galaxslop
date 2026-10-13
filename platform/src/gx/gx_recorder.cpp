@@ -843,7 +843,13 @@ struct Recorder final : Backend {
             c.push_back(bp[r]);
         }
         if (toXfb) {
+            // The display copy ends the game's frame: publish it now.  At the
+            // retrace (port_gx_recorder_end_frame) the game may already be
+            // recording its next frame when it runs slow, and that frame's
+            // start (sky, first models) would be cut off into this one: a
+            // frame with only the map and the clear colour.
             frame->xfbCopies++;
+            endFrame();
             return;
         }
         u32 addr = (bp[0x4B] & 0xFFFFFF) << 5;
@@ -1031,13 +1037,18 @@ struct Recorder final : Backend {
         img.version++;
     }
 
-    // Called when the game presents a frame (VI flip).  A frame is complete
-    // once it contains the EFB->XFB display copy.
+    // Called at the display copy (efbCopy), and when the game presents a
+    // frame (VI flip), which publishes only an oversized frame that never
+    // copied.
     void endFrame() {
         if (frame->xfbCopies == 0 && frame->cmds.size() < (16u << 20)) {
             return;
         }
         frame->number = frameNumber++;
+        static const bool frameLog = getenv("PETARI_FRAMELOG") != nullptr;
+        if (frameLog) {
+            port_log("framelog: %llu draws %u xfb %u cmds %zu", (unsigned long long)frame->number, frame->draws, frame->xfbCopies, frame->cmds.size());
+        }
         static const bool perfLog = getenv("PETARI_PERFLOG") != nullptr;
         if (perfLog && frame->number % 600 == 0) {
             port_log("perf: recorded frame %llu: %u draws, %zu vertex words, %zu command words, %zu textures", (unsigned long long)frame->number,
