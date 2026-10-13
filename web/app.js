@@ -343,7 +343,11 @@ function showLobby() {
     document.getElementById("join").onclick = () => (room.value.trim() ? go("join") : room.focus());
     document.getElementById("create").onclick = () => go("create");
     document.getElementById("solo").onclick = () => go("solo");
-    room.onkeydown = (e) => e.key === "Enter" && document.getElementById("join").click();
+    // Not `onkeydown = (e) => cond && ...`: an on-handler returning false
+    // cancels the key, which made the field refuse every letter.
+    room.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") document.getElementById("join").click();
+    });
   });
 }
 
