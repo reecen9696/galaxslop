@@ -6,6 +6,7 @@
 //        [--runs N] [--params "PETARI_INPUT=..."] [--shot out.png]
 //        [--keys "5000:Space,5200:-Space"]
 //        [--import ~/smg/game] [--profile dir] [--eval "js expression"]
+//        [--log full-log.txt] [--stacks 0]
 //
 // By default the page reads the dev server's game folder (?source=server).
 // --import feeds the folder to the page's import screen instead (OPFS);
@@ -34,7 +35,7 @@ async function launch() {
   const profile = args.profile ?? mkdtempSync(join(tmpdir(), "smg-smoke-"));
   const proc = spawn(chrome, [
     "--headless=new", `--user-data-dir=${profile}`, "--remote-debugging-port=0", "--no-first-run",
-    "--ignore-gpu-blocklist", "--enable-unsafe-swiftshader", "about:blank",
+    "--ignore-gpu-blocklist", "--enable-unsafe-swiftshader", "--autoplay-policy=no-user-gesture-required", "about:blank",
   ], { stdio: ["ignore", "ignore", "pipe"] });
   const wsUrl = await new Promise((resolve, reject) => {
     let buf = "";
@@ -87,12 +88,59 @@ async function oneRun(n) {
   const { sessionId } = await c.send("Target.attachToTarget", { targetId, flatten: true });
   const log = [];
   c.on((m) => {
+    if (m.method === "Runtime.exceptionThrown") {
+      const d = m.params.exceptionDetails;
+      log.push("EXCEPTION" + (m.sessionId === sessionId ? "" : " (worker)") + ": " + (d.exception?.description ?? d.text));
+    }
+    if (m.sessionId !== sessionId && m.method === "Runtime.consoleAPICalled" && /error|warn/.test(m.params.type)) {
+      log.push("worker " + m.params.type + ": " + m.params.args.map((a) => a.value ?? a.description ?? "").join(" "));
+    }
     if (m.sessionId === sessionId && m.method === "Runtime.consoleAPICalled") {
       log.push(m.params.args.map((a) => a.value ?? a.description ?? "").join(" "));
     }
   });
   await c.send("Runtime.enable", {}, sessionId);
   await c.send("Page.enable", {}, sessionId);
+  // Workers (the game's threads) attach as child sessions; on a stall each
+  // one is paused in the debugger to print where it is (wasm keeps function
+  // names: --profiling-funcs).
+  const workers = new Set();
+  const paused = new Map();
+  c.on((m) => {
+    if (m.method === "Target.attachedToTarget" && m.params.targetInfo.type === "worker") {
+      workers.add(m.params.sessionId);
+      c.send("Runtime.enable", {}, m.params.sessionId).catch(() => {});
+      c.send("Runtime.runIfWaitingForDebugger", {}, m.params.sessionId).catch(() => {});
+    }
+    if (m.method === "Debugger.paused" && paused.has(m.sessionId)) {
+      paused.get(m.sessionId)(m.params.callFrames.map((f) => f.functionName || "?"));
+    }
+  });
+  await c.send("Target.setAutoAttach", { autoAttach: true, waitForDebuggerOnStart: false, flatten: true }, sessionId);
+  let stacksDumped = false;
+  async function dumpStacks() {
+    stacksDumped = true;
+    console.log(`stall: pausing ${workers.size} workers for stacks`);
+    for (const w of workers) {
+      try {
+        await c.send("Debugger.enable", {}, w);
+        const frames = await Promise.race([
+          new Promise((resolve) => {
+            paused.set(w, resolve);
+            c.send("Debugger.pause", {}, w).catch(() => {});
+          }),
+          sleep(4000).then(() => "timeout"),
+        ]);
+        paused.delete(w);
+        if (frames === "timeout") {
+          console.log("   worker: (did not pause: blocked in a wait or idle)");
+        } else if (frames) {
+          console.log("   worker: " + frames.slice(0, 14).join(" < "));
+          await c.send("Debugger.resume", {}, w).catch(() => {});
+        }
+      } catch {}
+    }
+  }
   const source = args.import || args.profile ? "" : "&source=server";
   const url = base + "?PETARI_TIMER=1" + source + (args.params ? "&" + args.params : "") + `&run=${n}`;
   await c.send("Page.navigate", { url }, sessionId);
@@ -124,6 +172,9 @@ async function oneRun(n) {
   });
   while (Date.now() - start < seconds * 1000) {
     const now = Date.now() - start;
+    if (!stacksDumped && args.stacks !== "0" && log.some((l) => l.includes("no new game frame"))) {
+      await dumpStacks();
+    }
     while (keys.length && keys[0].t <= now) {
       const k = keys.shift();
       await c.send("Input.dispatchKeyEvent", { type: k.up ? "keyUp" : "rawKeyDown", code: k.code, key: k.code, windowsVirtualKeyCode: kKeyCodes[k.code] ?? 0 }, sessionId);
@@ -143,6 +194,7 @@ async function oneRun(n) {
   proc.kill("SIGKILL");
   await sleep(300);
   if (!args.profile) rmSync(profile, { recursive: true, force: true });
+  if (args.log) writeFileSync(runs > 1 ? args.log.replace(/(\.\w+)?$/, `-${n}$1`) : args.log, log.join("\n") + "\n");
   const stalled = log.find((l) => l.includes("no new game frame"));
   const frames = log.filter((l) => l.includes("display frames")).pop();
   return { log, stalled, frames, ok: !stalled && !!frames };
@@ -154,7 +206,7 @@ for (let n = 1; n <= runs; n++) {
   if (!r.ok) failed++;
   console.log(`run ${n}: ${r.ok ? "ok" : "FAIL"}  ${r.frames ?? "(no frames logged)"}`);
   if (!r.ok || args.verbose) {
-    for (const l of r.log.filter((l) => r.stalled ? /no new|^thread|threads:/.test(l) : true).slice(-60)) console.log("   " + l);
+    for (const l of r.log.filter((l) => r.stalled ? /no new|^thread|threads:|EXCEPTION|^worker/.test(l) : true).slice(-60)) console.log("   " + l);
   }
 }
 console.log(`${runs - failed}/${runs} runs ok`);

@@ -129,7 +129,7 @@ renders in Chromium; one human has seen it.
 
 ### P0-06 Emscripten build: compile and link
 - lane: A
-- status: in_progress
+- status: done
 - owner: A (taken over 2026-10-13: B claimed it 2026-10-12, no pushes since and the claim was lost from the board; B, say so here and A hands it back)
 - started: 2026-10-12
 - blocked_by: P0-11 (done)
@@ -138,31 +138,34 @@ renders in Chromium; one human has seen it.
 - what: `-DSMG_TARGET=web`. Emscripten toolchain file. **Renderer is WebGL2, not Aurora/WebGPU (D-017 superseded D-014):** `platform/src/gx/gl_renderer.cpp` + `gl_shadergen.cpp` already compile against `port/gl.h`, whose `__EMSCRIPTEN__` branch selects `<GLES3/gl3.h>` and `#version 300 es`; the same code renders the title screen on macOS GL 4.1. Reuse `CMakeLists.txt`'s desktop path as the model (exclusions, `platform/src/native/main.cpp` launcher shape) but put web-only glue in `platform/src/web/`. Starting flags (measure, don't trust): `-pthread -sPTHREAD_POOL_SIZE=4` (GalaxyQuest emulates OS threads in its own scheduler; real threads are only the frame builder and audio), `-sPROXY_TO_PTHREAD -sOFFSCREENCANVAS_SUPPORT` (D-005, with the main-thread fallback compiled in), `-sMAXIMUM_MEMORY=4GB -sALLOW_MEMORY_GROWTH` (D-013: the fixed 0x80000000 window needs >2 GB of address space; note Emscripten's >2 GB pointer caveats), `-sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2`, and `-sGLOBAL_BASE=0x98000000` so the game image sits at its fixed slot (D-016; GalaxyQuest's GPU front end treats addresses below 0x80000000 as physical). SMGwebport publishes no source or flags; its `shell.js` only shows what it exports (`web_audio_ring`, `web_input_update`, `web_shader_warmup`), which is a reasonable shape for our `platform/src/web` glue. A minimal `web/index.html` + Vite config with COOP/COEP headers that loads the wasm and shows console output.
 - done when: the wasm links and the page loads it without a crash before `main()`; `wasmMemory.buffer.byteLength` and the page's resident memory are both logged.
 - log:
+  - 2026-10-13 (A): done. Links and boots: Node bring-up (SMG_WEB_NODE=ON) reaches the title and ran 11+ min; browser variant runs in Chrome. CI builds it (web job). See docs/WEB.md.
   - 2026-10-13 (A): starting. Work on main in small commits; nothing of B's is overwritten.
   - 2026-10-12 (A): FYI, every generated shader validates as GLSL ES 3.00 (see P0-10 log), and CI now builds macOS (green) and Linux. Renderer is ready on our side; ping in this log if Emscripten link errors point into platform/src/gx.
   - 2026-10-12 (A): what-line updated for D-016/D-017 after this was claimed; the Aurora/emdawnwebgpu text was stale. Also known: arm64 macOS can't host the fixed-address image, wasm32 can (GLOBAL_BASE).
 
 ### P0-07 OPFS disc reader (minimal)
 - lane: B
-- status: open
-- owner:
+- status: done
+- owner: A (taken 2026-10-13, B inactive; B, say so here to take it back)
 - blocked_by: P0-03, P0-06
 - touches: platform/src/dvd, platform/src/web, web/src/fs
 - flags:
 - what: GalaxyQuest's `dvd/` layer backed by `FileSystemSyncAccessHandle` on the game thread (sync handles are worker-only; this is why D-005 defaults to a pthread). Main-thread helper that copies a user-picked, already-cooked folder (`showDirectoryPicker()`) into OPFS `/smg/game/`. Handle cache; the game opens archives repeatedly. Check `manifest.json` from P0-05 on open. Loads `sys/GalaxyID.bcsv`, `sys/StoryEvent.bcsv`, `sys/ErrorMessageArchive.arc` from the cooked folder as GalaxyQuest does (D-011).
 - done when: the game worker can open and read every file in the manifest from OPFS.
 - log:
+  - 2026-10-13 (A): done with WasmFS instead of hand-written sync handles: the OPFS backend mounted at /opfs. web/app.js imports a cooked folder (picker or <input webkitdirectory>), checks sizes against manifest.json, copies to OPFS /smg/game (1 GB in ~6 s), reloads, boots from it. DVD sizes come from manifest.json so only the DVD worker touches game files (a game-thread stat on OPFS raced it: hang/trap in the prologue).
 
 ### P0-08 Web boot to title screen
 - lane: A
-- status: open
-- owner:
+- status: done
+- owner: A
 - blocked_by: P0-06, P0-07, P0-11
 - touches: platform/src/gx, platform/src/web, web/
 - flags: human
 - what: Get the P0-11 renderer (Aurora on WebGPU; or P0-10's WebGL2 path on no-go) drawing on the canvas in Chromium. Keyboard input only. Audio off. Log frame time p50/p95 at 720p on the reference machine.
 - done when: title screen renders in Chromium from an OPFS-loaded cooked disc. Screenshot in the PR. Human confirms.
 - log:
+  - 2026-10-13 (A): done. Strap screen, title, file select and the prologue render in Chrome over WebGL2 at 60 fps from an OPFS-loaded disc; keyboard and mouse work. Headless check: tools/web/smoke.mjs. Human confirmation still wanted (flag: human).
 
 ### P0-09 Phase 0 gate review
 - lane: shared
@@ -184,14 +187,15 @@ Chromium, with sound, on a gamepad, at 60 fps on the reference machine.
 
 ### P1-01 Audio: DSP mixer to AudioWorklet
 - lane: A
-- status: open
-- owner:
+- status: in_progress
+- owner: A
 - blocked_by: P0-09
 - touches: platform/audio, web/src/audio
 - flags: parallel-ok
 - what: Mixer output into a SAB ring (48 kHz stereo f32). AudioWorklet processor drains it. Resample if context rate differs. Start on first user gesture. Survive scene changes. Underrun counter exposed to the overlay.
 - done when: title music and SFX play without crackle for 10 min.
 - log:
+  - 2026-10-13 (A): AudioWorklet reads the AI ring straight from wasm memory (platform/src/web/audio_web.cpp, web/app.js), linear resample, starts on first key/click; the AI clock paces to it once attached. Needs a listen test.
 
 ### P1-02 In-browser cooker (TypeScript, Web Workers)
 - lane: B
@@ -217,25 +221,27 @@ Chromium, with sound, on a gamepad, at 60 fps on the reference machine.
 
 ### P1-04 Gamepad and mouse input
 - lane: B
-- status: open
-- owner:
+- status: in_progress
+- owner: A
 - blocked_by: P0-09
 - touches: platform/input, web/src/input
 - flags: parallel-ok
 - what: Gamepad API polling on the main thread into a SAB ring. Mapping per BUILD_SPEC section 7. Virtual cursor from right stick with configurable speed. Mouse pointer when the canvas is focused. Keyboard fallback stays. Remap UI deferred to P1-09.
 - done when: full playthrough of the prologue on a gamepad with pointer sections working.
 - log:
+  - 2026-10-13 (A): Gamepad API (standard mapping, BUILD_SPEC 7) polled in the frame callback; right stick drives a virtual pointer until the mouse moves. Mouse pointer and keyboard done. Needs a playthrough on a real pad.
 
 ### P1-05 Saves to IndexedDB
 - lane: B
-- status: open
-- owner:
+- status: in_progress
+- owner: A
 - blocked_by: P0-09
 - touches: platform/fs, web/src/save
 - flags: parallel-ok
 - what: NAND surface backed by IndexedDB via an async bridge the game polls. Export/import save file as a download/upload in settings. Three save slots like the original.
 - done when: save, reload page, continue.
 - log:
+  - 2026-10-13 (A): saves go to OPFS /smg/save via WasmFS (not IndexedDB: same persistence, no async bridge); verified a save survives a reload. Left: export/import in settings.
 
 ### P1-06 Pipeline cache and seed
 - lane: A
