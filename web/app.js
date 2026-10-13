@@ -628,54 +628,62 @@ function boot(args, env = {}) {
   canvas.style.display = "block";
   document.getElementById("stage").style.display = "block";
   requestAnimationFrame(drawTags);
-  // Focus canvas and block destructive shortcuts during gameplay
-  canvas.focus();
 
-  // Input capture: keep focus on canvas, block only dangerous shortcuts in capture phase
-  const isPlaying = () => document.body.classList.contains("playing");
-  let wasFocused = false;
+  // Pointer lock for input capture - native browser API
+  let pointerLocked = false;
 
-  // On game start, ensure canvas has focus and keep it there until quitting
-  if (isPlaying()) {
-    wasFocused = true;
+  if (canvas.requestPointerLock) {
+    // Block destructive shortcuts while in pointer lock state
+    document.addEventListener("keydown", (e) => {
+      // Only block when pointer is locked (browser-level focus)
+      if (!pointerLocked) return;
+
+      // Dangerous actions to prevent:
+      if ((e.ctrlKey && e.key.toLowerCase() === "w") ||        // close tab
+          (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "t") ||  // reopen tabs
+          (e.ctrlKey && e.key.toLowerCase() === "d") ||   // bookmark page
+          (e.key === "F11") ||                    // browser fullscreen
+          (e.altKey && e.key.toLowerCase() === "f4")) {     // quit window
+        e.preventDefault();
+        return false;
+      }
+    }, { capture: true });
+
+    // Release pointer lock on Escape - allows clean exit and recapture
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && pointerLocked) {
+        // Exit pointer lock - this is the proper way to release it
+        document.exitPointerLock().then(() => {
+          pointerLocked = false;
+          canvas.focus();
+          // The game can now handle its quit logic normally
+        }).catch((err) => {
+          console.log("web: Pointer Lock API error:", err.message);
+        });
+        return true;  // Consume the Escape event while in pointer lock
+      }
+    }, { capture: true });
+
+    // Request pointer lock when clicking anywhere on canvas during gameplay
+    canvas.addEventListener("click", () => {
+      if (pointerLocked) return;
+      canvas.requestPointerLock().then(() => {
+        pointerLocked = true;
+      }).catch((e) => {
+        console.log("web: Pointer Lock request blocked:", e.message);
+      });
+    }, { capture: true });
+
+    // Also support keyboard-only recapture (Tab to canvas then click, or just use game controls)
     canvas.addEventListener("blur", () => {
-      // Canvas lost focus - restore it to prevent tab switching
-      canvas.focus();
+      pointerLocked = false;
+      document.exitPointerLock().then(() => {});
     }, { capture: true });
-
-    // Block only truly destructive shortcuts in the DOM capture phase
-    document.addEventListener("keydown", (e) => {
-      if (!isPlaying()) return;
-      
-      // Prevent dangerous actions that affect the browser or game window:
-      // Ctrl+W - close tab  (breaks gameplay)
-      // Ctrl+Shift+T - reopen closed tabs  (breaks gameplay)
-      // Alt+F4 - quit window (loses progress)
-      if ((e.ctrlKey && e.key.toLowerCase() === "w") ||
-          (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "t") ||
-          (e.altKey && e.key.toLowerCase() === "f4")) {
-        // Consume the event to prevent default action
-        // Important: only in capture phase ensures it takes precedence over browser
-        return false;
-      }
-      
-      // F11 - toggle browser fullscreen (breaks immersion)
-      if (e.key === "F11") {
-        return false;
-      }
-    }, { capture: true });
-
-    // Ctrl+F is tricky - in Firefox it toggles find, but the game shouldn't need it.
-    // Only block when combined with Ctrl as a chord that feels browser-like.
-    document.addEventListener("keydown", (e) => {
-      if (!isPlaying()) return;
-      if (e.ctrlKey && e.key.toLowerCase() === "f") {
-        // Firefox: toggle find; Chrome/Safari: focus address bar
-        // Let it through - the game's search UI handles Ctrl+Shift+F if needed
-        return true;
-      }
-    }, { capture: true });
+  } else {
+    console.log("web: Pointer Lock API not available in this browser");
   }
+
+  canvas.focus();
 
   window.Module = {
     canvas,
