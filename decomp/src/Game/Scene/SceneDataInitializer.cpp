@@ -2,6 +2,7 @@
 #include "Game/Util/EventUtil.hpp"
 #include <JSystem/JKernel/JKRSolidHeap.hpp>
 #include "net/puppet/remote_player_puppet.hpp"
+#include "net/world/world_sync.h"
 #endif
 #include "Game/Scene/SceneDataInitializer.hpp"
 #include "Game/NameObj/NameObjArchiveListCollector.hpp"
@@ -32,6 +33,9 @@ void SceneDataInitializer::startStageFileLoadAfterScenarioSelected() {
 
     LuigiLetter::makeArchiveListForMenu(&collector, JMapInfoIter());
 #ifdef TARGET_PC
+    // Co-op world sync: the previous scene's actors are gone; this one's
+    // register as they are placed (net/world).
+    port_world_scene_reset();
     // Co-op: remote players are drawn with the player models (net/puppet).
     // The save's own character is stationed; load the other with the stage,
     // and every power-up form for both characters: a remote player can be

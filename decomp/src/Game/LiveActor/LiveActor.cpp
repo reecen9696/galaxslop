@@ -1,3 +1,6 @@
+#ifdef TARGET_PC
+#include "net/world/world_sync.h"
+#endif
 #include "Game/LiveActor/LiveActor.hpp"
 #include "Game/AudioLib/AudAnmSoundObject.hpp"
 #include "Game/LiveActor/ActorAnimKeeper.hpp"
@@ -80,6 +83,9 @@ void LiveActor::kill() {
 }
 
 void LiveActor::makeActorDead() {
+#ifdef TARGET_PC
+    port_world_actor_dead(this);  // co-op: a placed enemy defeated (net/world)
+#endif
     mVelocity.zero();
 
     MR::clearHitSensors(this);

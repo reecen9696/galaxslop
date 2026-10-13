@@ -11,6 +11,7 @@ export const Msg = {
   PlayerLeft: 0x04,
   PlayerState: 0x10,
   Contact: 0x12,
+  WorldEvent: 0x13,
   ProgressEvent: 0x20,
   ProgressLog: 0x21,
   ProgressAck: 0x22,
@@ -219,6 +220,9 @@ export function encodeError(code: number, msg: string): Uint8Array {
 // server -> target only, the same bytes with the target id replaced by the
 // sender's.  Unreliable, not inspected beyond length and target.
 export const CONTACT_SIZE = 9;
+// WorldEvent (world sync, net/world): [0x13][u8 kind][u32 stage][u8 scenario]
+// [u32 id], forwarded as is to everyone else in the room.  Unreliable.
+export const WORLD_EVENT_SIZE = 11;
 export function forwardContact(fromId: number, b: Uint8Array): Uint8Array {
   const out = b.slice(0, CONTACT_SIZE);
   out[1] = fromId;

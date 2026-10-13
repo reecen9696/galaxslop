@@ -19,6 +19,7 @@ import {
   forwardPlayerState,
   forwardContact,
   CONTACT_SIZE,
+  WORLD_EVENT_SIZE,
   type PlayerInfo,
 } from "./protocol.ts";
 
@@ -114,6 +115,11 @@ export class Relay {
         break;
       case Msg.Contact:
         this.onContact(c, data);
+        break;
+      case Msg.WorldEvent:
+        if (c.room && c.info && data.length === WORLD_EVENT_SIZE) {
+          for (const other of c.room.players.values()) if (other !== c) other.conn.send(data);
+        }
         break;
       case Msg.Ping:
         // Echo the client's timestamp back.

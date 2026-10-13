@@ -229,6 +229,26 @@ describe("contact (D-020)", () => {
   });
 });
 
+describe("world events", () => {
+  it("forwards a WorldEvent to everyone else in the room", () => {
+    const relay = new Relay({ fixedRooms: ["ROOM22"] });
+    const inbox: Uint8Array[][] = [[], [], []];
+    const conns: Conn[] = [0, 1, 2].map((i) => ({ send: (b) => inbox[i].push(b), close: () => {} }));
+    conns.forEach((c, i) => {
+      relay.connect(c);
+      relay.message(c, hello("P" + i, "ROOM22"));
+    });
+    inbox.forEach((m) => (m.length = 0));
+    const ev = Uint8Array.of(Msg.WorldEvent, 1, 1, 2, 3, 4, 1, 9, 8, 7, 6);
+    relay.message(conns[0], ev);
+    expect(inbox[0].length).toBe(0);
+    expect(Array.from(inbox[1][0])).toEqual(Array.from(ev));
+    expect(Array.from(inbox[2][0])).toEqual(Array.from(ev));
+    relay.message(conns[0], Uint8Array.of(Msg.WorldEvent, 1, 2));
+    expect(inbox[1].length).toBe(1);
+  });
+});
+
 describe("progress log (P3-01)", () => {
   function setup() {
     let t = 0;

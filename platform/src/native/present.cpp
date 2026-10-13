@@ -137,6 +137,9 @@ static void readInput(PortPadState* pad, bool* quit) {
         if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat && e.key.key == SDLK_F9) {
             port_net_debug_request_mode(100);  // squash yourself
         }
+        if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat && e.key.key == SDLK_F10) {
+            port_net_debug_request_mode(101);  // defeat the nearest enemy
+        }
     }
     const bool* k = SDL_GetKeyboardState(nullptr);
     memset(pad, 0, sizeof(*pad));

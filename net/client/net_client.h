@@ -9,6 +9,7 @@
 //   SMG_TINT   puppet colour others see you in (net::kTint*; default auto)
 #pragma once
 
+#include <stddef.h>
 #include <stdint.h>
 
 #include "net/capture/player_capture.h"
@@ -40,6 +41,8 @@ bool netPump();
 void netTick(const NetPlayerCapture* local);
 // Slot i (0..kMaxRemotes-1) as of the last netTick.
 const RemoteView& netRemote(int slot);
+// Sends one message as is (world sync); dropped when not in a room.
+void netSendRaw(const uint8_t* data, size_t len);
 // Contact (D-020): tell player `targetId` this client touched them.
 void netSendContact(uint8_t targetId, uint8_t kind, const float dir[3]);
 // Contacts other players made with the local player, oldest first; false

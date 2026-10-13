@@ -530,6 +530,19 @@ observatory state.
 Each object type is its own task. Add tasks here after P3-06, ordered by
 playtest pain. Template:
 
+### P4-01 Sync: defeated enemies
+- lane: A
+- status: review
+- owner: A
+- started: 2026-10-13
+- blocked_by: (started before P3-06 at the user's request)
+- touches: net/world (new), net/client (raw send, 0x13 route), server/src (forward), decomp/src/Game/Util/LiveActorUtil.cpp (initDefaultPos: register), decomp/src/Game/LiveActor/LiveActor.cpp (makeActorDead: report), decomp/src/Game/Scene/SceneDataInitializer.cpp (reset)
+- flags: parallel-ok
+- what: A placed enemy defeated on one client dies on the others in the same stage and scenario. Identity = FNV-1a(name, placed position) from initDefaultPos, same on every client. WorldEvent 0x13 forwarded to the room. No authority (first defeat wins).
+- done when: two clients by the same enemy: one defeats it, it disappears on the other.
+- log:
+  - 2026-10-13 (A): works natively: Good Egg registers 40 enemies; Alice defeats an Octoomba next to both players (F10), Bob's copy dies (2 -> 1 Octoombas on Bob's screen), ids match. Relay vitest. Not yet: late joiners (no persistence), generator-spawned enemies (no placement id), death animation on the receiving side (plain kill()), loot from the enemy's kill() may drop twice. SMG_WORLD_SYNC=0 turns it off.
+
 ### P4-NN Sync: <object type>
 - lane:
 - status: open

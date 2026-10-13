@@ -41,6 +41,7 @@
 #include "Game/Util/SchedulerUtil.hpp"
 #include "net/client/net_client.h"
 #include "net/puppet/puppet_tint.h"
+#include "net/world/world_sync.h"
 #include "port/port.h"
 #include "revolution/gx.h"
 #include <JSystem/J3DGraphAnimator/J3DJoint.hpp>
@@ -1031,6 +1032,12 @@ void applyDebugModes() {
     if (!MR::isExistMario()) {
         return;
     }
+    if (mode == 101) {  // F10: defeat the nearest enemy (world sync test)
+        sPending = -1;
+        const TVec3f& p = *MR::getPlayerPos();
+        port_world_debug_kill_nearest(p.x, p.y, p.z);
+        return;
+    }
     if (mode == 100) {  // F9: squash the local player (as a ground pound does)
         sPending = -1;
         port_log("puppet: debug: squash");
@@ -1141,6 +1148,7 @@ extern "C" void port_net_puppets_update(void* pScene) {
     if (net::netEnabled()) {
         net::netTick(haveLocal ? &now : nullptr);
         applyContacts();
+        port_world_update();
         trySpawnSpacing();
         updateLocalTint();
         for (int i = 0; i < net::kMaxRemotes; i++) {

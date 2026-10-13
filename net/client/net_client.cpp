@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "net/client/progress.h"
+#include "net/world/world_sync.h"
 #include "net/client/ws_client.h"
 #include "net/client/ws_web.h"
 #include "net/proto/player_state.h"
@@ -193,6 +194,9 @@ void handle(Session& s, const std::vector<uint8_t>& m) {
         port_log("net: relay error %u: %s", code, msg.c_str());
         break;
     }
+    case kMsgWorldEvent:  // world sync (net/world)
+        worldOnEvent(m.data(), m.size());
+        break;
     case 0x21:  // ProgressLog (P3-02)
         progressOnLog(m.data(), m.size());
         break;
@@ -305,6 +309,12 @@ const RemoteView& netRemote(int slot) { return session().views[slot]; }
 const char* netRoomCode() { return session().room.c_str(); }
 
 uint8_t netLocalId() { return session().you; }
+
+void netSendRaw(const uint8_t* data, size_t len) {
+    Session& s = session();
+    if (s.state.load() != 2 || !s.transport || s.you == 0) return;
+    s.transport->send(data, len);
+}
 
 void netSendContact(uint8_t targetId, uint8_t kind, const float dir[3]) {
     Session& s = session();

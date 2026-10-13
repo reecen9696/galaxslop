@@ -24,6 +24,7 @@ unless marked f16.
 | 0x02 | Welcome | s->c | yes | u8 player_id, u8 room_code_len, room_code, u8 player_count, then per player: u8 id, u8 name_len, name, u8 character, u8 tint |
 | 0x03 | PlayerJoined | s->c | yes | u8 id, u8 name_len, name, u8 character, u8 tint |
 | 0x04 | PlayerLeft | s->c | yes | u8 id |
+| 0x13 | WorldEvent | c->s->others | no | u8 kind (1 enemy defeated), u32 stage_hash, u8 scenario, u32 placement id (FNV-1a of the actor name and its placed position, net/world). Forwarded as is to everyone else in the room. |
 | 0x12 | Contact | c->s->target | no | u8 target_id (server -> target: sender's id), u8 kind (1 jumped on: flinch; 2 ground-pounded: squash, -1 health), f16 dir[3] (toucher's facing). Forwarded only to the target. D-020 |
 | 0x10 | PlayerState | c->s->c | no | see below |
 | 0x20 | ProgressEvent | c->s | yes | u16 kind, u32 stage_hash, u8 scenario, u16 arg |

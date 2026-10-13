@@ -1,3 +1,6 @@
+#ifdef TARGET_PC
+#include "net/world/world_sync.h"
+#endif
 #include "Game/Animation/BckCtrl.hpp"
 #include "Game/Animation/XanimeCore.hpp"
 #include "Game/AudioLib/AudAnmSoundObject.hpp"
@@ -572,6 +575,10 @@ namespace MR {
         MR::getJMapInfoTrans(rIter, &pActor->mPosition);
         MR::getJMapInfoRotate(rIter, &pActor->mRotation);
         MR::getJMapInfoScale(rIter, &pActor->mScale);
+#ifdef TARGET_PC
+        // Co-op world sync: a placement id for this actor (net/world).
+        port_world_register(pActor, pActor->mName, pActor->mPosition.x, pActor->mPosition.y, pActor->mPosition.z);
+#endif
 
         pActor->mRotation.x = MR::repeat(pActor->mRotation.x, 0.0f, 360.0f);
         pActor->mRotation.y = MR::repeat(pActor->mRotation.y, 0.0f, 360.0f);
