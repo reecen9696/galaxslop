@@ -174,7 +174,7 @@ extern "C" int port_net_wants_puppets(void);
 
 // Debug: put the local player into PlayerMode `mode` on the next gameplay
 // frame (0 normal, 1 rainbow, 2 fire, 3 ice, 4 bee, 5 spring, 6 boo,
-// 7 flying).  Any thread.  The desktop window maps F1-F8 to it;
+// 7 flying; 100 squashes him).  Any thread.  The desktop window maps F1-F8 to it;
 // PETARI_DEBUG_MODES="seconds:mode,..." schedules them (seconds after the
 // first gameplay frame).
 extern "C" void port_net_debug_request_mode(int mode);

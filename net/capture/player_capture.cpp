@@ -87,6 +87,7 @@ extern "C" void port_net_capture_player(void) {
     if (MR::isDemoActive()) c.flags |= NET_CAPTURE_IN_DEMO;
     c.flags |= (uint16_t)((actor->_B6A & 3) << NET_CAPTURE_EYELID_SHIFT);
     c.flags |= (uint16_t)((actor->mPlayerMode & 15) << NET_CAPTURE_MODE_SHIFT);
+    if (actor->mScale.y < 0.5f) c.flags |= NET_CAPTURE_SQUASHED;  // MarioCrush::start scales y to 0.2
 
     std::lock_guard<std::mutex> lock(sLock);
     c.frame = sCount;

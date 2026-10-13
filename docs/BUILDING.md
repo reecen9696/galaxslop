@@ -118,7 +118,9 @@ SMG_RELAY=ws://<host-ip>:8787 SMG_ROOM=PLAY22 SMG_NAME=Reece ./build/native/smg 
   straight into Good Egg in ~20 s (`PETARI_QUICKSTART=Galaxy[:scenario]`
   skips the title, file select and prologue; `PETARI_QUICKSTART_LUIGI=1`).
   In a window F1-F8 switch your power-up form (normal, rainbow, fire, ice,
-  bee, spring, boo, flying); `PETARI_DEBUG_MODES` schedules them.
+  bee, spring, boo, flying) and F9 squashes you; `PETARI_DEBUG_MODES` schedules
+  them. Ground-pound another player to squash them (one health); jumping on
+  them just bounces you and makes them flinch.
   `PETARI_LOOPBACK=0 PETARI_LOOPBACK_SIDE=110` draws a copy of yourself
   beside you, for comparing the puppet with the real player. Nothing else is shared yet (no stars, no enemies).
 - `PETARI_NETLOG=1` logs the room, round-trip time and where the others are.

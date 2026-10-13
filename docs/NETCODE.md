@@ -24,7 +24,7 @@ unless marked f16.
 | 0x02 | Welcome | s->c | yes | u8 player_id, u8 room_code_len, room_code, u8 player_count, then per player: u8 id, u8 name_len, name, u8 character, u8 tint |
 | 0x03 | PlayerJoined | s->c | yes | u8 id, u8 name_len, name, u8 character, u8 tint |
 | 0x04 | PlayerLeft | s->c | yes | u8 id |
-| 0x12 | Contact | c->s->target | no | u8 target_id (server -> target: sender's id), u8 kind (1 trample), f16 dir[3] (toucher's facing). Forwarded only to the target. D-020 |
+| 0x12 | Contact | c->s->target | no | u8 target_id (server -> target: sender's id), u8 kind (1 jumped on: flinch; 2 ground-pounded: squash, -1 health), f16 dir[3] (toucher's facing). Forwarded only to the target. D-020 |
 | 0x10 | PlayerState | c->s->c | no | see below |
 | 0x20 | ProgressEvent | c->s | yes | u16 kind, u32 stage_hash, u8 scenario, u16 arg |
 | 0x21 | ProgressLog | s->c | yes | u32 from_seq, u16 count, then count x (u32 seq, u8 origin_id, u16 kind, u32 stage_hash, u8 scenario, u16 arg) |
@@ -51,7 +51,7 @@ u32  anim_hash      MR::getHashCode(current animation name); the receiver
                     calls XanimePlayer::changeAnimationByHash (D-018)
 u8   anim_weight[4] track blend weights x255 (locomotion group, D-018)
 f16  anim_frame
-u16  flags          bit0 luigi, bit1 grounded, bit2 hidden, bit3 in_cutscene, bits4-5 eyelid (0 open..3 closed), bits6-9 power-up form (MarioActor PlayerMode)
+u16  flags          bit0 luigi, bit1 grounded, bit2 hidden, bit3 in_cutscene, bits4-5 eyelid (0 open..3 closed), bits6-9 power-up form (MarioActor PlayerMode), bit10 squashed
 u32  stage_hash     MR::getHashCode(stage name): same galaxy check
 u8   scenario
 ```

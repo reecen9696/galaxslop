@@ -268,7 +268,8 @@ bool interpolate(const Remote& r, int64_t t, int64_t now, NetPlayerCapture* out)
     out->flags = (b->flags & NET_STATE_LUIGI ? NET_CAPTURE_LUIGI : 0) | (b->flags & NET_STATE_GROUNDED ? NET_CAPTURE_GROUNDED : 0) |
                  (b->flags & NET_STATE_HIDDEN ? NET_CAPTURE_HIDDEN : 0) | (b->flags & NET_STATE_IN_DEMO ? NET_CAPTURE_IN_DEMO : 0) |
                  (((b->flags & NET_STATE_EYELID_MASK) >> kNetStateEyelidShift) << NET_CAPTURE_EYELID_SHIFT) |
-                 (((b->flags & NET_STATE_MODE_MASK) >> kNetStateModeShift) << NET_CAPTURE_MODE_SHIFT);
+                 (((b->flags & NET_STATE_MODE_MASK) >> kNetStateModeShift) << NET_CAPTURE_MODE_SHIFT) |
+                 (b->flags & NET_STATE_SQUASHED ? NET_CAPTURE_SQUASHED : 0);
     return true;
 }
 
@@ -285,7 +286,8 @@ PlayerState toState(const NetPlayerCapture& c) {
     s.flags = (c.flags & NET_CAPTURE_LUIGI ? NET_STATE_LUIGI : 0) | (c.flags & NET_CAPTURE_GROUNDED ? NET_STATE_GROUNDED : 0) |
               (c.flags & NET_CAPTURE_HIDDEN ? NET_STATE_HIDDEN : 0) | (c.flags & NET_CAPTURE_IN_DEMO ? NET_STATE_IN_DEMO : 0) |
               (((c.flags & NET_CAPTURE_EYELID_MASK) >> NET_CAPTURE_EYELID_SHIFT) << kNetStateEyelidShift) |
-              (((c.flags & NET_CAPTURE_MODE_MASK) >> NET_CAPTURE_MODE_SHIFT) << kNetStateModeShift);
+              (((c.flags & NET_CAPTURE_MODE_MASK) >> NET_CAPTURE_MODE_SHIFT) << kNetStateModeShift) |
+              (c.flags & NET_CAPTURE_SQUASHED ? NET_STATE_SQUASHED : 0);
     s.stageHash = c.stageHash;
     s.scenario = (uint8_t)c.scenario;
     return s;

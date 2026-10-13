@@ -394,6 +394,7 @@ with no desync complaints at 100 ms delay.
 - what: D-020 option C. Puppet sensor (push, stomp bounce, no star bits, off while hidden/frozen), Contact 0x12 forwarded to the target, stomped player flinches (doFlipWeak, no damage). SMG_CONTACT=0 disables. Lobby toggle later (P2-06).
 - done when: two clients: walking into each other pushes, landing on the other bounces and the other flinches.
 - log:
+  - 2026-10-13 (A): ground pound onto another player squashes them (Contact kind 2 -> Mario::requestCrush: flattened 3 s, -1 health, then invincibility); a plain jump stays bounce + flinch (user's choice). PlayerState flags bit 10 = squashed, so the puppet flattens too. Verified: Alice ground-pounds Bob, Bob flat, life 3 -> 2; loopback side by side shows the copy flattening. F9 / PETARI_DEBUG_MODES 100 squashes yourself (testing).
   - 2026-10-13 (A): done natively: two headless clients, mutual push at the spawn, Alice stomps Bob's puppet and bounces, Bob's log "stomped by player 2" and his Mario flinches. Relay test for Contact forwarding, C++ round-trip test. Puppet names contain ゴーストマリオ so Mario's jump/hang exemption applies.
 
 ### P2-06 Lobby screen

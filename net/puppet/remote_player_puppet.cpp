@@ -326,14 +326,17 @@ bool RemotePlayerPuppet::receiveMsgPlayerAttack(u32 msg, HitSensor* pSender, Hit
     if (!mSolid) {
         return false;
     }
-    if (MR::isMsgPlayerTrample(msg) || MR::isMsgPlayerHipDrop(msg)) {
+    // A jump onto the head: the stomper bounces, the other flinches.  A
+    // ground pound: the other is squashed flat and loses health.
+    bool hipDrop = MR::isMsgPlayerHipDrop(msg);
+    if (MR::isMsgPlayerTrample(msg) || hipDrop) {
         if (mTrampleCooldown == 0 && mRemoteId != 0 && MR::isExistMario()) {
             const TVec3f& front = MarioAccess::getPlayerActor()->mMario->mFrontVec;
             float dir[3] = {front.x, front.y, front.z};
-            net::netSendContact(mRemoteId, net::kContactTrample, dir);
+            net::netSendContact(mRemoteId, hipDrop ? net::kContactHipDrop : net::kContactTrample, dir);
         }
         if (mTrampleCooldown == 0) {
-            port_log("puppet: local player stomped player %u", mRemoteId);
+            port_log("puppet: local player %s player %u", hipDrop ? "ground-pounded" : "stomped", mRemoteId);
         }
         mTrampleCooldown = 20;
         return true;
@@ -420,6 +423,12 @@ void RemotePlayerPuppet::applyState(const NetPlayerCapture& rState, bool valid, 
     mXanimePlayer->getFrameCtrl()->setFrame(rState.animFrame);
     mEyelid = (u8)((rState.flags & NET_CAPTURE_EYELID_MASK) >> NET_CAPTURE_EYELID_SHIFT);
     mMode = (u8)((rState.flags & NET_CAPTURE_MODE_MASK) >> NET_CAPTURE_MODE_SHIFT);
+    // Flattened like the sender (MarioCrush scales y to 0.2).
+    if (rState.flags & NET_CAPTURE_SQUASHED) {
+        mScale.set(1.0f, 0.2f, 1.0f);
+    } else {
+        mScale.set(1.0f, 1.0f, 1.0f);
+    }
     bool airborne = (rState.flags & NET_CAPTURE_GROUNDED) == 0;
     // Form animations advance like MarioActor's hidden holders do: movement()
     // on a killed actor still updates its frame controllers.
@@ -943,19 +952,26 @@ bool contactEnabled() {
     return !(sContact != nullptr && sContact[0] == '0');
 }
 
-// Contacts from other players: a stomp on the local Mario makes him flinch
-// (Mario::doFlipWeak: knocked back, no damage; refused while invincible
-// after a hit or in a state that cannot be pushed).
+// Contacts from other players.  Jumped on: the local Mario flinches
+// (Mario::doFlipWeak: knocked back, no damage).  Ground-pounded: squashed
+// flat like under a crusher (Mario::requestCrush -> MarioCrush: one health,
+// three seconds flat, then the usual invincibility).  Both are refused while
+// invincible or in a state that cannot be hit.
 void applyContacts() {
     net::Contact c;
     while (net::netPollContact(&c)) {
-        if (!contactEnabled() || !MR::isExistMario() || c.kind != net::kContactTrample) {
+        if (!contactEnabled() || !MR::isExistMario()) {
             continue;
         }
         MarioActor* actor = MarioAccess::getPlayerActor();
-        TVec3f dir(c.dir[0], c.dir[1], c.dir[2]);
-        bool flinched = actor->mMario->doFlipWeak(dir);
-        port_log("puppet: stomped by player %u%s", c.playerId, flinched ? "" : " (no reaction in this state)");
+        if (c.kind == net::kContactTrample) {
+            TVec3f dir(c.dir[0], c.dir[1], c.dir[2]);
+            bool flinched = actor->mMario->doFlipWeak(dir);
+            port_log("puppet: stomped by player %u%s", c.playerId, flinched ? "" : " (no reaction in this state)");
+        } else if (c.kind == net::kContactHipDrop) {
+            actor->mMario->requestCrush();
+            port_log("puppet: ground-pounded by player %u: squashed", c.playerId);
+        }
     }
 }
 
@@ -1013,6 +1029,12 @@ void applyDebugModes() {
         }
     }
     if (!MR::isExistMario()) {
+        return;
+    }
+    if (mode == 100) {  // F9: squash the local player (as a ground pound does)
+        sPending = -1;
+        port_log("puppet: debug: squash");
+        MarioAccess::getPlayerActor()->mMario->requestCrush();
         return;
     }
     {

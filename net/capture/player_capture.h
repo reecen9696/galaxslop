@@ -40,6 +40,7 @@ typedef struct NetPlayerCapture {
 // 3 ice, 4 bee, 5 spring, 6 boo, 7 flying, 9 spin drill...).
 #define NET_CAPTURE_MODE_MASK 0x03C0
 #define NET_CAPTURE_MODE_SHIFT 6
+#define NET_CAPTURE_SQUASHED 0x0400  // flattened (ground-pounded, crushed)
 
 // Called by game code once per gameplay frame (Mario exists, scene in play).
 void port_net_capture_player(void);

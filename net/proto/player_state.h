@@ -35,6 +35,7 @@ enum : uint16_t {
     NET_STATE_IN_DEMO = 0x0008,
     NET_STATE_EYELID_MASK = 0x0030,  // eyelid frame 0 (open) .. 3 (closed)
     NET_STATE_MODE_MASK = 0x03C0,    // power-up form (MarioActor's PlayerMode, 0-9)
+    NET_STATE_SQUASHED = 0x0400,     // flattened (MarioCrush)
 };
 constexpr int kNetStateEyelidShift = 4;
 constexpr int kNetStateModeShift = 6;
@@ -59,7 +60,8 @@ struct PlayerState {
 constexpr uint8_t kMsgContact = 0x12;
 constexpr size_t kContactSize = 9;
 enum : uint8_t {
-    kContactTrample = 1,  // stomped on (the target flinches)
+    kContactTrample = 1,  // jumped on (the target flinches)
+    kContactHipDrop = 2,  // ground-pounded (the target is squashed and loses health)
 };
 struct Contact {
     uint8_t playerId = 0;  // target when sending, sender when received
