@@ -1,3 +1,6 @@
+#ifdef TARGET_PC
+#include "net/world/world_sync.h"
+#endif
 #include "Game/MapObj/StarPiece.hpp"
 #include "Game/LiveActor/HitSensor.hpp"
 #include "Game/LiveActor/Nerve.hpp"
@@ -204,6 +207,9 @@ void StarPiece::appearFromGroup() {
 }
 
 void StarPiece::makeActorAppeared() {
+#ifdef TARGET_PC
+    port_world_item_appeared(this);
+#endif
     LiveActor::makeActorAppeared();
     getSensor("attack")->invalidate();
     _C8 = -1;
@@ -1260,6 +1266,9 @@ bool StarPiece::isIgnoreTriOnThrow(const Triangle* pTriangle) {
 }
 
 bool StarPiece::touchPlayer() {
+#ifdef TARGET_PC
+    port_world_item_collected(this);  // co-op: gone for the others too
+#endif
     if (MR::gotByPlayer()) {
         if (200.0f < calcDistToCamera()) {
             if (isEffectLight()) {

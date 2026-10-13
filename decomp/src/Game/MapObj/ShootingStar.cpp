@@ -1,3 +1,6 @@
+#ifdef TARGET_PC
+#include "net/world/world_sync.h"
+#endif
 #include "Game/MapObj/ShootingStar.hpp"
 #include "Game/LiveActor/Nerve.hpp"
 #include "Game/Util.hpp"
@@ -109,11 +112,20 @@ void ShootingStar::exePreShooting() {
         }
     }
 
+#ifdef TARGET_PC
+    // Co-op: the stage host's stars fire on their timer and say so; the
+    // others hold (fully grown) until told (net/world).
+    mScale.set(MR::min(static_cast< f32 >(getNerveStep()) / ::sPreShootingTime, 1.0f));
+    if (!MR::isFirstStep(this) && port_world_shooting_star_gate(this, MR::isGreaterStep(this, ::sPreShootingTime))) {
+        setNerve(GET_NERVE(ShootingStar, HostTypeNrvShooting));
+    }
+#else
     mScale.set(static_cast< f32 >(getNerveStep()) / ::sPreShootingTime);
 
     if (MR::isGreaterStep(this, ::sPreShootingTime)) {
         setNerve(GET_NERVE(ShootingStar, HostTypeNrvShooting));
     }
+#endif
 }
 
 void ShootingStar::exeShooting() {
@@ -133,7 +145,14 @@ void ShootingStar::exeShooting() {
     if (MR::isBinded(this)) {
         setNerve(GET_NERVE(ShootingStar, HostTypeNrvWaitForNextShoot));
 
-        if (MR::appearStarPiece(this, mPosition, mNumBurstStarPiece, 15.0f, ::sLaunchYVel, false)) {
+#ifdef TARGET_PC
+        port_world_ambient_drop(1);  // every client bursts this star itself
+#endif
+        bool burst = MR::appearStarPiece(this, mPosition, mNumBurstStarPiece, 15.0f, ::sLaunchYVel, false);
+#ifdef TARGET_PC
+        port_world_ambient_drop(0);
+#endif
+        if (burst) {
             MR::startSound(this, "SE_OJ_STAR_PIECE_BURST");
         } else {
             MR::startSound(this, "SE_OJ_STAR_PIECE_NOT_BURST");
@@ -161,7 +180,11 @@ void ShootingStar::exeWaitForNextShoot() {
         kill();
     }
 
+#ifdef TARGET_PC
+    if (MR::isGreaterStep(this, mWaitForNextShootTime) || port_world_shooting_star_signalled(this)) {
+#else
     if (MR::isGreaterStep(this, mWaitForNextShootTime)) {
+#endif
         MR::onCalcAnim(this);
         MR::validateShadow(this, nullptr);
         setNerve(GET_NERVE(ShootingStar, HostTypeNrvPreShooting));

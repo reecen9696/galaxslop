@@ -119,7 +119,7 @@ SMG_RELAY=ws://<host-ip>:8787 SMG_ROOM=PLAY22 SMG_NAME=Reece ./build/native/smg 
   skips the title, file select and prologue; `PETARI_QUICKSTART_LUIGI=1`).
   In a window F1-F8 switch your power-up form (normal, rainbow, fire, ice,
   bee, spring, boo, flying), F9 squashes you, F10 defeats the nearest
-  enemy (world sync test); `PETARI_DEBUG_MODES` schedules
+  enemy and F11 drops coins and star bits (world sync tests); `PETARI_DEBUG_MODES` schedules
   them. Ground-pound another player to squash them (one health); jumping on
   them just bounces you and makes them flinch.
   `PETARI_LOOPBACK=0 PETARI_LOOPBACK_SIDE=110` draws a copy of yourself

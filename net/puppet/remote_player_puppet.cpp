@@ -1032,6 +1032,12 @@ void applyDebugModes() {
     if (!MR::isExistMario()) {
         return;
     }
+    if (mode == 102) {  // F11: drop coins and star bits (world sync test)
+        sPending = -1;
+        const TVec3f& p = *MR::getPlayerPos();
+        port_world_debug_drop(p.x, p.y, p.z);
+        return;
+    }
     if (mode == 101) {  // F10: defeat the nearest enemy (world sync test)
         sPending = -1;
         const TVec3f& p = *MR::getPlayerPos();
@@ -1115,6 +1121,8 @@ extern "C" void port_net_puppets_create_for_scene(void) {
         }
     }
     if (net::netEnabled()) {
+        // Remote coin and star bit drops come from here (net/world).
+        port_world_declare_loot_host(sPuppets[0][0]);
         // Same model data as the player's (the puppet of its character).
         sLocalTint = new ModelTint();
         sLocalTint->init(MR::getJ3DModelData(sPuppets[0][MR::isPlayerLuigi() ? 1 : 0]), MR::isPlayerLuigi());

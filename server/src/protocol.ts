@@ -221,9 +221,9 @@ export function encodeError(code: number, msg: string): Uint8Array {
 // sender's.  Unreliable, not inspected beyond length and target.
 export const CONTACT_SIZE = 9;
 // WorldEvent (world sync, net/world): [0x13][u8 kind][u32 stage][u8 scenario]
-// [u32 placement id][u32 name hash][f32 pos x3], forwarded as is to everyone
-// else in the room.  Unreliable.
-export const WORLD_EVENT_SIZE = 27;
+// [u32 placement id or count][u32 name hash][f32 pos x3][f32 a][f32 b],
+// forwarded as is to everyone else in the room.  Unreliable.
+export const WORLD_EVENT_SIZE = 35;
 export function forwardContact(fromId: number, b: Uint8Array): Uint8Array {
   const out = b.slice(0, CONTACT_SIZE);
   out[1] = fromId;

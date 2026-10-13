@@ -29,8 +29,31 @@ void port_world_scene_reset(void);
 // and position.
 void port_world_actor_appeared(void* actor);
 // Coin and star bit spawns check this: nonzero while a remote defeat runs
-// the local copy's kill() (the defeating player got the loot).
+// the local copy's kill() (the defeater's drop event brings the loot).
 int port_world_suppress_loot(void);
+// MR::appearCoinPop / appearStarPiece: a local drop (kind 0 coins, 1 star
+// bits), repeated on the other clients in this stage.
+void port_world_loot_dropped(const void* source, int kind, float x, float y, float z, int count, float a, float b);
+// Coin::noticeGetCoin (not purple coins), StarPiece::touchPlayer: picked up.
+void port_world_item_collected(void* actor);
+// Coin / StarPiece::makeActorAppeared: items to match pickups against.
+void port_world_item_appeared(void* actor);
+// Scene init: the NameObj remote drops are made for (declared coins and
+// star bits).
+void port_world_declare_loot_host(const void* nameObj);
+// Shooting stars (falling stars that burst into star bits) are led by the
+// stage host (lowest player id in the stage and scenario): its stars fire on
+// their own timer and announce it; everyone else's fire only when told, so
+// the star bits rain down at the same moment everywhere.  `due`: the local
+// timer says fire.  Returns whether to fire now.
+int port_world_shooting_star_gate(void* actor, int due);
+// A non-host star waiting for its next shot: told to fire already?
+int port_world_shooting_star_signalled(void* actor);
+// Around a drop every client makes by itself (a synced shooting star's
+// burst): not announced.
+void port_world_ambient_drop(int on);
+// Debug (F11): drop coins and star bits over (x, y, z).
+void port_world_debug_drop(float x, float y, float z);
 // Once per gameplay frame (net/puppet): apply received events.
 void port_world_update(void);
 // Debug (F10): defeat the registered enemy nearest (x, y, z); 0 if none.
@@ -41,10 +64,16 @@ int port_world_debug_kill_nearest(float x, float y, float z);
 
 namespace net {
 constexpr uint8_t kMsgWorldEvent = 0x13;
-// [0x13][u8 kind][u32 stage][u8 scenario][u32 placement id or 0]
-// [u32 name hash][f32 pos[3]]
-constexpr unsigned kWorldEventSize = 27;
-enum : uint8_t { kWorldEnemyDefeated = 1 };
+// [0x13][u8 kind][u32 stage][u8 scenario][u32 placement id, or count]
+// [u32 name hash][f32 pos[3]][f32 a][f32 b]
+constexpr unsigned kWorldEventSize = 35;
+enum : uint8_t {
+    kWorldEnemyDefeated = 1,
+    kWorldItemCollected = 2,    // a coin or star bit picked up
+    kWorldCoinsDropped = 3,     // id = count
+    kWorldStarBitsDropped = 4,  // id = count, a/b = launch speeds
+    kWorldShootingStar = 5,     // a shooting star (id) fires now (stage host)
+};
 // Placement id: FNV-1a of the name and the position rounded to whole units.
 uint32_t worldPlacementId(const char* name, float x, float y, float z);
 // A received WorldEvent (net_client, network thread of the game: queued).

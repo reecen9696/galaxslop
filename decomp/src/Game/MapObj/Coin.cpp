@@ -1,3 +1,6 @@
+#ifdef TARGET_PC
+#include "net/world/world_sync.h"
+#endif
 #include "Game/MapObj/Coin.hpp"
 #include "Game/LiveActor/Nerve.hpp"
 #include "Game/MapObj/CoinHolder.hpp"
@@ -142,6 +145,11 @@ void Coin::setShadowAndPoseModeFromJMapIter(const JMapInfoIter& rIter) {
 }
 
 void Coin::makeActorAppeared() {
+#ifdef TARGET_PC
+    if (!mIsPurpleCoin) {
+        port_world_item_appeared(this);
+    }
+#endif
     MR::offCalcGravity(this);
 
     if (!_BA) {
@@ -540,6 +548,11 @@ bool Coin::requestHide() {
 }
 
 void Coin::noticeGetCoin() {
+#ifdef TARGET_PC
+    if (!mIsPurpleCoin) {
+        port_world_item_collected(this);  // co-op: gone for the others too (purple coins stay per player)
+    }
+#endif
     if (mIsNeedBubble) {
         MR::emitEffect(mAirBubble, "RecoveryBubbleBreak");
         MR::incPlayerOxygen(8);

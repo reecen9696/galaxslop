@@ -1,4 +1,5 @@
-// World sync, first slice: defeated enemies.  See the header.
+// World sync: defeated enemies, collected coins and star bits, dropped loot.
+// See the header.
 #include "world_sync.h"
 
 #include <math.h>
@@ -13,9 +14,11 @@
 #include "Game/LiveActor/HitSensorInfo.hpp"
 #include "Game/LiveActor/HitSensorKeeper.hpp"
 #include "Game/LiveActor/LiveActor.hpp"
+#include "Game/NameObj/NameObj.hpp"
 #include "Game/Util/ActorSensorUtil.hpp"
 #include "Game/Util/EffectUtil.hpp"
 #include "Game/Util/LiveActorUtil.hpp"
+#include "Game/Util/ObjUtil.hpp"
 #include "Game/Util/SoundUtil.hpp"
 #include "net/capture/player_capture.h"
 #include "net/client/net_client.h"
@@ -44,37 +47,43 @@ uint32_t worldPlacementId(const char* name, float x, float y, float z) {
 
 namespace {
 
-// A defeat as sent and received.  `id` is the placement id, 0 for an enemy
-// that was not placed from the stage data (spawned), which receivers match
-// by name and position instead.
-struct Defeat {
+// One WorldEvent.  Defeats and pickups: `id` is the placement id (0 for an
+// actor spawned in play, which receivers match by name hash and position).
+// Drops: `id` is the count, `a`/`b` the star bit launch speeds.
+struct Event {
+    uint8_t kind;
+    uint32_t stage;
+    uint8_t scenario;
     uint32_t id;
     uint32_t nameHash;
     float pos[3];
+    float a, b;
 };
 
 struct World {
     std::unordered_map<void*, uint32_t> idOf;     // placed actor -> placement id
     std::unordered_map<uint32_t, void*> actorOf;  // placement id -> placed actor
-    std::unordered_set<void*> unplaced;           // actors that appeared without a placement id
-    struct Event {
-        uint32_t stage;
-        uint8_t scenario;
-        Defeat d;
-    };
+    std::unordered_set<void*> unplaced;           // actors spawned during play (no placement id)
+    std::unordered_set<void*> items;              // coins and star bits, placed or pooled
     std::vector<Event> inbox;
-    // Defeats in this visit (local or received), told to players who arrive
-    // in the stage later.
-    std::vector<Defeat> defeated;
-    uint32_t defeatedStage = 0;
-    uint8_t defeatedScenario = 0xFF;
-    // Remote players already in this stage (by id), to spot arrivals.
-    std::unordered_set<uint8_t> here;
-    bool applying = false;  // killing for a remote event: no echo, no loot
+    // This visit's defeats and pickups of placed actors (local or received),
+    // told to players who arrive in the stage later.
+    std::vector<Event> history;
+    uint32_t historyStage = 0;
+    uint8_t historyScenario = 0xFF;
+    std::unordered_set<uint8_t> here;  // remote players already in this stage
+    // Applying a remote event: a defeat's kill() drops no loot (the event's
+    // sender drops it and says so); a remote drop is not sent back.
+    bool applyingDefeat = false;
+    bool applyingDrop = false;
+    bool applyingPickup = false;
     // Gameplay of this scene has begun (first port_world_update).  Scene
-    // set-up kills and hides actors too (boss parts, pooled objects); those
-    // are not defeats.
+    // set-up kills and hides actors too (boss parts, pooled objects).
     bool live = false;
+    const void* lootHost = nullptr;     // declared source of remote drops
+    const void* pendingHost = nullptr;  // to declare once placement starts
+    std::unordered_set<void*> shootSignals;  // shooting stars told to fire
+    bool ambientDrop = false;
 };
 
 World& world() {
@@ -130,45 +139,56 @@ bool logging() {
     return s;
 }
 
-void send(const Defeat& d, uint32_t stage, uint8_t scenario) {
+void send(const Event& e) {
     uint8_t m[kWorldEventSize];
     m[0] = kMsgWorldEvent;
-    m[1] = kWorldEnemyDefeated;
-    put32(m + 2, stage);
-    m[6] = scenario;
-    put32(m + 7, d.id);
-    put32(m + 11, d.nameHash);
-    for (int i = 0; i < 3; i++) putF(m + 15 + 4 * i, d.pos[i]);
+    m[1] = e.kind;
+    put32(m + 2, e.stage);
+    m[6] = e.scenario;
+    put32(m + 7, e.id);
+    put32(m + 11, e.nameHash);
+    for (int i = 0; i < 3; i++) putF(m + 15 + 4 * i, e.pos[i]);
+    putF(m + 27, e.a);
+    putF(m + 31, e.b);
     netSendRaw(m, sizeof(m));
 }
 
-// The visit's defeat list belongs to one stage and scenario.
-void rememberDefeat(const Defeat& d, uint32_t stage, uint8_t scenario) {
-    World& w = world();
-    if (stage != w.defeatedStage || scenario != w.defeatedScenario) {
-        w.defeated.clear();
-        w.defeatedStage = stage;
-        w.defeatedScenario = scenario;
+// Where the local player is now; false outside gameplay.
+bool currentStage(uint32_t* pStage, uint8_t* pScenario) {
+    NetPlayerCapture now;
+    if (!net_capture_latest(&now)) {
+        return false;
     }
-    w.defeated.push_back(d);
+    *pStage = now.stageHash;
+    *pScenario = (uint8_t)now.scenario;
+    return true;
 }
 
-// The local copy of a defeated enemy: by placement id, else (spawned
-// enemies) the nearest live one of the same name within 400 units.
-LiveActor* findLocal(const Defeat& d) {
+// The visit's history belongs to one stage and scenario; only placed actors
+// (stable ids) are worth repeating to an arrival.
+void remember(const Event& e) {
     World& w = world();
-    if (d.id != 0) {
-        auto it = w.actorOf.find(d.id);
-        return it != w.actorOf.end() ? static_cast< LiveActor* >(it->second) : nullptr;
+    if (e.id == 0 || (e.kind != kWorldEnemyDefeated && e.kind != kWorldItemCollected)) {
+        return;
     }
+    if (e.stage != w.historyStage || e.scenario != w.historyScenario) {
+        w.history.clear();
+        w.historyStage = e.stage;
+        w.historyScenario = e.scenario;
+    }
+    w.history.push_back(e);
+}
+
+// The nearest live actor of `set` named like `nameHash` within `radius`.
+LiveActor* nearest(const std::unordered_set<void*>& set, uint32_t nameHash, const float pos[3], float radius) {
     LiveActor* best = nullptr;
-    float bestD = 400.0f * 400.0f;
-    for (void* p : w.unplaced) {
+    float bestD = radius * radius;
+    for (void* p : set) {
         LiveActor* a = static_cast< LiveActor* >(p);
-        if (MR::isDead(a) || hashName(a->mName) != d.nameHash) {
+        if (MR::isDead(a) || hashName(a->mName) != nameHash) {
             continue;
         }
-        float dx = a->mPosition.x - d.pos[0], dy = a->mPosition.y - d.pos[1], dz = a->mPosition.z - d.pos[2];
+        float dx = a->mPosition.x - pos[0], dy = a->mPosition.y - pos[1], dz = a->mPosition.z - pos[2];
         float dist = dx * dx + dy * dy + dz * dz;
         if (dist < bestD) {
             bestD = dist;
@@ -178,34 +198,75 @@ LiveActor* findLocal(const Defeat& d) {
     return best;
 }
 
-// The defeat as the other player saw it: the enemy's own death effect and
-// the standard defeat sound where it stands, then its own kill() (cleanup,
-// parts), with the loot its kill() may drop suppressed (the defeating
-// player got that).
+// The local copy of a defeated enemy or collected item: by placement id,
+// else the nearest live one of the same name (enemies within 400 units,
+// items, which fly about after a drop, within 300).
+LiveActor* findLocal(const Event& e) {
+    World& w = world();
+    if (e.id != 0) {
+        auto it = w.actorOf.find(e.id);
+        return it != w.actorOf.end() ? static_cast< LiveActor* >(it->second) : nullptr;
+    }
+    if (e.kind == kWorldItemCollected) {
+        return nearest(w.items, e.nameHash, e.pos, 300.0f);
+    }
+    return nearest(w.unplaced, e.nameHash, e.pos, 400.0f);
+}
+
+// A defeat as the other player saw it: the enemy's own death effect and the
+// standard defeat sound, then its own kill() (cleanup, parts), its loot
+// suppressed (the defeating player's drop event brings it).
 void defeatLocally(LiveActor* actor) {
     World& w = world();
     if (MR::isRegisteredEffect(actor, "Death")) {
         MR::emitEffect(actor, "Death");
     }
     MR::startSound(actor, "SE_EM_EXPLODE_S", -1, -1);
-    w.applying = true;
+    w.applyingDefeat = true;
     actor->kill();
-    w.applying = false;
+    w.applyingDefeat = false;
+}
+
+// Another player took it: it vanishes here (its own kill(): a coin just
+// goes, a star bit breaks), nothing is added to the local counters.
+void collectLocally(LiveActor* actor) {
+    World& w = world();
+    w.applyingPickup = true;
+    actor->kill();
+    w.applyingPickup = false;
+}
+
+void dropLocally(const Event& e) {
+    World& w = world();
+    if (w.lootHost == nullptr) {
+        return;
+    }
+    TVec3f pos(e.pos[0], e.pos[1], e.pos[2]);
+    w.applyingDrop = true;
+    if (e.kind == kWorldCoinsDropped) {
+        MR::appearCoinPop(static_cast< const NameObj* >(w.lootHost), pos, (s32)e.id);
+    } else {
+        MR::appearStarPiece(static_cast< const NameObj* >(w.lootHost), pos, (s32)e.id, e.a, e.b, false);
+    }
+    w.applyingDrop = false;
 }
 
 }  // namespace
 
 void worldOnEvent(const uint8_t* data, unsigned len) {
-    if (len != kWorldEventSize || data[0] != kMsgWorldEvent || data[1] != kWorldEnemyDefeated) {
+    if (len != kWorldEventSize || data[0] != kMsgWorldEvent) {
         return;
     }
     PortHostAllocScope host;
-    World::Event e;
+    Event e;
+    e.kind = data[1];
     e.stage = get32(data + 2);
     e.scenario = data[6];
-    e.d.id = get32(data + 7);
-    e.d.nameHash = get32(data + 11);
-    for (int i = 0; i < 3; i++) e.d.pos[i] = getF(data + 15 + 4 * i);
+    e.id = get32(data + 7);
+    e.nameHash = get32(data + 11);
+    for (int i = 0; i < 3; i++) e.pos[i] = getF(data + 15 + 4 * i);
+    e.a = getF(data + 27);
+    e.b = getF(data + 31);
     world().inbox.push_back(e);
 }
 
@@ -217,8 +278,18 @@ extern "C" void port_world_register(void* actor, const char* name, float x, floa
     if (!enabled()) {
         return;
     }
-    PortHostAllocScope host;
     World& w = world();
+    if (w.pendingHost != nullptr) {
+        // Placement has begun: the star bit director exists, and star bits
+        // are allocated for all declarations after placement
+        // (GameScene::init -> MR::createStarPiece).  Declare now.
+        const NameObj* host = static_cast< const NameObj* >(w.pendingHost);
+        w.pendingHost = nullptr;
+        MR::declareCoin(host, 300);
+        MR::declareStarPiece(host, 600);
+        w.lootHost = host;
+    }
+    PortHostAllocScope host;
     uint32_t id = worldPlacementId(name, x, y, z);
     // Same name at the same spot: the next ids by registration order, which
     // follows the stage data and so matches on every client.
@@ -242,54 +313,180 @@ extern "C" void port_world_actor_appeared(void* actor) {
     }
 }
 
+extern "C" void port_world_item_appeared(void* actor) {
+    if (!enabled()) {
+        return;
+    }
+    World& w = world();
+    if (w.items.count(actor) == 0) {
+        PortHostAllocScope host;
+        w.items.insert(actor);
+    }
+}
+
+extern "C" void port_world_declare_loot_host(const void* nameObj) {
+    if (!enabled()) {
+        return;
+    }
+    // Room for the drops of the whole visit (each drop counts against it),
+    // declared when placement starts (port_world_register): the star bit
+    // director does not exist yet while puppets are created.
+    world().pendingHost = nameObj;
+}
+
 extern "C" void port_world_scene_reset(void) {
     PortHostAllocScope host;
     World& w = world();
     w.idOf.clear();
     w.actorOf.clear();
     w.unplaced.clear();
+    w.items.clear();
     w.inbox.clear();
-    w.defeated.clear();
-    w.defeatedScenario = 0xFF;
+    w.history.clear();
+    w.historyScenario = 0xFF;
     w.here.clear();
     w.live = false;
+    w.lootHost = nullptr;
+    w.pendingHost = nullptr;
+    w.shootSignals.clear();
+    w.ambientDrop = false;
 }
 
-extern "C" int port_world_suppress_loot(void) {
-    if (!world().applying) {
+namespace {
+// The lowest player id among the local player and the others in this stage
+// and scenario leads shared timers.  Alone (or offline): yes.
+bool isStageHost() {
+    if (!enabled() || netLocalId() == 0) {
+        return true;
+    }
+    uint32_t stage;
+    uint8_t scenario;
+    if (!currentStage(&stage, &scenario)) {
+        return true;
+    }
+    for (int i = 0; i < kMaxRemotes; i++) {
+        const RemoteView& v = netRemote(i);
+        if (v.present && v.id < netLocalId() && v.pose.stageHash == stage && (uint8_t)v.pose.scenario == scenario) {
+            return false;
+        }
+    }
+    return true;
+}
+}  // namespace
+
+extern "C" int port_world_shooting_star_gate(void* actor, int due) {
+    World& w = world();
+    if (isStageHost()) {
+        if (due && enabled()) {
+            auto it = w.idOf.find(actor);
+            Event e{};
+            if (it != w.idOf.end() && currentStage(&e.stage, &e.scenario)) {
+                e.kind = kWorldShootingStar;
+                e.id = it->second;
+                PortHostAllocScope host;
+                send(e);
+                if (logging()) port_log("world: shooting star %08x fires (host)", e.id);
+            }
+        }
+        return due;
+    }
+    // Not the host: only when told.
+    auto it = w.shootSignals.find(actor);
+    if (it == w.shootSignals.end()) {
         return 0;
     }
-    if (logging()) port_log("world: loot from a remote defeat suppressed");
+    PortHostAllocScope host;
+    w.shootSignals.erase(it);
+    if (logging()) port_log("world: shooting star fires (told by the host)");
     return 1;
+}
+
+extern "C" int port_world_shooting_star_signalled(void* actor) {
+    World& w = world();
+    return !isStageHost() && w.shootSignals.count(actor) != 0 ? 1 : 0;
+}
+
+extern "C" void port_world_ambient_drop(int on) { world().ambientDrop = on != 0; }
+
+extern "C" int port_world_suppress_loot(void) {
+    if (!world().applyingDefeat) {
+        return 0;
+    }
+    if (logging()) port_log("world: loot from a remote defeat suppressed (the defeater's drop event brings it)");
+    return 1;
+}
+
+extern "C" void port_world_loot_dropped(const void* source, int kind, float x, float y, float z, int count, float a, float b) {
+    World& w = world();
+    if (!enabled() || !w.live || w.applyingDrop || w.applyingDefeat || w.ambientDrop || count <= 0) {
+        return;
+    }
+    Event e{};
+    if (!currentStage(&e.stage, &e.scenario)) {
+        return;
+    }
+    e.kind = kind == 0 ? kWorldCoinsDropped : kWorldStarBitsDropped;
+    e.id = (uint32_t)count;
+    e.pos[0] = x;
+    e.pos[1] = y;
+    e.pos[2] = z;
+    e.a = a;
+    e.b = b;
+    PortHostAllocScope host;
+    send(e);
+    if (logging())
+        port_log("world: dropped %d %s at %.0f %.0f %.0f (from %s), told the room", count, kind == 0 ? "coins" : "star bits", x, y, z,
+                 source ? static_cast< const NameObj* >(source)->mName : "?");
+}
+
+extern "C" void port_world_item_collected(void* actorPtr) {
+    LiveActor* actor = static_cast< LiveActor* >(actorPtr);
+    World& w = world();
+    if (!enabled() || !w.live || w.applyingPickup) {
+        return;
+    }
+    Event e{};
+    if (!currentStage(&e.stage, &e.scenario)) {
+        return;
+    }
+    auto it = w.idOf.find(actorPtr);
+    e.kind = kWorldItemCollected;
+    e.id = it != w.idOf.end() ? it->second : 0;
+    e.nameHash = hashName(actor->mName);
+    e.pos[0] = actor->mPosition.x;
+    e.pos[1] = actor->mPosition.y;
+    e.pos[2] = actor->mPosition.z;
+    PortHostAllocScope host;
+    send(e);
+    remember(e);
+    if (logging()) port_log("world: collected %s (%s %08x), told the room", actor->mName, e.id ? "id" : "spawned", e.id);
 }
 
 extern "C" void port_world_actor_dead(void* actorPtr) {
     LiveActor* actor = static_cast< LiveActor* >(actorPtr);
     World& w = world();
-    if (!enabled() || !w.live || w.applying || MR::isDead(actor)) {
-        return;  // scene set-up, a remote defeat, or already dead
+    if (!enabled() || !w.live || w.applyingDefeat || w.applyingPickup || MR::isDead(actor)) {
+        return;  // scene set-up, a remote event, or already dead
     }
     auto it = w.idOf.find(actorPtr);
     bool placed = it != w.idOf.end();
-    if ((!placed && w.unplaced.count(actorPtr) == 0) || !hasEnemySensor(actor)) {
+    if ((!placed && w.unplaced.count(actorPtr) == 0) || w.items.count(actorPtr) != 0 || !hasEnemySensor(actor)) {
         return;
     }
-    NetPlayerCapture now;
-    if (!net_capture_latest(&now)) {
-        return;  // not in gameplay yet: scene set-up hides actors this way too
+    Event e{};
+    if (!currentStage(&e.stage, &e.scenario)) {
+        return;
     }
-    Defeat d;
-    d.id = placed ? it->second : 0;
-    d.nameHash = hashName(actor->mName);
-    d.pos[0] = actor->mPosition.x;
-    d.pos[1] = actor->mPosition.y;
-    d.pos[2] = actor->mPosition.z;
+    e.kind = kWorldEnemyDefeated;
+    e.id = placed ? it->second : 0;
+    e.nameHash = hashName(actor->mName);
+    e.pos[0] = actor->mPosition.x;
+    e.pos[1] = actor->mPosition.y;
+    e.pos[2] = actor->mPosition.z;
     PortHostAllocScope host;
-    send(d, now.stageHash, (uint8_t)now.scenario);
-    rememberDefeat(d, now.stageHash, (uint8_t)now.scenario);
-    if (logging()) {
-        port_log("world: defeated %s (%s %08x), told the room", actor->mName, placed ? "id" : "spawned", d.id);
-    }
+    send(e);
+    remember(e);
+    if (logging()) port_log("world: defeated %s (%s %08x), told the room", actor->mName, placed ? "id" : "spawned", e.id);
 }
 
 extern "C" void port_world_update(void) {
@@ -297,25 +494,25 @@ extern "C" void port_world_update(void) {
         return;
     }
     World& w = world();
-    NetPlayerCapture now;
-    if (!net_capture_latest(&now)) {
+    uint32_t stage;
+    uint8_t scenario;
+    if (!currentStage(&stage, &scenario)) {
         return;
     }
     w.live = true;
     PortHostAllocScope host;
-    uint8_t scenario = (uint8_t)now.scenario;
 
     // Arrivals: a player newly in this stage and scenario hears this visit's
-    // defeats, so their enemies match ours.
+    // defeats and pickups, so their world matches ours.
     for (int i = 0; i < kMaxRemotes; i++) {
         const RemoteView& v = netRemote(i);
-        bool inStage = v.present && v.pose.stageHash == now.stageHash && v.pose.scenario == now.scenario;
+        bool inStage = v.present && v.pose.stageHash == stage && (uint8_t)v.pose.scenario == scenario;
         bool known = w.here.count(v.id) != 0;
         if (inStage && !known) {
             w.here.insert(v.id);
-            if (w.defeatedStage == now.stageHash && w.defeatedScenario == scenario && !w.defeated.empty()) {
-                for (const Defeat& d : w.defeated) send(d, now.stageHash, scenario);
-                if (logging()) port_log("world: told player %u about %d defeats here", v.id, (int)w.defeated.size());
+            if (w.historyStage == stage && w.historyScenario == scenario && !w.history.empty()) {
+                for (const Event& e : w.history) send(e);
+                if (logging()) port_log("world: told player %u about %d events here", v.id, (int)w.history.size());
             }
         } else if (!inStage && known) {
             w.here.erase(v.id);
@@ -325,19 +522,36 @@ extern "C" void port_world_update(void) {
     if (w.inbox.empty()) {
         return;
     }
-    std::vector< World::Event > events;
+    std::vector< Event > events;
     events.swap(w.inbox);
-    for (const World::Event& e : events) {
-        if (e.stage != now.stageHash || e.scenario != scenario) {
+    for (const Event& e : events) {
+        if (e.stage != stage || e.scenario != scenario) {
             continue;  // another stage or scenario: not ours
         }
-        LiveActor* actor = findLocal(e.d);
+        if (e.kind == kWorldShootingStar) {
+            auto it = w.actorOf.find(e.id);
+            if (it != w.actorOf.end()) {
+                w.shootSignals.insert(it->second);
+            }
+            continue;
+        }
+        if (e.kind == kWorldCoinsDropped || e.kind == kWorldStarBitsDropped) {
+            if (logging()) port_log("world: another player dropped %u %s here", e.id, e.kind == kWorldCoinsDropped ? "coins" : "star bits");
+            dropLocally(e);
+            continue;
+        }
+        LiveActor* actor = findLocal(e);
         if (actor == nullptr || MR::isDead(actor)) {
             continue;  // already gone here (or no match)
         }
-        if (logging()) port_log("world: %s defeated by another player", actor->mName);
-        defeatLocally(actor);
-        rememberDefeat(e.d, e.stage, e.scenario);
+        if (e.kind == kWorldEnemyDefeated) {
+            if (logging()) port_log("world: %s defeated by another player", actor->mName);
+            defeatLocally(actor);
+        } else if (e.kind == kWorldItemCollected) {
+            if (logging()) port_log("world: %s collected by another player", actor->mName);
+            collectLocally(actor);
+        }
+        remember(e);
     }
 }
 
@@ -351,7 +565,7 @@ extern "C" int port_world_debug_kill_nearest(float x, float y, float z) {
     bool unplacedPass = false;
     auto consider = [&](void* p) {
         LiveActor* a = static_cast< LiveActor* >(p);
-        if (MR::isDead(a) || !hasEnemySensor(a)) {
+        if (MR::isDead(a) || w.items.count(p) != 0 || !hasEnemySensor(a)) {
             return;
         }
         enemies++;
@@ -366,11 +580,24 @@ extern "C" int port_world_debug_kill_nearest(float x, float y, float z) {
     for (auto& kv : w.idOf) consider(kv.first);
     unplacedPass = true;
     for (void* p : w.unplaced) consider(p);
-    port_log("world: debug: %d live enemies (%d spawned), nearest %s at %.0f (%.0f %.0f %.0f)", enemies, spawned, best ? best->mName : "-", best ? sqrtf(bestD) : -1.0f,
-             best ? best->mPosition.x : 0.0f, best ? best->mPosition.y : 0.0f, best ? best->mPosition.z : 0.0f);
+    port_log("world: debug: %d live enemies (%d spawned), nearest %s at %.0f (%.0f %.0f %.0f)", enemies, spawned, best ? best->mName : "-",
+             best ? sqrtf(bestD) : -1.0f, best ? best->mPosition.x : 0.0f, best ? best->mPosition.y : 0.0f, best ? best->mPosition.z : 0.0f);
     if (best == nullptr) {
         return 0;
     }
     best->kill();
     return 1;
+}
+
+// Debug (F11): drop 3 coins and 5 star bits over the local player, as an
+// enemy or a block would (testing the drop sync).
+extern "C" void port_world_debug_drop(float x, float y, float z) {
+    World& w = world();
+    if (w.lootHost == nullptr) {
+        port_log("world: debug: no loot host");
+        return;
+    }
+    TVec3f pos(x, y + 200.0f, z);
+    MR::appearCoinPop(static_cast< const NameObj* >(w.lootHost), pos, 3);
+    MR::appearStarPiece(static_cast< const NameObj* >(w.lootHost), pos, 5, 10.0f, 40.0f, false);
 }

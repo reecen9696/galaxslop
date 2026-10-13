@@ -239,7 +239,7 @@ describe("world events", () => {
       relay.message(c, hello("P" + i, "ROOM22"));
     });
     inbox.forEach((m) => (m.length = 0));
-    const ev = new Uint8Array(27);
+    const ev = new Uint8Array(35);
     ev.set([Msg.WorldEvent, 1, 1, 2, 3, 4, 1, 9, 8, 7, 6]);
     relay.message(conns[0], ev);
     expect(inbox[0].length).toBe(0);
