@@ -24,6 +24,62 @@ async function gameDir(create) {
   return smg.getDirectoryHandle("game", { create });
 }
 
+async function importedManifestText() {
+  try {
+    const dir = await gameDir(false);
+    return await (await (await dir.getFileHandle("manifest.json")).getFile()).text();
+  } catch {
+    return null;
+  }
+}
+
+// Pre-loaded game (GAME_DIR on the server, SMG_GAME on the dev server): the
+// page copies the server's cooked folder into OPFS by itself on the first
+// visit, and again only when the server's manifest changes.
+async function importFromServer(base, manifestText) {
+  const manifest = JSON.parse(manifestText);
+  navigator.storage.persist?.().catch(() => {});
+  const root = await navigator.storage.getDirectory();
+  const smg = await root.getDirectoryHandle("smg", { create: true });
+  await smg.removeEntry("game", { recursive: true }).catch(() => {});
+  const game = await smg.getDirectoryHandle("game", { create: true });
+  const total = manifest.files.reduce((n, e) => n + e.size, 0);
+  let done = 0;
+  const started = performance.now();
+  progress.style.display = "block";
+  const dirs = new Map([["", game]]);
+  async function dirFor(path) {
+    let key = "", dir = game;
+    for (const part of path.split("/").slice(0, -1)) {
+      key += part + "/";
+      if (!dirs.has(key)) dirs.set(key, await dir.getDirectoryHandle(part, { create: true }));
+      dir = dirs.get(key);
+    }
+    return dir;
+  }
+  const queue = manifest.files.slice();
+  await Promise.all(Array.from({ length: 6 }, async () => {
+    while (queue.length) {
+      const e = queue.shift();
+      const r = await fetch(base + e.path.split("/").map(encodeURIComponent).join("/"));
+      if (!r.ok) throw new Error(`${e.path}: HTTP ${r.status}`);
+      const bytes = new Uint8Array(await r.arrayBuffer());
+      if (bytes.byteLength !== e.size) throw new Error(`${e.path}: ${bytes.byteLength} bytes, manifest says ${e.size}`);
+      const w = await (await (await dirFor(e.path)).getFileHandle(e.path.split("/").pop(), { create: true })).createWritable();
+      if (bytes.byteLength) await w.write(bytes);
+      await w.close();
+      done += e.size;
+      progress.value = done / total;
+      say(`loading the game ${(done / 2 ** 20).toFixed(0)} / ${(total / 2 ** 20).toFixed(0)} MB`);
+    }
+  }));
+  const mw = await (await game.getFileHandle("manifest.json", { create: true })).createWritable();
+  await mw.write(manifestText);
+  await mw.close();
+  progress.style.display = "none";
+  console.log(`web: game pre-loaded from the server: ${manifest.files.length} files in ${((performance.now() - started) / 1000).toFixed(1)} s`);
+}
+
 async function importedManifest() {
   try {
     const dir = await gameDir(false);
@@ -570,6 +626,24 @@ setupSettings();
     const root = await navigator.storage.getDirectory();
     const smg = await root.getDirectoryHandle("smg", { create: true });
     await smg.removeEntry("game", { recursive: true }).catch(() => {});
+  }
+  const config = await fetch("config.json").then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  if (config && config.game) {
+    let serverManifest = null;
+    try {
+      const r = await fetch(config.game + "manifest.json", { cache: "no-cache" });
+      if (r.ok) serverManifest = await r.text();
+    } catch {}
+    if (serverManifest && serverManifest !== (await importedManifestText())) {
+      try {
+        await importFromServer(config.game, serverManifest);
+        location.replace(location.href.replace(/[?&]reimport=1/, ""));
+        return;
+      } catch (e) {
+        console.log("web: pre-loading the game failed: " + e.message);
+        say("Loading the game from the server failed (" + e.message + "). You can load it from a folder instead.");
+      }
+    }
   }
   if (!(await importedManifest())) {
     await showImport();

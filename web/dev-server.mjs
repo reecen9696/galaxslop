@@ -18,6 +18,7 @@ const types = { ".html": "text/html", ".js": "text/javascript", ".wasm": "applic
 function resolveUrl(url) {
   const path = decodeURIComponent(new URL(url, "http://x").pathname);
   if (path === "/") return join(repo, "web/index.html");
+  if (path === "/config.json" && game) return "CONFIG";
   if (path.startsWith("/pycook/")) {
     // The cooker's Python, run in the browser by web/cook/cook-worker.js.
     const name = path.slice(8);
@@ -46,6 +47,12 @@ createServer((req, res) => {
   res.setHeader("Cross-Origin-Resource-Policy", "same-origin");
   res.setHeader("Cache-Control", "no-cache");
   const file = resolveUrl(req.url);
+  if (file === "CONFIG") {
+    // SMG_GAME given: the page pre-loads that folder (web/app.js).  The relay
+    // is separate here (lobby default ws://<host>:8787).
+    res.writeHead(200, { "Content-Type": "application/json" }).end(JSON.stringify({ relay: null, game: "game/" }));
+    return;
+  }
   let st;
   try {
     st = file && statSync(file);

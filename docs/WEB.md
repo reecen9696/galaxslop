@@ -47,7 +47,24 @@ disc only; nothing is uploaded. Saves are written to OPFS
 too (`/smg/save`), so they survive reloads. `?reimport=1` forgets the files
 and asks again.
 
-For development the game can read a folder from the dev server instead:
+### Pre-loaded game (no import screen)
+
+Start the server with your converted folder and the page loads it into
+browser storage by itself on the first visit (about 6 s for 1 GB locally),
+then starts from storage every time after; it copies again only when the
+folder's `manifest.json` changes:
+
+```sh
+cd server && PORT=8787 STATIC_DIR=../dist/web GAME_DIR=~/smg/game npm start
+SMG_GAME=~/smg/game node web/dev-server.mjs 8080      # dev server: same
+```
+
+Use this only on your own machine or LAN: whoever can open the page gets
+the game files. Each player should own the game; never put `GAME_DIR` on
+a public server.
+
+For development the game can also read a folder from the dev server
+without copying it (`?source=server`):
 
 ```sh
 SMG_GAME=~/smg/game node web/dev-server.mjs 8080

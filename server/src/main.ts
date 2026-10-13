@@ -1,7 +1,8 @@
 // The relay as a WebSocket server.  Environment: PORT (default 8787),
 // ALLOWED_ORIGINS (comma-separated; unset = any, for local play), ROOMS
 // (comma-separated permanent room codes, e.g. ROOMS=PLAY22), STATIC_DIR
-// (also serve the web build from there: tools/web/bundle.mjs output).
+// (also serve the web build from there: tools/web/bundle.mjs output), GAME_DIR
+// (a cooked game folder the page loads by itself; own machine or LAN only).
 import { createServer } from "node:http";
 import { WebSocketServer, type WebSocket } from "ws";
 import { Relay, type Conn } from "./relay.ts";
@@ -14,7 +15,7 @@ export function startServer(port: number, log: (m: string) => void = console.log
     .filter(Boolean);
   const fixedRooms = (process.env.ROOMS ?? "").split(",").filter((s) => s.trim());
   const relay = new Relay({ log, fixedRooms });
-  const serve = process.env.STATIC_DIR ? staticHandler(process.env.STATIC_DIR) : (_req: unknown, res: { writeHead: (n: number) => { end: () => void } }) => res.writeHead(426).end();
+  const serve = process.env.STATIC_DIR ? staticHandler(process.env.STATIC_DIR, process.env.GAME_DIR) : (_req: unknown, res: { writeHead: (n: number) => { end: () => void } }) => res.writeHead(426).end();
   const http = createServer(serve);
   const ready = new Promise<void>((resolve, reject) => {
     http.once("listening", resolve);

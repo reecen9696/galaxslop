@@ -19,8 +19,13 @@ const kTypes: Record<string, string> = {
   ".svg": "image/svg+xml",
 };
 
-export function staticHandler(dir: string) {
+// gameDir (GAME_DIR): a cooked game folder (tools/cook/cook.py output) the
+// page loads into its storage by itself, so nobody picks a folder.  Only for
+// a server on your own machine or LAN: it hands the game to anyone who can
+// reach it.
+export function staticHandler(dir: string, gameDir?: string) {
   const root = resolve(dir);
+  const gameRoot = gameDir ? resolve(gameDir) : null;
   return (req: IncomingMessage, res: ServerResponse) => {
     res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
     res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
@@ -36,21 +41,33 @@ export function staticHandler(dir: string) {
     if (path === "/config.json") {
       // Tells the page the relay is on this origin (web/app.js).
       res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-cache" });
-      res.end(JSON.stringify({ relay: "same-origin" }));
+      res.end(JSON.stringify({ relay: "same-origin", game: gameRoot ? "game/" : null }));
       return;
     }
-    const file = normalize(join(root, path === "/" ? "index.html" : path));
+    const inGame = gameRoot !== null && path.startsWith("/game/");
+    const base = inGame ? (gameRoot as string) : root;
+    const file = normalize(join(base, inGame ? path.slice(6) : path === "/" ? "index.html" : path));
     let size = -1;
     try {
       const st = statSync(file);
-      if (st.isFile() && (file === root || file.startsWith(root + "/"))) size = st.size;
+      if (st.isFile() && file.startsWith(base + "/")) size = st.size;
     } catch {}
     if (size < 0 || req.method !== "GET" && req.method !== "HEAD") {
       res.writeHead(404).end();
       return;
     }
+    const type = kTypes[extname(file)] ?? "application/octet-stream";
+    const range = /^bytes=(\d+)-(\d*)$/.exec(String(req.headers.range ?? ""));
+    if (range && Number(range[1]) < size) {
+      const start = Number(range[1]);
+      const end = range[2] ? Math.min(Number(range[2]), size - 1) : size - 1;
+      res.writeHead(206, { "Content-Type": type, "Content-Length": end - start + 1, "Content-Range": `bytes ${start}-${end}/${size}`, "Accept-Ranges": "bytes" });
+      if (req.method === "HEAD") res.end();
+      else createReadStream(file, { start, end }).pipe(res);
+      return;
+    }
     // The big wasm changes per release under the same name: revalidate.
-    res.writeHead(200, { "Content-Type": kTypes[extname(file)] ?? "application/octet-stream", "Content-Length": size, "Cache-Control": "no-cache" });
+    res.writeHead(200, { "Content-Type": type, "Content-Length": size, "Cache-Control": "no-cache", "Accept-Ranges": "bytes" });
     if (req.method === "HEAD") res.end();
     else createReadStream(file).pipe(res);
   };

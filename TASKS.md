@@ -219,6 +219,7 @@ Chromium, with sound, on a gamepad, at 60 fps on the reference machine.
 - what: Folder picker (extracted disc), with the Dolphin extract steps shown on screen (right-click game, Properties, Filesystem, Extract Entire Disc), requirements check (Chromium, cross-origin isolated, OPFS quota), run cooker, progress bar, errors in plain words, "movies on/off" toggle, storage quota display. Re-import and delete options in settings.
 - done when: a non-technical person can import without reading docs.
 - log:
+  - 2026-10-13 (A): pre-loaded game, at the user's request: GAME_DIR (relay) / SMG_GAME (dev server) serve a cooked folder; config.json advertises it and the page copies it into OPFS on first visit with no picker (5-6 s locally), re-copying only when manifest.json changes. Own machine/LAN only (docs/WEB.md).
   - 2026-10-13 (A): the import screen takes an extracted disc (converted in the page) or a cooked folder; Dolphin steps on screen, size/manifest checks, quota check, progress bar, errors in words; ?reimport=1 starts over. Left for P1-09: re-import/delete buttons, movies toggle.
 
 ### P1-04 Gamepad and mouse input

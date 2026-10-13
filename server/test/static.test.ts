@@ -12,12 +12,17 @@ describe("static hosting (STATIC_DIR)", () => {
     writeFileSync(join(dir, "index.html"), "<!doctype html><title>t</title>");
     writeFileSync(join(dir, "smg.wasm"), new Uint8Array([0, 97, 115, 109]));
     process.env.STATIC_DIR = dir;
+    const game = mkdtempSync(join(tmpdir(), "smg-game-"));
+    writeFileSync(join(game, "manifest.json"), '{"version": 1, "files": []}');
+    writeFileSync(join(game, "big.bin"), new Uint8Array(100).map((_, i) => i));
+    process.env.GAME_DIR = game;
     server = startServer(0, () => {});
     await new Promise((r) => setTimeout(r, 50));
     base = `http://localhost:${server.port()}`;
   });
   afterAll(async () => {
     delete process.env.STATIC_DIR;
+    delete process.env.GAME_DIR;
     await server.close();
   });
 
@@ -34,8 +39,16 @@ describe("static hosting (STATIC_DIR)", () => {
     expect(r.headers.get("content-type")).toBe("application/wasm");
   });
 
-  it("tells the page the relay is on this origin", async () => {
-    expect(await (await fetch(base + "/config.json")).json()).toEqual({ relay: "same-origin" });
+  it("tells the page the relay is on this origin and where the game is", async () => {
+    expect(await (await fetch(base + "/config.json")).json()).toEqual({ relay: "same-origin", game: "game/" });
+  });
+
+  it("serves the game folder, with byte ranges", async () => {
+    expect((await fetch(base + "/game/manifest.json")).status).toBe(200);
+    const r = await fetch(base + "/game/big.bin", { headers: { Range: "bytes=10-19" } });
+    expect(r.status).toBe(206);
+    expect(Array.from(new Uint8Array(await r.arrayBuffer()))).toEqual([10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
+    expect((await fetch(base + "/game/..%2f..%2fetc%2fpasswd")).status).toBe(404);
   });
 
   it("refuses paths outside the folder", async () => {
