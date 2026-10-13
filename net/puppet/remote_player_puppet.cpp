@@ -41,6 +41,8 @@
 #include "Game/Util/SchedulerUtil.hpp"
 #include "net/client/net_client.h"
 #include "net/puppet/puppet_fx.h"
+
+void port_register_mario_common_effects(LiveActor* pActor);  // MarioEffect.cpp
 #include "net/puppet/puppet_tint.h"
 #include "net/world/world_sync.h"
 #include "port/port.h"
@@ -275,6 +277,7 @@ void RemotePlayerPuppet::init(const JMapInfoIter&) {
     // MarioActor::initEffect's group, in its order: the sender's effects come
     // by index (puppet_fx.h).
     initEffectKeeper(0xB8, "Mario", true);
+    port_register_mario_common_effects(this);  // landing smoke rings, splashes, floor dust
     MR::connectToScene(this, MR::MovementType_Player, MR::CalcAnimType_Player, MR::DrawBufferType_None, MR::DrawType_Player);
     mVelocity.zero();
     // The animation players need the player's animation table, and the player

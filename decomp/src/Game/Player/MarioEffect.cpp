@@ -527,6 +527,146 @@ void MarioActor::initCommonEffect() {
     }
 }
 
+#ifdef TARGET_PC
+// Co-op (net/puppet/puppet_fx.h): initCommonEffect's and initMaterialEffect's
+// effects registered on another actor (a remote player's puppet) under the
+// same names, so the effects the other player plays have somewhere to play.
+// The registration loops as above, without MarioActor's own bookkeeping; the
+// smoke and splash rings are hosted at the actor's position.
+void port_register_mario_common_effects(LiveActor* pActor) {
+    SmokeEffectEntry* entry = cSmokeTable;
+    while (entry->mName != nullptr) {
+        const char* smokeEffects[] = {"SmokeSphere", "SmokeSphereLoop", "SmokeCircle", "SmokeCircleLoop"};
+        const char* waterEffects[] = {"WaterSphere", "WaterSphereLoop", "WaterCircle", "WaterCircleLoop"};
+        const char* flowerEffects[] = {"FlowerCircle", "FlowerSphereLoop", "FlowerCircle", "FlowerSphereLoop"};
+        const char* sandEffects[] = {"SandCircle", "SandSphereLoop", "SandCircle", "SandSphereLoop"};
+        const char* snowEffects[] = {"SnowSphere", "SnowSphereLoop", "SnowCircle", "SnowCircleLoop"};
+        const char* smokeFollowEffects[] = {"SmokeSphereFollow", "SmokeSphereFollow1Time", "SmokeCircleFollow", "SmokeCircleLoopFollow"};
+        const char* mudEffects[] = {"MudSphere", "MudSphereLoop", "MudCircle", "MudCircleLoop"};
+        const char* honeyEffects[] = {"HoneySphere", "HoneySphereLoop", "HoneyCircle", "HoneyCircleLoop"};
+
+        s32 variant = 0;
+        s32 useFollow = 0;
+
+        switch (entry->mType.mByte0) {
+        case 6:
+            useFollow = 1;
+        case 0:
+            variant = 0;
+            break;
+        case 7:
+            useFollow = 1;
+        case 1:
+        case 2:
+            variant = 1;
+            break;
+        case 8:
+            useFollow = 1;
+        case 3:
+            variant = 2;
+            break;
+        case 9:
+            useFollow = 1;
+        case 4:
+        case 5:
+            variant = 3;
+            break;
+        }
+
+        char name[0x80];
+        for (u32 materialIndex = 0; materialIndex < 7; materialIndex++) {
+            sprintf(name, "%s", entry->mName);
+
+            const u8 flag2 = entry->mFlags.mByte2;
+            if ((flag2 & 0x8) && materialIndex != 1) {
+                continue;
+            }
+
+            const char* const* effectList;
+            switch (materialIndex) {
+            case 0:
+                effectList = useFollow ? smokeFollowEffects : smokeEffects;
+                break;
+            case 1:
+                effectList = waterEffects;
+                break;
+            case 2:
+                effectList = flowerEffects;
+                break;
+            case 3:
+                effectList = sandEffects;
+                break;
+            case 4:
+                effectList = snowEffects;
+                break;
+            case 5:
+                effectList = mudEffects;
+                break;
+            case 6:
+                effectList = honeyEffects;
+                break;
+            }
+
+            if (flag2 != 0) {
+                const char* effectName = effectList[variant];
+                pActor->mEffectKeeper->registerEffectWithoutSRT(effectName, name + materialIndex);
+                // MarioActor hosts these where it stands when it plays them
+                // (playCommonEffect); the puppet's stay hosted there.
+                MR::setEffectHostSRT(pActor, name + materialIndex, &pActor->mPosition, &pActor->mRotation, &pActor->mScale);
+            } else {
+                const u8 flag0 = entry->mFlags.mByte0;
+                switch (flag0) {
+                case 0: {
+                    const char* effectName = effectList[variant];
+                    const char* hostName = name + materialIndex;
+                    pActor->mEffectKeeper->registerEffectWithoutSRT(effectName, hostName);
+                    const TVec3f* rot = &pActor->mRotation;
+                    const TVec3f* pos = &pActor->mPosition;
+                    MR::setEffectHostSRT(pActor, hostName != nullptr ? hostName : effectName, pos, rot, nullptr);
+                    break;
+                }
+
+                case 1:
+                    ::addMarioEffectAtJoint(pActor, effectList[variant], "FootR", name + materialIndex);
+                    break;
+                case 2:
+                    ::addMarioEffectAtJoint(pActor, effectList[variant], "HandR", name + materialIndex);
+                    break;
+                case 3:
+                    ::addMarioEffectAtJoint(pActor, effectList[variant], "Spine1", name + materialIndex);
+                    break;
+                default:
+                    break;
+                }
+            }
+
+            if ((entry->mFlags.mByte1 & 0x1) != 0) {
+                MR::getEffect(pActor, name + materialIndex)->forceFollowOn();
+            }
+
+            if ((entry->mFlags.mByte1 & 0x2) != 0) {
+                MR::getEffect(pActor, name + materialIndex)->forceScaleOn();
+            }
+        }
+
+        entry++;
+    }
+
+    for (MaterialEffectEntry* material = cMaterialEffectTable; material->mName != nullptr; material++) {
+        for (u32 i = 0; i < 7; i++) {
+            if (material->mEffects[i] == nullptr) {
+                continue;
+            }
+            if (!MR::isRegisteredEffect(pActor, material->mEffects[i])) {
+                pActor->mEffectKeeper->registerEffectWithoutSRT(material->mEffects[i], nullptr);
+            } else {
+                MR::setEffectHostSRT(pActor, material->mEffects[i], nullptr, nullptr, nullptr);
+            }
+        }
+    }
+}
+#endif
+
 MultiEmitter* MarioActor::playCommonEffect(const char* pName) {
     if (mPlayerMode == 3) {
         return nullptr;

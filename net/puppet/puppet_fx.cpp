@@ -30,9 +30,10 @@ struct Fx {
     float rot[3];
     float scale;
     int64_t atNs;  // when it was played (loopback) or arrived
+    char name[48];  // the name the game played it by ("" if too long)
 };
 
-constexpr size_t kMaxPerMessage = 48;  // 3 + 48 * 32 bytes at most: under the relay's 1400
+constexpr size_t kMaxPerMessage = 16;  // 3 + 16 * 80 bytes at most: under the relay's 1400
 
 std::vector<Fx> sOut;                       // the local player's, this frame
 std::deque<Fx> sIn[256];                    // by remote player id (0: loopback)
@@ -83,6 +84,9 @@ void fxSend() {
             b.push_back((uint8_t)f.index);
             b.push_back((uint8_t)(f.index >> 8));
             b.push_back(f.mask);
+            uint8_t nameLen = (uint8_t)strlen(f.name);
+            b.push_back(nameLen);
+            b.insert(b.end(), f.name, f.name + nameLen);
             if (f.mask & kHasTrans) putF(b, f.trans, 3);
             if (f.mask & kHasRot) putF(b, f.rot, 3);
             if (f.mask & kHasScale) putF(b, &f.scale, 1);
@@ -98,13 +102,17 @@ void fxOnMessage(const uint8_t* m, size_t len) {
     std::deque<Fx>& q = sIn[m[1]];
     size_t o = 3;
     for (uint8_t i = 0; i < m[2]; i++) {
-        if (o + 4 > len) return;
+        if (o + 5 > len) return;
         Fx f = {};
         f.atNs = port_host_time_ns();
         f.op = m[o];
         f.index = (uint16_t)(m[o + 1] | m[o + 2] << 8);
         f.mask = m[o + 3];
-        o += 4;
+        size_t nameLen = m[o + 4];
+        o += 5;
+        if (o + nameLen > len) return;
+        if (nameLen < sizeof(f.name)) memcpy(f.name, m + o, nameLen);
+        o += nameLen;
         size_t need = (f.mask & kHasTrans ? 12 : 0) + (f.mask & kHasRot ? 12 : 0) + (f.mask & kHasScale ? 4 : 0);
         if (o + need > len) return;
         if (f.mask & kHasTrans) { memcpy(f.trans, m + o, 12); o += 12; }
@@ -127,13 +135,24 @@ void fxApply(uint8_t remoteId, LiveActor* pPuppet, int64_t delayNs) {
         }
         Fx f = q.front();
         q.pop_front();
-        if (keeper == nullptr || f.index >= keeper->_C.size()) {
-            continue;  // not shown here, or an effect the puppet does not have
+        if (keeper == nullptr) {
+            continue;  // not shown here
         }
-        MultiEmitter* e = keeper->getEmitter((s32)f.index);
+        // By name where the puppet has it (the effects MarioActor adds after
+        // its effect group: landing smoke rings, splashes...), else by index
+        // (the group, which MarioActor renamed in part).
+        MultiEmitter* e = nullptr;
+        if (f.name[0] != 0 && keeper->isRegisteredEmitter(f.name)) {
+            e = keeper->getEmitter(f.name);
+        } else if (f.index < keeper->_C.size()) {
+            e = keeper->getEmitter((s32)f.index);
+        }
+        if (e == nullptr) {
+            continue;  // an effect the puppet does not have
+        }
         static const bool sLog = getenv("PETARI_FXLOG") != nullptr;  // debug: what puppets play
         if (sLog) {
-            port_log("fx: player %u op %u emitter %u mask %x", remoteId, f.op, f.index, f.mask);
+            port_log("fx: player %u op %u emitter %u mask %x %s", remoteId, f.op, f.index, f.mask, f.name[0] && keeper->isRegisteredEmitter(f.name) ? "by name" : "by index");
         }
         if (f.op == kOpPlay) {
             e->createEmitter();
@@ -175,6 +194,9 @@ extern "C" void port_net_fx_note(LiveActor* pActor, const char* pName, int op) {
     net::Fx f = {};
     f.op = (uint8_t)op;
     f.index = (uint16_t)index;
+    if (strlen(pName) < sizeof(f.name)) {
+        strcpy(f.name, pName);
+    }
     net::sOut.push_back(f);
     net::sLastPlayed = op == net::kOpPlay ? pActor->mEffectKeeper->getEmitter(pName) : nullptr;
 }

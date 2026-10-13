@@ -4,20 +4,23 @@
 // Every effect the game plays on the local MarioActor goes through
 // MR::emitEffect / deleteEffect / forceDeleteEffect (decomp
 // EffectUtil.cpp calls port_net_fx_note), so those are captured there, by
-// the emitter's index in the actor's EffectKeeper.  A puppet builds its
-// EffectKeeper from the same "Mario" effect group in the same order
-// (RemotePlayerPuppet::init), so the index names the same effect on every
-// client even where MarioActor renamed it (MarioActor::initEffect).
-// Effects MarioActor registers beyond that group (some floor-material
-// variants) have indices the puppet lacks and are skipped.  The world
+// the name the game played it by and the emitter's index in the actor's
+// EffectKeeper.  A puppet builds its EffectKeeper from the same "Mario"
+// effect group in the same order (RemotePlayerPuppet::init), so the index
+// names the same effect on every client even where MarioActor renamed it
+// (MarioActor::initEffect), and registers MarioActor's common and floor-
+// material effects (landing smoke rings, splashes; port_register_mario_
+// common_effects in MarioEffect.cpp) under the same names, which the
+// receiver tries first.  MarioActor's few situational extras (WaterColumnS,
+// CrestGetFly...) the puppet lacks are skipped.  The world
 // position, rotation and scale MarioActor::playEffectTrans / RT / RTZ / SRT
 // give an emitter come along (port_net_fx_transform).
 //
 // PlayerEffect 0x15 (docs/NETCODE.md), sent once per frame with anything
 // queued: u8 type, u8 sender id, u8 count, then per effect u8 op (1 play,
 // 2 stop, 3 force stop), u16 index, u8 mask (1 translation, 2 rotation,
-// 4 scale, 8 follow off), then f32 t[3], f32 r[3] (degrees), f32 scale for
-// the bits set.
+// 4 scale, 8 follow off), u8 name length, the name (Shift-JIS), then
+// f32 t[3], f32 r[3] (degrees), f32 scale for the bits set.
 #pragma once
 
 #include <stddef.h>
