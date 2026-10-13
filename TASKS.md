@@ -513,6 +513,18 @@ observatory state.
 - log:
   - 2026-10-13 (A): deployable: the relay serves the bundled page (STATIC_DIR, COOP/COEP, /config.json -> same-origin relay), tools/web/bundle.mjs, server/Dockerfile (not built here: no Docker on this machine). Tested end to end on localhost: import, lobby create, room code shown. Waiting on a human to pick a host/domain (account and cost).
 
+### P3-07 Drop in with the host's progress
+- lane: shared
+- status: in_progress
+- owner: A
+- started: 2026-10-14
+- blocked_by: P3-02, P3-03
+- touches: server/src (relay, protocol), net/client (progress snapshot), decomp/src/Game/System (GameDataFunction, file start; name files in log), web/
+- flags: parallel-ok
+- what: The room takes the host's (room owner's) progress. Each client uploads a snapshot of its current file's progress; the relay keeps the host's and sends it to everyone else and to each joiner. A joiner's save gets what it lacks from the host's (stars, stored flags), as with the log. A brand-new file started in a room becomes a copy of the host's progress and skips the prologue, so a newcomer drops in at the Observatory.
+- done when: a host with stars before the room was made, a joiner with no save: the joiner starts a new file and lands in the Observatory with the host's stars; a joiner with an older save gets the host's stars.
+- log:
+
 ### P3-06 Playtest: 5 players, 2 hours
 - lane: shared
 - status: open
