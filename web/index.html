@@ -30,7 +30,10 @@
   #settings { position: fixed; top: 56px; right: 12px; width: min(320px, calc(100vw - 24px)); background: var(--panel); border-radius: 12px; padding: 16px; display: none; box-sizing: border-box; z-index: 2; }
   #settings h2 { font-size: 16px; margin: 0 0 8px; }
   #settings .row button { flex: 1; }
-  #settings input[type=range] { width: 100%; }
+  #settings input[type=range], #settings select { width: 100%; }
+  #settings select { font: inherit; padding: 6px; border-radius: 8px; background: #0b0e18; color: var(--fg); border: 1px solid #333a50; }
+  #settings label { display: block; color: var(--dim); font-size: 13px; margin-top: 10px; }
+  #perfbox { position: fixed; top: 12px; left: 12px; font: 12px ui-monospace, monospace; color: #9fe39f; background: #000a; padding: 6px 8px; border-radius: 6px; display: none; white-space: pre; }
 </style>
 </head>
 <body>
@@ -70,11 +73,15 @@
     </details>
   </div>
   <div id="roombar"></div>
+  <div id="perfbox"></div>
   <button id="gear" aria-label="Settings" title="Settings">⚙</button>
   <div id="settings">
     <h2>Settings</h2>
     <label for="volume">Volume</label>
     <input id="volume" type="range" min="0" max="1" step="0.05">
+    <label for="scale">Render scale</label>
+    <select id="scale"><option value="1">1x (640×456)</option><option value="2">2x (1280×912)</option><option value="3">3x (1920×1368)</option><option value="4">4x (2560×1824)</option></select>
+    <label><input id="perf" type="checkbox"> Show frame times</label>
     <div class="row"><button id="exportSave" class="ghost">Export save</button><button id="importSave" class="ghost">Import save</button></div>
     <input id="importSaveInput" type="file" accept=".zip" style="display:none">
     <div class="row"><button id="reimport" class="ghost">Load the disc again</button></div>

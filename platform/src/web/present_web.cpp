@@ -7,13 +7,18 @@
 // stalled on emscripten_webgl_commit_frame.
 #include "present_web.h"
 
+#include <emscripten.h>
 #include <emscripten/html5.h>
 #include <pthread.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <string.h>
 
+#include <algorithm>
+#include <atomic>
 #include <string>
+#include <vector>
 #include <unordered_set>
 
 #include "../gx/gl_renderer.h"
@@ -94,6 +99,9 @@ bool held(const char* code) { return sKeys.count(code) != 0; }
 // The thread that receives html5 and websocket callbacks (net/client/ws_web.cpp).
 extern "C" pthread_t web_event_thread(void) { return sEventThread; }
 
+static void applyScale();
+static void recordTiming(double presentMs);
+
 bool web_present_init(int scale) {
     sEventThread = pthread_self();
     EmscriptenWebGLContextAttributes attrs;
@@ -116,6 +124,10 @@ bool web_present_init(int scale) {
         return false;
     }
     int s = scale > 0 ? scale : 2;
+    if (const char* env = getenv("SMG_SCALE")) {
+        int v = atoi(env);
+        if (v >= 1 && v <= 4) s = v;
+    }
     sEfb = gpu::renderer().createTarget(kEfbW * s, kEfbH * s);
     emscripten_set_canvas_element_size("#canvas", kEfbW * s, kEfbH * s);
     port_log("present: WebGL2 ready, EFB %dx%d", sEfb.width, sEfb.height);
@@ -132,6 +144,8 @@ bool web_present_init(int scale) {
 }
 
 void web_present_frame() {
+    applyScale();
+    double t0 = emscripten_get_now();
     gpu::Renderer& r = gpu::renderer();
     r.update();
     r.render(sEfb, nullptr, nullptr);
@@ -145,6 +159,7 @@ void web_present_frame() {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, sEfb.fbo);
     glBlitFramebuffer(0, 0, sEfb.width, sEfb.height, 0, 0, cw, ch, GL_COLOR_BUFFER_BIT, GL_LINEAR);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    recordTiming(emscripten_get_now() - t0);
 }
 
 // Gamepad (standard mapping) on top of keyboard/mouse, per BUILD_SPEC
@@ -241,6 +256,61 @@ void web_read_input(PortPadState* pad) {
         pad->pointerY = sPointerY;
     }
     readGamepad(pad);
+}
+
+// Render scale (P1-07): the page asks for a new EFB size (settings);
+// applied between frames on this thread, which owns the GL context.
+static std::atomic<int> sWantScale{0};
+extern "C" EMSCRIPTEN_KEEPALIVE void web_request_scale(int scale) { sWantScale.store(scale); }
+
+static void applyScale() {
+    int want = sWantScale.exchange(0);
+    if (want < 1 || want > 4 || sEfb.width == kEfbW * want) {
+        return;
+    }
+    gpu::renderer().destroyTarget(sEfb);
+    sEfb = gpu::renderer().createTarget(kEfbW * want, kEfbH * want);
+    emscripten_set_canvas_element_size("#canvas", kEfbW * want, kEfbH * want);
+    port_log("present: render scale %dx (%dx%d)", want, sEfb.width, sEfb.height);
+}
+
+// Frame timing (P1-07): CPU time of each present and the interval between
+// presents, as p50/p95 over the last second, for the page's overlay.
+struct FrameStats {
+    float presentP50, presentP95, intervalP50, intervalP95;
+    uint32_t fps, gameFrame;
+};
+static FrameStats sStats;
+extern "C" EMSCRIPTEN_KEEPALIVE FrameStats* web_frame_stats(void) { return &sStats; }
+
+static void recordTiming(double presentMs) {
+    static std::vector<float> present, interval;
+    static double last = 0, windowStart = 0;
+    double now = emscripten_get_now();
+    if (last > 0) interval.push_back((float)(now - last));
+    last = now;
+    present.push_back((float)presentMs);
+    if (windowStart == 0) windowStart = now;
+    if (now - windowStart < 1000) return;
+    auto pct = [](std::vector<float>& v, double q) {
+        if (v.empty()) return 0.0f;
+        std::sort(v.begin(), v.end());
+        return v[std::min(v.size() - 1, (size_t)(q * v.size()))];
+    };
+    sStats.fps = (uint32_t)present.size();
+    sStats.presentP50 = pct(present, 0.5);
+    sStats.presentP95 = pct(present, 0.95);
+    sStats.intervalP50 = pct(interval, 0.5);
+    sStats.intervalP95 = pct(interval, 0.95);
+    sStats.gameFrame = (uint32_t)gpu::renderer().frameNumber();
+    static const bool log = getenv("PETARI_PERFLOG") != nullptr;
+    if (log) {
+        port_log("web: %u fps, present %.1f/%.1f ms, interval %.1f/%.1f ms (p50/p95)", sStats.fps, sStats.presentP50, sStats.presentP95,
+                 sStats.intervalP50, sStats.intervalP95);
+    }
+    present.clear();
+    interval.clear();
+    windowStart = now;
 }
 
 unsigned long long web_present_frame_number() { return gpu::renderer().frameNumber(); }

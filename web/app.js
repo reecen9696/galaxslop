@@ -298,7 +298,7 @@ function onNetLine(t) {
 }
 
 function boot(args, env = {}) {
-  window.smgEnv = env; // read by browser_env.js in preRun
+  window.smgEnv = { SMG_SCALE: store("smg.scale") || "2", ...env }; // read by browser_env.js in preRun
   importPanel.style.display = "none";
   const canvas = document.getElementById("canvas");
   canvas.style.display = "block";
@@ -419,6 +419,27 @@ function setupSettings() {
     store("smg.volume", vol.value);
     if (smgGain) smgGain.gain.value = Number(vol.value);
   };
+  // Render scale (applied live by present_web.cpp) and the frame-time overlay.
+  const scale = document.getElementById("scale");
+  scale.value = store("smg.scale") || "2";
+  scale.onchange = () => {
+    store("smg.scale", scale.value);
+    if (window.Module && Module._web_request_scale) Module._web_request_scale(Number(scale.value));
+  };
+  const perf = document.getElementById("perf"), perfbox = document.getElementById("perfbox");
+  perf.checked = store("smg.perf") === "1";
+  const showPerf = () => {
+    store("smg.perf", perf.checked ? "1" : "0");
+    perfbox.style.display = perf.checked ? "block" : "none";
+  };
+  perf.onchange = showPerf;
+  showPerf();
+  setInterval(() => {
+    if (!perf.checked || !window.Module || !Module._web_frame_stats || !Module.HEAPU8) return;
+    const v = new DataView(Module.HEAPU8.buffer, Module._web_frame_stats() >>> 0, 24);
+    const f = (o) => v.getFloat32(o, true).toFixed(1);
+    perfbox.textContent = `${v.getUint32(16, true)} fps   game frame ${v.getUint32(20, true)}\npresent  ${f(0)} / ${f(4)} ms (p50/p95)\ninterval ${f(8)} / ${f(12)} ms`;
+  }, 500);
   document.getElementById("exportSave").onclick = exportSave;
   const imp = document.getElementById("importSaveInput");
   document.getElementById("importSave").onclick = () => imp.click();
