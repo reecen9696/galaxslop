@@ -4,6 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>SMG Co-op</title>
+<!-- Installable (Add to Home Screen): full screen, landscape.  iOS ignores
+     the manifest's orientation, so touch.js turns the page when held upright. -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SMG Co-op">
 <style>
   /* The Wii menu's typeface is Rodin NTLG (Fontworks, commercial): used when
      installed, otherwise M PLUS 1p (OFL 1.1, web/fonts/OFL.txt), the closest
@@ -30,6 +40,7 @@
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; background: #000; color: var(--fg); font: 15px/1.45 var(--ui); }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }  /* no font inflation when turned (iOS, touch.js) */
   body { overflow: hidden; }
   button, input, select { font-family: inherit; }
 
@@ -223,17 +234,20 @@
   body.playing.touch #roombar { right: max(12px, env(safe-area-inset-right)); }
   /* Touch, held upright: the page turns a quarter so the game stays landscape (touch.js maps the
      fingers back).  Fixed elements sit in the turned body, so viewport units swap: 100vw is its height. */
+  /* Turned, the viewport units swap: --ui-size measured the same way as landscape. */
+  body.rotated { --ui-size: clamp(13px, min(1.1dvh, 1.75vw), 18px); }
   body.rotated { position: fixed; top: 0; left: 0; width: 100dvh; height: 100vw; transform-origin: 0 0; transform: rotate(90deg) translateY(-100%); }
   body.rotated canvas { width: min(100dvh, calc(100vw * 16 / 9)); }
   body.rotated.ultrawide canvas { width: min(100dvh, calc(100vw * 21 / 9)); }
   body.rotated.stretch canvas { width: 100dvh; height: 100vw; }
   body.playing.touch.rotated #settings { max-height: calc(100vw - max(12px, env(safe-area-inset-top)) - 56px); }
 
+  /* A narrow upright screen, unless the page is turned to landscape (touch.js). */
   @media (max-width: 560px) {
-    .screen { font-size: 14px; }
-    .tab { font-size: 1.15em; min-width: 0; left: 24px; padding-right: 1.2em; }
-    .btn-row { grid-template-columns: 1fr; }
-    #roombar { font-size: 13px; }
+    body:not(.rotated) .screen { font-size: 14px; }
+    body:not(.rotated) .tab { font-size: 1.15em; min-width: 0; left: 24px; padding-right: 1.2em; }
+    body:not(.rotated) .btn-row { grid-template-columns: 1fr; }
+    body:not(.rotated) #roombar { font-size: 13px; }
   }
 </style>
 </head>

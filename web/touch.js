@@ -231,9 +231,12 @@ const smgHaptics = (() => {
   const pref = () => { try { return localStorage.getItem("smg.touch"); } catch { return null; } };
   let enabled = pref() === "1" || (pref() !== "0" && coarse.matches);
   const portrait = matchMedia("(orientation: portrait)");
+  // Installed to the home screen the app is landscape only: Android locks it
+  // (manifest.webmanifest), iOS can't, so the page turns there, menus too.
+  const installed = navigator.standalone === true || matchMedia("(display-mode: standalone), (display-mode: fullscreen)").matches;
   function apply() {
     document.body.classList.toggle("touch", enabled);
-    document.body.classList.toggle("rotated", enabled && portrait.matches && document.body.classList.contains("playing"));
+    document.body.classList.toggle("rotated", portrait.matches && (installed || enabled && document.body.classList.contains("playing")));
     write({ active: enabled ? 1 : 0 });
     const box = document.getElementById("touchCtl");
     if (box) box.checked = enabled;

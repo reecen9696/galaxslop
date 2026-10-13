@@ -16,6 +16,7 @@ const kTypes: Record<string, string> = {
   ".py": "text/plain; charset=utf-8",
   ".css": "text/css",
   ".png": "image/png",
+  ".webmanifest": "application/manifest+json",
   ".svg": "image/svg+xml",
   ".woff2": "font/woff2",
   ".mp3": "audio/mpeg",
