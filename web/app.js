@@ -210,6 +210,8 @@ class SmgAudio extends AudioWorkletProcessor {
 registerProcessor("smg-audio", SmgAudio);
 `;
 
+let smgGain = null;
+
 async function startAudio() {
   if (startAudio.started || !window.Module || !Module._web_audio_ring || !Module.HEAPU8) return;
   startAudio.started = true;
@@ -224,7 +226,9 @@ async function startAudio() {
       processorOptions: { buffer: Module.HEAPU8.buffer, ring: Module._web_audio_ring() >>> 0, frames: Module._web_audio_ring_frames() },
     });
     node.onprocessorerror = (e) => console.log("web: audio worklet failed: " + (e.message || e));
-    node.connect(ctx.destination);
+    smgGain = ctx.createGain();
+    smgGain.gain.value = Number(store("smg.volume") ?? 0.8);
+    node.connect(smgGain).connect(ctx.destination);
     await ctx.resume();
     console.log(`web: audio on, ${ctx.sampleRate} Hz`);
   } catch (e) {
@@ -319,6 +323,122 @@ function boot(args, env = {}) {
   s.src = "smg.js";
   document.body.appendChild(s);
 }
+
+// Settings (P1-09, page side): volume, save export/import, re-import, delete.
+// Saves live in OPFS /smg/save (main_web.cpp); export packs them into an
+// uncompressed zip, import unpacks one and restarts the page so the game
+// reads it at boot.
+const crcTable = Array.from({ length: 256 }, (_, n) => {
+  let c = n;
+  for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+  return c >>> 0;
+});
+function crc32(bytes) {
+  let c = 0xffffffff;
+  for (const b of bytes) c = crcTable[(c ^ b) & 0xff] ^ (c >>> 8);
+  return (c ^ 0xffffffff) >>> 0;
+}
+function zipStore(files) {
+  const enc = new TextEncoder(), parts = [], central = [];
+  let offset = 0;
+  for (const { name, data } of files) {
+    const n = enc.encode(name), crc = crc32(data);
+    const h = new DataView(new ArrayBuffer(30));
+    h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint32(14, crc, true);
+    h.setUint32(18, data.length, true); h.setUint32(22, data.length, true); h.setUint16(26, n.length, true);
+    parts.push(new Uint8Array(h.buffer), n, data);
+    const c = new DataView(new ArrayBuffer(46));
+    c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint32(16, crc, true);
+    c.setUint32(20, data.length, true); c.setUint32(24, data.length, true); c.setUint16(28, n.length, true); c.setUint32(42, offset, true);
+    central.push(new Uint8Array(c.buffer), n);
+    offset += 30 + n.length + data.length;
+  }
+  const size = central.reduce((s, p) => s + p.length, 0);
+  const e = new DataView(new ArrayBuffer(22));
+  e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true);
+  e.setUint32(12, size, true); e.setUint32(16, offset, true);
+  return new Blob([...parts, ...central, new Uint8Array(e.buffer)], { type: "application/zip" });
+}
+function zipRead(buf) {
+  const v = new DataView(buf), out = [], dec = new TextDecoder();
+  let p = 0;
+  while (p + 30 <= buf.byteLength && v.getUint32(p, true) === 0x04034b50) {
+    if (v.getUint16(p + 8, true) !== 0) throw new Error("compressed zip entries are not supported: export from this page");
+    const size = v.getUint32(p + 18, true), nlen = v.getUint16(p + 26, true), xlen = v.getUint16(p + 28, true);
+    const name = dec.decode(new Uint8Array(buf, p + 30, nlen));
+    out.push({ name, data: new Uint8Array(buf.slice(p + 30 + nlen + xlen, p + 30 + nlen + xlen + size)) });
+    p += 30 + nlen + xlen + size;
+  }
+  return out;
+}
+async function saveDir(create) {
+  const root = await navigator.storage.getDirectory();
+  return (await root.getDirectoryHandle("smg", { create })).getDirectoryHandle("save", { create });
+}
+async function exportSave() {
+  const files = [];
+  async function walk(dir, prefix) {
+    for await (const [name, h] of dir.entries()) {
+      if (h.kind === "directory") await walk(h, prefix + name + "/");
+      else files.push({ name: prefix + name, data: new Uint8Array(await (await h.getFile()).arrayBuffer()) });
+    }
+  }
+  try {
+    await walk(await saveDir(false), "");
+  } catch {}
+  if (!files.length) return say("No save data yet.");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(zipStore(files));
+  a.download = `smg-save-${new Date().toISOString().slice(0, 10)}.zip`;
+  a.click();
+}
+async function importSave(file) {
+  const entries = zipRead(await file.arrayBuffer());
+  if (!entries.some((e) => /GameData\.bin$/.test(e.name))) return say("That zip holds no Super Mario Galaxy save (GameData.bin).");
+  const root = await navigator.storage.getDirectory();
+  const smg = await root.getDirectoryHandle("smg", { create: true });
+  await smg.removeEntry("save", { recursive: true }).catch(() => {});
+  const save = await smg.getDirectoryHandle("save", { create: true });
+  for (const { name, data } of entries) {
+    if (name.endsWith("/") || name.includes("..")) continue;
+    let dir = save;
+    const parts = name.split("/");
+    for (const part of parts.slice(0, -1)) dir = await dir.getDirectoryHandle(part, { create: true });
+    const w = await (await dir.getFileHandle(parts.at(-1), { create: true })).createWritable();
+    await w.write(data);
+    await w.close();
+  }
+  location.reload();
+}
+function setupSettings() {
+  const gear = document.getElementById("gear"), panel = document.getElementById("settings");
+  gear.onclick = () => (panel.style.display = panel.style.display === "block" ? "none" : "block");
+  const vol = document.getElementById("volume");
+  vol.value = store("smg.volume") ?? 0.8;
+  vol.oninput = () => {
+    store("smg.volume", vol.value);
+    if (smgGain) smgGain.gain.value = Number(vol.value);
+  };
+  document.getElementById("exportSave").onclick = exportSave;
+  const imp = document.getElementById("importSaveInput");
+  document.getElementById("importSave").onclick = () => imp.click();
+  imp.onchange = () => imp.files[0] && importSave(imp.files[0]);
+  document.getElementById("reimport").onclick = () => {
+    location.href = location.pathname + "?reimport=1";
+  };
+  document.getElementById("deleteAll").onclick = async () => {
+    const btn = document.getElementById("deleteAll");
+    if (btn.dataset.armed !== "1") {
+      btn.dataset.armed = "1";
+      btn.textContent = "Click again to delete game files and saves";
+      return;
+    }
+    const root = await navigator.storage.getDirectory();
+    await root.removeEntry("smg", { recursive: true }).catch(() => {});
+    location.href = location.pathname;
+  };
+}
+setupSettings();
 
 (async () => {
   if (!crossOriginIsolated) {

@@ -26,6 +26,11 @@
   #lobby details { margin-top: 12px; color: var(--dim); }
   #roombar { display: none; color: var(--dim); font-size: 13px; }
   #roombar b { color: var(--accent); letter-spacing: .15em; }
+  #gear { position: fixed; top: 12px; right: 12px; background: transparent; color: var(--dim); font-size: 20px; padding: 4px 10px; border: 1px solid #333a50; }
+  #settings { position: fixed; top: 56px; right: 12px; width: min(320px, calc(100vw - 24px)); background: var(--panel); border-radius: 12px; padding: 16px; display: none; box-sizing: border-box; z-index: 2; }
+  #settings h2 { font-size: 16px; margin: 0 0 8px; }
+  #settings .row button { flex: 1; }
+  #settings input[type=range] { width: 100%; }
 </style>
 </head>
 <body>
@@ -65,6 +70,16 @@
     </details>
   </div>
   <div id="roombar"></div>
+  <button id="gear" aria-label="Settings" title="Settings">⚙</button>
+  <div id="settings">
+    <h2>Settings</h2>
+    <label for="volume">Volume</label>
+    <input id="volume" type="range" min="0" max="1" step="0.05">
+    <div class="row"><button id="exportSave" class="ghost">Export save</button><button id="importSave" class="ghost">Import save</button></div>
+    <input id="importSaveInput" type="file" accept=".zip" style="display:none">
+    <div class="row"><button id="reimport" class="ghost">Load the disc again</button></div>
+    <div class="row"><button id="deleteAll" class="ghost">Delete all data</button></div>
+  </div>
   <div id="status">loading…</div>
 </div>
 <script src="cook/cooker.js"></script>

@@ -280,14 +280,15 @@ Chromium, with sound, on a gamepad, at 60 fps on the reference machine.
 
 ### P1-09 Settings screen
 - lane: A
-- status: open
-- owner:
+- status: in_progress
+- owner: A
 - blocked_by: P1-04, P1-05, P1-07
 - touches: web/src/screens/settings
 - flags:
 - what: Controls remap, cursor speed, render scale, volume, save export/import, re-import disc, delete data. Persist in localStorage.
 - done when: every setting works and persists.
 - log:
+  - 2026-10-13 (A): page-side settings (gear, top right): volume (GainNode, remembered), save export/import as a plain zip (validated with Python zipfile), load the disc again, delete all data (two clicks). Left: render scale (P1-07), cursor speed, control remap.
 
 ### P1-10 Playtest: prologue to first star
 - lane: shared

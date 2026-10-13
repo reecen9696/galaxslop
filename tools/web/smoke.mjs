@@ -69,10 +69,18 @@ function cdp(wsUrl) {
   const ready = new Promise((r) => (ws.onopen = r));
   return {
     ready,
-    send: (method, params = {}, sessionId) =>
+    // Every call times out, so a wedged page or worker can't hang the harness.
+    send: (method, params = {}, sessionId, timeoutMs = 15000) =>
       new Promise((resolve, reject) => {
         const n = ++id;
-        pending.set(n, { resolve, reject });
+        const timer = setTimeout(() => {
+          pending.delete(n);
+          reject(new Error(`${method} timed out`));
+        }, timeoutMs);
+        pending.set(n, {
+          resolve: (v) => (clearTimeout(timer), resolve(v)),
+          reject: (e) => (clearTimeout(timer), reject(e)),
+        });
         ws.send(JSON.stringify({ id: n, method, params, sessionId }));
       }),
     on: (fn) => listeners.push(fn),
@@ -82,8 +90,11 @@ function cdp(wsUrl) {
 
 const kKeyCodes = { Space: 32, Enter: 13, KeyW: 87, KeyA: 65, KeyS: 83, KeyD: 68, KeyK: 75, KeyC: 67, ArrowUp: 38, ArrowDown: 40, ArrowLeft: 37, ArrowRight: 39, ShiftLeft: 16, Digit1: 49, Digit2: 50 };
 
+let current = null; // the running Chrome, killed if a run throws
+
 async function oneRun(n) {
   const { proc, profile, wsUrl } = await launch();
+  current = proc;
   const c = cdp(wsUrl);
   await c.ready;
   const { targetId } = await c.send("Target.createTarget", { url: "about:blank" });
@@ -180,12 +191,16 @@ async function oneRun(n) {
       await dumpStacks();
     }
     while (ats.length && ats[0].t <= now) {
-      const { result } = await c.send("Runtime.evaluate", { expression: ats.shift().js, returnByValue: true }, sessionId);
-      if (result.subtype === "error") console.log("at: " + result.description);
+      try {
+        const { result } = await c.send("Runtime.evaluate", { expression: ats.shift().js, returnByValue: true }, sessionId);
+        if (result.subtype === "error") console.log("at: " + result.description);
+      } catch (e) {
+        console.log("at: " + e.message);
+      }
     }
     while (keys.length && keys[0].t <= now) {
       const k = keys.shift();
-      await c.send("Input.dispatchKeyEvent", { type: k.up ? "keyUp" : "rawKeyDown", code: k.code, key: k.code, windowsVirtualKeyCode: kKeyCodes[k.code] ?? 0 }, sessionId);
+      await c.send("Input.dispatchKeyEvent", { type: k.up ? "keyUp" : "rawKeyDown", code: k.code, key: k.code, windowsVirtualKeyCode: kKeyCodes[k.code] ?? 0 }, sessionId).catch(() => {});
     }
     await sleep(100);
   }
@@ -210,7 +225,13 @@ async function oneRun(n) {
 
 let failed = 0;
 for (let n = 1; n <= runs; n++) {
-  const r = await oneRun(n);
+  let r;
+  try {
+    r = await oneRun(n);
+  } catch (e) {
+    current?.kill("SIGKILL");
+    r = { ok: false, log: [String(e)], frames: "harness error: " + e.message };
+  }
   if (!r.ok) failed++;
   console.log(`run ${n}: ${r.ok ? "ok" : "FAIL"}  ${r.frames ?? "(no frames logged)"}`);
   if (!r.ok || args.verbose) {
