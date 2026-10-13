@@ -23,6 +23,7 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(DECOMP ${CMAKE_SOURCE_DIR}/decomp)
+include(${CMAKE_SOURCE_DIR}/assets/mods/mods.cmake)
 
 if(ANDROID)
   set(PORT_PLATFORM android)
@@ -175,6 +176,7 @@ if(EMSCRIPTEN)
       -sOFFSCREENCANVASES_TO_PTHREAD=\#canvas -sEXPORTED_RUNTIME_METHODS=ENV,HEAPU8 -lwebsocket.js
       --pre-js ${CMAKE_SOURCE_DIR}/platform/src/web/browser_env.js)
   endif()
+  smg_add_mods(smg)
   return()
 endif()
 
@@ -213,6 +215,7 @@ if(NOT ANDROID)
 
   add_executable(smg $<TARGET_OBJECTS:decomp> ${PLATFORM_SRCS})
   target_link_libraries(smg PRIVATE SDL3::SDL3-static)
+  smg_add_mods(smg)  # build/<dir>/mods, beside the executable
   if(APPLE)
     target_link_libraries(smg PRIVATE "-framework OpenGL")
   else()

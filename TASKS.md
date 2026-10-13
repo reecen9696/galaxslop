@@ -668,3 +668,15 @@ Starter list, unordered: switches, launch stars (fired), coins (collected), 1-up
 ## Done
 
 (reviewer moves tasks here on merge, newest first)
+
+### P5-06 Barney, the port's own NPC
+- lane: shared
+- status: done
+- owner: A
+- blocked_by:
+- touches: assets/mods/, tools/mods/, decomp/src/Game/NPC/BarneyNPC.cpp, decomp/include/Game/NPC/BarneyNPC.hpp, decomp/src/Game/Scene/SceneDataInitializer.cpp, decomp/src/Game/Effect/EffectSystemUtil.cpp, platform/src/dvd/dvd.cpp, platform/src/port/, platform/src/audio/, platform/src/web/, platform/src/native/present.cpp, net/world/actor_sync.*
+- flags: solo, human
+- what: The user's dog as a Galaxy character (model and animations built in Blender in the MoonRabbit's style, `tools/mods/barney/`), running laps of the Star Festival plaza, stopping when a player comes close, barking a line in a talk balloon (E for the next one), synced in co-op. Resources the disc lacks live in `assets/mods/` and are served by a DVD overlay (D-026).
+- done when: he runs, stops and talks in the first area on native and in the browser.
+- log:
+  - 2026-10-14: model v1-v3 built and iterated with the user in-game (eyes, mouth, tongue, jumper clipping, proportions); NPC, overlay, talk key, bark and co-op sync written; native build passes; merged to deploy.

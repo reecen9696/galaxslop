@@ -5,6 +5,7 @@
 // files on the host.  Reads run on a worker thread and complete through the
 // DVD interrupt, like the real drive.
 #include <ctype.h>
+#include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -27,6 +28,10 @@
 #include "revolution/dvd.h"
 #include "revolution/os.h"
 #include "revolution/sc.h"
+
+#if defined(__APPLE__)
+#include <mach-o/dyld.h>
+#endif
 
 enum {
     kStateEnd = 0,
@@ -252,6 +257,89 @@ static void loadManifestSizes() {
     port_log("dvd: %u file sizes from manifest.json", known);
 }
 
+// The port's own resources (assets/mods, cooked by tools/mods/build_mods.py
+// into a "mods" folder beside the executable; embedded at /mods in the
+// browser build): files the disc doesn't have, such as ObjectData/Barney.arc.
+// They are appended to the file table after the disc's entries, outside every
+// directory's range, and found by path when the disc has no such file
+// (DVDConvertPathToEntrynum).  SMG_MODS=<dir> reads another folder; "0": none.
+static std::unordered_map<std::string, u32> sOverlay;  // lower-case path from the disc root
+
+static std::string overlayRoot() {
+    if (const char* env = getenv("SMG_MODS")) {
+        return strcmp(env, "0") == 0 ? std::string() : std::string(env);
+    }
+#if defined(__EMSCRIPTEN__)
+    return "/mods";
+#else
+    char exe[4096] = {};
+#if defined(__APPLE__)
+    uint32_t size = sizeof(exe);
+    if (_NSGetExecutablePath(exe, &size) != 0) return std::string();
+#else
+    if (readlink("/proc/self/exe", exe, sizeof(exe) - 1) <= 0) return std::string();
+#endif
+    std::string dir(exe);
+    size_t slash = dir.rfind('/');
+    return slash == std::string::npos ? std::string() : dir.substr(0, slash) + "/mods";
+#endif
+}
+
+static std::string lowerPath(std::string path) {
+    for (char& c : path) c = (char)tolower((unsigned char)c);
+    return path;
+}
+
+static void scanOverlay(const std::string& root, const std::string& rel) {
+    DIR* d = opendir((root + "/" + rel).c_str());
+    if (!d) {
+        return;
+    }
+    while (struct dirent* e = readdir(d)) {
+        if (e->d_name[0] == '.') continue;
+        std::string child = rel.empty() ? e->d_name : rel + "/" + e->d_name;
+        struct stat st;
+        if (stat((root + "/" + child).c_str(), &st) != 0) continue;
+        if (S_ISDIR(st.st_mode)) {
+            scanOverlay(root, child);
+        } else if (S_ISREG(st.st_mode) && DVDConvertPathToEntrynum(("/" + child).c_str()) < 0) {
+            FstEntry fe;
+            fe.isDir = false;
+            fe.name = e->d_name;
+            fe.parent = 0;
+            fe.next = 0;
+            fe.hostPath = root + "/" + child;
+            fe.size = (s64)st.st_size;
+            sOverlay[lowerPath(child)] = (u32)sFst.size();
+            sFst.push_back(fe);
+            port_log("dvd: mod file %s (%lld bytes)", child.c_str(), (long long)fe.size);
+        }
+    }
+    closedir(d);
+}
+
+static void loadOverlay() {
+    std::string root = overlayRoot();
+    if (!root.empty()) {
+        scanOverlay(root, "");
+    }
+}
+
+extern "C" const char* port_dvd_mods_root(void) {
+    static std::string sRoot = overlayRoot();
+    return sRoot.c_str();
+}
+
+// An overlay file at `path` (absolute, or relative to the root directory).
+static s32 findOverlay(const char* path) {
+    if (sOverlay.empty() || (path[0] != '/' && sCurrentDir != 0)) {
+        return -1;
+    }
+    while (*path == '/') path++;
+    auto it = sOverlay.find(lowerPath(path));
+    return it == sOverlay.end() ? -1 : (s32)it->second;
+}
+
 static bool loadFst() {
     PortHostAllocScope scope;
     std::vector<u8> data = readFst(sDataRoot);
@@ -293,6 +381,7 @@ static bool loadFst() {
     }
     port_log("dvd: fst loaded, %u entries, root %s", count, sDataRoot.c_str());
     loadManifestSizes();
+    loadOverlay();
     return true;
 }
 
@@ -341,7 +430,7 @@ extern "C" s32 DVDConvertPathToEntrynum(const char* path) {
             found = findChild(dir, p, len);
         }
         if (found < 0) {
-            return -1;
+            return findOverlay(path);
         }
         if (*end == 0) {
             return found;

@@ -148,6 +148,15 @@ namespace MR {
             if (pInfo->mAnimName == nullptr) {
                 return;
             }
+#ifdef TARGET_PC
+            // A model with no animation player has no animation to sync to:
+            // a co-op puppet takes the "Mario" effect group before it builds
+            // its player (net/puppet/remote_player_puppet.cpp), and the
+            // group's animation-synced entries would read through a null one.
+            if (pModelManager == nullptr || pModelManager->mXanimePlayer == nullptr) {
+                return;
+            }
+#endif
 
             MultiEmitter* pEmitter = pKeeper->getEmitter(pInfo->getName());
             if (!hasStringSpace(pInfo->mAnimName)) {
@@ -163,6 +172,12 @@ namespace MR {
                         name[nameLength] = '\0';
                         const char* pAnimName = nullptr;
                         findBckNameStringInResource(&pAnimName, pModelManager->getResourceHolder(), name);
+#ifdef TARGET_PC
+                        if (pAnimName == nullptr) {
+                            nameLength = 0;
+                            continue;  // not in this model's archive
+                        }
+#endif
                         if (pEmitter->_24 == nullptr) {
                             initEffectSyncBck(pKeeper, pModelManager, pInfo->getName(), pAnimName, ::countAnimNames(pAnimNames), 0.0f, -1.0f, false);
                         } else {

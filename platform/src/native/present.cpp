@@ -20,6 +20,7 @@ extern "C" void port_net_request_follow(int slot);  // GameDataFunction.cpp
 #include "../gx/gx_record.h"
 #include "port/input.h"
 #include "port/port.h"
+#include "port/talk.h"
 
 #ifdef __APPLE__
 #include <objc/message.h>
@@ -130,6 +131,9 @@ static void readInput(PortPadState* pad, bool* quit) {
                     break;
                 }
             }
+        }
+        if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat && e.key.scancode == SDL_SCANCODE_E) {
+            port_talk_note_press();  // talk (port/talk.h)
         }
         if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat && e.key.key >= SDLK_F1 && e.key.key <= SDLK_F8) {
             port_net_debug_request_mode((int)(e.key.key - SDLK_F1));  // F1 normal, F2 rainbow, F3 fire...

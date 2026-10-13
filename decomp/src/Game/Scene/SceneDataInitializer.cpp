@@ -3,6 +3,7 @@
 #include <JSystem/JKernel/JKRSolidHeap.hpp>
 #include "net/puppet/remote_player_puppet.hpp"
 #include "net/world/world_sync.h"
+#include "Game/NPC/BarneyNPC.hpp"
 #endif
 #include "Game/Scene/SceneDataInitializer.hpp"
 #include "Game/NameObj/NameObjArchiveListCollector.hpp"
@@ -54,6 +55,10 @@ void SceneDataInitializer::startStageFileLoadAfterScenarioSelected() {
     }
 #endif
 
+#ifdef TARGET_PC
+    BarneyNPC::requestArchive();  // the port's own NPC (assets/mods)
+#endif
+
     for (int i = 0; i < collector.getArchiveNum(); i++) {
         MR::mountAsyncArchiveByObjectOrLayoutName(collector.getArchive(i), nullptr);
     }
@@ -80,6 +85,7 @@ void SceneDataInitializer::initAfterScenarioSelected() {
     mDataHolder->initAfterScenarioSelected();
 #ifdef TARGET_PC
     port_net_puppets_create_for_scene();  // co-op: remote players (net/puppet)
+    BarneyNPC::create();
 #endif
 }
 

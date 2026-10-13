@@ -10,6 +10,7 @@
 #include <atomic>
 
 #include "port/port.h"
+#include "port/sfx.h"
 
 namespace {
 
@@ -44,10 +45,16 @@ void port_audio_submit(const int16_t* rightLeft, uint32_t frames, uint32_t rate)
     if (frames > space) {
         frames = space;  // the worklet stopped reading; the AI clock waits for it
     }
+    static int16_t sMixed[kRingFrames * 2];
+    for (uint32_t i = 0; i < frames; i++) {
+        sMixed[i * 2] = rightLeft[i * 2 + 1];
+        sMixed[i * 2 + 1] = rightLeft[i * 2];
+    }
+    port_sfx_mix(sMixed, frames, rate);  // the port's own sounds (port/sfx.h)
     for (uint32_t i = 0; i < frames; i++) {
         uint32_t idx = (w + i) & (kRingFrames - 1);
-        sRing.lr[idx * 2] = rightLeft[i * 2 + 1];
-        sRing.lr[idx * 2 + 1] = rightLeft[i * 2];
+        sRing.lr[idx * 2] = sMixed[i * 2];
+        sRing.lr[idx * 2 + 1] = sMixed[i * 2 + 1];
     }
     sRing.write.store(w + frames, std::memory_order_release);
 }

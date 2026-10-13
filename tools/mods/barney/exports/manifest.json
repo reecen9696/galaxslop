@@ -1,0 +1,75 @@
+{
+  "triangles": 13612,
+  "vertices": 6951,
+  "bones": [
+    "Root",
+    "Spine",
+    "Chest",
+    "Head",
+    "Jaw",
+    "Tongue",
+    "EarL",
+    "EyeL",
+    "EarR",
+    "EyeR",
+    "FrontL",
+    "FrontLShin",
+    "FrontLPaw",
+    "FrontR",
+    "FrontRShin",
+    "FrontRPaw",
+    "RearL",
+    "RearLShin",
+    "RearLPaw",
+    "RearR",
+    "RearRShin",
+    "RearRPaw",
+    "Tail",
+    "TailTip"
+  ],
+  "shapes": 14,
+  "actions": {
+    "Wait": {
+      "frames": 180,
+      "fps": 60,
+      "loop": true
+    },
+    "Walk": {
+      "frames": 48,
+      "fps": 60,
+      "loop": true
+    },
+    "Run": {
+      "frames": 28,
+      "fps": 60,
+      "loop": true
+    },
+    "Happy": {
+      "frames": 90,
+      "fps": 60,
+      "loop": true
+    },
+    "Talk": {
+      "frames": 120,
+      "fps": 60,
+      "loop": true
+    },
+    "Sit": {
+      "frames": 180,
+      "fps": 60,
+      "loop": true
+    },
+    "Jump": {
+      "frames": 60,
+      "fps": 60,
+      "loop": false
+    },
+    "Blink": {
+      "frames": 12,
+      "fps": 60,
+      "loop": false
+    }
+  },
+  "format": "Big-endian J3D2bmd3 + J3D1bck1, uncompressed RARC",
+  "game_tested": false
+}

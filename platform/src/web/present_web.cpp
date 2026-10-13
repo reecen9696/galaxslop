@@ -25,6 +25,7 @@
 #include "net/client/net_client.h"
 #include "net/puppet/puppet_tint.h"
 #include "port/port.h"
+#include "port/talk.h"
 
 namespace {
 
@@ -52,7 +53,7 @@ bool sCursorActive = false;  // the gamepad's virtual pointer, until the mouse m
 bool isGameKey(const char* code) {
     static const char* const kKeys[] = {"KeyW", "KeyA", "KeyS", "KeyD", "Space", "KeyK", "KeyQ", "KeyC", "Enter",
                                         "Backspace", "Digit1", "Digit2", "KeyH", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
-                                        "KeyJ", "ShiftLeft"};
+                                        "KeyJ", "ShiftLeft", "KeyE"};
     for (const char* k : kKeys) {
         if (strcmp(code, k) == 0) return true;
     }
@@ -64,6 +65,9 @@ bool onKey(int type, const EmscriptenKeyboardEvent* e, void*) {
         return false;  // leave browser shortcuts alone
     }
     if (type == EMSCRIPTEN_EVENT_KEYDOWN) {
+        if (strcmp(e->code, "KeyE") == 0 && !e->repeat) {
+            port_talk_note_press();  // talk (port/talk.h)
+        }
         sKeys.insert(e->code);
     } else {
         sKeys.erase(e->code);

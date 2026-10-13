@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "port/port.h"
+#include "port/sfx.h"
 #include "revolution/types.h"
 
 namespace {
@@ -273,6 +274,7 @@ extern "C" void port_audio_submit(const s16* rightLeft, u32 frames, u32 rate) {
         sLR[i * 2 + 1] = rightLeft[i * 2];
     }
     mixSpeaker(sLR.data(), frames, rate);
+    port_sfx_mix(sLR.data(), frames, rate);  // the port's own sounds (port/sfx.h)
     applySkipGain(sLR.data(), frames, rate);
 
     static bool wavChecked = false;

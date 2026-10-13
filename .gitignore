@@ -58,3 +58,6 @@ __pycache__/
 *.dll
 # vendored three.js keeps its own build/ folder name
 !/web/vendor/three/build/
+
+# the port's own resources (assets/mods/README.md): made for the port, not game data
+!/assets/mods/**/*.arc

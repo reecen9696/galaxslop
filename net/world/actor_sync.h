@@ -33,6 +33,10 @@ void port_actor_sync_part(void* host, int kind, void* part);
 // LiveActor::movement (before the sensors update): a copy run by another
 // player takes the owner's position and nerve.
 void port_actor_sync_movement(void* actor);
+// Whether another player runs `actor` (so this copy shows theirs); `anim`,
+// if given, gets the BCK they play ("" before any).  For an actor with its
+// own behaviour to stand aside (BarneyNPC).
+int port_actor_sync_driven(void* actor, const char** anim);
 // LiveActor::calcAnmMtx (after calcAndSetBaseMtx): a copy run by another
 // player is drawn (and collides) with the owner's matrix.
 void port_actor_sync_mtx(void* actor);

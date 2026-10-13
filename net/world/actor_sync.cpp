@@ -209,6 +209,7 @@ struct Tracked {
     uint32_t sentNerve = 0;
     uint8_t sentFlags = 0;
     uint32_t sentFrame = 0;
+    uint32_t sentAnim = 0;  // hash of the BCK name last sent
     // Copy side.
     int snaps = 0;
     Snap last, prev;
@@ -970,6 +971,14 @@ extern "C" void port_actor_sync_movement(void* actorPtr) {
     }
 }
 
+extern "C" int port_actor_sync_driven(void* actorPtr, const char** anim) {
+    State& s = st();
+    Tracked* t = s.live ? find(actorPtr) : nullptr;
+    if (t == nullptr || !driven(*t)) return 0;
+    if (anim != nullptr) *anim = t->ownerAnim;
+    return 1;
+}
+
 extern "C" void port_actor_sync_mtx(void* actorPtr) {
     State& s = st();
     if (!s.live) return;
@@ -1161,8 +1170,12 @@ extern "C" void port_actor_sync_update(uint32_t stage, uint8_t scenario) {
             if (!moved && nerve == t.baseNerve && f == t.baseFlags) continue;
             t.dynamic = true;
         }
+        // A new animation counts as a change: an NPC that stands still and
+        // starts talking (BarneyNPC) shows it on the others now, not in 2 s.
+        const char* anim = t.actor->mModelManager != nullptr ? MR::getPlayingBckName(t.actor) : nullptr;
+        uint32_t animHash = anim != nullptr ? fnvStr(anim) : 0;
         bool changed = !t.everSent || dist2(p.pos, t.sent.pos) > 0.25f || fabsf(qdot(p.q, t.sent.q)) < 0.99999f || nerve != t.sentNerve ||
-                       f != t.sentFlags;
+                       f != t.sentFlags || animHash != t.sentAnim;
         uint32_t age = s.frame - t.sentFrame;
         bool near = (f & kFlagClaim) != 0 || dist2(p.pos, mePos) < kNear * kNear;
         uint32_t every = changed ? (near ? (uint32_t)kSendEvery : 12u) : 120u;
@@ -1188,6 +1201,8 @@ extern "C" void port_actor_sync_update(uint32_t stage, uint8_t scenario) {
         d.t->sentNerve = nerveHashOf(d.t->actor->mSpine);
         d.t->sentFlags = d.flags;
         d.t->sentFrame = s.frame;
+        const char* sentAnim = d.t->actor->mModelManager != nullptr ? MR::getPlayingBckName(d.t->actor) : nullptr;
+        d.t->sentAnim = sentAnim != nullptr ? fnvStr(sentAnim) : 0;
         count++;
     }
     b[kActorStateHeader - 1] = (uint8_t)count;

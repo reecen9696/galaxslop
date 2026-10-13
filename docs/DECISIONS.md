@@ -431,3 +431,15 @@ saves combined, so one friend's full save would fill everyone's). Lets a
 newcomer drop in at any time.
 Revisit: if players want to keep a fresh file (SMG_DROP_IN=0 for now).
 
+## D-026 (2026-10-14, lane A, asked for by the user): The port's own resources in `assets/mods/`, served by a DVD overlay
+What: files the disc doesn't have (Barney's archive and bark) live in
+`assets/mods/`, cooked by `tools/mods/build_mods.py` at build time into
+`build/<dir>/mods` (embedded at `/mods` in the wasm) and found by the DVD
+layer when the disc has no file at that path. They are the port's own work,
+so the `.gitignore` rule against `.arc` files is lifted for that folder only.
+Why: the user wanted their dog in the game as an NPC. The game can only load
+J3D resources from its file system, and the disc stays out of git, so the
+port needs a second root for its own files. An overlay keeps the game code
+unchanged: `ObjectData/Barney.arc` is mounted like any other archive.
+Revisit: if mods should be loadable at run time (a folder the player picks)
+rather than built in; or if a cooked mod should go into OPFS with the disc.
