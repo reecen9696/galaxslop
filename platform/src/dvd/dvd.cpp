@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
@@ -18,6 +19,7 @@
 #include <mutex>
 #include <string>
 #include <thread>
+#include <unordered_map>
 #include <vector>
 
 #include "port/heap_routing.h"
@@ -212,6 +214,44 @@ extern "C" int port_language_start(void) {
 
 extern "C" const char* port_dvd_root(void) { return sDataRoot.c_str(); }
 
+// File sizes from the cooker's manifest.json, so opening a file needs no
+// stat of the host file system.  In the browser that file system is OPFS
+// through WasmFS, where a stat from a game thread raced the DVD worker's reads
+// (a hang or a trap in the prologue); with the sizes known up front only the
+// DVD worker touches game files.  Entries the manifest lacks fall back to stat.
+static void loadManifestSizes() {
+    std::string path = sDataRoot + "/manifest.json";
+    FILE* f = fopen(path.c_str(), "rb");
+    if (!f) {
+        return;
+    }
+    std::string json;
+    char buf[65536];
+    size_t n;
+    while ((n = fread(buf, 1, sizeof(buf), f)) > 0) json.append(buf, n);
+    fclose(f);
+    std::unordered_map<std::string, s64> sizes;
+    // Machine-written by tools/cook/manifest.py: {"path": "...", "size": N, ...}
+    for (size_t at = json.find("\"path\""); at != std::string::npos; at = json.find("\"path\"", at + 6)) {
+        size_t q1 = json.find('"', json.find(':', at) + 1);
+        size_t q2 = json.find('"', q1 + 1);
+        size_t sz = json.find("\"size\"", q2);
+        if (q1 == std::string::npos || q2 == std::string::npos || sz == std::string::npos) break;
+        sizes[sDataRoot + "/" + json.substr(q1 + 1, q2 - q1 - 1)] = strtoll(json.c_str() + json.find(':', sz) + 1, nullptr, 10);
+    }
+    u32 known = 0;
+    for (FstEntry& fe : sFst) {
+        if (!fe.isDir) {
+            auto it = sizes.find(fe.hostPath);
+            if (it != sizes.end()) {
+                fe.size = it->second;
+                known++;
+            }
+        }
+    }
+    port_log("dvd: %u file sizes from manifest.json", known);
+}
+
 static bool loadFst() {
     PortHostAllocScope scope;
     std::vector<u8> data = readFst(sDataRoot);
@@ -252,6 +292,7 @@ static bool loadFst() {
         }
     }
     port_log("dvd: fst loaded, %u entries, root %s", count, sDataRoot.c_str());
+    loadManifestSizes();
     return true;
 }
 

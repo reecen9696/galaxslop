@@ -141,6 +141,68 @@ function showImport() {
   });
 }
 
+// Audio (P1-01): an AudioWorklet reads the game's PCM ring straight out of
+// wasm memory (platform/src/web/audio_web.cpp) and resamples it linearly to
+// the context rate.  Browsers only start audio after a user gesture.
+const kWorklet = `
+class SmgAudio extends AudioWorkletProcessor {
+  constructor(opts) {
+    super();
+    const { buffer, ring, frames } = opts.processorOptions;
+    this.u32 = new Uint32Array(buffer, ring, 5);
+    this.pcm = new Int16Array(buffer, ring + 20, frames * 2);
+    this.mask = frames - 1;
+    this.pos = 0;  // fractional read position within the current frame
+    Atomics.store(this.u32, 4, 1);  // attached
+  }
+  process(_inputs, outputs) {
+    const out = outputs[0], L = out[0], R = out[1] || out[0];
+    const u = this.u32, pcm = this.pcm, mask = this.mask;
+    const step = (Atomics.load(u, 2) || 32000) / sampleRate;
+    let read = Atomics.load(u, 1);
+    const write = Atomics.load(u, 0);
+    for (let i = 0; i < L.length; i++) {
+      if (write - read < 2) {
+        L[i] = R[i] = 0;
+        if (i === 0 && write !== 0) Atomics.add(u, 3, 1);
+        continue;
+      }
+      const a = (read & mask) * 2, b = ((read + 1) & mask) * 2, t = this.pos;
+      L[i] = (pcm[a] * (1 - t) + pcm[b] * t) / 32768;
+      R[i] = (pcm[a + 1] * (1 - t) + pcm[b + 1] * t) / 32768;
+      this.pos += step;
+      const whole = Math.floor(this.pos);
+      read += whole;
+      this.pos -= whole;
+    }
+    Atomics.store(u, 1, read);
+    return true;
+  }
+}
+registerProcessor("smg-audio", SmgAudio);
+`;
+
+async function startAudio() {
+  if (startAudio.started || !window.Module || !Module._web_audio_ring || !Module.HEAPU8) return;
+  startAudio.started = true;
+  try {
+    const ctx = new AudioContext({ latencyHint: "interactive" });
+    const url = URL.createObjectURL(new Blob([kWorklet], { type: "text/javascript" }));
+    await ctx.audioWorklet.addModule(url);
+    const node = new AudioWorkletNode(ctx, "smg-audio", {
+      outputChannelCount: [2],
+      processorOptions: { buffer: Module.HEAPU8.buffer, ring: Module._web_audio_ring(), frames: Module._web_audio_ring_frames() },
+    });
+    node.connect(ctx.destination);
+    await ctx.resume();
+    console.log(`web: audio on, ${ctx.sampleRate} Hz`);
+  } catch (e) {
+    startAudio.started = false;
+    console.log("web: audio failed: " + e);
+  }
+}
+for (const ev of ["keydown", "pointerdown"]) addEventListener(ev, startAudio, { capture: true });
+
 function boot(args) {
   importPanel.style.display = "none";
   const canvas = document.getElementById("canvas");
@@ -157,6 +219,9 @@ function boot(args) {
       if (/joined room|present:|disc:|web:/.test(t)) say(t);
     },
     onAbort: (e) => say("aborted: " + e),
+    onRuntimeInitialized: () => {
+      if (params.get("audio") === "auto") startAudio();  // automated runs (autoplay allowed by flag)
+    },
   };
   const s = document.createElement("script");
   s.src = "smg.js";
@@ -177,6 +242,12 @@ function boot(args) {
     const smg = await root.getDirectoryHandle("smg", { create: true });
     await smg.removeEntry("game", { recursive: true }).catch(() => {});
   }
-  if (!(await importedManifest())) await showImport();
+  if (!(await importedManifest())) {
+    await showImport();
+    // Start the game in a fresh page: the import leaves a gigabyte of file
+    // data behind in this one.
+    location.replace(location.href.replace(/[?&]reimport=1/, ""));
+    return;
+  }
   boot(["--game", "/opfs/smg/game"]);
 })();
