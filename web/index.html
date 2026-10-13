@@ -37,7 +37,7 @@
   /* The game draws 16:9 squeezed into its 640x456 frame (the port's
      SCGetAspectRatio says 16:9), so it is shown at 16:9, or stretched to
      the whole window when Picture says so. */
-  canvas { width: min(100vw, calc(100dvh * 16 / 9)); aspect-ratio: 16 / 9; background: #000; display: none; outline: none; }
+  canvas { width: min(100vw, calc(100dvh * 16 / 9)); aspect-ratio: 16 / 9; background: #000; display: none; outline: none; cursor: none; }  /* the game draws its own pointer */
   body.stretch canvas { width: 100vw; height: 100dvh; aspect-ratio: auto; }
   #stage { position: relative; display: none; }
   #stage canvas { display: block; }
@@ -124,12 +124,14 @@
     box-shadow: 0 2px 6px #000a; }
   #gear:hover, #gear[aria-expanded="true"] { border-color: var(--wii-blue); box-shadow: 0 0 10px var(--wii-blue); color: var(--wii-blue-deep); }
   #roombar { display: none; position: fixed; top: 12px; right: 66px; z-index: 3; max-width: min(520px, calc(100vw - 90px));
-    padding: 6px 14px; min-height: 44px; font-size: 14px; line-height: 1.35; color: var(--ink);
+    padding: 0 16px; min-height: 44px; font-size: 14px; line-height: 1.35; color: var(--ink);
     background: var(--face); border: 2px solid var(--wii-blue); border-radius: 22px; box-shadow: 0 0 10px var(--wii-glow), 0 2px 6px #000a; }
   /* Panels read like Wii UI, not a web page: no text selection (fields still allow it). */
   #roombar, .screen, #settings, .toast, #tags { -webkit-user-select: none; user-select: none; }
   .wii-input { -webkit-user-select: text; user-select: text; }
-  #roombar .rb-head { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
+  #roombar .rb-head { display: flex; align-items: center; gap: 8px; height: 40px; line-height: 1; white-space: nowrap; }
+  #roombar .rb-head > * { display: inline-flex; align-items: center; }
+  #roombar .rb-who { padding-bottom: 8px; margin-top: -4px; }
   #roombar b { color: var(--wii-blue-deep); letter-spacing: .15em; font-size: 17px; }
   #roombar .rb-count { display: inline-flex; align-items: center; gap: 4px; margin-left: 4px; font-weight: 600; font-size: 16px; color: var(--ink); }
   #roombar .rb-count svg { width: 16px; height: 16px; fill: currentColor; }
