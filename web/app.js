@@ -191,8 +191,11 @@ async function startAudio() {
     await ctx.audioWorklet.addModule(url);
     const node = new AudioWorkletNode(ctx, "smg-audio", {
       outputChannelCount: [2],
-      processorOptions: { buffer: Module.HEAPU8.buffer, ring: Module._web_audio_ring(), frames: Module._web_audio_ring_frames() },
+      // The ring sits above 2 GB (the game image is at 0x98000000): read the
+      // returned pointer as unsigned.
+      processorOptions: { buffer: Module.HEAPU8.buffer, ring: Module._web_audio_ring() >>> 0, frames: Module._web_audio_ring_frames() },
     });
+    node.onprocessorerror = (e) => console.log("web: audio worklet failed: " + (e.message || e));
     node.connect(ctx.destination);
     await ctx.resume();
     console.log(`web: audio on, ${ctx.sampleRate} Hz`);
