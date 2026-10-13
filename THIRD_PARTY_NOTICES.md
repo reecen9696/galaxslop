@@ -13,3 +13,4 @@ Add an entry for every new dependency, and a DECISIONS.md line explaining why.
 
 Super Mario Galaxy and Mario are trademarks of Nintendo. This project contains no Nintendo game data.
 - M PLUS 1p (The M+ Project Authors): SIL Open Font License 1.1. Latin subset in `web/fonts/`, license in `web/fonts/OFL.txt` (D-023).
+- three.js 0.169.0 (three.js authors): MIT. Core build and the FBX loader with its imports, in `web/vendor/three/`, license in `web/vendor/three/LICENSE` (D-024).

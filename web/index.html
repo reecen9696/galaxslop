@@ -155,6 +155,26 @@
     border: 2px solid var(--wii-blue); border-radius: 14px; box-shadow: 0 0 12px var(--wii-glow), 0 4px 14px #000b; }
   #perfbox { position: fixed; top: 12px; left: 12px; z-index: 3; font: 12px ui-monospace, monospace; color: #9fe39f; background: #000a; padding: 6px 8px; border-radius: 6px; display: none; white-space: pre; }
 
+  /* ---- first-visit loading screen: Luma over the bar, in space ---- */
+  #luma, #loadingTitle, #loadingNote { display: none; }
+  body.loading { background:
+      radial-gradient(1.5px 1.5px at 12% 18%, #fff, transparent), radial-gradient(1px 1px at 27% 72%, #cfe3ff, transparent),
+      radial-gradient(1.5px 1.5px at 41% 33%, #fff8d0, transparent), radial-gradient(1px 1px at 58% 84%, #fff, transparent),
+      radial-gradient(2px 2px at 69% 22%, #fff, transparent), radial-gradient(1px 1px at 83% 61%, #d8e8ff, transparent),
+      radial-gradient(1.5px 1.5px at 91% 12%, #fff, transparent), radial-gradient(1px 1px at 6% 88%, #fff, transparent),
+      radial-gradient(1px 1px at 35% 9%, #fff, transparent), radial-gradient(1.5px 1.5px at 76% 92%, #fff6c8, transparent),
+      radial-gradient(ellipse at 50% 45%, #1a2c5c 0%, #0a1230 45%, #03050e 100%); }
+  body.loading #wrap { gap: 14px; font-size: var(--ui-size); }
+  body.loading #loadingTitle { display: block; font-size: 1.6em; font-weight: 600; color: #fff; text-shadow: 0 0 .5em #6fb8ff88; letter-spacing: .01em; }
+  body.loading #luma { display: block; width: min(680px, 94vw); height: min(300px, 42dvh); margin-bottom: -6px; }
+  body.loading #luma canvas { display: block; width: 100%; height: 100%; background: transparent; cursor: default; }
+  body.loading #progress { width: min(460px, 80vw); height: 16px; }
+  body.loading #status { color: var(--fg); font-size: 1em; }
+  body.loading #loadingNote { display: block; color: var(--dim); font-size: .9em; }
+  #musicHint { position: fixed; left: 16px; bottom: 16px; z-index: 6; padding: 6px 14px; font-size: 13px; font-weight: 600; color: var(--ink);
+    background: var(--face); border: 2px solid var(--wii-blue); border-radius: 16px; box-shadow: 0 0 10px var(--wii-glow); pointer-events: none; }
+  #musicHint[hidden] { display: none; }
+
   @media (max-width: 560px) {
     .screen { font-size: 14px; }
     .tab { font-size: 1.15em; min-width: 0; left: 24px; padding-right: 1.2em; }
@@ -211,8 +231,11 @@
       <footer><button id="serverBtn" class="pill" aria-controls="serverBox" aria-expanded="false">Server</button></footer>
     </div>
   </section>
+  <div id="loadingTitle">Getting the galaxy ready</div>
+  <div id="luma" aria-hidden="true"></div>
   <progress id="progress" max="1" value="0"></progress>
   <div id="status">loading…</div>
+  <div id="loadingNote">First visit only: the game is copied into this browser once.</div>
 </div>
 <div id="roombar"></div>
 <div id="perfbox"></div>
@@ -233,7 +256,9 @@
   <div class="row"><button id="reimport" class="wii-btn">Load the disc again</button></div>
   <div class="row"><button id="deleteAll" class="wii-btn">Delete all data</button></div>
 </div>
-<audio id="bgm" src="music/wii-menu.mp3" loop preload="auto"></audio>
+<audio id="bgm" loop preload="auto"></audio>
+<div id="musicHint" hidden>♪ Click anywhere for music</div>
+<script type="importmap">{ "imports": { "three": "./vendor/three/build/three.module.min.js" } }</script>
 <script src="cook/cooker.js"></script>
 <script src="app.js"></script>
 </body>

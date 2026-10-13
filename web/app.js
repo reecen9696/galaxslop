@@ -55,6 +55,7 @@ async function importFromServer(base, manifestText) {
   let done = 0;
   const started = performance.now();
   progress.style.display = "block";
+  showLoading();
   const dirs = new Map([["", game]]);
   async function dirFor(path) {
     let key = "", dir = game;
@@ -216,6 +217,17 @@ function showImport() {
   startMenuMusic();
   say("");
   const input = document.getElementById("pickInput");
+  // The chosen folder is copied or converted under the loading screen; on a
+  // problem the import screen comes back with the message.
+  async function load(source) {
+    importPanel.style.display = "none";
+    showLoading();
+    if (await importFolder(source)) return true;
+    hideLoading();
+    importPanel.style.display = "block";
+    startMenuMusic("menu");
+    return false;
+  }
   return new Promise((resolve) => {
     document.getElementById("pick").onclick = async () => {
       if (window.showDirectoryPicker) {
@@ -225,13 +237,13 @@ function showImport() {
         } catch {
           return; // cancelled
         }
-        if (await importFolder(dir)) resolve();
+        if (await load(dir)) resolve();
       } else {
         input.click();
       }
     };
     input.onchange = async () => {
-      if (input.files.length && (await importFolder([...input.files]))) resolve();
+      if (input.files.length && (await load([...input.files]))) resolve();
     };
   });
 }
@@ -305,24 +317,41 @@ async function startAudio() {
 }
 for (const ev of ["keydown", "pointerdown"]) addEventListener(ev, startAudio, { capture: true });
 
-// Menu music: the Wii Menu theme loops on the opening screens (import,
-// lobby) and fades out when the game starts.  web/music/wii-menu.mp3 is not
-// in git (copyrighted); without it the page is silent.  Browsers block
-// autoplay until the first click or key, so a blocked start retries then.
+// Music: the Wii Menu theme loops on the opening screens (import, lobby),
+// Comet Observatory, a little quieter, on the first-visit loading screen;
+// both fade out when the game starts.  The files (web/music/) are not in git
+// (copyrighted); without them the page is silent.  Browsers block autoplay
+// until the first click or key, so a blocked start shows a hint and retries
+// then.
 const bgm = document.getElementById("bgm");
+const musicHint = document.getElementById("musicHint");
+const kTracks = { menu: { src: "music/wii-menu.mp3", level: 0.6 }, loading: { src: "music/comet-observatory.mp3", level: 0.35 } };
+const missingTracks = new Set();
+let track = "";
 const musicOn = () => store("smg.music") !== "0";
-const musicVolume = () => 0.6 * Number(store("smg.volume") ?? 0.8);
-function startMenuMusic() {
-  if (!musicOn() || bgm.dataset.state === "done" || bgm.dataset.state === "missing") return;
+const musicVolume = () => (kTracks[track]?.level ?? 0.6) * Number(store("smg.volume") ?? 0.8);
+function startMenuMusic(name = "menu") {
+  if (bgm.dataset.state === "done") return;
+  if (name !== track) {
+    track = name;
+    bgm.src = kTracks[name].src;
+    if (bgm.dataset.state !== "waiting") bgm.dataset.state = "";
+  }
+  if (!musicOn() || missingTracks.has(track)) return;
   bgm.volume = musicVolume();
-  bgm.play().then(() => (bgm.dataset.state = "playing")).catch(() => {
-    if (bgm.dataset.state === "waiting") return;
+  bgm.play().then(() => {
+    bgm.dataset.state = "playing";
+    musicHint.hidden = true;
+  }).catch(() => {
+    if (bgm.dataset.state === "waiting" || missingTracks.has(track)) return;
     bgm.dataset.state = "waiting";
+    musicHint.hidden = false;
     const retry = () => {
       removeEventListener("pointerdown", retry, true);
       removeEventListener("keydown", retry, true);
+      musicHint.hidden = true;
       bgm.dataset.state = "";
-      startMenuMusic();
+      startMenuMusic(track);
     };
     addEventListener("pointerdown", retry, true);
     addEventListener("keydown", retry, true);
@@ -330,6 +359,7 @@ function startMenuMusic() {
 }
 function stopMenuMusic(fadeMs = 800) {
   bgm.dataset.state = "done";
+  musicHint.hidden = true;
   if (bgm.paused) return;
   const v0 = bgm.volume, t0 = performance.now();
   const step = () => {
@@ -340,7 +370,40 @@ function stopMenuMusic(fadeMs = 800) {
   };
   requestAnimationFrame(step);
 }
-bgm.addEventListener("error", () => (bgm.dataset.state = "missing"));
+bgm.addEventListener("error", () => {
+  missingTracks.add(track);
+  musicHint.hidden = true;
+});
+
+// First-visit loading screen: Luma dances above the bar (web/luma.js, which
+// pulls in three.js only now) to Comet Observatory.  ?demo=loading shows it
+// with a fake bar, to look at without clearing browser storage.
+let luma = null;
+function showLoading() {
+  document.body.classList.add("loading");
+  startMenuMusic("loading");
+  luma ??= import("./luma.js")
+    .then((m) => m.startLuma(document.getElementById("luma")))
+    .catch((e) => {
+      console.log("web: no dancing Luma: " + e.message);
+      return null;
+    });
+}
+function hideLoading() {
+  document.body.classList.remove("loading");
+  luma?.then((l) => l?.stop());
+  luma = null;
+}
+function runLoadingDemo() {
+  showLoading();
+  progress.style.display = "block";
+  const total = 1180, t0 = performance.now();
+  setInterval(() => {
+    const f = ((performance.now() - t0) / 30000) % 1;
+    progress.value = f;
+    say(`loading the game ${Math.round(f * total)} / ${total} MB`);
+  }, 100);
+}
 
 // Lobby (P2-06): name, room code and relay, remembered in localStorage.
 // Skipped when the URL already says (?SMG_RELAY=... or ?solo=1).
@@ -752,6 +815,7 @@ function setupSettings() {
 setupSettings();
 
 (async () => {
+  if (params.get("demo") === "loading") return runLoadingDemo();
   if (!crossOriginIsolated) {
     say("This page needs cross-origin isolation (COOP/COEP headers): serve it with web/dev-server.mjs.");
     return;
@@ -780,6 +844,8 @@ setupSettings();
         return;
       } catch (e) {
         console.log("web: pre-loading the game failed: " + e.message);
+        hideLoading();
+        progress.style.display = "none";
         say("Loading the game from the server failed (" + e.message + "). You can load it from a folder instead.");
       }
     }
