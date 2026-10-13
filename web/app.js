@@ -14,6 +14,20 @@ const progress = document.getElementById("progress");
 const params = new URLSearchParams(location.search);
 var smgLog = []; // recent game log lines, for automated checks
 
+// Everything the page and the game log (the game prints through console.log),
+// for Settings > Send log.
+const pageLog = [];
+for (const k of ["log", "warn", "error"]) {
+  const orig = console[k].bind(console);
+  console[k] = (...a) => {
+    pageLog.push((k === "log" ? "" : k + ": ") + a.map(String).join(" "));
+    if (pageLog.length > 4000) pageLog.shift();
+    orig(...a);
+  };
+}
+addEventListener("error", (e) => console.error(`${e.message} (${e.filename}:${e.lineno})`));
+addEventListener("unhandledrejection", (e) => console.error("unhandled: " + (e.reason?.stack || e.reason)));
+
 // While the game runs the status line floats over the bottom of the canvas
 // and fades a few seconds after each message.
 function say(text) {
@@ -828,6 +842,35 @@ async function saveDir(create) {
   const root = await navigator.storage.getDirectory();
   return (await root.getDirectoryHandle("smg", { create })).getDirectoryHandle("save", { create });
 }
+// Settings > Send log: posts the device, its GPU and the log to the server
+// (server/src/report.ts), which answers with a code to pass on.
+async function sendLog() {
+  const note = document.getElementById("sendLogNote");
+  note.hidden = false;
+  note.textContent = "Sending...";
+  const info = [`url: ${location.href}`, `agent: ${navigator.userAgent}`,
+    `screen: ${screen.width}x${screen.height} @${devicePixelRatio}, window ${innerWidth}x${innerHeight}, body: ${document.body.className}`,
+    `isolated: ${crossOriginIsolated}, cores: ${navigator.hardwareConcurrency}, memory: ${navigator.deviceMemory ?? "?"} GB`];
+  try {
+    const gl = document.createElement("canvas").getContext("webgl2");
+    const ext = gl?.getExtension("WEBGL_debug_renderer_info");
+    info.push(`webgl2: ${gl ? (ext ? gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) + " / " + gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)) : "none"}`);
+  } catch (e) { info.push("webgl2: " + e); }
+  try {
+    const a = await navigator.gpu?.requestAdapter();
+    info.push(`webgpu: ${a ? JSON.stringify(a.info ?? {}) : navigator.gpu ? "no adapter" : "none"}`);
+  } catch (e) { info.push("webgpu: " + e); }
+  const c = document.getElementById("canvas");
+  info.push(`canvas: ${c.width}x${c.height}, shown ${c.clientWidth}x${c.clientHeight}`);
+  try {
+    const r = await fetch("report", { method: "POST", headers: { "Content-Type": "text/plain" }, body: info.join("\n") + "\n\n" + pageLog.join("\n") });
+    if (!r.ok) throw new Error("server said " + r.status);
+    note.textContent = `Sent. Code: ${(await r.json()).code}`;
+  } catch (e) {
+    note.textContent = "Couldn't send: " + e.message;
+  }
+}
+
 async function exportSave() {
   const files = [];
   async function walk(dir, prefix) {
@@ -974,6 +1017,7 @@ function setupSettings() {
     const f = (o) => v.getFloat32(o, true).toFixed(1);
     perfbox.textContent = `${v.getUint32(16, true)} fps   game frame ${v.getUint32(20, true)}\npresent  ${f(0)} / ${f(4)} ms (p50/p95)\ninterval ${f(8)} / ${f(12)} ms`;
   }, 500);
+  document.getElementById("sendLog").onclick = sendLog;
   document.getElementById("exportSave").onclick = exportSave;
   const imp = document.getElementById("importSaveInput");
   document.getElementById("importSave").onclick = () => imp.click();

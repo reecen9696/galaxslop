@@ -6,6 +6,7 @@
 import { createServer } from "node:http";
 import { WebSocketServer, type WebSocket } from "ws";
 import { Relay, type Conn } from "./relay.ts";
+import { reportHandler } from "./report.ts";
 import { staticHandler } from "./static.ts";
 
 export function startServer(port: number, log: (m: string) => void = console.log): { close: () => Promise<void>; port: () => number; ready: Promise<void> } {
@@ -19,8 +20,10 @@ export function startServer(port: number, log: (m: string) => void = console.log
   // /healthz: for the host's health check, with or without STATIC_DIR.
   // /room/<code>: whether a room exists and how full it is, so the lobby
   // refuses a wrong code before starting the game (any origin may ask: the
-  // dev page is on another port).
+  // dev page is on another port).  /report: logs players send (report.ts).
+  const report = reportHandler(log);
   const http = createServer((req, res) => {
+    if (report(req, res)) return;
     const room = /^\/room\/([A-Za-z0-9]{1,16})$/.exec(req.url ?? "");
     if (req.url === "/healthz") res.writeHead(200, { "Content-Type": "text/plain" }).end("ok\n");
     else if (room) {
