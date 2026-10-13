@@ -143,9 +143,6 @@ static void readInput(PortPadState* pad, bool* quit) {
         if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat && e.key.key == SDLK_F11) {
             port_net_debug_request_mode(102);  // drop coins and star bits
         }
-        if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat && e.key.key == SDLK_F12) {
-            port_net_debug_request_mode(103);  // beat the nearest boss (its star appears)
-        }
     }
     const bool* k = SDL_GetKeyboardState(nullptr);
     memset(pad, 0, sizeof(*pad));
@@ -155,7 +152,7 @@ static void readInput(PortPadState* pad, bool* quit) {
     pad->stickY = (k[SDL_SCANCODE_W] ? 1.0f : 0.0f) - (k[SDL_SCANCODE_S] ? 1.0f : 0.0f);
     if (k[SDL_SCANCODE_SPACE]) pad->buttons |= kA;
     if (k[SDL_SCANCODE_K]) pad->buttons |= kB;
-    if (k[SDL_SCANCODE_LCTRL] || k[SDL_SCANCODE_RCTRL]) pad->buttons |= kZ;
+    if (k[SDL_SCANCODE_Q] || k[SDL_SCANCODE_LCTRL] || k[SDL_SCANCODE_RCTRL]) pad->buttons |= kZ;  // Q as in the browser
     if (k[SDL_SCANCODE_C]) pad->buttons |= kC;
     if (k[SDL_SCANCODE_RETURN] || k[SDL_SCANCODE_ESCAPE]) pad->buttons |= kPlus;
     if (k[SDL_SCANCODE_BACKSPACE]) pad->buttons |= kMinus;

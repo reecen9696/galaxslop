@@ -68,7 +68,7 @@ void port_world_star_got(int id);
 // PowerStar.cpp: pulls a waiting star onto the local player so he grabs it
 // (1), 2 if it is being grabbed already, 0 if it cannot be yet.
 int port_power_star_pull_to_player(void* star);
-// Debug (F12): beat the nearest event star host (as a boss's defeat does).
+// Debug (mode 103): beat the nearest event star host (as a boss's defeat does).
 void port_world_debug_event_star(float x, float y, float z);
 // Debug: the local player grabs the nearest waiting power star.
 void port_world_debug_grab_star(void);

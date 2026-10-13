@@ -1032,7 +1032,7 @@ void applyDebugModes() {
     if (!MR::isExistMario()) {
         return;
     }
-    if (mode == 103) {  // F12: beat the nearest event star host (boss) (world sync test)
+    if (mode == 103) {  // beat the nearest event star host (boss) (world sync test)
         sPending = -1;
         const TVec3f& p = *MR::getPlayerPos();
         port_world_debug_event_star(p.x, p.y, p.z);

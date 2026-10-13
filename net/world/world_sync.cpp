@@ -854,7 +854,7 @@ extern "C" void port_world_debug_drop(float x, float y, float z) {
     MR::appearStarPiece(static_cast< const NameObj* >(w.lootHost), pos, 5, 10.0f, 40.0f, false);
 }
 
-// Debug (F12): the nearest declared event star host (a boss) is beaten: its
+// Debug (mode 103): the nearest declared event star host (a boss) is beaten: its
 // star appears, as its defeat would request.
 extern "C" void port_world_debug_event_star(float x, float y, float z) {
     World& w = world();

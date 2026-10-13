@@ -648,6 +648,12 @@ function boot(args, env = {}) {
   importPanel.style.display = "none";
   stopMenuMusic();
   document.body.classList.add("playing");
+  // Closing or leaving the tab mid-game (Ctrl+W, a stray click) asks first.
+  window.addEventListener("beforeunload", (e) => {
+    if (window.smgLeaving) return;
+    e.preventDefault();
+    e.returnValue = "";
+  });
   status.textContent = "";
   if (env.SMG_RELAY) {
     roombar.dataset.mode = "net";
@@ -764,6 +770,7 @@ async function importSave(file) {
     await w.write(data);
     await w.close();
   }
+  window.smgLeaving = true;
   location.reload();
 }
 function setupSettings() {
@@ -866,6 +873,7 @@ function setupSettings() {
   document.getElementById("importSave").onclick = () => imp.click();
   imp.onchange = () => imp.files[0] && importSave(imp.files[0]);
   document.getElementById("reimport").onclick = () => {
+    window.smgLeaving = true;
     location.href = location.pathname + "?reimport=1";
   };
   document.getElementById("deleteAll").onclick = async () => {
@@ -877,6 +885,7 @@ function setupSettings() {
     }
     const root = await navigator.storage.getDirectory();
     await root.removeEntry("smg", { recursive: true }).catch(() => {});
+    window.smgLeaving = true;
     location.href = location.pathname;
   };
 }

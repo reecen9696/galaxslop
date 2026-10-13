@@ -48,7 +48,7 @@ bool sMouseL = false, sMouseR = false;
 bool sCursorActive = false;  // the gamepad's virtual pointer, until the mouse moves
 
 bool isGameKey(const char* code) {
-    static const char* const kKeys[] = {"KeyW", "KeyA", "KeyS", "KeyD", "Space", "KeyK", "ControlLeft", "ControlRight", "KeyC", "Enter",
+    static const char* const kKeys[] = {"KeyW", "KeyA", "KeyS", "KeyD", "Space", "KeyK", "KeyQ", "KeyC", "Enter",
                                         "Backspace", "Digit1", "Digit2", "KeyH", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
                                         "KeyJ", "ShiftLeft"};
     for (const char* k : kKeys) {
@@ -271,7 +271,9 @@ void web_read_input(PortPadState* pad) {
     pad->stickY = (held("KeyW") ? 1.0f : 0.0f) - (held("KeyS") ? 1.0f : 0.0f);
     if (held("Space")) pad->buttons |= kA;
     if (held("KeyK") || sMouseR) pad->buttons |= kB;
-    if (held("ControlLeft") || held("ControlRight")) pad->buttons |= kZ;
+    // Not Ctrl: Ctrl+W/D/S with the movement keys are the browser's (close
+    // the tab, bookmark, save), and a page cannot stop Ctrl+W.
+    if (held("KeyQ")) pad->buttons |= kZ;
     if (held("KeyC")) pad->buttons |= kC;
     if (held("Enter")) pad->buttons |= kPlus;  // Esc is the page's: it shows the cursor
     if (held("Backspace")) pad->buttons |= kMinus;

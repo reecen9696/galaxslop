@@ -40,7 +40,7 @@ through Apple's OpenGL 4.1 (on Metal).
 | A (jump) | Space |
 | B | K, right click |
 | Spin (shake) | J, Left Shift, left click |
-| Z (crouch) | Ctrl |
+| Z (crouch) | Q (desktop: also Ctrl) |
 | C | C |
 | + / − | Enter or Esc / Backspace |
 | 1 / 2 | 1 / 2 |
@@ -119,8 +119,8 @@ SMG_RELAY=ws://<host-ip>:8787 SMG_ROOM=PLAY22 SMG_NAME=Reece ./build/native/smg 
   skips the title, file select and prologue; `PETARI_QUICKSTART_LUIGI=1`).
   In a window F1-F8 switch your power-up form (normal, rainbow, fire, ice,
   bee, spring, boo, flying), F9 squashes you, F10 defeats the nearest
-  enemy, F11 drops coins and star bits and F12 beats the nearest boss (its star
-  appears; PETARI_DEBUG_MODES `104` grabs the nearest waiting star) (world sync tests); `PETARI_DEBUG_MODES` schedules
+  enemy, F11 drops coins and star bits (PETARI_DEBUG_MODES `103` beats the nearest
+  boss so its star appears, `104` grabs the nearest waiting star) (world sync tests); `PETARI_DEBUG_MODES` schedules
   them. Ground-pound another player to squash them (one health); jumping on
   them just bounces you and makes them flinch.
   `PETARI_LOOPBACK=0 PETARI_LOOPBACK_SIDE=110` draws a copy of yourself
