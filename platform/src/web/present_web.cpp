@@ -106,6 +106,8 @@ static void recordTiming(double presentMs);
 static std::atomic<int> sAutoMax{0};  // auto render scale: highest scale, 0 = off (see recordTiming)
 static int sHold = 0;                  // frames to keep the previous picture for
 static void updateNameTags();
+static void loadShaderKeys();
+static void saveShaderKeys();
 
 bool web_present_init(int scale) {
     sEventThread = pthread_self();
@@ -144,6 +146,7 @@ bool web_present_init(int scale) {
     sEfb = gpu::renderer().createTarget(kEfbW * s, kEfbH * s);
     emscripten_set_canvas_element_size("#canvas", kEfbW * s, kEfbH * s);
     port_log("present: WebGL2 ready, EFB %dx%d", sEfb.width, sEfb.height);
+    loadShaderKeys();
 
     const pthread_t self = EM_CALLBACK_THREAD_CONTEXT_CALLING_THREAD;
     emscripten_set_keydown_callback_on_thread(EMSCRIPTEN_EVENT_TARGET_WINDOW, nullptr, true, onKey, self);
@@ -161,7 +164,13 @@ void web_present_frame() {
     double t0 = emscripten_get_now();
     gpu::Renderer& r = gpu::renderer();
     r.update();
+    double t1 = emscripten_get_now();
     r.render(sEfb, nullptr, nullptr);
+    static const bool perfLog = getenv("PETARI_PERFLOG") != nullptr;
+    double t2 = emscripten_get_now();
+    if (perfLog && t2 - t0 > 12) {
+        port_log("web: slow present %.1f ms (update %.1f, render %.1f)", t2 - t0, t1 - t0, t2 - t1);
+    }
     // Keep the last complete picture on screen rather than show one with
     // draws missing (a program still compiling: a skipped full-screen pass
     // turned the whole frame black) or a just-recreated target.  Not
@@ -188,6 +197,8 @@ void web_present_frame() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     recordTiming(emscripten_get_now() - t0);
     updateNameTags();
+    static int sFrames = 0;
+    if (++sFrames % 300 == 0) saveShaderKeys();  // every ~5 s
 }
 
 // Gamepad (standard mapping) on top of keyboard/mouse, per BUILD_SPEC
@@ -455,5 +466,57 @@ extern "C" EMSCRIPTEN_KEEPALIVE RemoteList* web_remote_list(void) {
     return &sRemotes;
 }
 extern "C" EMSCRIPTEN_KEEPALIVE void web_follow(int slot) { port_net_request_follow(slot); }
+
+// Shader warm-up (P1-06): every program key the renderer builds is saved to
+// OPFS; the next session compiles them in the background from the loading
+// screen on, so effects seen before don't stall the frame when they appear.
+static const char* const kShaderKeysPath = "/opfs/smg/shaders.bin";
+static std::unordered_set<std::string> sSavedKeys;
+static size_t sKeySize = 0;
+
+static void loadShaderKeys() {
+    FILE* f = fopen(kShaderKeysPath, "rb");
+    if (!f) return;
+    std::string all;
+    char buf[65536];
+    size_t n;
+    while ((n = fread(buf, 1, sizeof(buf), f)) > 0) all.append(buf, n);
+    fclose(f);
+    // The file starts with the key size, so a key layout change starts over.
+    if (all.size() < 4) return;
+    uint32_t size;
+    memcpy(&size, all.data(), 4);
+    std::vector<uint8_t> probe;
+    if (size == 0 || (all.size() - 4) % size != 0) return;
+    sKeySize = size;
+    for (size_t at = 4; at + size <= all.size(); at += size) sSavedKeys.insert(all.substr(at, size));
+    std::string keys;
+    for (const std::string& k : sSavedKeys) keys += k;
+    gpu::renderer().queueWarmUp(keys.data(), keys.size());
+    port_log("present: warming up %zu shader programs from earlier sessions", sSavedKeys.size());
+}
+
+static void saveShaderKeys() {
+    std::vector<uint8_t> fresh;
+    size_t n = gpu::renderer().takeNewShaderKeys(fresh);
+    if (n == 0) return;
+    size_t size = fresh.size() / n;
+    std::string out;
+    for (size_t i = 0; i < n; i++) {
+        std::string k((const char*)fresh.data() + i * size, size);
+        if (sSavedKeys.insert(k).second) out += k;
+    }
+    if (out.empty()) return;
+    bool start = sKeySize != size;
+    FILE* f = fopen(kShaderKeysPath, start ? "wb" : "ab");
+    if (!f) return;
+    if (start) {
+        uint32_t s32 = (uint32_t)size;
+        fwrite(&s32, 4, 1, f);
+        sKeySize = size;
+    }
+    fwrite(out.data(), 1, out.size(), f);
+    fclose(f);
+}
 
 unsigned long long web_present_frame_number() { return gpu::renderer().frameNumber(); }

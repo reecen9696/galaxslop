@@ -7,6 +7,7 @@
 #include "port/gl.h"
 
 #include <memory>
+#include <vector>
 
 #include "gx_record.h"
 
@@ -105,6 +106,11 @@ public:
     // compiling (GL_KHR_parallel_shader_compile, or Android's compile
     // thread): the picture is incomplete.  Failed programs do not count.
     int lastSkippedDraws() const;
+    // Shader warm-up (browser): raw ShaderUid keys saved from earlier
+    // sessions compile in the background; takeNewShaderKeys hands out the
+    // keys built since the last call, for the platform to save.
+    void queueWarmUp(const void* keys, size_t bytes);
+    size_t takeNewShaderKeys(std::vector<uint8_t>& out);
     uint64_t frameNumber() const;
 
     // Replays the current frame into `efb`.  With `eye`, the perspective 3D

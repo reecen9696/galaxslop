@@ -193,7 +193,13 @@ struct DataTex {
         }
         glBindTexture(GL_TEXTURE_2D, tex);
         if (needRows > rows) {
-            rows = needRows + needRows / 4;
+            // 1.5x (at least 64 rows): every growth reallocates the whole
+            // texture.  Doubling was worse: a row is 32 KB of RGBA32F, and the
+            // browser zero-fills a 100+ MB allocation for 250 ms.
+            int was = rows;
+            rows = needRows + needRows / 2 > 64 ? needRows + needRows / 2 : 64;
+            static const bool perfLog = debugEnv("PETARI_PERFLOG") != nullptr;
+            if (perfLog) port_log("upload: data texture grows %d -> %d rows (%d KB)", was, rows, rows * kDataTexWidth * (isFloat ? 16 : 4) / 1024);
             glTexImage2D(GL_TEXTURE_2D, 0, (GLint)internal, kDataTexWidth, rows, 0, format, type, nullptr);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -397,6 +403,14 @@ struct Renderer::Impl {
         GLuint prog, vs, fs;
     };
     std::unordered_map<ShaderUid, AsyncProgram, ShaderUidHash> asyncPrograms;
+    // Starting a compile is not free in the browser (Chrome translates and
+    // validates the GLSL synchronously): at most a few new ones per frame,
+    // the rest wait their turn (counted as pending, so the presenter holds
+    // the previous picture rather than show the frame without them).
+    int compileStarts = 0;
+    std::deque<ShaderUid> deferredCompiles;
+    std::deque<ShaderUid> warmUp;        // keys from earlier sessions, compiled ahead
+    std::vector<ShaderUid> newKeys;      // built this session, for the platform to save
     GLuint programAsync(const ShaderUid& uid);
     std::deque<ShaderUid> compileQueue;
     std::condition_variable compileCv;
@@ -738,6 +752,13 @@ GLuint Renderer::Impl::program(const ShaderUid& uid, bool sync) {
 GLuint Renderer::Impl::programAsync(const ShaderUid& uid) {
     auto it = asyncPrograms.find(uid);
     if (it == asyncPrograms.end()) {
+        const int kStartsPerFrame = 3;
+        if (compileStarts >= kStartsPerFrame) {
+            pendingPrograms.insert(uid);  // waiting for a start slot
+            return 0;
+        }
+        compileStarts++;
+        pendingPrograms.erase(uid);
         std::string vsrc, fsrc;
         generateSources(uid, &vsrc, &fsrc);
         AsyncProgram a;
@@ -786,6 +807,7 @@ GLuint Renderer::Impl::programAsync(const ShaderUid& uid) {
     glDeleteShader(a.vs);
     glDeleteShader(a.fs);
     programs[uid] = prog;  // 0 stays: a failed program is not retried
+    if (prog) newKeys.push_back(uid);
     static int built = 0;
     if ((++built % 50) == 0) {
         port_log("gl: %d shader programs built (parallel compile)", built);
@@ -1695,13 +1717,14 @@ void Builder::build(std::shared_ptr<const Frame> frame, Prepared& out) {
 // Render thread: uploads a built frame and resolves its programs.
 void Renderer::Impl::upload(Prepared& p, bool syncPrograms) {
     const Frame& f = *p.frame;
+    int64_t tStart = port_host_time_ns();
     FrameBuffers& fb = frameBufs[frameBufNext];
     frameBufNext = (frameBufNext + 1) % 3;
     glBindVertexArray(0);  // the element buffer binding belongs to the bound VAO
     auto put = [&fb](int i, GLenum target, const void* data, size_t bytes) {
         glBindBuffer(target, fb.buf[i]);
         if (bytes > fb.cap[i]) {
-            fb.cap[i] = bytes + bytes / 4 + 4096;
+            fb.cap[i] = bytes + bytes / 2 > (1u << 20) ? bytes + bytes / 2 : (1u << 20);  // grow rarely (see DataTex)
             glBufferData(target, (GLsizeiptr)fb.cap[i], nullptr, GL_DYNAMIC_DRAW);
         }
         if (bytes) {
@@ -1723,6 +1746,9 @@ void Renderer::Impl::upload(Prepared& p, bool syncPrograms) {
     recBuf = fb.tex[2].tex;
     stateBuf = fb.tex[3].tex;
 
+    int64_t tBuffers = port_host_time_ns();
+    size_t texBytes = 0;
+    int texCount = 0;
     // New textures.
     for (auto& img : f.textures) {
         if (img->glTex && img->glVersion == img->version) {
@@ -1734,6 +1760,8 @@ void Renderer::Impl::upload(Prepared& p, bool syncPrograms) {
         glBindTexture(GL_TEXTURE_2D, img->glTex);
         const u32* px = img->rgba.data();
         u32 w = img->width, h = img->height;
+        texCount++;
+        texBytes += img->rgba.size() * 4;
         for (u32 l = 0; l < img->levels; l++) {
             glTexImage2D(GL_TEXTURE_2D, (GLint)l, GL_RGBA8, (GLsizei)w, (GLsizei)h, 0, GL_RGBA, GL_UNSIGNED_BYTE, px);
             px += (size_t)w * h;
@@ -1750,6 +1778,7 @@ void Renderer::Impl::upload(Prepared& p, bool syncPrograms) {
         }
     }
 
+    int64_t tTextures = port_host_time_ns();
     std::vector<GLuint> progs(p.uids.size());
     std::vector<char> pending(p.uids.size(), 0);
     for (size_t i = 0; i < p.uids.size(); i++) {
@@ -1759,6 +1788,13 @@ void Renderer::Impl::upload(Prepared& p, bool syncPrograms) {
             std::lock_guard<std::mutex> lock(progLock);
             pending[i] = asyncPrograms.count(p.uids[i]) || pendingPrograms.count(p.uids[i]);
         }
+    }
+    // PETARI_PERFLOG: say what a slow upload spent its time on.
+    static const bool perfLog = debugEnv("PETARI_PERFLOG") != nullptr;
+    int64_t tEnd = port_host_time_ns();
+    if (perfLog && tEnd - tStart > 8000000) {
+        port_log("upload: %.1f ms (buffers %.1f, %d textures %zu KB %.1f, programs %.1f)", (tEnd - tStart) / 1e6, (tBuffers - tStart) / 1e6,
+                 texCount, texBytes / 1024, (tTextures - tBuffers) / 1e6, (tEnd - tTextures) / 1e6);
     }
     p.pendingDraws = 0;
     for (Item& it : p.items) {
@@ -2482,12 +2518,51 @@ static void onFramePublished() {
     }
 }
 
+// Shader warm-up (browser): keys built in earlier sessions compile in the
+// background with the start slots frames leave free; finished ones are
+// collected here because no frame asks for them yet.
+void Renderer::queueWarmUp(const void* keys, size_t bytes) {
+    if (!sImpl) return;
+    std::lock_guard<std::mutex> lock(sImpl->progLock);
+    const ShaderUid* k = (const ShaderUid*)keys;
+    for (size_t i = 0; i < bytes / sizeof(ShaderUid); i++) sImpl->warmUp.push_back(k[i]);
+}
+
+size_t Renderer::takeNewShaderKeys(std::vector<uint8_t>& out) {
+    if (!sImpl) return 0;
+    std::lock_guard<std::mutex> lock(sImpl->progLock);
+    size_t n = sImpl->newKeys.size();
+    const uint8_t* b = (const uint8_t*)sImpl->newKeys.data();
+    out.insert(out.end(), b, b + n * sizeof(ShaderUid));
+    sImpl->newKeys.clear();
+    return n;
+}
+
 bool Renderer::update() {
     flushDeletes();
     if (!sImpl) {
         return false;
     }
     Impl& im = *sImpl;
+    // A new display frame: fresh compile-start slots.  One goes to the shader
+    // warm-up (keys from earlier sessions); compiles nobody asked for this
+    // frame are finished here.
+    if (sParallelCompile && !im.compiler.joinable()) {
+        std::lock_guard<std::mutex> lock(im.progLock);
+        im.compileStarts = 0;
+        while (im.compileStarts < 1 && !im.warmUp.empty()) {
+            ShaderUid uid = im.warmUp.front();
+            im.warmUp.pop_front();
+            if (!im.programs.count(uid) && !im.asyncPrograms.count(uid)) im.programAsync(uid);
+        }
+        ShaderUid inFlight[8];
+        int n = 0;
+        for (auto& kv : im.asyncPrograms) {
+            if (n == 8) break;
+            inFlight[n++] = kv.first;
+        }
+        for (int i = 0; i < n; i++) im.programAsync(inFlight[i]);
+    }
     if (!im.worker.joinable()) {
         im.startCompiler();
         PortHostAllocScope hostAlloc;
