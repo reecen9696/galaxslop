@@ -30,15 +30,19 @@ Deployment is P3-05 (a container on a cheap host, D-010).
 
 Every push to `main` builds the wasm, bundles the page and pushes
 `ghcr.io/reecen9696/galaxslop:latest` (amd64 + arm64,
-`.github/workflows/docker.yml`). On the host:
+`.github/workflows/docker.yml`).
+
+With HTTPS (what players need): `deploy/compose.yml` runs the image behind
+Caddy, which gets the certificate itself. On a machine with Docker and ports
+80 and 443 reachable from the internet:
 
 ```
-docker run -d --name smg --restart unless-stopped -p 8787:8787 \
-  -e ROOMS=PLAY22 ghcr.io/reecen9696/galaxslop:latest
+curl -O https://raw.githubusercontent.com/reecen9696/galaxslop/main/deploy/compose.yml
+DOMAIN=smg.example.com docker compose up -d     # a domain pointing at it
+DOMAIN=203-0-113-7.sslip.io docker compose up -d # or no domain: the public IP
 ```
 
-To update: `docker pull ghcr.io/reecen9696/galaxslop:latest`, then remove the
-container and run it again (or run Watchtower to do that for you). `/healthz`
-answers `ok`. Put HTTPS in front (Caddy, a Cloudflare tunnel, or the host's
-own TLS): the page needs a secure context, and the relay is `wss://` on the
-same origin.
+Players open `https://<DOMAIN>/`. Update to the latest build with
+`docker compose pull && DOMAIN=... docker compose up -d`. `/healthz` answers
+`ok`. Without the compose file, `docker run -p 8787:8787
+ghcr.io/reecen9696/galaxslop:latest` serves plain HTTP for localhost only.

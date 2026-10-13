@@ -1,0 +1,28 @@
+# The whole site with HTTPS, for a host with Docker and ports 80/443 open:
+#   curl -O https://raw.githubusercontent.com/reecen9696/galaxslop/main/deploy/compose.yml
+#   DOMAIN=smg.example.com docker compose up -d
+# No domain?  Use the server's public IP through sslip.io, e.g.
+#   DOMAIN=203-0-113-7.sslip.io docker compose up -d
+# Caddy gets and renews the certificate itself.  Update to the latest build:
+#   docker compose pull && DOMAIN=... docker compose up -d
+services:
+  smg:
+    image: ghcr.io/reecen9696/galaxslop:latest
+    restart: unless-stopped
+    environment:
+      ALLOWED_ORIGINS: https://${DOMAIN:?set DOMAIN}
+      ROOMS: ${ROOMS:-PLAY22}
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    command: caddy reverse-proxy --from ${DOMAIN:?set DOMAIN} --to smg:8787
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - caddy_data:/data
+    depends_on:
+      - smg
+volumes:
+  caddy_data:
