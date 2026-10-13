@@ -628,74 +628,72 @@ function boot(args, env = {}) {
   canvas.style.display = "block";
   document.getElementById("stage").style.display = "block";
   requestAnimationFrame(drawTags);
+  // Focus canvas and set up input capture during gameplay
   canvas.focus();
 
   // Input capture: prevent browser shortcuts when playing, capture pointer lock
-  function setupInputCapture() {
-    const isPlaying = () => document.body.classList.contains("playing");
-    
-    // Block common destructive shortcuts while playing
+  let pointerLocked = false;
+  if (canvas.requestPointerLock) {
+    // Block common destructive shortcuts while playing - must be in capture phase
     document.addEventListener("keydown", (e) => {
+      const isPlaying = () => document.body.classList.contains("playing");
       if (!isPlaying()) return;
       
-      // Don't let Ctrl+W close tabs, Ctrl+Shift+T reopen closed tabs
-      // Ctrl+F fullscreen toggle, F11 browser fullscreen, Alt+F4 quit window
-      const blocked = [
-        { key: "w", modifiers: ["Control"] },
-        { key: "F11", modifiers: [] },
-        { key: "f", modifiers: ["Control"] },
-        { key: "q", modifiers: ["Alt"] },
-      ];
+      // Don't let these close tabs or trigger browser actions:
+      // Ctrl+W close tab, Ctrl+Shift+T reopen closed tabs, Ctrl+F find/fullscreen,
+      // F11 browser fullscreen, Alt+F4 quit window, Esc exit pointer lock
+      if (e.key.toLowerCase() === "w" && e.ctrlKey) return false;      // prevent ctrl+w
+      if (e.key === "F11") return false;                                // prevent f11
+      if (e.key.toLowerCase() === "f" && e.ctrlKey) return false;      // prevent ctrl+f
+      if (e.altKey && e.key.toLowerCase() === "f4") return false;      // prevent alt+f4
       
-      for (const rule of blocked) {
-        const matched = e.key.toLowerCase() === rule.key;
-        const hasModifier = rule.modifiers.length && rule.modifiers.every(m => e.getModifierState(m.toLowerCase()) || e.altKey || e.ctrlKey);
-        if (matched && (!rule.modifiers.length || hasModifier)) {
-          // Consume the event - but let Escape still work to quit
-          if (!(e.key === "Escape")) {
-            e.preventDefault();
-            e.stopPropagation();
-          }
+      // Allow escape to release pointer lock, but don't stop it from bubbling
+      // so the game can handle quitting
+      if (e.key === "Escape") {
+        if (!pointerLocked) {
+          // Game wants to quit naturally
+          return true;
         }
+        // Release pointer lock when escape is pressed while in pointer lock
+        document.exitPointerLock().then(() => {
+          pointerLocked = false;
+          say("input capture released");
+        }).catch((err) => {
+          console.log("web: exitPointerLock failed:", err);
+          // If we can't release, still mark as released for UX purposes
+          pointerLocked = false;
+        });
+        return true; // consume escape while in pointer lock
       }
+      
+      // Let other keys pass through to the game
     }, { capture: true });
 
-    // Pointer lock for mouse capture when clicking on canvas while playing
-    let pointerLocked = false;
-    if (canvas.requestPointerLock) {
-      canvas.addEventListener("click", () => {
-        if (isPlaying() && !pointerLocked) {
-          canvas.requestPointerLock().then(() => {
-            pointerLocked = true;
-            say("mouse captured");
-          }).catch((e) => {
-            // Some browsers don't support it or block it
-            console.log("web: pointer lock not available:", e.message);
-          });
-        }
-      }, { once: false });
-    } else {
-      console.log("web: pointer lock API not available in this browser");
-    }
+    // Request pointer lock on canvas click during gameplay
+    canvas.addEventListener("click", () => {
+      const isPlaying = () => document.body.classList.contains("playing");
+      if (isPlaying() && !pointerLocked) {
+        canvas.requestPointerLock().then(() => {
+          pointerLocked = true;
+          say("mouse captured");
+        }).catch((e) => {
+          console.log("web: pointer lock request blocked:", e.message);
+          // Some browsers block this in certain contexts (like fullscreen tabs)
+        });
+      }
+    }, { once: false, capture: true });
 
-    // Escape key tells the game to quit gracefully (game handles it, we just consume)
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && isPlaying()) {
+    // Prevent right-click context menu on canvas while playing or visible
+    canvas.addEventListener("contextmenu", (e) => {
+      const isPlaying = () => document.body.classList.contains("playing");
+      if (isPlaying()) {
         e.preventDefault();
         e.stopPropagation();
-        say("press escape to stop input capture");
       }
-    });
-
-    // Prevent right-click context menu on canvas while playing
-    if (isPlaying() || canvas.style.display === "block") {
-      canvas.addEventListener("contextmenu", (e) => {
-        e.preventDefault();
-      });
-    }
+    }, { capture: true });
+  } else {
+    console.log("web: pointer lock API not available in this browser");
   }
-
-  setupInputCapture();
 
   window.Module = {
     canvas,
