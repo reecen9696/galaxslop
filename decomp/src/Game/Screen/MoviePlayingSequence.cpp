@@ -291,11 +291,19 @@ void MoviePlayingSequence::exePlayWait() {
 }
 
 #ifdef TARGET_PC
+#include <cstdlib>
+#include <cstring>
+
 namespace {
     // A game folder cooked without --with-movies still lists the movies in
     // its fst.bin, but the files are absent (size 0).  The player would wait
-    // in its Open state forever, leaving the screen black.
-    bool isMovieFilePresent(const char* pName) {
+    // in its Open state forever, leaving the screen black.  SMG_MOVIES=0 (the
+    // page's Cutscenes setting, off) skips them even when they are there.
+    bool isMovieAvailable(const char* pName) {
+        const char* setting = getenv("SMG_MOVIES");
+        if (setting && strcmp(setting, "0") == 0) {
+            return false;
+        }
         DVDFileInfo info;
         if (!DVDOpen(pName, &info)) {
             return false;
@@ -310,7 +318,7 @@ namespace {
 void MoviePlayingSequence::exePlayStart() {
 #ifdef TARGET_PC
     // No movie to play: carry on as if it had been skipped.
-    if (MR::isFirstStep(this) && !isMovieFilePresent(::getMovieName(mInfo))) {
+    if (MR::isFirstStep(this) && !isMovieAvailable(::getMovieName(mInfo))) {
         MR::forceCloseWipeFade();
         setNerve(GET_NERVE(MoviePlayingSequence, HostTypeEndWait));
         return;

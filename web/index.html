@@ -253,6 +253,7 @@
           <li>Pick the extracted folder. The page converts it for the port (a few minutes, once).
             A folder already converted with <code>tools/cook/cook.py</code> works too.</li>
         </ol>
+        <label class="wii-check"><input id="importMovies" type="checkbox"> Include the cutscenes (2.2 GB more)</label>
         <div class="btn-row"><button id="pick" class="wii-btn primary">Choose folder…</button></div>
         <input id="pickInput" type="file" webkitdirectory hidden>
       </div></main>
@@ -321,6 +322,7 @@
   <label class="inline"><input id="showKeys" type="checkbox"> Show controls</label>
   <label class="inline"><input id="touchCtl" type="checkbox"> Touch controls</label>
   <label class="inline"><input id="perf" type="checkbox"> Show frame times</label>
+  <label class="inline" title="The prologue and ending movies: 2.2 GB more, copied the next time the game loads. A disc loaded from a folder needs loading again."><input id="movies" type="checkbox"> Cutscenes (2.2 GB, from the next load)</label>
   <div class="row"><button id="exportSave" class="wii-btn">Export save</button><button id="importSave" class="wii-btn">Import save</button></div>
   <input id="importSaveInput" type="file" accept=".zip" style="display:none">
   <div class="row"><button id="reimport" class="wii-btn">Load the disc again</button></div>

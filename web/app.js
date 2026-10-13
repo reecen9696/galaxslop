@@ -41,12 +41,29 @@ async function importedManifestText() {
   }
 }
 
+// The Cutscenes setting: the prologue and ending movies are 2.2 GB, so they
+// are left out of the copy in this browser (and skipped by the game) unless
+// it is on.
+function moviesWanted() {
+  return store("smg.movies") === "1";
+}
+
+// A cooked folder's manifest text as this browser should copy it: without
+// the movies when the setting is off.
+function wantedManifest(text) {
+  if (moviesWanted()) return text;
+  const files = JSON.parse(text).files.filter((e) => !e.path.startsWith("files/MovieData/"));
+  return manifestJson(files);
+}
+
 // Pre-loaded game (GAME_DIR on the server, SMG_GAME on the dev server): the
 // page copies the server's cooked folder into OPFS by itself on the first
 // visit, and again only when the server's manifest changes.  pending.json
 // holds the manifest being downloaded: a download cut short (a reload, a
 // failed file) resumes with the files it already has, which OPFS only shows
-// once complete (createWritable writes to a swap file until close).
+// once complete (createWritable writes to a swap file until close).  A
+// finished copy that only needs some files changed (a new cook, or the
+// Cutscenes setting) keeps the files whose sha1 is unchanged.
 async function importFromServer(base, manifestText) {
   const manifest = JSON.parse(manifestText);
   navigator.storage.persist?.().catch(() => {});
@@ -56,14 +73,31 @@ async function importFromServer(base, manifestText) {
   const pending = await game.getFileHandle("pending.json").then((h) => h.getFile()).then((f) => f.text()).catch(() => null);
   const resuming = pending === manifestText;
   if (!resuming) {
-    await smg.removeEntry("game", { recursive: true }).catch(() => {});
-    game = await smg.getDirectoryHandle("game", { create: true });
+    const old = pending === null ? await importedManifest() : null;
+    if (old) {
+      // Drop manifest.json first, so a cut-short update is never taken for
+      // a finished copy, then every file the new manifest doesn't keep.
+      await game.removeEntry("manifest.json").catch(() => {});
+      const keep = new Set(manifest.files.map((e) => `${e.path} ${e.size} ${e.sha1}`));
+      for (const e of old.files) {
+        if (keep.has(`${e.path} ${e.size} ${e.sha1}`)) continue;
+        const parts = e.path.split("/");
+        let dir = game;
+        try {
+          for (const part of parts.slice(0, -1)) dir = await dir.getDirectoryHandle(part);
+          await dir.removeEntry(parts.at(-1));
+        } catch {}
+      }
+    } else {
+      await smg.removeEntry("game", { recursive: true }).catch(() => {});
+      game = await smg.getDirectoryHandle("game", { create: true });
+    }
     const pw = await (await game.getFileHandle("pending.json", { create: true })).createWritable();
     await pw.write(manifestText);
     await pw.close();
   }
   const total = manifest.files.reduce((n, e) => n + e.size, 0);
-  let done = 0;
+  let done = 0, fetched = 0;
   const started = performance.now();
   progress.style.display = "block";
   showLoading();
@@ -106,8 +140,9 @@ async function importFromServer(base, manifestText) {
   await Promise.all(Array.from({ length: 6 }, async () => {
     while (queue.length) {
       const e = queue.shift();
-      if (!(resuming && (await have(e)))) {
+      if (!(await have(e))) {
         const bytes = await download(e);
+        fetched++;
         const w = await (await (await dirFor(e.path)).getFileHandle(e.path.split("/").pop(), { create: true })).createWritable();
         if (bytes.byteLength) await w.write(bytes);
         await w.close();
@@ -122,7 +157,7 @@ async function importFromServer(base, manifestText) {
   await mw.close();
   await game.removeEntry("pending.json").catch(() => {});
   progress.style.display = "none";
-  console.log(`web: game pre-loaded from the server: ${manifest.files.length} files in ${((performance.now() - started) / 1000).toFixed(1)} s`);
+  console.log(`web: game pre-loaded from the server: ${manifest.files.length} files (${fetched} downloaded) in ${((performance.now() - started) / 1000).toFixed(1)} s`);
 }
 
 async function importedManifest() {
@@ -163,7 +198,8 @@ async function importFolder(source) {
     say("That folder is neither an extracted disc (sys/, files/) nor a converted one (manifest.json).");
     return false;
   }
-  const manifest = JSON.parse(await manifestEntry.file.text());
+  const manifestText = wantedManifest(await manifestEntry.file.text());
+  const manifest = JSON.parse(manifestText);
   const byPath = new Map(files.map((f) => [f.path, f.file]));
   const missing = manifest.files.filter((e) => !byPath.has(e.path) || byPath.get(e.path).size !== e.size);
   if (missing.length) {
@@ -213,7 +249,7 @@ async function importFolder(source) {
   }));
   const mh = await game.getFileHandle("manifest.json", { create: true });
   const mw = await mh.createWritable();
-  await mw.write(await manifestEntry.file.text());
+  await mw.write(manifestText);
   await mw.close();
   progress.style.display = "none";
   console.log(`web: imported ${manifest.files.length} files in ${((performance.now() - started) / 1000).toFixed(1)} s`);
@@ -235,7 +271,7 @@ async function cookFolder(files) {
     const r = await cookDisc(files, game, (fraction, text) => {
       progress.value = fraction;
       say(text);
-    });
+    }, { movies: moviesWanted() });
     console.log(`web: converted the disc: ${r.files} files in ${r.seconds.toFixed(0)} s`);
     return true;
   } catch (e) {
@@ -261,6 +297,12 @@ function showImport(serverError) {
     document.getElementById("retryServer").onclick = () => location.replace(location.href.replace(/[?&]reimport=1/, ""));
   }
   const input = document.getElementById("pickInput");
+  const movies = document.getElementById("importMovies");
+  movies.checked = moviesWanted();
+  movies.onchange = () => {
+    store("smg.movies", movies.checked ? "1" : "0");
+    syncMovieSetting();
+  };
   // The chosen folder is copied or converted under the loading screen; on a
   // problem the import screen comes back with the message.
   async function load(source) {
@@ -688,7 +730,8 @@ function drawTags() {
 }
 
 function boot(args, env = {}) {
-  window.smgEnv = { SMG_SCALE: store("smg.scale") || "auto", ...env }; // read by browser_env.js in preRun
+  // read by browser_env.js in preRun
+  window.smgEnv = { SMG_SCALE: store("smg.scale") || "auto", SMG_MOVIES: moviesWanted() ? "1" : "0", ...env };
   importPanel.style.display = "none";
   stopMenuMusic();
   document.body.classList.add("playing");
@@ -898,6 +941,12 @@ function setupSettings() {
     gear.setAttribute("aria-expanded", "false");
     e.stopPropagation();
   }, true);
+  const movies = document.getElementById("movies");
+  movies.checked = moviesWanted();
+  movies.onchange = () => {
+    store("smg.movies", movies.checked ? "1" : "0");
+    syncMovieSetting();
+  };
   const perf = document.getElementById("perf"), perfbox = document.getElementById("perfbox");
   perf.checked = store("smg.perf") === "1";
   const showPerf = () => {
@@ -963,6 +1012,7 @@ setupSettings();
       const r = await fetch(config.game + "manifest.json", { cache: "no-cache" });
       if (r.ok) serverManifest = await r.text();
     } catch {}
+    if (serverManifest) serverManifest = wantedManifest(serverManifest);
     if (serverManifest && serverManifest !== (await importedManifestText())) {
       try {
         await importFromServer(config.game, serverManifest);
@@ -985,3 +1035,8 @@ setupSettings();
   }
   boot(["--game", "/opfs/smg/game"], wantsLobby ? await showLobby() : {});
 })();
+
+// The two Cutscenes checkboxes (import screen, settings) show one setting.
+function syncMovieSetting() {
+  for (const id of ["movies", "importMovies"]) document.getElementById(id).checked = moviesWanted();
+}

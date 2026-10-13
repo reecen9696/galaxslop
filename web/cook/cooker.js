@@ -6,7 +6,7 @@
 "use strict";
 
 // eslint-disable-next-line no-unused-vars
-async function cookDisc(files, outDir, onProgress) {
+async function cookDisc(files, outDir, onProgress, { movies = false } = {}) {
   // The game partition holds sys/ and files/; Dolphin may put it under DATA/.
   let root = "";
   if (!files.some((f) => f.path === "sys/fst.bin")) {
@@ -19,13 +19,17 @@ async function cookDisc(files, outDir, onProgress) {
   if (!byPath.has("sys/main.dol")) throw new Error("sys/main.dol is missing: extract the whole disc (sys/ and files/)");
 
   // cook.py plan(): archives are decompressed and converted, a few file
-  // types converted, movies skipped (off by default), everything else copied.
-  const jobs = [];
+  // types converted, movies skipped unless asked for (cook.py --with-movies),
+  // everything else copied.
+  const jobs = [], movieJobs = [];
   for (const [p, file] of byPath) {
     if (!p.startsWith("files/")) continue;
     const rel = p.slice(6);
-    if (rel.split("/")[0] === "MovieData") continue;
     const ext = (rel.match(/\.[^./]*$/) || [""])[0].toLowerCase();
+    if (rel.split("/")[0] === "MovieData") {
+      if (movies && ext === ".thp") movieJobs.push({ rel, file, size: file.size });
+      continue;
+    }
     const mode = ext === ".arc" || ext === ".szs" ? "archive" : ext === ".bcsv" || ext === ".tbl" || ext === ".ast" ? "file" : ext === ".thp" ? null : "copy";
     if (mode) jobs.push({ rel, mode, file, size: file.size });
   }
@@ -85,7 +89,7 @@ async function cookDisc(files, outDir, onProgress) {
 
   let done = 0, doneBytes = 0;
   const inFlight = (window.smgCookInFlight = new Set()); // for diagnosing a stuck job
-  const totalBytes = jobs.reduce((s, j) => s + j.size, 0);
+  const totalBytes = [...jobs, ...movieJobs].reduce((s, j) => s + j.size, 0);
   let next = 0;
   async function runOn(w) {
     while (next < jobs.length) {
@@ -115,6 +119,20 @@ async function cookDisc(files, outDir, onProgress) {
   }
   await Promise.all(workers.map(runOn));
   workers.forEach((w) => w.terminate());
+  // Movies are hundreds of megabytes each: one at a time, on this thread.
+  for (const j of movieJobs) {
+    try {
+      const bytes = new Uint8Array(await j.file.arrayBuffer());
+      cookThp(bytes, j.rel);
+      await put("files/" + j.rel, bytes);
+      stats.movies = (stats.movies || 0) + 1;
+    } catch (e) {
+      errors.push(`${j.rel}: ${e.message}`);
+    }
+    done++;
+    doneBytes += j.size;
+    onProgress?.(doneBytes / totalBytes, `cooking ${done} / ${jobs.length + movieJobs.length} files`);
+  }
   const seconds = (performance.now() - t0) / 1000;
   console.log(`cook: ${jobs.length} disc files in ${seconds.toFixed(1)} s with ${n} workers`);
   console.log("cook: " + Object.entries(stats).sort().map(([k, v]) => `${k} ${v}`).join(", "));
@@ -122,12 +140,72 @@ async function cookDisc(files, outDir, onProgress) {
   for (const e of errors) console.log("cook: ERROR " + e);
   if (errors.length) throw new Error(`${errors.length} files failed to convert (first: ${errors[0]})`);
 
-  // manifest.json last, in manifest.py's exact format (json.dump indent=0).
-  const entries = [...manifest.keys()].sort().map((p) => `{\n"path": ${JSON.stringify(p)},\n"size": ${manifest.get(p).size},\n"sha1": "${manifest.get(p).sha1}"\n}`);
-  const text = `{\n"version": 1,\n"files": [\n${entries.join(",\n")}\n]\n}`;
+  // manifest.json last.
+  const text = manifestJson([...manifest.keys()].sort().map((path) => ({ path, ...manifest.get(path) })));
   const mh = await outDir.getFileHandle("manifest.json", { create: true });
   const mw = await mh.createWritable();
   await mw.write(text);
   await mw.close();
   return { files: manifest.size, seconds };
+}
+
+// manifest.json text in tools/cook/manifest.py's exact format (json.dump
+// indent=0), so the same files always give the same text.
+function manifestJson(entries) {
+  const items = entries.map((e) => `{\n"path": ${JSON.stringify(e.path)},\n"size": ${e.size},\n"sha1": "${e.sha1}"\n}`);
+  return `{\n"version": 1,\n"files": [\n${items.join(",\n")}\n]\n}`;
+}
+
+// tools/cook/thp.py cook_thp(), in place: the file header, component info,
+// frame headers and audio record headers become little-endian; the video and
+// ADPCM data are byte streams and stay as they are.
+function cookThp(bytes, name) {
+  const v = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const swap32 = (off, count) => {
+    const out = [];
+    for (let i = 0; i < count; i++) {
+      const x = v.getUint32(off + 4 * i, false);
+      v.setUint32(off + 4 * i, x, true);
+      out.push(x);
+    }
+    return out;
+  };
+  const swap16 = (off, count) => {
+    for (let i = 0; i < count; i++) v.setUint16(off + 2 * i, v.getUint16(off + 2 * i, false), true);
+  };
+  if (v.getUint32(0, false) !== 0x54485000 || v.getUint32(4, false) !== 0x00011000) throw new Error(`${name}: not a version 1.1 THP file`);
+  const [, , , , numFrames, firstSize, , compOff, , movieOff] = swap32(4, 11);
+  const ncomp = swap32(compOff, 1)[0];
+  const kinds = Array.from(bytes.subarray(compOff + 4, compOff + 4 + ncomp));
+  let pos = compOff + 0x14, tracks = 1;
+  for (const kind of kinds) {
+    if (kind === 0) {        // video: xSize, ySize, videoType
+      swap32(pos, 3);
+      pos += 12;
+    } else if (kind === 1) { // audio: channels, frequency, samples, tracks
+      tracks = swap32(pos, 4)[3];
+      pos += 16;
+    } else {
+      throw new Error(`${name}: unknown THP component ${kind}`);
+    }
+  }
+  const kAudioHeaderHalfwords = 16 + 16 + 4; // lCoef[8][2], rCoef[8][2], lYn1/2, rYn1/2
+  let off = movieOff, size = firstSize;
+  for (let f = 0; f < numFrames; f++) {
+    const words = swap32(off, 2 + ncomp);
+    let data = off + 8 + 4 * ncomp;
+    kinds.forEach((kind, i) => {
+      if (kind === 1) {
+        for (let t = 0; t < tracks; t++) {
+          const rec = data + words[2 + i] * t;
+          swap32(rec, 2); // offsetNextChannel, sampleSize
+          swap16(rec + 8, kAudioHeaderHalfwords);
+        }
+      }
+      data += words[2 + i];
+    });
+    off += size;
+    size = words[0];
+  }
+  return numFrames;
 }
