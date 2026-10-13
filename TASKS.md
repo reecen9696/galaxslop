@@ -374,14 +374,15 @@ with no desync complaints at 100 ms delay.
 
 ### P2-06 Lobby screen
 - lane: A
-- status: open
-- owner:
+- status: review
+- owner: A
 - blocked_by: P2-02
 - touches: web/src/screens/lobby
 - flags: parallel-ok
 - what: Name, character, tint, create room (shows code), join by code, player list, "play solo". Relay URL setting (default localhost, Phase 3 sets the deployed one).
 - done when: 3 people can get into a room without help.
 - log:
+  - 2026-10-13 (A): web/app.js lobby before boot: name, room code (join) / create / solo, relay address under "Server"; remembered in localStorage; passed to the game as SMG_* (browser_env.js). Room bar under the canvas from the net: log lines. Verified headless that the settings reach the game. Note: the client connects at the first gameplay frame, so the room code shows once in a level.
 
 ### P2-07 Name tags and player list overlay
 - lane: A

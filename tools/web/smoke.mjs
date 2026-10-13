@@ -6,7 +6,9 @@
 //        [--runs N] [--params "PETARI_INPUT=..."] [--shot out.png]
 //        [--keys "5000:Space,5200:-Space"]
 //        [--import ~/smg/game] [--profile dir] [--eval "js expression"]
-//        [--log full-log.txt] [--stacks 0]
+//        [--log full-log.txt] [--stacks 0] [--at "2000:document.getElementById('solo').click()"]
+//
+// The lobby is skipped (?solo=1) unless --params mentions SMG_RELAY or lobby.
 //
 // By default the page reads the dev server's game folder (?source=server).
 // --import feeds the folder to the page's import screen instead (OPFS);
@@ -141,7 +143,7 @@ async function oneRun(n) {
       } catch {}
     }
   }
-  const source = args.import || args.profile ? "" : "&source=server";
+  const source = (args.import || args.profile ? "" : "&source=server") + (/SMG_RELAY|lobby/.test(args.params ?? "") ? "" : "&solo=1");
   const url = base + "?PETARI_TIMER=1" + source + (args.params ? "&" + args.params : "") + `&run=${n}`;
   await c.send("Page.navigate", { url }, sessionId);
   if (args.import) {
@@ -166,6 +168,8 @@ async function oneRun(n) {
     console.log(`import finished in ${((Date.now() - t0) / 1000).toFixed(0)} s`);
   }
   const start = Date.now();
+  // --at "1500:js expression;9000:js expression" runs page script at times.
+  const ats = (args.at ?? "").split(";").filter(Boolean).map((e) => ({ t: Number(e.slice(0, e.indexOf(":"))), js: e.slice(e.indexOf(":") + 1) }));
   const keys = (args.keys ?? "").split(",").filter(Boolean).map((k) => {
     const [t, name] = k.split(":");
     return { t: Number(t), up: name.startsWith("-"), code: name.replace(/^-/, "") };
@@ -174,6 +178,10 @@ async function oneRun(n) {
     const now = Date.now() - start;
     if (!stacksDumped && args.stacks !== "0" && log.some((l) => l.includes("no new game frame"))) {
       await dumpStacks();
+    }
+    while (ats.length && ats[0].t <= now) {
+      const { result } = await c.send("Runtime.evaluate", { expression: ats.shift().js, returnByValue: true }, sessionId);
+      if (result.subtype === "error") console.log("at: " + result.description);
     }
     while (keys.length && keys[0].t <= now) {
       const k = keys.shift();

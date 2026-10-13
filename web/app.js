@@ -206,7 +206,67 @@ async function startAudio() {
 }
 for (const ev of ["keydown", "pointerdown"]) addEventListener(ev, startAudio, { capture: true });
 
-function boot(args) {
+// Lobby (P2-06): name, room code and relay, remembered in localStorage.
+// Skipped when the URL already says (?SMG_RELAY=... or ?solo=1).
+function store(key, value) {
+  try {
+    if (value === undefined) return localStorage.getItem(key);
+    localStorage.setItem(key, value);
+  } catch {}
+  return null;
+}
+
+function showLobby() {
+  const lobby = document.getElementById("lobby");
+  const name = document.getElementById("name");
+  const room = document.getElementById("room");
+  const relay = document.getElementById("relay");
+  name.value = store("smg.name") || "";
+  room.value = params.get("room") || "";
+  relay.value = store("smg.relay") || `${location.protocol === "https:" ? "wss" : "ws"}://${location.hostname}:8787`;
+  lobby.style.display = "block";
+  say("");
+  return new Promise((resolve) => {
+    const go = (mode) => {
+      const n = name.value.trim() || "Player";
+      store("smg.name", n);
+      store("smg.relay", relay.value.trim());
+      lobby.style.display = "none";
+      if (mode === "solo") return resolve({});
+      resolve({ SMG_RELAY: relay.value.trim(), SMG_ROOM: mode === "join" ? room.value.trim().toUpperCase() : "", SMG_NAME: n });
+    };
+    document.getElementById("join").onclick = () => (room.value.trim() ? go("join") : room.focus());
+    document.getElementById("create").onclick = () => go("create");
+    document.getElementById("solo").onclick = () => go("solo");
+    room.onkeydown = (e) => e.key === "Enter" && document.getElementById("join").click();
+  });
+}
+
+// Room bar under the canvas, fed by the game's net: log lines.
+const roombar = document.getElementById("roombar");
+const players = new Set();
+function onNetLine(t) {
+  let m;
+  if ((m = /^net: joined room (\S+) as player/.exec(t))) {
+    roombar.dataset.room = m[1];
+  } else if ((m = /^net: (.+) joined \(player/.exec(t))) {
+    players.add(m[1]);
+  } else if ((m = /^net: (.+) left$/.exec(t))) {
+    players.delete(m[1]);
+  } else if (/^net: connection lost/.test(t)) {
+    roombar.dataset.room = "";
+  } else {
+    return;
+  }
+  const code = roombar.dataset.room;
+  roombar.style.display = "block";
+  roombar.innerHTML = code
+    ? `Room <b>${code}</b> · ${players.size ? "with " + [...players].map((p) => p.replace(/[<&]/g, "")).join(", ") : "waiting for friends"}`
+    : "reconnecting…";
+}
+
+function boot(args, env = {}) {
+  window.smgEnv = env; // read by browser_env.js in preRun
   importPanel.style.display = "none";
   const canvas = document.getElementById("canvas");
   canvas.style.display = "block";
@@ -218,6 +278,7 @@ function boot(args) {
     printErr: (t) => {
       console.log(t);
       smgLog.push(t);
+      if (t.startsWith("net: ")) onNetLine(t);
       if (smgLog.length > 2000) smgLog.shift();
       if (/joined room|present:|disc:|web:/.test(t)) say(t);
     },
@@ -236,8 +297,9 @@ function boot(args) {
     say("This page needs cross-origin isolation (COOP/COEP headers): serve it with web/dev-server.mjs.");
     return;
   }
+  const wantsLobby = !params.get("solo") && !params.get("SMG_RELAY");
   if (params.get("source") === "server") {
-    boot([]);
+    boot([], wantsLobby && params.get("lobby") ? await showLobby() : {});
     return;
   }
   if (params.get("reimport")) {
@@ -252,5 +314,5 @@ function boot(args) {
     location.replace(location.href.replace(/[?&]reimport=1/, ""));
     return;
   }
-  boot(["--game", "/opfs/smg/game"]);
+  boot(["--game", "/opfs/smg/game"], wantsLobby ? await showLobby() : {});
 })();

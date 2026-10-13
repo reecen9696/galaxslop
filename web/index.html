@@ -17,7 +17,15 @@
   button { font: inherit; padding: 8px 16px; border-radius: 8px; border: 0; background: var(--accent); color: #000; cursor: pointer; }
   button.ghost { background: transparent; color: var(--dim); border: 1px solid #333a50; }
   progress { width: 100%; height: 10px; display: none; margin-top: 12px; }
-  .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; align-items: center; }
+  #lobby { max-width: 560px; width: 100%; background: var(--panel); border-radius: 12px; padding: 24px; display: none; box-sizing: border-box; }
+  #lobby h1 { font-size: 20px; margin: 0 0 12px; }
+  #lobby label { display: block; color: var(--dim); font-size: 13px; margin-top: 10px; }
+  #lobby input { font: inherit; width: 100%; box-sizing: border-box; padding: 8px 10px; border-radius: 8px; border: 1px solid #333a50; background: #0b0e18; color: var(--fg); }
+  #lobby input#room { text-transform: uppercase; letter-spacing: .15em; }
+  #lobby details { margin-top: 12px; color: var(--dim); }
+  #roombar { display: none; color: var(--dim); font-size: 13px; }
+  #roombar b { color: var(--accent); letter-spacing: .15em; }
 </style>
 </head>
 <body>
@@ -39,6 +47,24 @@
     </div>
     <progress id="progress" max="1" value="0"></progress>
   </div>
+  <div id="lobby">
+    <h1>Super Mario Galaxy co-op</h1>
+    <label for="name">Your name</label>
+    <input id="name" maxlength="32" autocomplete="nickname">
+    <label for="room">Room code (to join a friend)</label>
+    <input id="room" maxlength="8" placeholder="e.g. K7QF">
+    <div class="row">
+      <button id="join">Join room</button>
+      <button id="create" class="ghost">Create a room</button>
+      <button id="solo" class="ghost">Play solo</button>
+    </div>
+    <details>
+      <summary>Server</summary>
+      <label for="relay">Relay address</label>
+      <input id="relay" spellcheck="false">
+    </details>
+  </div>
+  <div id="roombar"></div>
   <div id="status">loading…</div>
 </div>
 <script src="app.js"></script>

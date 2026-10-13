@@ -194,6 +194,11 @@ int main(int argc, char** argv) {
     snprintf(startText, sizeof(startText), "%lld", start);
     setenv("PETARI_T0_MS", startText, 1);
     fprintf(stderr, "smg-web: booting %s (save %s)\n", game.c_str(), save.c_str());
+    if (const char* relay = getenv("SMG_RELAY")) {
+        const char* room = getenv("SMG_ROOM");
+        const char* name = getenv("SMG_NAME");
+        fprintf(stderr, "smg-web: co-op via %s, room %s, as %s\n", relay, room && *room ? room : "(new)", name ? name : "Player");
+    }
     port_boot(game.c_str(), save.c_str());
 
 #ifndef SMG_WEB_NODE
