@@ -472,14 +472,15 @@ observatory state.
 
 ### P3-03 Story flags, unlocks, Observatory state
 - lane: A
-- status: open
-- owner:
+- status: review
+- owner: A
 - blocked_by: P3-02
 - touches: decomp/src/Game/System, net/progress
 - flags:
 - what: Same for StoryFlag, GalaxyUnlock, DomeUnlock, GrandStar. Find which flags the Observatory reads to decide layout. smg-online only shares "from the Observatory on"; decide and log whether the prologue is shared.
 - done when: a late joiner's Observatory matches the host's.
 - log:
+  - 2026-10-13 (A): event flags split two ways (GameEventFlagChecker::isOn): mSaveFlag bit 0 set = computed from stars/other flags (grand stars, galaxy-open counts, most Observatory layout) -> follow the shared stars with no message; bit 0 clear = stored -> shared as kind 2 with the flag-table index, for SpecialStar/EventFlag/StoryEvent/Galaxy types; Type_None (tutorials) stays per player. Applied in log order, so a flag whose condition is a shared star applies after it. Verified in Chrome: Phantom star 1 + LuigiTalkAfterRescued reach a client joining later. Prologue shared? Stored story flags of the prologue are shared like any other once in a room. PETARI_FAKEFLAG=Name,... for tests.
 
 ### P3-04 Follow-host warp
 - lane: B

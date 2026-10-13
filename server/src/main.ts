@@ -7,7 +7,7 @@ import { WebSocketServer, type WebSocket } from "ws";
 import { Relay, type Conn } from "./relay.ts";
 import { staticHandler } from "./static.ts";
 
-export function startServer(port: number, log: (m: string) => void = console.log): { close: () => Promise<void>; port: () => number } {
+export function startServer(port: number, log: (m: string) => void = console.log): { close: () => Promise<void>; port: () => number; ready: Promise<void> } {
   const allowed = (process.env.ALLOWED_ORIGINS ?? "")
     .split(",")
     .map((s) => s.trim())
@@ -16,6 +16,10 @@ export function startServer(port: number, log: (m: string) => void = console.log
   const relay = new Relay({ log, fixedRooms });
   const serve = process.env.STATIC_DIR ? staticHandler(process.env.STATIC_DIR) : (_req: unknown, res: { writeHead: (n: number) => { end: () => void } }) => res.writeHead(426).end();
   const http = createServer(serve);
+  const ready = new Promise<void>((resolve, reject) => {
+    http.once("listening", resolve);
+    http.once("error", reject);
+  });
   http.listen(port);
   const wss = new WebSocketServer({
     server: http,
@@ -38,7 +42,9 @@ export function startServer(port: number, log: (m: string) => void = console.log
     ws.on("error", () => relay.disconnect(conn));
   });
   const timer = setInterval(() => relay.tick(), 2000);
+  wss.on("error", () => {});  // reported through `ready`
   return {
+    ready,
     port: () => {
       const a = http.address();
       return typeof a === "object" && a ? a.port : port;
@@ -55,5 +61,11 @@ export function startServer(port: number, log: (m: string) => void = console.log
 if (import.meta.url === `file://${process.argv[1]}`) {
   const port = Number(process.env.PORT ?? 8787);
   const s = startServer(port);
-  console.log(`relay listening on ws://localhost:${s.port()}` + (process.env.STATIC_DIR ? `, page at http://localhost:${s.port()}/` : ""));
+  s.ready.then(
+    () => console.log(`relay listening on ws://localhost:${s.port()}` + (process.env.STATIC_DIR ? `, page at http://localhost:${s.port()}/` : "")),
+    (e: Error) => {
+      console.error(`relay: cannot listen on port ${port}: ${e.message}`);
+      process.exit(1);
+    },
+  );
 }

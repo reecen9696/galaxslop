@@ -461,16 +461,27 @@ extern "C" void port_net_apply_progress() {
     static bool sFaked = false;
     if (!sFaked) {
         sFaked = true;
-        if (const char* fake = getenv("PETARI_FAKESTAR")) {
-            char galaxy[64];
-            int scenario = 1;
-            snprintf(galaxy, sizeof(galaxy), "%s", fake);
-            if (char* colon = strchr(galaxy, ':')) {
-                *colon = 0;
-                scenario = atoi(colon + 1);
+        if (const char* fake = getenv("PETARI_FAKESTAR")) {  // Galaxy:scenario[,Galaxy:scenario...]
+            char list[256];
+            snprintf(list, sizeof(list), "%s", fake);
+            for (char* galaxy = strtok(list, ","); galaxy != nullptr; galaxy = strtok(nullptr, ",")) {
+                int scenario = 1;
+                if (char* colon = strchr(galaxy, ':')) {
+                    *colon = 0;
+                    scenario = atoi(colon + 1);
+                }
+                GameDataFunction::setGameFlagPowerStarSuccess(galaxy, scenario, true);
+                port_log("net: PETARI_FAKESTAR %s %d", galaxy, scenario);
             }
-            GameDataFunction::setGameFlagPowerStarSuccess(galaxy, scenario, true);
-            port_log("net: PETARI_FAKESTAR %s %d", galaxy, scenario);
+        }
+        // PETARI_FAKEFLAG=Name[,Name...] turns event flags on the same way.
+        if (const char* fake = getenv("PETARI_FAKEFLAG")) {
+            char names[256];
+            snprintf(names, sizeof(names), "%s", fake);
+            for (char* name = strtok(names, ","); name != nullptr; name = strtok(nullptr, ",")) {
+                GameDataFunction::getCurrentGameDataHolder()->tryOnGameEventFlag(name);
+                port_log("net: PETARI_FAKEFLAG %s", name);
+            }
         }
     }
     PortNetProgress p;
@@ -492,6 +503,12 @@ extern "C" void port_net_apply_progress() {
                     port_log("net: power star %s %u from %s", galaxy, p.scenario, port_net_player_name(p.origin));
                 }
                 break;
+            }
+        } else if (p.kind == net::kProgressStoryFlag) {
+            const GameEventFlag* flag = p.arg < GameEventFlagTable::getTableSize() ? GameEventFlagTable::getFlag(p.arg) : nullptr;
+            if (flag != nullptr && !holder->isOnGameEventFlag(flag->mName)) {
+                holder->tryOnGameEventFlag(flag->mName);
+                port_log("net: flag %s from %s", flag->mName, port_net_player_name(p.origin));
             }
         } else if (p.kind == net::kProgressGrandStar) {
             char flag[32];

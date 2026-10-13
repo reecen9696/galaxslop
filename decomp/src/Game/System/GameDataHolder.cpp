@@ -15,8 +15,6 @@
 #ifdef TARGET_PC
 #include "Game/Util/HashUtil.hpp"
 #include "net/client/progress.h"
-#include <cstdlib>
-#include <cstring>
 #endif
 
 extern const u8 StoryEventBCSV[];
@@ -84,9 +82,26 @@ void GameDataHolder::tryOnGameEventFlag(const char* pFlagName) {
 #endif
     mEventFlagChecker->tryOn(pFlagName);
 #ifdef TARGET_PC
-    // Co-op: grand stars are event flags SpecialStarGrand<n>.
-    if (!had && strncmp(pFlagName, "SpecialStarGrand", 16) == 0 && isOnGameEventFlag(pFlagName) && !port_net_progress_is_applying()) {
-        port_net_progress_send(net::kProgressGrandStar, 0, 0, (u16)atoi(pFlagName + 16));
+    // Co-op (P3-03, D-022): flags the save stores (mSaveFlag bit 0 clear)
+    // are shared with the room by their index in the flag table, the same on
+    // every client.  Flags with the bit set are computed from stars and other
+    // flags (GameEventFlagChecker::isOn), so they follow the shared stars by
+    // themselves; grand stars are among them.  Type_None flags (first-time
+    // explanations, tutorials) stay per player.
+    if (!had && isOnGameEventFlag(pFlagName) && !port_net_progress_is_applying()) {
+        const GameEventFlag* flag = GameEventFlagTable::findFlag(pFlagName);
+        if (flag != nullptr && (flag->mSaveFlag & 0x1) == 0) {
+            switch (flag->mType) {
+            case GameEventFlag::Type_SpecialStar:
+            case GameEventFlag::Type_EventFlag:
+            case GameEventFlag::Type_StoryEvent:
+            case GameEventFlag::Type_Galaxy:
+                port_net_progress_send(net::kProgressStoryFlag, 0, 0, (u16)GameEventFlagTable::getIndex(flag));
+                break;
+            default:
+                break;
+            }
+        }
     }
 #endif
 }
