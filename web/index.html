@@ -156,7 +156,7 @@
   #perfbox { position: fixed; top: 12px; left: 12px; z-index: 3; font: 12px ui-monospace, monospace; color: #9fe39f; background: #000a; padding: 6px 8px; border-radius: 6px; display: none; white-space: pre; }
 
   /* ---- first-visit loading screen: Luma over the bar, in space ---- */
-  #luma, #loadingTitle, #loadingNote { display: none; }
+  #luma, #loadingTitle { display: none; }
   body.loading { background:
       radial-gradient(1.5px 1.5px at 12% 18%, #fff, transparent), radial-gradient(1px 1px at 27% 72%, #cfe3ff, transparent),
       radial-gradient(1.5px 1.5px at 41% 33%, #fff8d0, transparent), radial-gradient(1px 1px at 58% 84%, #fff, transparent),
@@ -170,7 +170,6 @@
   body.loading #luma canvas { display: block; width: 100%; height: 100%; background: transparent; cursor: default; }
   body.loading #progress { width: min(460px, 80vw); height: 16px; }
   body.loading #status { color: var(--fg); font-size: 1em; }
-  body.loading #loadingNote { display: block; color: var(--dim); font-size: .9em; }
   #musicHint { position: fixed; left: 16px; bottom: 16px; z-index: 6; padding: 6px 14px; font-size: 13px; font-weight: 600; color: var(--ink);
     background: var(--face); border: 2px solid var(--wii-blue); border-radius: 16px; box-shadow: 0 0 10px var(--wii-glow); pointer-events: none; }
   #musicHint[hidden] { display: none; }
@@ -235,7 +234,6 @@
   <div id="luma" aria-hidden="true"></div>
   <progress id="progress" max="1" value="0"></progress>
   <div id="status">loading…</div>
-  <div id="loadingNote">First visit only: the game is copied into this browser once.</div>
 </div>
 <div id="roombar"></div>
 <div id="perfbox"></div>
@@ -249,7 +247,7 @@
   <select id="picture"><option value="wide">Widescreen 16:9</option><option value="stretch">Stretch to fill the window</option></select>
   <div class="row"><button id="fullscreen" class="wii-btn">Full screen</button></div>
   <label for="scale">Render scale</label>
-  <select id="scale"><option value="1">1x (640×456)</option><option value="2">2x (1280×912)</option><option value="3">3x (1920×1368)</option><option value="4">4x (2560×1824)</option></select>
+  <select id="scale"><option value="auto">Auto (up to 2x, lower when frames run late)</option><option value="1">1x (640×456)</option><option value="2">2x (1280×912)</option><option value="3">3x (1920×1368)</option><option value="4">4x (2560×1824)</option></select>
   <label class="inline"><input id="perf" type="checkbox"> Show frame times</label>
   <div class="row"><button id="exportSave" class="wii-btn">Export save</button><button id="importSave" class="wii-btn">Import save</button></div>
   <input id="importSaveInput" type="file" accept=".zip" style="display:none">
