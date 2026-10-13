@@ -29,7 +29,13 @@ async function cookDisc(files, outDir, onProgress) {
     const mode = ext === ".arc" || ext === ".szs" ? "archive" : ext === ".bcsv" || ext === ".tbl" || ext === ".ast" ? "file" : ext === ".thp" ? null : "copy";
     if (mode) jobs.push({ rel, mode, file, size: file.size });
   }
-  jobs.sort((a, b) => b.size - a.size); // big archives first keeps the pool busy at the end
+  // The planets whose collision cook.py rebuilds from the model
+  // (collision.FROM_MODEL) take far longer than their size suggests (about
+  // 100 s each under Firefox's Pyodide): start them first, then the big
+  // archives, so the pool stays busy to the end.
+  const kSlow = ["ObjectData/MoonPlanet.arc", "ObjectData/FullMoonPlanet.arc", "ObjectData/HeavensDoorBlackHolePlanet.arc"];
+  const weight = (j) => (kSlow.includes(j.rel) ? 1e12 : j.size);
+  jobs.sort((a, b) => weight(b) - weight(a));
 
   const manifest = new Map(); // path -> {size, sha1}
   const dirs = new Map([["", outDir]]);
@@ -49,7 +55,7 @@ async function cookDisc(files, outDir, onProgress) {
   async function put(path, bytes) {
     const fh = await (await dirFor(path)).getFileHandle(path.split("/").pop(), { create: true });
     const w = await fh.createWritable();
-    await w.write(bytes);
+    if (bytes.byteLength) await w.write(bytes); // an empty write never resolved in Firefox 132
     await w.close();
     manifest.set(path, { size: bytes.byteLength, sha1: await sha1(bytes) });
   }
@@ -78,11 +84,13 @@ async function cookDisc(files, outDir, onProgress) {
   for (const [name, bytes] of Object.entries(dolResult.files)) await put("sys/" + name, bytes);
 
   let done = 0, doneBytes = 0;
+  const inFlight = (window.smgCookInFlight = new Set()); // for diagnosing a stuck job
   const totalBytes = jobs.reduce((s, j) => s + j.size, 0);
   let next = 0;
   async function runOn(w) {
     while (next < jobs.length) {
       const j = jobs[next++];
+      inFlight.add(j.rel);
       const data = await j.file.arrayBuffer();
       let out;
       if (j.mode === "copy") {
@@ -99,6 +107,7 @@ async function cookDisc(files, outDir, onProgress) {
         out = r.out;
       }
       if (out) await put("files/" + j.rel, out);
+      inFlight.delete(j.rel);
       done++;
       doneBytes += j.size;
       onProgress?.(doneBytes / totalBytes, `cooking ${done} / ${jobs.length} files`);

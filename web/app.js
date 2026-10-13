@@ -69,7 +69,8 @@ async function importFolder(source) {
     say(`${missing.length} files are missing or the wrong size (first: ${missing[0].path}). Re-run cook.py.`);
     return false;
   }
-  if (navigator.storage.persist) await navigator.storage.persist();
+  // Ask for persistent storage, but never wait on it: Firefox shows a prompt.
+  navigator.storage.persist?.().catch(() => {});
   const est = navigator.storage.estimate ? await navigator.storage.estimate() : null;
   const total = manifest.files.reduce((n, e) => n + e.size, 0);
   if (est && est.quota - est.usage < total) {
@@ -121,7 +122,8 @@ async function importFolder(source) {
 // A Dolphin-extracted disc: convert it in the browser (web/cook/cooker.js,
 // tools/cook/cook.py under Pyodide) straight into OPFS.
 async function cookFolder(files) {
-  if (navigator.storage.persist) await navigator.storage.persist();
+  // Ask for persistent storage, but never wait on it: Firefox shows a prompt.
+  navigator.storage.persist?.().catch(() => {});
   const root = await navigator.storage.getDirectory();
   const smg = await root.getDirectoryHandle("smg", { create: true });
   await smg.removeEntry("game", { recursive: true }).catch(() => {});

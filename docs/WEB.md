@@ -84,6 +84,17 @@ also works on a static host that can set headers (`_headers` is included for
 Netlify / Cloudflare Pages), with the relay elsewhere (enter its address
 under "Server" in the lobby). Choosing and paying for the host is P3-05.
 
+## Browsers
+
+- Chrome / Edge (Chromium): the main target; everything above is tested
+  there (tools/web/smoke.mjs).
+- Firefox 132: boots, imports a cooked folder (about 5 s) or converts an
+  extracted disc in the page (about 3-4 min: Pyodide is slower there),
+  plays from OPFS (tools/web/firefox-check.mjs, needs Playwright). No
+  `showDirectoryPicker`, so the folder input is used.
+- Safari: untested (automation needs "Allow Remote Automation" turned on
+  by hand).
+
 ## Smoke test
 
 ```sh

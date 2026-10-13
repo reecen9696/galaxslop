@@ -556,13 +556,14 @@ Starter list, unordered: switches, launch stars (fired), coins (collected), 1-up
 
 ### P5-02 Firefox and Safari support
 - lane: A
-- status: open
-- owner:
+- status: in_progress
+- owner: A
 - blocked_by: P3-06
 - touches: platform/src/web, web/
 - flags:
 - what: Both ship WebGPU now; what differs is OffscreenCanvas-on-worker, OPFS sync handles, JSPI and pipeline-cache behaviour. Build the test matrix, fix what is cheap, document what is not. Decide whether P5-03 is needed.
 - log:
+  - 2026-10-13 (A): Firefox 132 (Playwright, headless): boots to title, cooked-folder import ~5 s, in-page disc conversion ~3-4 min, plays from OPFS. Fixed for it: never await storage.persist() (Firefox prompts), no empty OPFS writes (hung). tools/web/firefox-check.mjs. Safari untested.
 
 ### P5-03 WebGL2 fallback renderer
 - lane: A
