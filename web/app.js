@@ -266,6 +266,7 @@ function showLobby() {
   const room = document.getElementById("room");
   const relay = document.getElementById("relay");
   name.value = store("smg.name") || "";
+  document.getElementById("contact").checked = store("smg.contact") !== "0";
   room.value = params.get("room") || "";
   relay.value = store("smg.relay") || defaultRelay;
   lobby.style.display = "block";
@@ -277,7 +278,9 @@ function showLobby() {
       store("smg.relay", relay.value.trim());
       lobby.style.display = "none";
       if (mode === "solo") return resolve({});
-      resolve({ SMG_RELAY: relay.value.trim(), SMG_ROOM: mode === "join" ? room.value.trim().toUpperCase() : "", SMG_NAME: n });
+      const contact = document.getElementById("contact").checked;
+      store("smg.contact", contact ? "1" : "0");
+      resolve({ SMG_RELAY: relay.value.trim(), SMG_ROOM: mode === "join" ? room.value.trim().toUpperCase() : "", SMG_NAME: n, SMG_CONTACT: contact ? "1" : "0" });
     };
     document.getElementById("join").onclick = () => (room.value.trim() ? go("join") : room.focus());
     document.getElementById("create").onclick = () => go("create");
