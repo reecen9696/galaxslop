@@ -216,9 +216,12 @@
   body.playing.touch #settings { top: calc(max(12px, env(safe-area-inset-top)) + 48px); right: auto; left: 50%; transform: translateX(-50%);
     max-height: calc(100dvh - max(12px, env(safe-area-inset-top)) - 56px); overflow-y: auto; overscroll-behavior: contain; }
   body.playing.touch #roombar { right: max(12px, env(safe-area-inset-right)); }
-  #t-rotate { display: none; position: absolute; left: 50%; top: 18%; transform: translateX(-50%); padding: 8px 16px; border-radius: 12px;
-    background: #000b; color: #fff; font-size: 15px; white-space: nowrap; pointer-events: none; }
-  @media (orientation: portrait) { #t-rotate { display: block; } }
+  /* Touch, held upright: the page turns a quarter so the game stays landscape (touch.js maps the
+     fingers back).  Fixed elements sit in the turned body, so viewport units swap: 100vw is its height. */
+  body.rotated { position: fixed; top: 0; left: 0; width: 100dvh; height: 100vw; transform-origin: 0 0; transform: rotate(90deg) translateY(-100%); }
+  body.rotated canvas { width: min(100dvh, calc(100vw * 16 / 9)); }
+  body.rotated.stretch canvas { width: 100dvh; height: 100vw; }
+  body.playing.touch.rotated #settings { max-height: calc(100vw - max(12px, env(safe-area-inset-top)) - 56px); }
 
   @media (max-width: 560px) {
     .screen { font-size: 14px; }

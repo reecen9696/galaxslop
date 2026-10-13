@@ -94,11 +94,21 @@ const smgHaptics = (() => {
   const root = document.createElement("div");
   root.id = "touch";
   root.innerHTML = `<div class="t-stick"><div class="t-knob"></div></div>` +
-    BUTTONS.map((b) => `<div id="${b.id}" class="t-btn">${b.label}</div>`).join("") +
-    `<div id="t-rotate">Turn your phone sideways</div>`;
+    BUTTONS.map((b) => `<div id="${b.id}" class="t-btn">${b.label}</div>`).join("");
   document.body.append(root);
   const base = root.querySelector(".t-stick"), knob = root.querySelector(".t-knob");
   const btnEls = BUTTONS.map((b) => ({ ...b, el: root.querySelector("#" + b.id) }));
+
+  // Held upright, the whole page is turned a quarter (body.rotated, index.html)
+  // so the game stays landscape.  Events and boxes come in screen space; the
+  // controls work in the page's own (landscape) space: x' = y, y' = W - x.
+  const rotated = () => document.body.classList.contains("rotated");
+  const at = (e) => (rotated() ? { x: e.clientY, y: innerWidth - e.clientX } : { x: e.clientX, y: e.clientY });
+  function box(el) {
+    const r = el.getBoundingClientRect();
+    return rotated() ? { left: r.top, top: innerWidth - r.right, width: r.height, height: r.width } : r;
+  }
+  const pageW = () => (rotated() ? innerHeight : innerWidth), pageH = () => (rotated() ? innerWidth : innerHeight);
 
   const fingers = new Map(); // pointerId -> { kind: "stick" | "button" | "aim", bit?, x0?, y0? }
   let held = 0, aimId = null;
@@ -114,7 +124,7 @@ const smgHaptics = (() => {
     // Generous hit areas: the nearest button whose circle, grown by 30%, holds the point.
     let best = null, bestD = Infinity;
     for (const b of btnEls) {
-      const r = b.el.getBoundingClientRect();
+      const r = box(b.el);
       if (!r.width) continue;
       const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
       const d = Math.hypot(x - cx, y - cy);
@@ -124,8 +134,8 @@ const smgHaptics = (() => {
   }
 
   // The stick zone: bottom left.  The stick's base jumps to where the thumb lands.
-  const inStickZone = (x, y) => x < innerWidth * 0.32 && y > innerHeight * 0.38;
-  const stickRadius = () => base.getBoundingClientRect().width / 2;
+  const inStickZone = (x, y) => x < pageW() * 0.32 && y > pageH() * 0.38;
+  const stickRadius = () => box(base).width / 2;
 
   function moveStick(f, x, y) {
     const r = stickRadius();
@@ -139,7 +149,7 @@ const smgHaptics = (() => {
   }
 
   function aim(x, y) {
-    const c = document.getElementById("canvas").getBoundingClientRect();
+    const c = box(document.getElementById("canvas"));
     if (!c.width) return;
     const px = Math.max(-1, Math.min(1, ((x - c.left) / c.width) * 2 - 1));
     const py = Math.max(-1, Math.min(1, ((y - c.top) / c.height) * 2 - 1));
@@ -150,7 +160,7 @@ const smgHaptics = (() => {
     if (e.target.closest?.("#gear, #settings, #roombar")) return;
     e.preventDefault();
     try { root.setPointerCapture(e.pointerId); } catch {}
-    const x = e.clientX, y = e.clientY;
+    const { x, y } = at(e);
     const b = buttonAt(x, y);
     if (b) {
       fingers.set(e.pointerId, { kind: "button", bit: b.bit });
@@ -160,7 +170,7 @@ const smgHaptics = (() => {
     } else if (inStickZone(x, y) && ![...fingers.values()].some((f) => f.kind === "stick")) {
       // Keep the whole base on screen.
       const r = stickRadius();
-      const x0 = Math.max(r + 8, x), y0 = Math.min(innerHeight - r - 8, y);
+      const x0 = Math.max(r + 8, x), y0 = Math.min(pageH() - r - 8, y);
       fingers.set(e.pointerId, { kind: "stick", x0, y0 });
       base.classList.add("live");
       base.style.left = x0 - r + "px";
@@ -179,11 +189,12 @@ const smgHaptics = (() => {
     const f = fingers.get(e.pointerId);
     if (!f) return;
     e.preventDefault();
-    if (f.kind === "stick") moveStick(f, e.clientX, e.clientY);
-    else if (f.kind === "aim" && e.pointerId === aimId) aim(e.clientX, e.clientY);
+    const { x, y } = at(e);
+    if (f.kind === "stick") moveStick(f, x, y);
+    else if (f.kind === "aim" && e.pointerId === aimId) aim(x, y);
     else if (f.kind === "button") {
       // Sliding a thumb onto a neighbouring button presses that one instead (A to B and back).
-      const b = buttonAt(e.clientX, e.clientY);
+      const b = buttonAt(x, y);
       if (b && b.bit !== f.bit) {
         f.bit = b.bit;
         press(b.bit);
@@ -219,8 +230,10 @@ const smgHaptics = (() => {
   const coarse = matchMedia("(pointer: coarse)");
   const pref = () => { try { return localStorage.getItem("smg.touch"); } catch { return null; } };
   let enabled = pref() === "1" || (pref() !== "0" && coarse.matches);
+  const portrait = matchMedia("(orientation: portrait)");
   function apply() {
     document.body.classList.toggle("touch", enabled);
+    document.body.classList.toggle("rotated", enabled && portrait.matches && document.body.classList.contains("playing"));
     write({ active: enabled ? 1 : 0 });
     const box = document.getElementById("touchCtl");
     if (box) box.checked = enabled;
@@ -234,6 +247,7 @@ const smgHaptics = (() => {
     try { localStorage.setItem("smg.touch", enabled ? "1" : "0"); } catch {}
     apply();
   });
+  portrait.addEventListener("change", apply);
   apply();
 
   // Every frame: tell the game the overlay is up (the module loads after this

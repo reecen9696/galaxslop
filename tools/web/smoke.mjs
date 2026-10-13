@@ -14,7 +14,7 @@
 // By default the page reads the dev server's game folder (?source=server).
 // --import feeds the folder to the page's import screen instead (OPFS);
 // --profile keeps the Chrome profile, and so OPFS and saves, between runs.
-// --mobile emulates a landscape phone (844x390, touch); --touch then sends
+// --mobile emulates a landscape phone (844x390, touch; "--mobile portrait" 390x844); --touch then sends
 // finger events at times: "ms:start|move|end:finger:x:y" in CSS pixels.
 //
 // Needs web/dev-server.mjs running.  Exit status 1 if any run stalls (the
@@ -133,7 +133,9 @@ async function oneRun(n) {
     }
   });
   if (args.mobile !== undefined) {
-    await c.send("Emulation.setDeviceMetricsOverride", { width: 844, height: 390, deviceScaleFactor: 2, mobile: true, screenOrientation: { type: "landscapePrimary", angle: 90 } }, sessionId);
+    const tall = args.mobile === "portrait";
+    await c.send("Emulation.setDeviceMetricsOverride", { width: tall ? 390 : 844, height: tall ? 844 : 390, deviceScaleFactor: 2, mobile: true,
+      screenOrientation: tall ? { type: "portraitPrimary", angle: 0 } : { type: "landscapePrimary", angle: 90 } }, sessionId);
     await c.send("Emulation.setTouchEmulationEnabled", { enabled: true, maxTouchPoints: 5 }, sessionId);
     await c.send("Emulation.setEmitTouchEventsForMouse", { enabled: true, configuration: "mobile" }, sessionId);
   }
