@@ -166,6 +166,13 @@ export class Relay {
     return this.rooms.size;
   }
 
+  // For the lobby's check before joining (GET /room/<code>): null when there
+  // is no such room.
+  roomInfo(code: string): { players: number; max: number } | null {
+    const room = this.rooms.get(code.toUpperCase());
+    return room ? { players: room.players.size, max: MAX_PLAYERS } : null;
+  }
+
   private onHello(c: Client, data: Uint8Array): void {
     if (c.room) return; // one Hello per connection
     let hello;

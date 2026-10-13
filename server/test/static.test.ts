@@ -1,7 +1,7 @@
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { startServer } from "../src/main.ts";
 
 describe("static hosting (STATIC_DIR)", () => {
@@ -54,5 +54,28 @@ describe("static hosting (STATIC_DIR)", () => {
   it("refuses paths outside the folder", async () => {
     expect((await fetch(base + "/..%2f..%2fetc%2fpasswd")).status).toBe(404);
     expect((await fetch(base + "/missing.js")).status).toBe(404);
+  });
+});
+
+describe("room lookup", () => {
+  let server: ReturnType<typeof startServer>;
+  beforeEach(async () => {
+    process.env.ROOMS = "PLAY22";
+    server = startServer(0, () => {});
+    await server.ready;
+  });
+  afterEach(async () => {
+    delete process.env.ROOMS;
+    await server.close();
+  });
+
+  it("answers 200 for a room that exists, any case, and 404 otherwise", async () => {
+    const base = `http://localhost:${server.port()}/room/`;
+    const ok = await fetch(base + "play22");
+    expect(ok.status).toBe(200);
+    expect(ok.headers.get("access-control-allow-origin")).toBe("*");
+    expect(await ok.json()).toEqual({ players: 0, max: 5 });
+    expect((await fetch(base + "NOPE99")).status).toBe(404);
+    expect((await fetch(base + "bad-code")).status).not.toBe(200);
   });
 });

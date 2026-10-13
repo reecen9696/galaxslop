@@ -138,6 +138,7 @@
   #roombar .rb-who { display: block; color: var(--ink); }
   #roombar .rb-who:empty { display: none; }
   #roombar .rb-bad { color: #c0392b; }
+  .field-err { color: #c0392b; font-weight: 600; min-height: 1.3em; margin-top: .3em; }
   #roombar .follow { font-size: 12px; padding: 1px 10px; min-height: 0; margin-left: 4px; border-width: 2px; border-radius: 10px; }
   #settings { position: fixed; top: 64px; right: 12px; z-index: 5; width: min(340px, calc(100vw - 24px)); display: none;
     padding: 0 16px 16px; background: var(--stripes); border: 2px solid #f4f5f7; border-radius: 16px; box-shadow: 0 6px 24px #000c; }
@@ -225,7 +226,8 @@
         <label class="field" id="tintLabel">Your colour</label>
         <div id="tint" class="swatches" role="radiogroup" aria-labelledby="tintLabel"></div>
         <label class="field" for="room">Room code</label>
-        <input id="room" class="wii-input" maxlength="8" placeholder="e.g. K7QF" autocomplete="off" spellcheck="false">
+        <input id="room" class="wii-input" maxlength="8" placeholder="e.g. K7QF2M" autocomplete="off" spellcheck="false" autocapitalize="characters">
+        <div id="roomErr" class="field-err" role="alert"></div>
         <div class="btn-row">
           <button id="join" class="wii-btn primary">Join room</button>
           <button id="create" class="wii-btn">Create a room</button>

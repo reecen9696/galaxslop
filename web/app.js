@@ -431,7 +431,18 @@ function showLobby() {
   const relay = document.getElementById("relay");
   name.value = store("smg.name") || "";
   document.getElementById("contact").checked = store("smg.contact") !== "0";
-  room.value = params.get("room") || "";
+  // Room codes: letters and digits only (the relay's codes are 6 of them;
+  // ROOMS= permanent ones can differ), upper case as you type.
+  const roomErr = document.getElementById("roomErr");
+  const cleanCode = (t) => t.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8);
+  room.value = cleanCode(params.get("room") || "");
+  room.addEventListener("input", () => {
+    const pos = room.selectionStart, before = room.value;
+    room.value = cleanCode(before);
+    const at = cleanCode(before.slice(0, pos)).length;
+    room.setSelectionRange(at, at);
+    roomErr.textContent = "";
+  });
   const tintBox = document.getElementById("tint");
   const savedTint = Number(store("smg.tint")) || 0;
   tintBox.innerHTML = kTints
@@ -466,7 +477,33 @@ function showLobby() {
       store("smg.contact", contact ? "1" : "0");
       resolve({ SMG_RELAY: relay.value.trim(), SMG_ROOM: mode === "join" ? room.value.trim().toUpperCase() : "", SMG_NAME: n, SMG_TINT: tint, SMG_CONTACT: contact ? "1" : "0" });
     };
-    document.getElementById("join").onclick = () => (room.value.trim() ? go("join") : room.focus());
+    // Join only a room the relay has: ask it first (GET /room/<code>).  If
+    // the relay cannot be asked (down, or an older relay without the
+    // lookup), join anyway and let the game report it.
+    const join = document.getElementById("join");
+    join.onclick = async () => {
+      const code = room.value;
+      const bad = (msg) => {
+        roomErr.textContent = msg;
+        room.focus();
+      };
+      if (!code) return bad("Type the room code first.");
+      if (code.length < 4) return bad("Room codes are 6 letters and numbers, like K7QF2M.");
+      join.disabled = true;
+      let res = null;
+      try {
+        const base = relay.value.trim().replace(/^ws/, "http").replace(/\/?$/, "/");
+        res = await fetch(new URL(`room/${code}`, base), { cache: "no-store", signal: AbortSignal.timeout(4000) });
+      } catch {}
+      join.disabled = false;
+      if (res?.status === 404) return bad(`There is no room ${code}. Check the code with whoever made it.`);
+      if (res?.ok) {
+        const info = await res.json().catch(() => null);
+        if (info && info.players >= info.max) return bad(`Room ${code} is full (${info.max} players).`);
+      }
+      roomErr.textContent = "";
+      go("join");
+    };
     document.getElementById("create").onclick = () => go("create");
     document.getElementById("solo").onclick = () => go("solo");
     // Not `onkeydown = (e) => cond && ...`: an on-handler returning false

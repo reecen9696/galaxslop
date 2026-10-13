@@ -17,9 +17,17 @@ export function startServer(port: number, log: (m: string) => void = console.log
   const relay = new Relay({ log, fixedRooms });
   const serve = process.env.STATIC_DIR ? staticHandler(process.env.STATIC_DIR, process.env.GAME_DIR) : (_req: unknown, res: { writeHead: (n: number) => { end: () => void } }) => res.writeHead(426).end();
   // /healthz: for the host's health check, with or without STATIC_DIR.
+  // /room/<code>: whether a room exists and how full it is, so the lobby
+  // refuses a wrong code before starting the game (any origin may ask: the
+  // dev page is on another port).
   const http = createServer((req, res) => {
+    const room = /^\/room\/([A-Za-z0-9]{1,16})$/.exec(req.url ?? "");
     if (req.url === "/healthz") res.writeHead(200, { "Content-Type": "text/plain" }).end("ok\n");
-    else serve(req, res);
+    else if (room) {
+      const info = relay.roomInfo(room[1]);
+      res.writeHead(info ? 200 : 404, { "Content-Type": "application/json", "Cache-Control": "no-store", "Access-Control-Allow-Origin": "*", "Cross-Origin-Resource-Policy": "cross-origin" });
+      res.end(JSON.stringify(info ?? { error: "no such room" }));
+    } else serve(req, res);
   });
   const ready = new Promise<void>((resolve, reject) => {
     http.once("listening", resolve);
