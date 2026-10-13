@@ -407,6 +407,7 @@ with no desync complaints at 100 ms delay.
 - done when: 3 people can get into a room without help.
 - log:
   - 2026-10-13 (A): web/app.js lobby before boot: name, room code (join) / create / solo, relay address under "Server"; remembered in localStorage; passed to the game as SMG_* (browser_env.js). Room bar under the canvas from the net: log lines. Verified headless that the settings reach the game. Note: the client connects at the first gameplay frame, so the room code shows once in a level.
+  - 2026-10-13 (A): lobby colour swatches (SMG_TINT, remembered); room panel shows the code and a player icon with the room's head count (you included; names on hover) instead of "Room ... with <names>".
 
 ### P2-07 Name tags and player list overlay
 - lane: A

@@ -417,7 +417,6 @@ function showLobby() {
 // Room panel, floating top right next to the settings gear, fed by the
 // game's net: log lines.
 const roombar = document.getElementById("roombar");
-const players = new Set();
 function toast(text) {
   const el = document.createElement("div");
   el.className = "toast";
@@ -432,10 +431,8 @@ function onNetLine(t) {
   if ((m = /^net: grand star (\d+) from (.+)$/.exec(t))) return toast(`${m[2]} got Grand Star ${m[1]}`);
   if ((m = /^net: joined room (\S+) as player/.exec(t))) {
     roombar.dataset.room = m[1];
-  } else if ((m = /^net: (.+) joined \(player/.exec(t))) {
-    players.add(m[1]);
-  } else if ((m = /^net: (.+) left$/.exec(t))) {
-    players.delete(m[1]);
+  } else if (/^net: .+ (joined \(player|left$)/.test(t)) {
+    // the count comes from the game's remote list; just redraw
   } else if (/^net: connected to /.test(t)) {
     roombar.dataset.state = "joining…";
   } else if (/^net: connection lost/.test(t) || (m = /^net: relay closed the connection/.exec(t))) {
@@ -468,6 +465,7 @@ function readRemotes() {
   }
   return out;
 }
+const kPersonIcon = `<svg viewBox="0 0 24 24" aria-label="players" role="img"><circle cx="12" cy="7.5" r="4.5"/><path d="M3 21c0-5 4-8 9-8s9 3 9 8z"/></svg>`;
 function renderRoomBar() {
   const code = roombar.dataset.room;
   if (!code) {
@@ -475,7 +473,7 @@ function renderRoomBar() {
     if (!roombar.dataset.mode) return;
     roombar.style.display = "block";
     const st = roombar.dataset.state || "connecting…";
-    const html = `<div class="rb-head"><span class="rb-label">Room</span>${roombar.dataset.want ? `<b>${roombar.dataset.want}</b>` : ""}</div>`
+    const html = `<div class="rb-head">${roombar.dataset.want ? `<b>${roombar.dataset.want}</b>` : ""}</div>`
       + `<span class="rb-who${st[0] === "!" ? " rb-bad" : ""}">${st.replace(/^!/, "").replace(/[<&"]/g, "")}</span>`;
     if (roombar.innerHTML !== html) roombar.innerHTML = html;
     return;
@@ -484,10 +482,14 @@ function renderRoomBar() {
   roombar.style.display = "block";
   const remotes = readRemotes();
   const esc = (t) => t.replace(/[<&"]/g, "");
-  const who = remotes.length
-    ? remotes.map((r) => `<span>${esc(r.name)}${r.same ? " (here)" : r.stage ? ` in ${esc(pretty(r.stage))} ${r.scenario} <button class="wii-btn follow" data-slot="${r.slot}">Follow</button>` : ""}</span>`).join("<br>")
-    : players.size ? "with " + [...players].map(esc).join(", ") : "waiting for friends";
-  const html = `<div class="rb-head"><span class="rb-label">Room</span><b>${code}</b></div><span class="rb-who">${who}</span>`;
+  // The head has the code and how many are in the room (you included),
+  // names on hover; below, only friends in another level, to Follow.
+  const who = remotes
+    .filter((r) => !r.same && r.stage)
+    .map((r) => `<span>${esc(r.name)} in ${esc(pretty(r.stage))} ${r.scenario} <button class="wii-btn follow" data-slot="${r.slot}">Follow</button></span>`)
+    .join("<br>");
+  const names = esc(remotes.map((r) => r.name).join(", ")) || "just you";
+  const html = `<div class="rb-head"><b>${code}</b><span class="rb-count" title="${names}">${kPersonIcon}${remotes.length + 1}</span></div><span class="rb-who">${who}</span>`;
   if (roombar.innerHTML !== html) roombar.innerHTML = html;
 }
 roombar.addEventListener("click", (e) => {
