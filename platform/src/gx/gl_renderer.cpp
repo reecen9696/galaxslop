@@ -317,6 +317,7 @@ struct Prepared {
     std::vector<Item> items;
     std::vector<ShaderUid> uids;
     std::vector<GLuint> cutProgs;  // cutaway variants of uids' programs, 0 until resolved
+    int pendingDraws = 0;           // draws whose program is still compiling (left out)
     std::vector<float> rows;    // vec4 matrix rows
     std::vector<u32> recs;      // kRecWords per draw record
     std::vector<float> states;  // vec4 light / projection / pixel states
@@ -396,7 +397,6 @@ struct Renderer::Impl {
         GLuint prog, vs, fs;
     };
     std::unordered_map<ShaderUid, AsyncProgram, ShaderUidHash> asyncPrograms;
-    int skippedDraws = 0;  // draws the last execute() left out for want of a program
     GLuint programAsync(const ShaderUid& uid);
     std::deque<ShaderUid> compileQueue;
     std::condition_variable compileCv;
@@ -1751,12 +1751,20 @@ void Renderer::Impl::upload(Prepared& p, bool syncPrograms) {
     }
 
     std::vector<GLuint> progs(p.uids.size());
+    std::vector<char> pending(p.uids.size(), 0);
     for (size_t i = 0; i < p.uids.size(); i++) {
         progs[i] = program(p.uids[i], syncPrograms);
+        if (progs[i] == 0) {
+            // Still compiling (not failed: a failed program is stored as 0).
+            std::lock_guard<std::mutex> lock(progLock);
+            pending[i] = asyncPrograms.count(p.uids[i]) || pendingPrograms.count(p.uids[i]);
+        }
     }
+    p.pendingDraws = 0;
     for (Item& it : p.items) {
         if (it.type == IT_DRAW) {
             it.program = progs[it.uid];
+            if (pending[it.uid]) p.pendingDraws++;
         }
     }
     p.cutProgs.assign(p.uids.size(), 0);
@@ -1978,7 +1986,6 @@ void Renderer::Impl::doCopy(const Item& it, EfbTarget& src, Renderer& r, bool vr
 }
 
 void Renderer::Impl::execute(EfbTarget& efb, const EyeView* eye, EfbTarget* hud, HudMode hudMode, Renderer& r) {
-    skippedDraws = 0;
     const std::vector<Item>& items = cur->items;
     const std::vector<std::shared_ptr<TexImage>>& textures = cur->frame->textures;
     u32 nativeW = cur->nativeW, nativeH = cur->nativeH;
@@ -2245,7 +2252,6 @@ void Renderer::Impl::execute(EfbTarget& efb, const EyeView* eye, EfbTarget* hud,
             continue;
         }
         if (!it.program || !it.idxCount) {
-            if (it.idxCount) skippedDraws++;  // program still compiling (parallel compile)
             continue;
         }
         EfbTarget& t = *cur;
@@ -2514,7 +2520,7 @@ bool Renderer::update() {
 
 bool Renderer::hasFrame() const { return sImpl && sImpl->cur; }
 
-int Renderer::lastSkippedDraws() const { return sImpl ? sImpl->skippedDraws : 0; }
+int Renderer::lastSkippedDraws() const { return sImpl && sImpl->cur ? sImpl->cur->pendingDraws : 0; }
 
 uint64_t Renderer::frameNumber() const { return hasFrame() ? sImpl->cur->number : 0; }
 

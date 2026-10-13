@@ -101,8 +101,9 @@ public:
     // to the most recently prepared one.  Returns true if the frame changed.
     bool update();
     bool hasFrame() const;
-    // Draws the last render() left out because their program was still
-    // compiling (GL_KHR_parallel_shader_compile): the picture is incomplete.
+    // Draws the current frame leaves out because their program is still
+    // compiling (GL_KHR_parallel_shader_compile, or Android's compile
+    // thread): the picture is incomplete.  Failed programs do not count.
     int lastSkippedDraws() const;
     uint64_t frameNumber() const;
 
