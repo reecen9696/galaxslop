@@ -302,11 +302,13 @@ static void recordTiming(double presentMs) {
     sStats.presentP95 = pct(present, 0.95);
     sStats.intervalP50 = pct(interval, 0.5);
     sStats.intervalP95 = pct(interval, 0.95);
+    float intervalMax = interval.empty() ? 0.0f : interval.back();  // sorted by pct()
+    float presentMax = present.empty() ? 0.0f : present.back();
     sStats.gameFrame = (uint32_t)gpu::renderer().frameNumber();
     static const bool log = getenv("PETARI_PERFLOG") != nullptr;
     if (log) {
-        port_log("web: %u fps, present %.1f/%.1f ms, interval %.1f/%.1f ms (p50/p95)", sStats.fps, sStats.presentP50, sStats.presentP95,
-                 sStats.intervalP50, sStats.intervalP95);
+        port_log("web: %u fps, present %.1f/%.1f/%.1f ms, interval %.1f/%.1f/%.1f ms (p50/p95/max)", sStats.fps, sStats.presentP50,
+                 sStats.presentP95, presentMax, sStats.intervalP50, sStats.intervalP95, intervalMax);
     }
     present.clear();
     interval.clear();

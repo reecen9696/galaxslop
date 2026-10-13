@@ -247,14 +247,15 @@ Chromium, with sound, on a gamepad, at 60 fps on the reference machine.
 
 ### P1-06 Pipeline cache and seed
 - lane: A
-- status: open
-- owner:
+- status: in_progress
+- owner: A
 - blocked_by: P0-09
 - touches: platform/src/gx, platform/src/web, web/src/shaders, tools/bench
 - flags: parallel-ok
 - what: Aurora keeps a pipeline cache with transferable entries (zstd by default). Persist it to OPFS on the web and to the user data dir natively; load it before the first frame. Pipeline creation goes through `createRenderPipelineAsync`; never block the frame on it. Ship a seed built by a `tools/bench/shader-tour.ts` script that visits every galaxy headless (human runs it once with a real disc; the seed contains no game data, only pipeline descriptors and WGSL). Version the seed against the Aurora commit; a submodule bump invalidates it. If P0-11 went no-go, this task is the WebGL2 version: GLSL source cache keyed by TEV hash plus `KHR_parallel_shader_compile`.
 - done when: second load of Good Egg has no pipeline hitch over 50 ms.
 - log:
+  - 2026-10-13 (A): WebGL2 path: KHR_parallel_shader_compile, programs compile in the driver and a draw waits (skipped) until ready instead of blocking the frame. Good Egg load worst present 192 -> 33 ms, worst interval 209 -> 89 ms. Program binaries do not exist in WebGL (0 formats), so the "cache" is the browser's own shader cache; left: texture-upload spikes.
 
 ### P1-07 Frame pacing and resolution scale
 - lane: A

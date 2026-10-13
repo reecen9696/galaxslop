@@ -100,6 +100,15 @@ GLuint compileShader(GLenum type, const std::string& src) {
     return s;
 }
 
+GLuint setupProgram(GLuint p);
+
+// GL_KHR_parallel_shader_compile (WebGL2 in Chrome): programs compile while
+// frames go on; a draw whose program is not ready yet is skipped.
+bool sParallelCompile = false;
+#ifndef GL_COMPLETION_STATUS_KHR
+#define GL_COMPLETION_STATUS_KHR 0x91B1
+#endif
+
 GLuint linkProgram(GLuint vs, GLuint fs) {
     GLuint p = glCreateProgram();
     glAttachShader(p, vs);
@@ -117,6 +126,11 @@ GLuint linkProgram(GLuint vs, GLuint fs) {
         glDeleteProgram(p);
         return 0;
     }
+    return setupProgram(p);
+}
+
+// Sampler units and the uniform block slot of a linked program.
+GLuint setupProgram(GLuint p) {
     // Texture units and the uniform block slot (no layout(binding) before
     // GLSL ES 3.10 / GLSL 4.20).
     GLint prevProg = 0;
@@ -377,6 +391,12 @@ struct Renderer::Impl {
     std::mutex progLock;
     std::unordered_map<ShaderUid, GLuint, ShaderUidHash> programs;
     std::unordered_set<ShaderUid, ShaderUidHash> pendingPrograms;
+    // Programs compiling in the driver (sParallelCompile), render thread only.
+    struct AsyncProgram {
+        GLuint prog, vs, fs;
+    };
+    std::unordered_map<ShaderUid, AsyncProgram, ShaderUidHash> asyncPrograms;
+    GLuint programAsync(const ShaderUid& uid);
     std::deque<ShaderUid> compileQueue;
     std::condition_variable compileCv;
     std::thread compiler;
@@ -520,6 +540,7 @@ void Renderer::Impl::init() {
     std::string exts;
     for (GLint i = 0; i < numExt; i++) {
         const char* e = (const char*)glGetStringi(GL_EXTENSIONS, (GLuint)i);
+        if (strcmp(e, "GL_KHR_parallel_shader_compile") == 0) sParallelCompile = true;
         if (strstr(e, "parallel") || strstr(e, "binary") || strstr(e, "multiview") || strstr(e, "buffer_storage") || strstr(e, "QCOM") || strstr(e, "foveat")) {
             exts += e;
             exts += ' ';
@@ -691,6 +712,9 @@ GLuint Renderer::Impl::program(const ShaderUid& uid, bool sync) {
         if (it != programs.end()) {
             return it->second;
         }
+        if (!sync && !compiler.joinable() && sParallelCompile) {
+            return programAsync(uid);  // progLock is free of other threads here
+        }
         // Queued for the compile thread; without one it is built right here.
         if (!sync && compiler.joinable()) {
             if (pendingPrograms.insert(uid).second) {
@@ -705,6 +729,66 @@ GLuint Renderer::Impl::program(const ShaderUid& uid, bool sync) {
     programs[uid] = prog;
     pendingPrograms.erase(uid);
     storeBinary(uid, prog);
+    return prog;
+}
+
+// Starts a program compiling in the driver, or finishes one that has; 0 until
+// it is ready.  Called with progLock held (render thread, no compile thread).
+GLuint Renderer::Impl::programAsync(const ShaderUid& uid) {
+    auto it = asyncPrograms.find(uid);
+    if (it == asyncPrograms.end()) {
+        std::string vsrc, fsrc;
+        generateSources(uid, &vsrc, &fsrc);
+        AsyncProgram a;
+        a.vs = glCreateShader(GL_VERTEX_SHADER);
+        a.fs = glCreateShader(GL_FRAGMENT_SHADER);
+        const char* v = vsrc.c_str();
+        const char* f = fsrc.c_str();
+        glShaderSource(a.vs, 1, &v, nullptr);
+        glShaderSource(a.fs, 1, &f, nullptr);
+        glCompileShader(a.vs);
+        glCompileShader(a.fs);
+        a.prog = glCreateProgram();
+        glAttachShader(a.prog, a.vs);
+        glAttachShader(a.prog, a.fs);
+        glLinkProgram(a.prog);  // no status query: that would wait for the compile
+        asyncPrograms[uid] = a;
+        return 0;
+    }
+    AsyncProgram a = it->second;
+    GLint done = 0;
+    glGetProgramiv(a.prog, GL_COMPLETION_STATUS_KHR, &done);
+    if (!done) {
+        return 0;
+    }
+    asyncPrograms.erase(it);
+    GLint ok = 0;
+    glGetProgramiv(a.prog, GL_LINK_STATUS, &ok);
+    GLuint prog = 0;
+    if (ok) {
+        prog = setupProgram(a.prog);
+    } else {
+        char log[4096];
+        GLuint shaders[2] = {a.vs, a.fs};
+        for (GLuint sh : shaders) {
+            GLint compiled = 0;
+            glGetShaderiv(sh, GL_COMPILE_STATUS, &compiled);
+            if (!compiled) {
+                glGetShaderInfoLog(sh, sizeof(log), nullptr, log);
+                port_log("gl: %s shader compile failed: %s", sh == a.vs ? "vertex" : "fragment", log);
+            }
+        }
+        glGetProgramInfoLog(a.prog, sizeof(log), nullptr, log);
+        port_log("gl: program link failed: %s", log);
+        glDeleteProgram(a.prog);
+    }
+    glDeleteShader(a.vs);
+    glDeleteShader(a.fs);
+    programs[uid] = prog;  // 0 stays: a failed program is not retried
+    static int built = 0;
+    if ((++built % 50) == 0) {
+        port_log("gl: %d shader programs built (parallel compile)", built);
+    }
     return prog;
 }
 
