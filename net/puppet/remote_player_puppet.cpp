@@ -303,29 +303,82 @@ void RemotePlayerPuppet::init(const JMapInfoIter&) {
     makeActorAppeared();
 }
 
-// GhostPlayer::attackSensor, racing branch: push the local Mario out, unless
-// he is the faster of the two.  Each client moves only its own Mario, so
-// with plain mutual repulsion the walker is deflected around the stander
-// and the stander, seeing the walker late, barely moves.  Instead the faster
-// one is the pusher: he walks on (into the puppet), and on the other
-// player's client the same contact shoves the slower one out of the way.
-// Equal speeds (both standing) push both apart.
+// GhostPlayer::attackSensor, racing branch, made gentle.  Each client moves
+// only its own Mario.  The faster of the two is the pusher: he walks on
+// (into the puppet) with a little resistance, and on the other player's
+// client the same contact moves the slower one out of the way.  Equal
+// speeds (both standing) push both apart.
+//
+// The puppet is drawn in the past (100 ms behind, plus half a round trip
+// for the state to arrive), so contact is measured against where the other
+// player is now: the drawn position carried forward by their velocity.
+// And the push is smooth: part of the overlap per frame, capped near the
+// pusher's speed, instead of the game's whole-overlap shove
+// (MarioActor::receiveMsgPush, which moved a lot or a little depending on
+// how stale the puppet's position happened to be).  Mid-air the game's own
+// push message still runs: it is what lets a falling Mario stomp or
+// ground-pound the other player.
 void RemotePlayerPuppet::attackSensor(HitSensor* pSender, HitSensor* pReceiver) {
     if (!mSolid || !MR::isSensorPlayer(pReceiver)) {
         return;
     }
-    const f32 kPusherMargin = 1.0f;  // units/frame faster than the other
-    f32 localSpeed = MarioAccess::getPlayerActor()->mVelocity.length();
-    if (localSpeed > mVelocity.length() + kPusherMargin) {
+    MarioActor* local = MarioAccess::getPlayerActor();
+    if (!MR::isOnGroundPlayer()) {
+        if (MR::sendMsgPush(pReceiver, pSender)) {
+            static const bool sLog = getenv("PETARI_PUPPETLOG") != nullptr;
+            static u32 sN = 0;
+            if (sLog && (sN++ % 30) == 0) {
+                port_log("puppet: pushing the local player in the air (player %u)", mRemoteId);
+            }
+        }
         return;
     }
-    if (MR::sendMsgPush(pReceiver, pSender)) {
-        static const bool sLog = getenv("PETARI_PUPPETLOG") != nullptr;
-        static u32 sN = 0;
-        if (sLog && (sN++ % 30) == 0) {
-            port_log("puppet: pushing the local player (player %u)", mRemoteId);
-        }
+
+    // Where the other player is now (frames at 60 per second).
+    f32 rtt = net::netRttMs();
+    f32 aheadFrames = (100.0f + (rtt > 0.0f ? rtt * 0.5f : 50.0f)) * 0.06f;
+    if (aheadFrames > 15.0f) {
+        aheadFrames = 15.0f;  // a long stall: do not throw the guess far
     }
+    TVec3f other = mPosition + mVelocity * aheadFrames;
+
+    // Apart along the ground (perpendicular to the local player's gravity).
+    const TVec3f& up = -*MR::getPlayerGravity();
+    TVec3f away = local->mPosition - other;
+    away -= up * away.dot(up);
+    f32 dist = away.length();
+    const f32 kContact = 80.0f;  // shoulder to shoulder
+    if (dist >= kContact) {
+        return;
+    }
+    if (dist < 1.0f) {
+        // Right on top of each other: part by player id so both agree.
+        MtxPtr base = local->getBaseMtx();
+        away.set(base[0][0], base[1][0], base[2][0]);  // his side
+        if (mRemoteId < net::netLocalId()) {
+            away = -away;
+        }
+        dist = 0.0f;
+    } else {
+        away *= 1.0f / dist;
+    }
+    f32 overlap = kContact - dist;
+
+    f32 localSpeed = local->mVelocity.length();
+    f32 otherSpeed = mVelocity.length();
+    const f32 kPusherMargin = 1.0f;  // units/frame faster than the other
+    f32 step;
+    if (localSpeed > otherSpeed + kPusherMargin) {
+        step = overlap * 0.15f;  // the pusher: a little resistance
+        if (step > 1.5f) step = 1.5f;
+    } else if (otherSpeed > localSpeed + kPusherMargin) {
+        step = overlap * 0.5f;  // being pushed: kept in front of the pusher
+        if (step > otherSpeed + 2.0f) step = otherSpeed + 2.0f;
+    } else {
+        step = overlap * 0.3f;  // both slow: part gently
+        if (step > 3.0f) step = 3.0f;
+    }
+    local->mMario->push(away * step);
 }
 
 // GhostPlayer::receiveMsgPlayerAttack without the star bits: the stomping

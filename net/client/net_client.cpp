@@ -321,6 +321,7 @@ const RemoteView& netRemote(int slot) { return session().views[slot]; }
 const char* netRoomCode() { return session().room.c_str(); }
 
 uint8_t netLocalId() { return session().you; }
+float netRttMs() { return session().rttMs; }
 
 void netSendRaw(const uint8_t* data, size_t len) {
     Session& s = session();

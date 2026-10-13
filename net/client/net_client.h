@@ -52,6 +52,8 @@ bool netPollContact(Contact* out);
 const char* netRoomCode();
 // This client's player id in the room (1-based; 0 before joining).
 uint8_t netLocalId();
+// Round trip to the relay in ms (-1 before the first pong).
+float netRttMs();
 
 }  // namespace net
 
