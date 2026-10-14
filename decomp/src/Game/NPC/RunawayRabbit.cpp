@@ -24,6 +24,9 @@
 #include "Game/Util/SoundUtil.hpp"
 #include "Game/Util/StarPointerUtil.hpp"
 #include "Game/Util/TalkUtil.hpp"
+#ifdef TARGET_PC
+#include "net/world/world_sync.h"
+#endif
 
 void RunawayRabbit_FORCE_MATCH_SDATA2() {
     (void)1.0f;
@@ -151,6 +154,9 @@ void RunawayRabbit::init(const JMapInfoIter& rIter) {
     MR::hideModel(this);
     MR::invalidateHitSensors(this);
     initNerve(GET_NERVE(RunawayRabbit, RunawayRabbitNrvNoActive));
+#ifdef TARGET_PC
+    port_world_catch_register(this);  // co-op: a catch counts for everyone, it is no defeat
+#endif
 
     if (MR::useStageSwitchReadAppear(this, rIter)) {
         MR::listenStageSwitchOnAppear(this, MR::Functor(this, &RunawayRabbit::startRunnaway));
@@ -219,6 +225,11 @@ void RunawayRabbit::activate() {
 }
 
 void RunawayRabbit::startRunnaway() {
+#ifdef TARGET_PC
+    if (isCaught()) {
+        return;  // co-op: another player caught it before its switch came on here
+    }
+#endif
     if (mIsActive) {
         MR::showModel(this);
         MR::invalidateClipping(this);
@@ -262,6 +273,9 @@ void RunawayRabbit::attackSensor(HitSensor* pSender, HitSensor* pReceiver) {
     if (MR::isSensorPlayer(pReceiver)) {
         if (pSender == getSensor("Catch") && isCaughtable()) {
             mCollect->noticeCaughtRabbit(this);
+#ifdef TARGET_PC
+            port_world_caught(this);  // co-op: caught for everyone
+#endif
             MR::requestStartDemoMarioPuppetable(this, "\x95\xdf\x82\xdc\x82\xe8", GET_NERVE(RunawayRabbit, RunawayRabbitNrvCaught),
                                                 GET_NERVE(RunawayRabbit, RunawayRabbitNrvTryCaughtDemo));
         } else if (isCaught()) {
@@ -540,3 +554,41 @@ bool RunawayRabbit::isValidFollow(s32 id) const {
 
     return true;
 }
+
+#ifdef TARGET_PC
+// Co-op (net/world): catches are shared, so the three rabbits can be caught by
+// three players.
+
+// The local player is catching it, or has caught it.
+bool RunawayRabbit::isCatchStarted() const {
+    return isNerve(GET_NERVE(RunawayRabbit, RunawayRabbitNrvTryCaughtDemo)) || isNerve(GET_NERVE(RunawayRabbit, RunawayRabbitNrvCaught)) ||
+           isNerve(GET_NERVE(RunawayRabbit, RunawayRabbitNrvCaughtTalk)) || isNerve(GET_NERVE(RunawayRabbit, RunawayRabbitNrvCaughtEnd)) ||
+           isNerve(GET_NERVE(RunawayRabbit, RunawayRabbitNrvStop));
+}
+
+// Caught by someone else: gone here, in the state a local catch ends in
+// (isCaught), without the catch demo.
+void RunawayRabbit::caughtByOtherPlayer() {
+    setNerve(GET_NERVE(RunawayRabbit, RunawayRabbitNrvStop));
+    vanish();
+}
+
+void RunawayRabbit::vanish() {
+    if (!MR::isDead(mSpotMarkLight)) {
+        mSpotMarkLight->kill();
+    }
+    if (!MR::isDead(this)) {
+        kill();
+    }
+}
+
+extern "C" int port_runaway_rabbit_catchable(void* pRabbit) {
+    RunawayRabbit* rabbit = static_cast< RunawayRabbit* >(pRabbit);
+    return rabbit->mIsActive && !rabbit->isCatchStarted() ? 1 : 0;
+}
+
+extern "C" int port_runaway_rabbit_caught_remote(void* pRabbit) {
+    RunawayRabbit* rabbit = static_cast< RunawayRabbit* >(pRabbit);
+    return rabbit->mCollect->noticeCaughtRabbitByOtherPlayer(rabbit) ? 1 : 0;
+}
+#endif

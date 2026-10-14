@@ -49,6 +49,12 @@ public:
     bool isChasing() const;
     bool isEnableBlow() const NO_INLINE;
     bool isValidFollow(s32 id) const;
+#ifdef TARGET_PC
+    // Co-op (net/world): another player caught this rabbit.
+    bool isCatchStarted() const;
+    void caughtByOtherPlayer();
+    void vanish();
+#endif
     s32 getGroupId() const {
         return mGroupId;
     }

@@ -41,6 +41,16 @@ void port_world_loot_dropped(const void* source, int kind, float x, float y, flo
 void port_world_item_collected(void* actor);
 // The same, `purple`: a purple coin (counted for everyone).
 void port_world_item_collected2(void* actor, int purple);
+// RunawayRabbit::init: an actor whose catch is shared (kWorldCaught), so
+// its death is no defeat.  RunawayRabbit::attackSensor: the local player
+// caught it.
+void port_world_catch_register(void* actor);
+void port_world_caught(void* actor);
+// RunawayRabbit.cpp: count a rabbit another player caught (0: it was caught
+// here already).
+int port_runaway_rabbit_caught_remote(void* rabbit);
+// Not caught yet, and in a group none of whose rabbits is caught (debug).
+int port_runaway_rabbit_catchable(void* rabbit);
 // Coin.cpp: count a purple coin another player took.
 void port_coin_count_purple(void);
 // ChipGroup::noticeGet: the local player took chip `index` (registration
@@ -85,6 +95,9 @@ void port_world_star_got(int id);
 int port_power_star_pull_to_player(void* star);
 // Debug (mode 103): beat the nearest event star host (as a boss's defeat does).
 void port_world_debug_event_star(float x, float y, float z);
+// Debug (mode 108): the local player catches the nearest star bunny
+// (without the catch demo: counted here and told to the room).
+void port_world_debug_catch_nearest(float x, float y, float z);
 // Debug (mode 105): the local player hits the nearest boss.
 void port_world_debug_hit_boss(float x, float y, float z);
 // Debug: the local player grabs the nearest waiting power star.
@@ -128,6 +141,7 @@ enum : uint8_t {
     kWorldBossHit = 9,          // a hit on a boss: id = placement id or ordinal, pos = sender offset,
                                 // a = msg | sensor index << 16, b = sender sensor type | placed << 16
     kWorldChipGot = 10,         // a star chip taken: id = type << 24 | index << 16 | group (u16)
+    kWorldCaught = 11,          // a player caught a star bunny (Gateway's RunawayRabbit): id = placement id
 };
 // Placement id: FNV-1a of the name and the position rounded to whole units.
 uint32_t worldPlacementId(const char* name, float x, float y, float z);

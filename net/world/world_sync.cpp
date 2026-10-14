@@ -77,6 +77,7 @@ struct World {
     std::unordered_map<uint32_t, void*> actorOf;  // placement id -> placed actor
     std::unordered_set<void*> unplaced;           // actors spawned during play (no placement id)
     std::unordered_set<void*> items;              // coins and star bits, placed or pooled
+    std::unordered_set<void*> catches;            // caught rather than defeated (star bunnies)
     std::vector<Event> inbox;
     // This visit's defeats and pickups of placed actors (local or received),
     // told to players who arrive in the stage later.
@@ -207,7 +208,7 @@ bool currentStage(uint32_t* pStage, uint8_t* pScenario) {
 // (stable ids) are worth repeating to an arrival.
 void remember(const Event& e) {
     World& w = world();
-    bool byId = e.kind == kWorldEnemyDefeated || e.kind == kWorldItemCollected;
+    bool byId = e.kind == kWorldEnemyDefeated || e.kind == kWorldItemCollected || e.kind == kWorldCaught;
     if ((byId && e.id == 0) || (!byId && e.kind != kWorldSwitch && e.kind != kWorldEventStar && e.kind != kWorldChipGot)) {
         return;
     }
@@ -391,6 +392,7 @@ extern "C" void port_world_scene_reset(void) {
     w.actorOf.clear();
     w.unplaced.clear();
     w.items.clear();
+    w.catches.clear();
     w.inbox.clear();
     w.history.clear();
     w.historyScenario = 0xFF;
@@ -572,8 +574,9 @@ extern "C" void port_world_actor_dead(void* actorPtr) {
     }
     auto it = w.idOf.find(actorPtr);
     bool placed = it != w.idOf.end();
-    if ((!placed && w.unplaced.count(actorPtr) == 0) || w.items.count(actorPtr) != 0 || !hasEnemySensor(actor)) {
-        return;
+    if ((!placed && w.unplaced.count(actorPtr) == 0) || w.items.count(actorPtr) != 0 || w.catches.count(actorPtr) != 0 ||
+        !hasEnemySensor(actor)) {
+        return;  // a caught star bunny goes as kWorldCaught instead
     }
     Event e{};
     if (!currentStage(&e.stage, &e.scenario)) {
@@ -589,6 +592,60 @@ extern "C" void port_world_actor_dead(void* actorPtr) {
     send(e);
     remember(e);
     if (logging()) port_log("world: defeated %s (%s %08x), told the room", actor->mName, placed ? "id" : "spawned", e.id);
+}
+
+extern "C" void port_world_catch_register(void* actor) {
+    if (!enabled() || actor == nullptr) {
+        return;
+    }
+    PortHostAllocScope host;
+    world().catches.insert(actor);
+}
+
+extern "C" void port_world_caught(void* actorPtr) {
+    LiveActor* actor = static_cast< LiveActor* >(actorPtr);
+    World& w = world();
+    if (!enabled() || !w.live) {
+        return;
+    }
+    auto it = w.idOf.find(actorPtr);
+    Event e{};
+    if (it == w.idOf.end() || !currentStage(&e.stage, &e.scenario)) {
+        return;
+    }
+    e.kind = kWorldCaught;
+    e.id = it->second;
+    e.nameHash = hashName(actor->mName);
+    e.pos[0] = actor->mPosition.x;
+    e.pos[1] = actor->mPosition.y;
+    e.pos[2] = actor->mPosition.z;
+    PortHostAllocScope host;
+    send(e);
+    remember(e);
+    if (logging()) port_log("world: caught %s (%08x), told the room", actor->mName, e.id);
+}
+
+extern "C" void port_world_debug_catch_nearest(float x, float y, float z) {
+    World& w = world();
+    LiveActor* best = nullptr;
+    float bestD = 1e30f;
+    for (void* p : w.catches) {
+        LiveActor* a = static_cast< LiveActor* >(p);
+        float dx = a->mPosition.x - x, dy = a->mPosition.y - y, dz = a->mPosition.z - z;
+        float d = dx * dx + dy * dy + dz * dz;
+        if (d < bestD && port_runaway_rabbit_catchable(p)) {
+            bestD = d;
+            best = a;
+        }
+    }
+    if (best == nullptr) {
+        port_log("world: debug: no star bunny to catch");
+        return;
+    }
+    port_log("world: debug: catching %s at %.0f %.0f %.0f", best->mName, best->mPosition.x, best->mPosition.y, best->mPosition.z);
+    if (port_runaway_rabbit_caught_remote(best)) {
+        port_world_caught(best);
+    }
 }
 
 // ---- Switches ----
@@ -991,8 +1048,20 @@ extern "C" void port_world_update(void) {
             dropLocally(e);
             continue;
         }
+        if (e.kind == kWorldCaught) {
+            // Counted here even if it never showed here (dead or hidden).
+            auto it = w.actorOf.find(e.id);
+            if (it == w.actorOf.end() || w.catches.count(it->second) == 0) {
+                continue;
+            }
+            if (port_runaway_rabbit_caught_remote(it->second)) {
+                if (logging()) port_log("world: %s caught by another player: counted here", static_cast< LiveActor* >(it->second)->mName);
+                remember(e);
+            }
+            continue;
+        }
         LiveActor* actor = findLocal(e);
-        if (actor == nullptr || MR::isDead(actor)) {
+        if (actor == nullptr || MR::isDead(actor) || w.catches.count(actor) != 0) {
             continue;  // already gone here (or no match)
         }
         if (e.kind == kWorldEnemyDefeated) {

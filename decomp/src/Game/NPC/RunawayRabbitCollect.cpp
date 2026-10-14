@@ -281,3 +281,62 @@ void RunawayRabbitCollect::exeActive() {
         kill();
     }
 }
+
+#ifdef TARGET_PC
+// Co-op (net/world): another player caught `pRabbit`.  It counts here as if
+// caught here, so the three can be caught by different players.  The last
+// one links as a local catch does (the all-caught demo, which brings out
+// Rosalina); the others only play the catch jingle, without their Luma's
+// talk.  False if it was caught here already (or is being caught).
+bool RunawayRabbitCollect::noticeCaughtRabbitByOtherPlayer(RunawayRabbit* pRabbit) {
+    s32 groupId = pRabbit->getGroupId();
+
+    for (s32 i = 0; i < mRabbitNum; i++) {
+        RunawayRabbit* rabbit = mRabbit[i];
+        bool sameGroup = rabbit == pRabbit || (groupId >= 0 && groupId == rabbit->getGroupId());
+        if (sameGroup && rabbit->isCatchStarted()) {
+            return false;
+        }
+    }
+
+    // A group is one rabbit in one of several hiding places: the caught one
+    // is the group's, wherever it showed here.
+    pRabbit->mIsActive = true;
+    for (s32 i = 0; i < mRabbitNum; i++) {
+        RunawayRabbit* rabbit = mRabbit[i];
+        if (rabbit != pRabbit && groupId >= 0 && groupId == rabbit->getGroupId()) {
+            rabbit->mIsActive = false;
+            rabbit->vanish();
+        }
+    }
+
+    mCaughtRabbitCount++;
+    for (s32 i = 0; i < mRabbitNum; i++) {
+        mRabbit[i]->incrementRunawayLevel();
+    }
+    pRabbit->caughtByOtherPlayer();
+
+    s32 caughtCount = 0;
+    for (s32 i = 0; i < mRabbitNum; i++) {
+        if (mRabbit[i]->mIsActive && mRabbit[i]->isCaught()) {
+            caughtCount++;
+        }
+    }
+
+    if (caughtCount < mCompleteRabbitCount) {
+        pRabbit->mIsLinked = true;
+        mLinkedRabbitCount++;
+        for (s32 j = 0; j < mTicoNum; j++) {
+            s32 castId = mTico[j]->mDemoCastID;
+            if (castId == groupId && castId >= 0 && castId < (s32)ARRAY_SIZE(mIsAppearTico)) {
+                mIsAppearTico[castId] = true;
+            }
+        }
+        if (isNerve(GET_NERVE(RunawayRabbitCollect, RunawayRabbitCollectNrvActive))) {
+            MR::startSystemSE(caughtCount == mCompleteRabbitCount - 1 ? "SE_SY_RUNAWAY_RABBIT_GET_2" : "SE_SY_RUNAWAY_RABBIT_GET_1");
+        }
+    }
+
+    return true;
+}
+#endif

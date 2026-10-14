@@ -48,6 +48,8 @@ void port_register_mario_common_effects(LiveActor* pActor);  // MarioEffect.cpp
 #include "net/puppet/puppet_tint.h"
 #include "net/world/world_sync.h"
 #include "port/port.h"
+
+extern "C" void port_net_request_follow(int slot);  // GameDataFunction.cpp
 #include "revolution/gx.h"
 #include <JSystem/J3DGraphAnimator/J3DJoint.hpp>
 #include <JSystem/J3DGraphAnimator/J3DModel.hpp>
@@ -1033,6 +1035,78 @@ void trySpawnSpacing() {
     port_log("puppet: spawn spacing: player %d has no room to the side; staying", id);
 }
 
+// Go to a player (port_net_request_goto).  The request is kept by player id
+// (a slot can be reused by someone else) for up to a minute, across the
+// stage change that takes us to their galaxy.
+std::atomic<int> sGotoRequest{-1};  // slot asked for, from any thread
+int sGotoId = 0;                    // player being gone to (0: none)
+int sGotoFrames = 0;                // frames spent on it
+bool sGotoFollowed = false;         // asked for the stage change already
+
+void tryGoto() {
+    int slot = sGotoRequest.exchange(-1);
+    if (slot >= 0 && slot < net::kMaxRemotes && net::netRemote(slot).present) {
+        sGotoId = net::netRemote(slot).id;
+        sGotoFrames = 0;
+        sGotoFollowed = false;
+        port_log("puppet: going to %s", net::netRemote(slot).name);
+    }
+    if (sGotoId == 0) {
+        return;
+    }
+    slot = -1;
+    for (int i = 0; i < net::kMaxRemotes; i++) {
+        if (net::netRemote(i).present && net::netRemote(i).id == sGotoId) slot = i;
+    }
+    if (slot < 0 || ++sGotoFrames > 60 * 60) {
+        port_log("puppet: gave up going to player %d (%s)", sGotoId, slot < 0 ? "left" : "took too long");
+        sGotoId = 0;
+        return;
+    }
+    const net::RemoteView& v = net::netRemote(slot);
+    if (!v.visible) {
+        // Elsewhere: load their galaxy and star; the warp follows there.
+        if (!sGotoFollowed && v.pose.stageHash != 0) {
+            sGotoFollowed = true;
+            port_net_request_follow(slot);
+        }
+        return;
+    }
+    // Here: not in the middle of a cutscene, a cannon, a pipe... of our own.
+    if (!MR::isExistMario() || MR::isDemoActive() || MR::isPlayerInBind() || sSpawnPending) {
+        return;
+    }
+    TVec3f at(v.pose.pos[0], v.pose.pos[1], v.pose.pos[2]);
+    TVec3f up(v.pose.up[0], v.pose.up[1], v.pose.up[2]);
+    TVec3f front(v.pose.front[0], v.pose.front[1], v.pose.front[2]);
+    if (MR::normalizeOrZero(&up)) {
+        up.set(0.0f, 1.0f, 0.0f);
+    }
+    bool grounded = (v.pose.flags & NET_CAPTURE_GROUNDED) != 0;
+    if (!grounded && sGotoFrames < 60 * 3) {
+        return;  // they are in the air: wait a little for them to land
+    }
+    TVec3f side;
+    PSVECCrossProduct(&up, &front, &side);
+    if (MR::normalizeOrZero(&side)) {
+        MR::makeAxisVerticalZX(&side, up);
+    }
+    // Beside them, else behind, else in front, else where they stand.
+    const TVec3f spots[] = {at + side * 120.0f, at - side * 120.0f, at - front * 120.0f, at + front * 120.0f};
+    bool placed = false;
+    for (const TVec3f& spot : spots) {
+        if (trySpawnAt(at, up, spot)) {
+            placed = true;
+            break;
+        }
+    }
+    if (!placed) {
+        MR::setPlayerPos(at + up * 20.0f);
+    }
+    port_log("puppet: went to %s", v.name);
+    sGotoId = 0;
+}
+
 // Shows the slot's puppet for `luigi` posed by `pose`, hides the other.
 // SMG_CONTACT=0: puppets are ghosts again (no push, no stomp, no flinch).
 bool contactEnabled() {
@@ -1137,6 +1211,22 @@ void applyDebugModes() {
         port_log("puppet: debug: take the nearest star chip: %s", port_chip_debug_take_nearest(p.x, p.y, p.z) ? "taken" : "none in reach");
         return;
     }
+    if (mode == 107) {  // go to the first friend in the room (Go to test)
+        sPending = -1;
+        for (int i = 0; i < net::kMaxRemotes; i++) {
+            if (net::netRemote(i).present) {
+                sGotoRequest.store(i);
+                break;
+            }
+        }
+        return;
+    }
+    if (mode == 108) {  // catch the nearest star bunny (world sync test)
+        sPending = -1;
+        const TVec3f& p = *MR::getPlayerPos();
+        port_world_debug_catch_nearest(p.x, p.y, p.z);
+        return;
+    }
     if (mode == 105) {  // hit the nearest boss (world sync test)
         sPending = -1;
         const TVec3f& p = *MR::getPlayerPos();
@@ -1223,6 +1313,8 @@ void applyDebugModes() {
 
 extern "C" void port_net_debug_request_mode(int mode) { sDebugMode = mode; }
 
+extern "C" void port_net_request_goto(int slot) { sGotoRequest.store(slot); }
+
 extern "C" int port_net_wants_puppets(void) { return loopbackDelay() != nullptr || net::netEnabled(); }
 
 extern "C" void port_net_puppets_create_for_scene(void) {
@@ -1288,6 +1380,7 @@ extern "C" void port_net_puppets_update(void* pScene) {
         applyContacts();
         port_world_update();
         trySpawnSpacing();
+        tryGoto();
         updateLocalTint();
         for (int i = 0; i < net::kMaxRemotes; i++) {
             const net::RemoteView& v = net::netRemote(i);

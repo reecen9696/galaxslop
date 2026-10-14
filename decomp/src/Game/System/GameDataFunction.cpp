@@ -711,6 +711,19 @@ namespace {
             sStageHashes[n] = MR::getHashCode(name);
             n++;
         }
+        // The Comet Observatory (a hub, not in the galaxy list).
+        static const char* const kHubs[] = {"AstroGalaxy"};
+        for (const char* hub : kHubs) {
+            bool listed = false;
+            for (s32 i = 0; i < n; i++) {
+                listed |= strcmp(sStageNames[i], hub) == 0;
+            }
+            if (!listed && n < kMaxStages) {
+                sStageNames[n] = hub;
+                sStageHashes[n] = MR::getHashCode(hub);
+                n++;
+            }
+        }
         sStageCount.store(n);
     }
 }  // namespace

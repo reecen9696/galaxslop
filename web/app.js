@@ -649,8 +649,9 @@ function onNetLine(t) {
   renderRoomBar();
 }
 
-// Room bar: the code and each friend with where they are; Follow takes you
-// to their galaxy and star (P3-04, present_web.cpp's player list).
+// Room bar: the code and each friend with where they are; Go to puts you
+// beside them, loading their galaxy and star first if they are elsewhere
+// (P3-04, present_web.cpp's player list).
 const pretty = (stage) => stage.replace(/([a-z])([A-Z0-9])/g, "$1 $2");
 function readRemotes() {
   if (!window.Module || !Module._web_remote_list || !Module.HEAPU8) return [];
@@ -668,6 +669,7 @@ function readRemotes() {
   }
   return out;
 }
+const goingTo = { slot: -1, at: 0 };  // the Go to button pressed last
 const kPersonIcon = `<svg viewBox="0 0 24 24" aria-label="players" role="img"><circle cx="12" cy="7.5" r="4.5"/><path d="M3 21c0-5 4-8 9-8s9 3 9 8z"/></svg>`;
 function renderRoomBar() {
   const code = roombar.dataset.room;
@@ -690,10 +692,11 @@ function renderRoomBar() {
   const remotes = readRemotes();
   const esc = (t) => t.replace(/[<&"]/g, "");
   // The head has the code and how many are in the room (you included),
-  // names on hover; below, only friends in another level, to Follow.
+  // names on hover; below, each friend, where they are and Go to.
+  const where = (r) => (r.same ? "here" : r.stage ? `in ${esc(pretty(r.stage === "AstroGalaxy" ? "Comet Observatory" : r.stage))}${r.stage === "AstroGalaxy" ? "" : " " + r.scenario}` : "");
+  const going = (r) => goingTo.slot === r.slot && Date.now() - goingTo.at < 5000;
   const who = remotes
-    .filter((r) => !r.same && r.stage)
-    .map((r) => `<span>${esc(r.name)} in ${esc(pretty(r.stage))} ${r.scenario} <button class="wii-btn follow" data-slot="${r.slot}">Follow</button></span>`)
+    .map((r) => `<span>${esc(r.name)} ${where(r)} <button class="wii-btn follow" data-slot="${r.slot}"${going(r) ? " disabled" : ""}>${going(r) ? "Going…" : "Go to"}</button></span>`)
     .join("<br>");
   const names = esc(remotes.map((r) => r.name).join(", ")) || "just you";
   const html = `<div class="rb-head"><b>${code}</b><span class="rb-count" title="${names}">${kPersonIcon}${remotes.length + 1}</span></div><span class="rb-who">${who}</span>`;
@@ -701,9 +704,11 @@ function renderRoomBar() {
 }
 roombar.addEventListener("click", (e) => {
   const b = e.target.closest(".follow");
-  if (b && window.Module && Module._web_follow) {
-    Module._web_follow(Number(b.dataset.slot));
-    b.textContent = "Going…";
+  if (b && window.Module && Module._web_goto) {
+    goingTo.slot = Number(b.dataset.slot);
+    goingTo.at = Date.now();
+    Module._web_goto(goingTo.slot);
+    renderRoomBar();
   }
 });
 setInterval(renderRoomBar, 1000);

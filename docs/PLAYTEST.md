@@ -57,11 +57,16 @@ each. This list reorders Phases 2-4.
 - [ ] both see each other on the title/file select in the room bar
 - [ ] in the same galaxy, each sees the other's Mario/Luigi and name tag
 - [ ] one gets a star: the other gets a toast and the star on their save
-- [ ] one enters another galaxy: the other's room bar shows it; Follow
-      takes them there and they see each other again
+- [ ] one enters another galaxy: the other's room bar shows it; Go to
+      takes them there, beside the other player
+- [ ] in the same galaxy, Go to puts you beside that player
 - [ ] contact: walking into each other pushes, landing on a head bounces
       (lobby toggle off disables it)
 
 ## Phase 3 gate additions
 - [ ] a player who joins later receives every star and flag already logged
-- [ ] Follow works from the Observatory and from inside a galaxy
+- [ ] Go to works from the Observatory and from inside a galaxy, and into
+      the Observatory
+- [ ] three players back from a grand star: each one's dome door opens in
+      their own return cutscene and each can walk in (no reload)
+- [ ] Gateway: three players catching one bunny each finish the hunt

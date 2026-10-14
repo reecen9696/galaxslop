@@ -4,6 +4,10 @@
 #include "Game/NameObj/NameObjArchiveListCollector.hpp"
 #include "Game/Util.hpp"
 #include <cstdio>
+#ifdef TARGET_PC
+#include "net/client/progress.h"
+#include "port/port.h"
+#endif
 
 namespace {
     static const s32 sDemoCameraZoomOutStartFrame = 630;
@@ -88,6 +92,19 @@ void RunawayTico::init(const JMapInfoIter& rIter) {
 
 void RunawayTico::initAfterPlacement() {
     if (mObjArg1 == 1 && MR::isOnGameEventFlagEndTicoGuideDemo()) {
+#ifdef TARGET_PC
+        // Co-op: story events are shared, so this player can have the
+        // flag without having seen the demo that starts the rabbit hunt
+        // (another player saw it; a drop-in copy of the host's file).
+        // Without the demo the rabbits never wake: start the hunt now.
+        if (port_net_in_room()) {
+            port_log("co-op: the Luma guide demo was seen on another save: the rabbit hunt starts now");
+            mIsStartRunaway = true;
+            if (MR::isValidSwitchA(this)) {
+                MR::onSwitchA(this);
+            }
+        }
+#endif
         makeActorDead();
     }
 }

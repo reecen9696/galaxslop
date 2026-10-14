@@ -6,6 +6,7 @@
 # Starts its own relay (port $PORT, room TEST01), fresh saves in a temp dir.
 # Environment:
 #   GALAXY=EggStarGalaxy:1    galaxy[:scenario] both players start in
+#   GALAXY_B=...              player B starts in another one instead
 #   LUIGI_A=1 / LUIGI_B=1     play that client as Luigi
 #   SMG_TINT_A / SMG_TINT_B   colour override (docs/NETCODE.md)
 #   INPUT_A / INPUT_B         PETARI_INPUT scripts (platform/include/port/input_script.h)
@@ -36,7 +37,7 @@ PIDS=($!)
 trap 'kill "${PIDS[@]}" 2>/dev/null' EXIT INT TERM
 sleep 1
 
-launch() {  # name, window x, tint, luigi, input, shots subdir, debug modes
+launch() {  # name, window x, tint, luigi, input, shots subdir, debug modes, galaxy
   local args=(--game "$GAME" --save "$WORK/save-$1")
   if [ -n "$HEADLESS" ]; then
     args+=(--headless --seconds "${RUN_SECONDS:-60}")
@@ -46,12 +47,12 @@ launch() {  # name, window x, tint, luigi, input, shots subdir, debug modes
     args+=(--shots "$SHOTS/$6" --shot-every "${SHOT_EVERY:-2000}")
   fi
   SMG_RELAY=ws://127.0.0.1:$PORT SMG_ROOM=$ROOM SMG_NAME=$1 SMG_TINT=$3 SMG_WINDOW="$2,40,715,450" \
-  PETARI_QUICKSTART=$GALAXY PETARI_QUICKSTART_LUIGI=$4 PETARI_INPUT=$5 PETARI_DEBUG_MODES=$7 \
+  PETARI_QUICKSTART=$8 PETARI_QUICKSTART_LUIGI=$4 PETARI_INPUT=$5 PETARI_DEBUG_MODES=$7 \
     "$SMG" "${args[@]}" > "$WORK/$1.log" 2>&1 &
   PIDS+=($!)
 }
-launch Alice 0 "${SMG_TINT_A:-0}" "${LUIGI_A:-0}" "$INPUT_A" a "$MODES_A"
+launch Alice 0 "${SMG_TINT_A:-0}" "${LUIGI_A:-0}" "$INPUT_A" a "$MODES_A" "$GALAXY"
 sleep 1  # usually Alice joins first (player 1, left window)
-launch Bob 725 "${SMG_TINT_B:-0}" "${LUIGI_B:-0}" "$INPUT_B" b "$MODES_B"
+launch Bob 725 "${SMG_TINT_B:-0}" "${LUIGI_B:-0}" "$INPUT_B" b "$MODES_B" "${GALAXY_B:-$GALAXY}"
 echo "two clients starting in $GALAXY; close both windows (or Ctrl-C here) to stop"
 wait "${PIDS[1]}" "${PIDS[2]}"

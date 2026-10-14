@@ -612,6 +612,8 @@ extern "C" EMSCRIPTEN_KEEPALIVE RemoteList* web_remote_list(void) {
     return &sRemotes;
 }
 extern "C" EMSCRIPTEN_KEEPALIVE void web_follow(int slot) { port_net_request_follow(slot); }
+extern "C" void port_net_request_goto(int slot);  // net/puppet
+extern "C" EMSCRIPTEN_KEEPALIVE void web_goto(int slot) { port_net_request_goto(slot); }
 
 // Leaderboard (P5-07): the local player's pickups per run (port/board.h).
 extern "C" EMSCRIPTEN_KEEPALIVE PortBoard* web_board(void) { return port_board(); }

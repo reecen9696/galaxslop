@@ -16,7 +16,7 @@
 #include "../gx/gl_renderer.h"
 #include "net/client/net_client.h"
 
-extern "C" void port_net_request_follow(int slot);  // GameDataFunction.cpp
+extern "C" void port_net_request_goto(int slot);  // net/puppet
 #include "../gx/gx_record.h"
 #include "port/input.h"
 #include "port/port.h"
@@ -122,12 +122,14 @@ static void readInput(PortPadState* pad, bool* quit) {
         if (e.type == SDL_EVENT_QUIT || (e.type == SDL_EVENT_KEY_DOWN && e.key.key == SDLK_F12)) {
             *quit = true;
         }
-        // F: follow the first friend who is in another galaxy (P3-04).
+        // F: go to the next friend in turn, wherever they are (P3-04).
         if (e.type == SDL_EVENT_KEY_DOWN && !e.key.repeat && e.key.scancode == SDL_SCANCODE_F && net::netEnabled()) {
-            for (int i = 0; i < net::kMaxRemotes; i++) {
-                const net::RemoteView& v = net::netRemote(i);
-                if (v.present && !v.visible && v.pose.stageHash != 0) {
-                    port_net_request_follow(i);
+            static int sNext = 0;
+            for (int n = 0; n < net::kMaxRemotes; n++) {
+                int i = (sNext + n) % net::kMaxRemotes;
+                if (net::netRemote(i).present && net::netRemote(i).pose.stageHash != 0) {
+                    port_net_request_goto(i);
+                    sNext = i + 1;
                     break;
                 }
             }

@@ -1,4 +1,7 @@
 #include "Game/Demo/DemoDirector.hpp"
+#ifdef TARGET_PC
+#include "net/world/actor_sync.h"
+#endif
 #include "Game/Demo/DemoCastGroupHolder.hpp"
 #include "Game/Demo/DemoExecutor.hpp"
 #include "Game/Demo/DemoFunction.hpp"
@@ -129,6 +132,13 @@ bool DemoDirector::registerDemoCast(LiveActor* pActor, const JMapInfoIter& rIter
 
     JMapIdInfo idInfo = JMapIdInfo(MR::getDemoGroupID(rIter), rIter);
 
+#ifdef TARGET_PC
+    bool registered = _18->tryRegisterDemoActor(pActor, rIter, idInfo) || mCastSubGroupHolder->tryRegisterDemoActor(pActor, rIter, idInfo);
+    if (registered) {
+        port_actor_sync_demo_cast(pActor);  // co-op: its cutscenes play per player (net/world)
+    }
+    return registered;
+#endif
     if (_18->tryRegisterDemoActor(pActor, rIter, idInfo)) {
         return true;
     }
@@ -137,6 +147,13 @@ bool DemoDirector::registerDemoCast(LiveActor* pActor, const JMapInfoIter& rIter
 }
 
 bool DemoDirector::registerDemoCast(LiveActor* pActor, const char* pParam2, const JMapInfoIter& rIter) {
+#ifdef TARGET_PC
+    bool registered = _18->tryRegisterDemoActor(pActor, pParam2, rIter) || mCastSubGroupHolder->tryRegisterDemoActor(pActor, pParam2, rIter);
+    if (registered) {
+        port_actor_sync_demo_cast(pActor);
+    }
+    return registered;
+#endif
     if (_18->tryRegisterDemoActor(pActor, pParam2, rIter)) {
         return true;
     }

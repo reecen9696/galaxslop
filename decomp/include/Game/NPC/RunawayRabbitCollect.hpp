@@ -21,6 +21,10 @@ public:
     void noticeAppearRabbit(RunawayRabbit* pRabbit);
     void noticeCaughtRabbit(RunawayRabbit* pRabbit);
     void appearTico(RunawayTico* pTico, const TVec3f& rPos);
+#ifdef TARGET_PC
+    // Co-op (net/world): another player caught `pRabbit`; counted here too.
+    bool noticeCaughtRabbitByOtherPlayer(RunawayRabbit* pRabbit);
+#endif
 
     void exeWait();
     void exeActive();

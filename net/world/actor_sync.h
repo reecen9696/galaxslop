@@ -30,6 +30,11 @@ void port_actor_sync_obj_name(void* actor, const char* objName);
 // MapParts constructors: kind 1 MapPartsRailMover, 2 MapPartsRotator,
 // 3 MapPartsRailRotator of `host` (its phase goes with the host's state).
 void port_actor_sync_part(void* host, int kind, void* part);
+// DemoDirector::registerDemoCast: `actor` plays a part in one of the
+// stage's cutscenes.  Its state follows that player's story and cutscenes
+// (a dome door opens in its grand star's return demo), so each player runs
+// it on their own.
+void port_actor_sync_demo_cast(void* actor);
 // LiveActor::movement (before the sensors update): a copy run by another
 // player takes the owner's position and nerve.
 void port_actor_sync_movement(void* actor);

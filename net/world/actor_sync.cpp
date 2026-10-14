@@ -189,6 +189,7 @@ struct Tracked {
     bool familyKnown = false;
     bool enemySensor = false;
     bool excluded = false;  // items, the sky...: the same everywhere or synced elsewhere
+    bool localOnly = false; // each player runs it on their own (isLocalOnlyObjName)
     MapPartsRailMover* railMover = nullptr;
     MapPartsRotator* rotator = nullptr;
     MapPartsRailRotator* railRotator = nullptr;
@@ -247,6 +248,7 @@ struct State {
     // Received, applied on the next update.
     std::vector<std::vector<uint8_t>> inbox;
     std::unordered_map<void*, bool> bosses;  // placed bosses (by object name)
+    std::vector<void*> demoCasts;            // registered in a cutscene (port_actor_sync_demo_cast)
     uint32_t sentMsgs = 0, sentEntries = 0, recvEntries = 0;
     uint32_t staleFrames = 0;  // logging: copies shown from an owner's frozen one
 };
@@ -451,7 +453,7 @@ void setPartSpine(Spine* spine, uint32_t hash, uint16_t step) {
 }
 
 // What the families sync.
-bool syncsTransform(const Tracked& t) { return t.family != kFamBoss && !t.excluded; }
+bool syncsTransform(const Tracked& t) { return t.family != kFamBoss && !t.excluded && !t.localOnly; }
 bool syncsNerve(const Tracked& t) {
     return t.family == kFamMapObj || t.family == kFamRide || t.family == kFamEnemy || t.family == kFamOther;
 }
@@ -863,6 +865,7 @@ extern "C" void port_actor_sync_reset(void) {
     s.parts.clear();
     s.inbox.clear();
     s.bosses.clear();
+    s.demoCasts.clear();
     s.live = false;
     s.standing = s.holding = s.lastHeld = s.binding = nullptr;
     s.cursor = 0;
@@ -897,8 +900,38 @@ static bool isBossObjName(const char* n) {
     return test != nullptr && *test != 0 && strcmp(n, test) == 0;
 }
 
+// Actors each player runs on their own, by placement object name.  Gateway's
+// star bunny hunt: a bunny shows, runs and is caught for the player who
+// finds it (its catch is shared, kWorldCaught), and its Lumas and the
+// opening demo's bunnies play their talks and demos locally.  Driven by
+// another player's copy, a bunny still hidden here was dragged to where it
+// ran or was caught there, and came out of the wrong place, or was pulled
+// back into its hole while it jumped out here.
+static bool isLocalOnlyObjName(const char* n) {
+    static const char* const kLocal[] = {"RunawayRabbit", "RunawayTico", "DemoRabbit"};
+    for (const char* l : kLocal) {
+        if (strcmp(n, l) == 0) return true;
+    }
+    return false;
+}
+
+extern "C" void port_actor_sync_demo_cast(void* actor) {
+    if (!enabled() || actor == nullptr) return;
+    if (Tracked* t = find(actor)) {
+        t->localOnly = true;
+        return;
+    }
+    PortHostAllocScope host;
+    st().demoCasts.push_back(actor);  // placed later: marked when the scene starts
+}
+
 extern "C" void port_actor_sync_obj_name(void* actor, const char* objName) {
-    if (!enabled() || actor == nullptr || objName == nullptr || !isBossObjName(objName)) return;
+    if (!enabled() || actor == nullptr || objName == nullptr) return;
+    if (isLocalOnlyObjName(objName)) {
+        if (Tracked* t = find(actor)) t->localOnly = true;
+        return;
+    }
+    if (!isBossObjName(objName)) return;
     PortHostAllocScope host;
     st().bosses[actor] = true;
     if (Tracked* t = find(actor)) {
@@ -1038,6 +1071,15 @@ extern "C" void port_actor_sync_update(uint32_t stage, uint8_t scenario) {
         for (Tracked& t : s.list) {
             t.enemySensor = port_world_has_enemy_sensor(t.actor) != 0;
             t.excluded = port_world_is_item(t.actor) != 0;
+        }
+        for (void* a : s.demoCasts) {
+            if (Tracked* t = find(a)) t->localOnly = true;
+        }
+        s.demoCasts.clear();
+        if (logging()) {
+            int local = 0;
+            for (Tracked& t : s.list) local += t.localOnly ? 1 : 0;
+            port_log("actors: %d left to each player (cutscene actors, star bunnies)", local);
         }
         if (logging()) port_log("actors: %d placed actors tracked", (int)s.list.size());
     }

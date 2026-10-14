@@ -179,3 +179,9 @@ extern "C" int port_net_wants_puppets(void);
 // PETARI_DEBUG_MODES="seconds:mode,..." schedules them (seconds after the
 // first gameplay frame).
 extern "C" void port_net_debug_request_mode(int mode);
+
+// Go to a player (the page's button per player, the desktop's F key): the
+// local player is put beside remote `slot` (net::netRemote).  In another
+// galaxy or star, that one is loaded first (Follow), then the warp follows
+// once they are seen there.  Any thread.
+extern "C" void port_net_request_goto(int slot);
