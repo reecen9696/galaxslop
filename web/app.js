@@ -675,9 +675,13 @@ function renderRoomBar() {
     // In co-op the panel shows from the start: connecting, joining, errors.
     if (!roombar.dataset.mode) return;
     roombar.style.display = "block";
+    // Connecting, joining or reconnecting: a spinner next to the code.  An
+    // error ("!" prefix) is written out under it.
     const st = roombar.dataset.state || "connecting…";
-    const html = `<div class="rb-head">${roombar.dataset.want ? `<b>${roombar.dataset.want}</b>` : ""}</div>`
-      + `<span class="rb-who${st[0] === "!" ? " rb-bad" : ""}">${st.replace(/^!/, "").replace(/[<&"]/g, "")}</span>`;
+    const bad = st[0] === "!";
+    const html = `<div class="rb-head">${roombar.dataset.want ? `<b>${roombar.dataset.want}</b>` : ""}`
+      + (bad ? "" : `<span class="rb-spin" role="status" aria-label="${st.replace(/[<&"]/g, "")}"></span>`) + `</div>`
+      + (bad ? `<span class="rb-who rb-bad">${st.slice(1).replace(/[<&"]/g, "")}</span>` : "");
     if (roombar.innerHTML !== html) roombar.innerHTML = html;
     return;
   }
