@@ -662,6 +662,18 @@ Starter list, unordered: switches, launch stars (fired), coins (collected), 1-up
 - log:
   - 2026-10-14 (A): done (D-027). Game: port/board.h, counted in ScenePlayingResult::incCoin/incStarPiece (gains only), runs split by GameDataFunction's stage hook and GameDataHolder::setPowerStar; read by web/board.js through _web_board. Relay: server/src/board.ts + Relay onLeave/members (vitest). Verified headless: two clients in one room each saw their own pickups (Sam 3 coins/1 bit = HUD) and the other's; a player who left dropped off; PETARI_FAKESTAR showed the board for 6 s; Tab opens it; seeded scores load after a reload. Not tried: gamepad Y on a real pad. Note: smoke.mjs SIGKILLs Chrome, so localStorage written late in a run is lost there (not in a normal close).
 
+### P5-08 Rebind the keyboard controls in Settings
+- lane: A
+- status: in_progress
+- owner: A
+- started: 2026-10-14
+- blocked_by:
+- touches: web/app.js, web/index.html, platform/src/web/present_web.cpp, docs/BUILDING.md
+- flags: solo
+- what: Asked for by the user. Settings lists each Wii control with its keys; click one and press a key to rebind it. The layout is kept in localStorage, so it is the preset on every visit, and the controls legend shows it. Reset restores the defaults.
+- done when: a rebound key moves Mario, survives a reload, and the old key no longer acts.
+- log:
+
 ### P5-05 Local 2-player (two real players, one machine)
 - lane: shared
 - status: open
