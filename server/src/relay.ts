@@ -29,7 +29,7 @@ import {
 
 export const MAX_PLAYERS = 5;
 export const IDLE_DROP_MS = 15_000; // drop a client after 15 s of silence
-export const RATE_LIMIT_PER_S = 120; // messages per client per second: PlayerState 30 + ActorState 20 + events
+export const RATE_LIMIT_PER_S = 160; // messages per client per second: PlayerState 30 + ActorState 20 + PlayerSound 30 + effects and events
 export const RESEND_MS = 2000; // unacknowledged progress is resent this often
 const ROOM_IDLE_MS = 24 * 60 * 60 * 1000;
 // No 0/O, 1/I/L: room codes are read out loud.
@@ -137,7 +137,8 @@ export class Relay {
         }
         break;
       case Msg.PlayerEffect:
-        // The sender's particle effects: forwarded like ActorState.
+      case Msg.PlayerSound:
+        // The sender's particle effects and sounds: forwarded like ActorState.
         if (c.room && c.info && data.length >= 3 && data.length <= ACTOR_STATE_MAX && data[1] === c.info.id) {
           for (const other of c.room.players.values()) if (other !== c) other.conn.send(data);
         }

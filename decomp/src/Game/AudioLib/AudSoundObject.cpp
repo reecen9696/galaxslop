@@ -7,6 +7,9 @@
 #include "Game/Util/SingletonHolder.hpp"
 #include <JSystem/JAudio2/JAISound.hpp>
 #include <JSystem/JGadget/hashcode.hpp>
+#ifdef TARGET_PC
+#include "net/puppet/puppet_sound.h"
+#endif
 
 void AudSoundObject_FORCE_MATCH_SDATA2() {
     f32 f1 = 1.0f;
@@ -107,6 +110,11 @@ JAISoundHandle* AudSoundObject::startSound(JAISoundID soundID) {
     JAISoundHandle* handle = JAUSoundObject::startSound(soundID);
     setMapCodeToPort(handle, soundID);
     setCutoffToPort(handle, soundID);
+#ifdef TARGET_PC
+    if (handle != nullptr && handle->isSoundAttached()) {
+        port_net_snd_note(this, soundID, 1);  // the local player's, for the others (net/puppet/puppet_sound.h)
+    }
+#endif
     return handle;
 }
 
@@ -130,6 +138,11 @@ JAISoundHandle* AudSoundObject::startLevelSound(JAISoundID soundID) {
     JAISoundHandle* handle = JAUSoundObject::startLevelSound(soundID);
     setMapCodeToPort(handle, soundID);
     setCutoffToPort(handle, soundID);
+#ifdef TARGET_PC
+    if (handle != nullptr && handle->isSoundAttached()) {
+        port_net_snd_note(this, soundID, 2);
+    }
+#endif
     return handle;
 }
 
@@ -147,6 +160,12 @@ JAISoundHandle* AudSoundObject::startSoundParam(JAISoundID soundID, s32 volume, 
         modifySe_Gohara(handle, volume, a2);
     }
 
+#ifdef TARGET_PC
+    if (handle != nullptr && handle->isSoundAttached()) {
+        port_net_snd_params(this, soundID, volume, a2);
+    }
+#endif
+
     return handle;
 }
 
@@ -158,6 +177,12 @@ JAISoundHandle* AudSoundObject::startLevelSoundParam(JAISoundID soundID, s32 vol
         modifySe_Takezawa(handle, volume, a2);
         modifySe_Gohara(handle, volume, a2);
     }
+
+#ifdef TARGET_PC
+    if (handle != nullptr && handle->isSoundAttached()) {
+        port_net_snd_params(this, soundID, volume, a2);
+    }
+#endif
 
     return handle;
 }

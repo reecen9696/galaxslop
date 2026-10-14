@@ -42,6 +42,7 @@
 #include "Game/Util/SoundUtil.hpp"
 #include "net/client/net_client.h"
 #include "net/puppet/puppet_fx.h"
+#include "net/puppet/puppet_sound.h"
 
 void port_register_mario_common_effects(LiveActor* pActor);  // MarioEffect.cpp
 #include "net/puppet/puppet_tint.h"
@@ -279,6 +280,9 @@ void RemotePlayerPuppet::init(const JMapInfoIter&) {
     // by index (puppet_fx.h).
     initEffectKeeper(0xB8, "Mario", true);
     port_register_mario_common_effects(this);  // landing smoke rings, splashes, floor dust
+    // MarioActor::initSound: the sender's sounds play here, at the puppet's
+    // position (puppet_sound.h).
+    initSound(0x10, false);
     MR::connectToScene(this, MR::MovementType_Player, MR::CalcAnimType_Player, MR::DrawBufferType_None, MR::DrawType_Player);
     mVelocity.zero();
     // The animation players need the player's animation table, and the player
@@ -1082,6 +1086,7 @@ void showSlot(int slot, bool luigi, const NetPlayerCapture& pose, bool visible, 
     // The effects that player played, on the puppet showing them.
     RemotePlayerPuppet* shown = sPuppets[slot][luigi ? 1 : 0];
     net::fxApply(remoteId, visible ? shown : nullptr, fxDelayNs);
+    net::sndApply(remoteId, visible ? shown : nullptr, luigi, fxDelayNs);
 }
 }  // namespace
 
@@ -1270,6 +1275,7 @@ extern "C" void port_net_puppets_update(void* pScene) {
     NetPlayerCapture now;
     bool haveLocal = net_capture_latest(&now) != 0;
     net::fxSend();  // the local player's effects this frame
+    net::sndSend();  // and its sounds
 
     if (net::netEnabled()) {
         net::netTick(haveLocal ? &now : nullptr);

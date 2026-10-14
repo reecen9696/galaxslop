@@ -14,6 +14,7 @@ export const Msg = {
   WorldEvent: 0x13,
   ActorState: 0x14,
   PlayerEffect: 0x15,
+  PlayerSound: 0x16,
   ProgressEvent: 0x20,
   ProgressLog: 0x21,
   ProgressAck: 0x22,

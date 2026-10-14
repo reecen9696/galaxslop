@@ -15,6 +15,7 @@
 
 #include "net/client/progress.h"
 #include "net/puppet/puppet_fx.h"
+#include "net/puppet/puppet_sound.h"
 #include "net/world/actor_sync.h"
 #include "net/world/world_sync.h"
 #include "net/client/ws_client.h"
@@ -208,6 +209,9 @@ void handle(Session& s, const std::vector<uint8_t>& m) {
         break;
     case net::kMsgPlayerEffect:  // the sender's particle effects (net/puppet/puppet_fx.h)
         fxOnMessage(m.data(), m.size());
+        break;
+    case net::kMsgPlayerSound:  // the sender's sounds (net/puppet/puppet_sound.h)
+        sndOnMessage(m.data(), m.size());
         break;
     case 0x23:  // ProgressSnapshot: the host's progress (P3-07)
         progressOnSnapshot(m.data(), m.size());

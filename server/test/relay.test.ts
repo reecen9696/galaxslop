@@ -10,7 +10,7 @@ import {
   encodeHello,
   encodeProgressEvent,
 } from "../src/protocol.ts";
-import { MAX_PLAYERS, RESEND_MS, Relay, type Conn } from "../src/relay.ts";
+import { MAX_PLAYERS, RATE_LIMIT_PER_S, RESEND_MS, Relay, type Conn } from "../src/relay.ts";
 
 // A real WebSocket client that collects what it receives.
 class TestClient {
@@ -182,7 +182,7 @@ describe("relay logic", () => {
     expect(decodeWelcome(sent[0]).roomCode).toBe("PLAY22");
   });
 
-  it("drops clients silent for 15 s and rate-limits beyond 120 messages a second", () => {
+  it("drops clients silent for 15 s and rate-limits beyond RATE_LIMIT_PER_S messages a second", () => {
     let t = 0;
     const relay = new Relay({ now: () => t });
     const sent: Uint8Array[][] = [[], []];
@@ -195,7 +195,7 @@ describe("relay logic", () => {
     sent[0].length = 0;
 
     for (let i = 0; i < 200; i++) relay.message(conns[1], state(i));
-    expect(sent[0].filter((m) => m[0] === Msg.PlayerState).length).toBe(120 - 1); // the Hello used one of B's 120
+    expect(sent[0].filter((m) => m[0] === Msg.PlayerState).length).toBe(RATE_LIMIT_PER_S - 1); // the Hello used one of them
 
     t = 16_000;
     relay.message(conns[0], Uint8Array.of(Msg.Ping, 0, 0, 0, 0));
@@ -425,5 +425,20 @@ describe("player effects", () => {
     relay.message(conns[0], fx(2)); // not A's id: dropped
     expect(inbox[1].filter((m) => m[0] === Msg.PlayerEffect).map((m) => m[1])).toEqual([1]);
     expect(inbox[0].filter((m) => m[0] === Msg.PlayerEffect)).toEqual([]);
+  });
+
+  it("forwards a player's sounds to the others, only under their own id", () => {
+    const relay = new Relay({ fixedRooms: ["ROOM22"] });
+    const inbox: Uint8Array[][] = [[], []];
+    const conns: Conn[] = [0, 1].map((i) => ({ send: (b: Uint8Array) => inbox[i].push(b), close: () => {} }));
+    conns.forEach((c, i) => {
+      relay.connect(c);
+      relay.message(c, hello(i ? "B" : "A", "ROOM22"));
+    });
+    const snd = (sender: number) => Uint8Array.from([Msg.PlayerSound, sender, 1, 1, 1, 0, 0, 0, 0, 0]);
+    relay.message(conns[0], snd(1));
+    relay.message(conns[0], snd(2)); // not A's id: dropped
+    expect(inbox[1].filter((m) => m[0] === Msg.PlayerSound).map((m) => m[1])).toEqual([1]);
+    expect(inbox[0].filter((m) => m[0] === Msg.PlayerSound)).toEqual([]);
   });
 });

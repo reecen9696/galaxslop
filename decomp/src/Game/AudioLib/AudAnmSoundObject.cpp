@@ -9,6 +9,9 @@
 #include <JSystem/JAudio2/JAISound.hpp>
 #include <JSystem/JAudio2/JAUSoundAnimator.hpp>
 #include <JSystem/JKernel/JKRHeap.hpp>
+#ifdef TARGET_PC
+#include "net/puppet/puppet_sound.h"
+#endif
 
 void AudAnmSoundObject_FORCE_MATCH_SDATA2() {
     (void)0.0f;
@@ -271,6 +274,11 @@ void AudAnmSoundObject::startAnimSound(const TVec3f& rPos, f32 speed, JAISoundSt
     }
 
     modifySoundParams(&handle->getSound()->getAuxiliary().mParams, sound, speed);
+#ifdef TARGET_PC
+    // The local player's footsteps and other animation sounds, for the
+    // others (net/puppet/puppet_sound.h).
+    port_net_snd_anim(this, soundID, &handle->getSound()->getAuxiliary().mParams.mVolume);
+#endif
     releaseHandleIfNecessary(handle, soundID);
 }
 

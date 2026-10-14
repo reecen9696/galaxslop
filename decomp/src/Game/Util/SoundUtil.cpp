@@ -29,6 +29,9 @@
 #include "Game/Util/SoundUtil.hpp"
 #include "Game/Util/StringUtil.hpp"
 #include <JSystem/JAudio2/JAISound.hpp>
+#ifdef TARGET_PC
+#include "net/puppet/puppet_sound.h"
+#endif
 
 bool SoundUtil_FORCE_MATCH_DATA(const char* pName) {
     return MR::isEqualString(pName, "SE_SY_READ_RIDDLE_S");
@@ -180,10 +183,16 @@ namespace MR {
     void stopSound(const LiveActor* pActor, const char* pName, u32 param3) {
         AudAnmSoundObject* pSound = pActor->mSoundObject;
 
+#ifdef TARGET_PC
+        port_net_snd_stop(pSound, static_cast< u32 >(AudSingletonHolder< AudSoundNameConverter >::get()->getSoundID(pName)), param3);
+#endif
         pSound->stopSound(static_cast< u32 >(AudSingletonHolder< AudSoundNameConverter >::get()->getSoundID(pName)), param3);
     }
 
     void stopSound(const LiveActor* pActor, JAISoundID id, u32 param3) {
+#ifdef TARGET_PC
+        port_net_snd_stop(pActor->mSoundObject, id, param3);
+#endif
         pActor->mSoundObject->stopSound(id, param3);
     }
 
