@@ -113,6 +113,19 @@ bool busyNpcNerve(const char* name) {
     return false;
 }
 
+// An enemy's reaction to being hit, stomped, frozen...: on a copy, the local
+// player did it.
+bool reactionNerve(const char* name) {
+    static const char* const kHit[] = {"Attacked", "Damage", "Press", "Blow", "Frozen", "Freeze", "Dead", "Death", "Die",
+                                       "Hit", "Stomp", "Trample", "Squash", "Swoon", "Reaction", "Flip"};
+    const char* n = strstr(name, "::");
+    n = n ? n + 2 : name;
+    for (const char* k : kHit) {
+        if (strstr(n, k) != nullptr) return true;
+    }
+    return false;
+}
+
 }  // namespace
 
 extern "C" int port_nerve_register(const void* nerve, const char* name, const char* file) {
@@ -227,6 +240,10 @@ struct Tracked {
     float ownerAnimFrame = 0.0f;
     float ownerAnimRate = 0.0f;
     uint32_t ownerAnimFrameAt = 0;  // local frame it was received
+    // A driven enemy's nerve and step at the end of its last movement.
+    const Nerve* keptNerve = nullptr;
+    int32_t keptStep = 0;
+    uint32_t keptFrame = 0;
 };
 
 struct State {
@@ -975,6 +992,31 @@ extern "C" void port_actor_sync_movement(void* actorPtr) {
     updateShown(*t);
     a->mPosition.set(t->shownPose.pos[0], t->shownPose.pos[1], t->shownPose.pos[2]);
 
+    // An enemy copy's own AI goes after the local player, not the owner's: a
+    // Karikari hopping after the owner's player stopped on each landing here
+    // (the local player was too far), dropped to Wait and NoCalcWait, and was
+    // pulled back 45 frames later, over and over.  While it is in the owner's
+    // state it stays there; a hit it takes here (Star Pointer, a stomp) makes
+    // it ours instead.
+    Spine* spine = a->mSpine;
+    if (t->family == kFamEnemy && spine != nullptr && spine->mStateKeeper == nullptr && t->keptNerve != nullptr && t->keptFrame + 1 == s.frame &&
+        spine->getCurrentNerve() != t->keptNerve && nerveHashOf(spine) != t->ownerNerve) {
+        const NerveInfo* kept = nerveInfo(t->keptNerve);
+        const NerveInfo* now = nerveInfo(spine->getCurrentNerve());
+        if (kept != nullptr && kept->hash == t->ownerNerve) {
+            if (now != nullptr && reactionNerve(now->name)) {
+                if (logging()) port_log("actors: took %s (%08x): hit here (%s)", a->mName, t->id, now->name);
+                t->keptNerve = nullptr;
+                claim(*t);
+                return;
+            }
+            if (logging()) port_log("actors: %s stays in its owner's %s (not %s)", a->mName, kept->name, now ? now->name : "?");
+            spine->mCurrNerve = t->keptNerve;
+            spine->mNextNerve = nullptr;
+            spine->mStep = t->keptStep + 1;
+        }
+    }
+
     // The owner's state machine.
     if (syncsNerve(*t) && a->mSpine != nullptr && t->ownerNerve != 0) {
         uint32_t local = nerveHashOf(a->mSpine);
@@ -1001,6 +1043,11 @@ extern "C" void port_actor_sync_movement(void* actorPtr) {
             }
         }
     }
+    if (spine != nullptr) {
+        t->keptNerve = spine->getCurrentNerve();
+        t->keptStep = spine->mStep;
+        t->keptFrame = s.frame;
+    }
     if (t->ownerAnim[0] != 0 && a->mModelManager != nullptr) {
         // The owner's animation, at its frame.
         const char* local = MR::getPlayingBckName(a);
@@ -1011,9 +1058,13 @@ extern "C" void port_actor_sync_movement(void* actorPtr) {
         if (local != nullptr && strcmp(local, t->ownerAnim) == 0) {
             float want = t->ownerAnimFrame + t->ownerAnimRate * (float)(s.frame - t->ownerAnimFrameAt + 3);
             float end = MR::getBckFrameMax(a);
-            if (end > 0.0f && want >= end) want = MR::isBckLooped(a) ? fmodf(want, end) : end;
+            bool looped = MR::isBckLooped(a);
+            if (end > 0.0f && want >= end) want = looped ? fmodf(want, end) : end;
             float now = MR::getBckFrame(a);
-            if (fabsf(now - want) > 3.0f && fabsf(now - want) < end - 3.0f) MR::setBckFrame(a, want);
+            // A loop near its seam is in step; a one-shot the owner restarted
+            // (a Karikari's next hop) is not, however far apart.
+            float off = fabsf(now - want);
+            if (off > 3.0f && (!looped || off < end - 3.0f)) MR::setBckFrame(a, want);
         }
     }
     if (syncsFlags(*t)) {
@@ -1228,8 +1279,8 @@ extern "C" void port_actor_sync_update(uint32_t stage, uint8_t scenario) {
             const NerveInfo* ni = t.actor->mSpine ? nerveInfo(t.actor->mSpine->getCurrentNerve()) : nullptr;
             Pose q;
             mtxToPose(m, &q);
-            port_log("actors: t=%lld %08x %s at %.0f %.0f %.0f owner %u%s nerve %s q %.4f %.4f %.4f %.4f", (long long)(port_host_time_ns() / 1000000),
-                     t.id, t.actor->mName, p[0], p[1], p[2], t.owner, driven(t) ? " (driven)" : "", ni ? ni->name : "-", q.q[0], q.q[1], q.q[2], q.q[3]);
+            port_log("actors: t=%lld %08x %s at %.0f %.0f %.0f owner %u%s%s nerve %s q %.4f %.4f %.4f %.4f", (long long)(port_host_time_ns() / 1000000),
+                     t.id, t.actor->mName, p[0], p[1], p[2], t.owner, driven(t) ? " (driven)" : "", MR::isClipped(t.actor) ? " (clipped)" : "", ni ? ni->name : "-", q.q[0], q.q[1], q.q[2], q.q[3]);
             if (++n == 40) break;
         }
     }
