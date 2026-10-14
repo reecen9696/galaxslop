@@ -675,6 +675,7 @@ Starter list, unordered: switches, launch stars (fired), coins (collected), 1-up
 - done when: a rebound key moves Mario, survives a reload, and the old key no longer acts.
 - log:
   - 2026-10-14 (A): done. present_web.cpp maps KeyboardEvent.code -> actions from a table (defaults as before), set by SMG_KEYS at boot and _web_keys_buffer/_web_keys_commit live. Settings > Change keys / Default keys; layout in localStorage `smg.controls`; the legend is built from it. Esc, Tab, M reserved; a key moved to a new control leaves the old one. Verified headless (POSLOG): with up=KeyI, I moves Mario and W does not; rebinding up to L in the UI mid-game, W then did nothing and L moved him, and the layout was saved. Mouse buttons stay fixed; desktop (SDL) build unchanged.
+  - 2026-10-14 (A): the leaderboard key (Tab) is a row in the same list (page-only, board.js reads smgBoardKeys); Tab no longer reserved. Verified headless: rebound to B, B opened the board, Tab did not.
 
 ### P5-05 Local 2-player (two real players, one machine)
 - lane: shared

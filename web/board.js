@@ -214,9 +214,11 @@
   }
   document.getElementById("gear").addEventListener("click", close);
   const playing = () => document.body.classList.contains("playing");
-  // Tab: the game has no use for it; the page would move the focus.
+  // Tab by default (the game has no use for it; the page would move the
+  // focus); Settings > Change keys can move it (app.js smgBoardKeys).
   addEventListener("keydown", (e) => {
-    if (e.code !== "Tab" || !playing() || e.target.closest?.("input, select, textarea")) return;
+    const keys = window.smgBoardKeys?.() ?? ["Tab"];
+    if (!keys.includes(e.code) || !playing() || e.target.closest?.("input, select, textarea")) return;
     e.preventDefault();
     if (!e.repeat) toggle();
   }, true);

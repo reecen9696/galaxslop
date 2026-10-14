@@ -53,8 +53,9 @@ On the title screen press **Space and K together** (A + B).
 
 In the browser, Settings > **Change keys** rebinds any of these (click a
 control, press its new key). The layout is saved in the browser and used on
-every visit; **Default keys** restores the table above. Esc, Tab and M stay
-the page's, and the mouse buttons are fixed.
+every visit; **Default keys** restores the table above. The leaderboard's
+key (Tab) is in the same list. Esc and M stay the page's, and the mouse
+buttons are fixed.
 
 ### Useful flags
 

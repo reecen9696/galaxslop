@@ -927,10 +927,11 @@ const kControls = [
   ["one", "1 button", ["Digit1"]], ["two", "2 button", ["Digit2"]], ["home", "Home", ["KeyH"]],
   ["dup", "D-pad up", ["ArrowUp"]], ["ddown", "D-pad down", ["ArrowDown"]],
   ["dleft", "D-pad left", ["ArrowLeft"]], ["dright", "D-pad right", ["ArrowRight"]],
+  ["board", "Leaderboard", ["Tab"]],  // the page's (board.js), not the game's
 ];
-// The page's own keys: Esc frees the cursor (and cancels a rebind), Tab
-// opens the leaderboard, M the legend.
-const kReservedKeys = ["Escape", "Tab", "KeyM"];
+// The page's own keys: Esc frees the cursor (and cancels a rebind), M
+// shows the legend.
+const kReservedKeys = ["Escape", "KeyM"];
 function defaultControls() {
   return Object.fromEntries(kControls.map(([id, , keys]) => [id, [...keys]]));
 }
@@ -958,6 +959,8 @@ function keyName(code) {
   return code.replace(/(Left|Right)$/, " $1").replace(/^(\w+) (Left|Right)$/, "$2 $1");
 }
 const keyNames = (id) => controls[id].map(keyName).join(" / ") || "—";
+// For board.js: the keys that open the leaderboard.
+window.smgBoardKeys = () => controls.board;
 // Hands the layout to the running game (no-op before it starts: SMG_KEYS covers that).
 function sendControls() {
   if (!window.Module || !Module._web_keys_buffer || !Module.HEAPU8) return;
@@ -986,9 +989,10 @@ function renderKeyLegend() {
     [isDefault(pad) ? "Arrows" : pad.map((id) => keyName(controls[id][0])).join(" "), "D-pad"],
     [keyNames("plus"), "pause (+)"],
     ["Esc", "show cursor"],
-    ["Tab / pad Y", "leaderboard"],
+    [`${keyNames("board")} / pad Y`, "leaderboard"],
     ["M", "hide this"],
   ];
+  document.getElementById("boardBtn").title = `Leaderboard (${keyNames("board")}, or Y on a gamepad)`;
   const keys = document.getElementById("keys");
   keys.replaceChildren(...rows.flatMap(([k, what]) => {
     const kbd = document.createElement("kbd"), span = document.createElement("span");
@@ -1049,7 +1053,7 @@ function setupControls() {
       return render();
     }
     if (kReservedKeys.includes(e.code) || !e.code) {
-      tell(`${keyName(e.code) || "That key"} belongs to the page (Esc, Tab and M). Pick another.`);
+      tell(`${keyName(e.code) || "That key"} belongs to the page (Esc and M). Pick another.`);
       return render();
     }
     // A key presses one control: take it off any other.
