@@ -196,6 +196,7 @@ struct Tracked {
     uint8_t owner = 0;           // player id (0: nobody yet)
     uint32_t claimUntil = 0;     // the local player touched it: ours until
     bool busy = false;           // an NPC busy with the local player (talk, race): never driven
+    bool binding = false;        // holds the local player (a Launch Star's flight): never driven
     bool killedByOwner = false;  // killed here because it was gone for its owner
     uint32_t remoteClaimUntil = 0;
     // Owner side.
@@ -239,6 +240,7 @@ struct State {
     bool live = false;
     LiveActor* standing = nullptr;  // what the local player stands on
     LiveActor* holding = nullptr;   // what the local player holds
+    LiveActor* binding = nullptr;   // what holds the local player (a rush: Launch Star, Pull Star...)
     LiveActor* lastHeld = nullptr;  // ... or held last, and until when it counts
     uint32_t lastHeldUntil = 0;
     size_t cursor = 0;
@@ -680,8 +682,8 @@ bool acceptFrom(Tracked& t, uint8_t sender, uint8_t flags) {
     State& s = st();
     bool claimed = (flags & kFlagClaim) != 0;
     uint8_t me = netLocalId();
-    if (t.busy) {
-        return false;  // the local player's race or talk: his copy is the real one
+    if (t.busy || t.binding) {
+        return false;  // the local player's race or talk, or it holds him: his copy is the real one
     }
     // A copy that is frozen (clipped) or gone where the sender has it is no
     // state to show: a late joiner's enemies were snapped to a stale pose and
@@ -862,7 +864,7 @@ extern "C" void port_actor_sync_reset(void) {
     s.inbox.clear();
     s.bosses.clear();
     s.live = false;
-    s.standing = s.holding = s.lastHeld = nullptr;
+    s.standing = s.holding = s.lastHeld = s.binding = nullptr;
     s.cursor = 0;
     s.sentMsgs = s.sentEntries = s.recvEntries = 0;
     s.staleFrames = 0;
@@ -1053,7 +1055,9 @@ extern "C" void port_actor_sync_update(uint32_t stage, uint8_t scenario) {
     MarioActor* mario = MarioAccess::getPlayerActor();
     s.standing = nullptr;
     s.holding = nullptr;
+    s.binding = nullptr;
     if (mario != nullptr) {
+        if (mario->_934 && mario->_924 != nullptr) s.binding = mario->_924->mHost;
         HitSensor* taking = MarioAccess::getTakingSensor();
         if (taking != nullptr) {
             s.holding = taking->mHost;
@@ -1077,6 +1081,20 @@ extern "C" void port_actor_sync_update(uint32_t stage, uint8_t scenario) {
         LiveActor* a = t.actor;
         learnFamily(t);
         if (!syncsTransform(t)) continue;
+        // Holding the local player (in a Launch Star until it lets go): ours,
+        // whatever the others say.  A Launch Star forced back to Wait by its
+        // owner mid-flight never let go of a second player (stuck in it).
+        bool binding = a == s.binding;
+        if (binding != t.binding && logging()) port_log("actors: %s %s the local player", a->mName, binding ? "holds" : "lets go of");
+        t.binding = binding;
+        if (binding) {
+            if (t.owner != me && logging()) port_log("actors: took %s (%08x): it holds the local player", a->mName, t.id);
+            t.owner = me;
+            t.claimUntil = s.frame + kClaimFrames;
+            t.remoteClaimUntil = 0;
+            t.nerveDirty = false;
+            continue;
+        }
         if (driven(t) && (t.ownerFlags & kFlagDead) != 0 && !MR::isDead(a) && syncsFlags(t) && !t.enemySensor) {
             // Broken or gone where its owner runs it (a crate, a rock): here
             // too, without its loot (the owner's drop brings it).
