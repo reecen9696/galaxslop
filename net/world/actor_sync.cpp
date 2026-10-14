@@ -161,6 +161,7 @@ enum Flags : uint8_t {
     kFlagHidden = 2,
     kFlagCollision = 4,   // collision valid
     kFlagClaim = 8,       // the sender touches it (stands on, holds, hits)
+    kFlagAsleep = 16,     // clipped for the sender: its copy is frozen, not run
 };
 enum Extras : uint8_t {
     kExRail = 1,        // RailRider: coord, speed, direction
@@ -245,6 +246,7 @@ struct State {
     std::vector<std::vector<uint8_t>> inbox;
     std::unordered_map<void*, bool> bosses;  // placed bosses (by object name)
     uint32_t sentMsgs = 0, sentEntries = 0, recvEntries = 0;
+    uint32_t staleFrames = 0;  // logging: copies shown from an owner's frozen one
 };
 
 State& st() {
@@ -559,6 +561,7 @@ uint8_t flagsOf(const Tracked& t) {
     if (MR::isHiddenModel(a)) f |= kFlagHidden;
     if (a->mCollisionParts != nullptr && MR::isValidCollisionParts(a)) f |= kFlagCollision;
     if (t.claimUntil > st().frame) f |= kFlagClaim;
+    if (MR::isClipped(a)) f |= kFlagAsleep;
     return f;
 }
 
@@ -673,11 +676,33 @@ void skipExtras(Reader& r, uint8_t ex) {
 }
 
 // Does the snapshot's sender run the actor (for us)?
-bool acceptFrom(Tracked& t, uint8_t sender, bool claimed) {
+bool acceptFrom(Tracked& t, uint8_t sender, uint8_t flags) {
     State& s = st();
+    bool claimed = (flags & kFlagClaim) != 0;
     uint8_t me = netLocalId();
     if (t.busy) {
         return false;  // the local player's race or talk: his copy is the real one
+    }
+    // A copy that is frozen (clipped) or gone where the sender has it is no
+    // state to show: a late joiner's enemies were snapped to a stale pose and
+    // nerve every frame while their own AI ran (they twitched until the
+    // joiner came near enough to own them).  Whoever runs it owns it.  Dead
+    // map objects and rides still count: they go here too (the update loop).
+    LiveActor* a = t.actor;
+    bool deadThere = (flags & kFlagDead) != 0 && !(syncsFlags(t) && !t.enemySensor);
+    bool runsThere = (flags & kFlagAsleep) == 0 && !deadThere;
+    bool runsHere = !MR::isDead(a) && !MR::isClipped(a);
+    if (!runsThere && runsHere) {
+        if (t.owner != me && logging()) port_log("actors: took %s (%08x): idle for player %u", a->mName, t.id, sender);
+        t.owner = me;
+        t.remoteClaimUntil = 0;
+        t.snaps = 0;
+        t.shown = false;
+        return false;
+    }
+    if (runsThere && !runsHere && !MR::isDead(a) && t.claimUntil <= s.frame) {
+        t.owner = sender;  // frozen here: the sender's is the one that moves
+        return true;
     }
     if (t.claimUntil > s.frame) {
         // We touch it too: the lower player id keeps it.
@@ -734,7 +759,7 @@ void applyMessage(const std::vector<uint8_t>& m) {
         if (!r.ok) break;
         auto it = s.byId.find(id);
         Tracked* t = it != s.byId.end() ? &s.list[(size_t)it->second] : nullptr;
-        if (t == nullptr || !acceptFrom(*t, sender, (flags & kFlagClaim) != 0) || !syncsTransform(*t)) {
+        if (t == nullptr || !acceptFrom(*t, sender, flags) || !syncsTransform(*t)) {
             skipExtras(r, ex);
             continue;
         }
@@ -840,6 +865,7 @@ extern "C" void port_actor_sync_reset(void) {
     s.standing = s.holding = s.lastHeld = nullptr;
     s.cursor = 0;
     s.sentMsgs = s.sentEntries = s.recvEntries = 0;
+    s.staleFrames = 0;
 }
 
 extern "C" int port_actor_sync_remote_owned(const void* nameObj) {
@@ -1094,6 +1120,9 @@ extern "C" void port_actor_sync_update(uint32_t stage, uint8_t scenario) {
             continue;
         }
         if (!reassign || t.claimUntil > s.frame || t.remoteClaimUntil > s.frame) continue;
+        if (MR::isClipped(a) && t.owner != me && t.owner != 0 && present(t.owner) && (t.ownerFlags & kFlagAsleep) == 0) {
+            continue;  // frozen here, running for its owner: theirs, however near we are
+        }
         // Nearest player, with a margin before it changes hands.
         int best = 0, cur = -1;
         float bestD = 1e30f;
@@ -1118,8 +1147,14 @@ extern "C" void port_actor_sync_update(uint32_t stage, uint8_t scenario) {
         }
     }
 
+    if (logging()) {
+        for (Tracked& t : s.list) {
+            if (driven(t) && (t.ownerFlags & kFlagAsleep) != 0 && !MR::isDead(t.actor) && !MR::isClipped(t.actor)) s.staleFrames++;
+        }
+    }
     if (logging() && s.frame % 600 == 0) {
-        port_log("actors: %u messages (%u states) sent, %u states applied so far", s.sentMsgs, s.sentEntries, s.recvEntries);
+        port_log("actors: %u messages (%u states) sent, %u states applied so far; %u actor-frames shown from a frozen owner", s.sentMsgs,
+                 s.sentEntries, s.recvEntries, s.staleFrames);
     }
     if (logging() && s.frame % 30 == 0) {
         // Moving actors near the local player, to compare between clients.
