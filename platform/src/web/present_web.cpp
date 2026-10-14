@@ -19,6 +19,7 @@
 #include <atomic>
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <unordered_set>
 
 #include "../gx/gl_renderer.h"
@@ -51,14 +52,74 @@ float sPointerX = 0, sPointerY = 0;  // -1..1 over the canvas
 bool sMouseL = false, sMouseR = false;
 bool sCursorActive = false;  // the gamepad's virtual pointer, until the mouse moves
 
-bool isGameKey(const char* code) {
-    static const char* const kKeys[] = {"KeyW", "KeyA", "KeyS", "KeyD", "Space", "KeyK", "KeyQ", "KeyC", "Enter",
-                                        "Backspace", "Digit1", "Digit2", "KeyH", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
-                                        "KeyJ", "ShiftLeft", "KeyE"};
-    for (const char* k : kKeys) {
-        if (strcmp(code, k) == 0) return true;
+// Rebindable keys (P5-08): each action holds the KeyboardEvent.code values
+// that press it.  The page's Settings sends the player's layout as
+// "action=Code,Code;..." (SMG_KEYS at boot, web_keys_buffer + web_keys_commit
+// when it changes); actions it leaves out keep their default keys.
+enum Action {
+    aUp, aDown, aLeft, aRight, aA, aB, aZ, aC, aSpin, aPlus, aMinus, aOne, aTwo, aHome,
+    aPadUp, aPadDown, aPadLeft, aPadRight, aTalk, kActionCount,
+};
+const char* const kActionNames[kActionCount] = {
+    "up", "down", "left", "right", "a", "b", "z", "c", "spin", "plus", "minus", "one", "two", "home",
+    "dup", "ddown", "dleft", "dright", "talk",
+};
+const char* const kDefaultKeys =
+    "up=KeyW;down=KeyS;left=KeyA;right=KeyD;a=Space;b=KeyK;z=KeyQ;c=KeyC;spin=KeyJ,ShiftLeft;plus=Enter;"
+    "minus=Backspace;one=Digit1;two=Digit2;home=KeyH;dup=ArrowUp;ddown=ArrowDown;dleft=ArrowLeft;"
+    "dright=ArrowRight;talk=KeyE";
+std::unordered_map<std::string, uint32_t> sBinds;  // code -> bit per action
+char sKeysText[1024];                               // written by the page
+std::atomic<int> sKeysVersion{0};
+int sKeysApplied = -1;
+
+void parseKeys(const char* text) {
+    std::string t(text);
+    size_t p = 0;
+    while (p < t.size()) {
+        size_t end = t.find(';', p);
+        if (end == std::string::npos) end = t.size();
+        std::string item = t.substr(p, end - p);
+        p = end + 1;
+        size_t eq = item.find('=');
+        if (eq == std::string::npos) continue;
+        std::string name = item.substr(0, eq);
+        int action = -1;
+        for (int i = 0; i < kActionCount; i++) {
+            if (name == kActionNames[i]) action = i;
+        }
+        if (action < 0) continue;
+        for (auto& b : sBinds) b.second &= ~(1u << action);  // the page's list replaces the default
+        size_t q = eq + 1;
+        while (q <= item.size()) {
+            size_t comma = item.find(',', q);
+            if (comma == std::string::npos) comma = item.size();
+            std::string code = item.substr(q, comma - q);
+            if (!code.empty()) sBinds[code] |= 1u << action;
+            q = comma + 1;
+        }
     }
-    return false;
+}
+
+void applyKeys() {
+    int v = sKeysVersion.load();
+    if (v == sKeysApplied) return;
+    sKeysApplied = v;
+    sBinds.clear();
+    parseKeys(kDefaultKeys);
+    if (v == 0) {
+        if (const char* env = getenv("SMG_KEYS")) parseKeys(env);
+    } else {
+        sKeysText[sizeof(sKeysText) - 1] = 0;
+        parseKeys(sKeysText);
+    }
+    sKeys.clear();  // a key held across the change would stay pressed
+}
+
+bool isGameKey(const char* code) {
+    applyKeys();
+    auto it = sBinds.find(code);
+    return it != sBinds.end() && it->second != 0;
 }
 
 bool onKey(int type, const EmscriptenKeyboardEvent* e, void*) {
@@ -66,7 +127,7 @@ bool onKey(int type, const EmscriptenKeyboardEvent* e, void*) {
         return false;  // leave browser shortcuts alone
     }
     if (type == EMSCRIPTEN_EVENT_KEYDOWN) {
-        if (strcmp(e->code, "KeyE") == 0 && !e->repeat) {
+        if ((sBinds[e->code] & (1u << aTalk)) && !e->repeat) {
             port_talk_note_press();  // talk (port/talk.h)
         }
         sKeys.insert(e->code);
@@ -101,7 +162,14 @@ bool onMouse(int type, const EmscriptenMouseEvent* e, void*) {
     return type != EMSCRIPTEN_EVENT_MOUSEMOVE;
 }
 
-bool held(const char* code) { return sKeys.count(code) != 0; }
+// Whether any key bound to the action is down.
+bool held(Action action) {
+    for (const std::string& code : sKeys) {
+        auto it = sBinds.find(code);
+        if (it != sBinds.end() && (it->second & (1u << action))) return true;
+    }
+    return false;
+}
 
 }  // namespace
 
@@ -332,25 +400,26 @@ void web_read_input(PortPadState* pad) {
     memset(pad, 0, sizeof(*pad));
     pad->connected = 1;
     pad->pointerDist = 2.0f;
-    pad->stickX = (held("KeyD") ? 1.0f : 0.0f) - (held("KeyA") ? 1.0f : 0.0f);
-    pad->stickY = (held("KeyW") ? 1.0f : 0.0f) - (held("KeyS") ? 1.0f : 0.0f);
-    if (held("Space")) pad->buttons |= kA;
-    if (held("KeyK") || sMouseR) pad->buttons |= kB;
-    // Not Ctrl: Ctrl+W/D/S with the movement keys are the browser's (close
-    // the tab, bookmark, save), and a page cannot stop Ctrl+W.
-    if (held("KeyQ")) pad->buttons |= kZ;
-    if (held("KeyC")) pad->buttons |= kC;
-    if (held("Enter")) pad->buttons |= kPlus;  // Esc is the page's: it shows the cursor
-    if (held("Backspace")) pad->buttons |= kMinus;
-    if (held("Digit1")) pad->buttons |= kOne;
-    if (held("Digit2")) pad->buttons |= kTwo;
-    if (held("KeyH")) pad->buttons |= kHome;
-    if (held("ArrowUp")) pad->buttons |= kUp;
-    if (held("ArrowDown")) pad->buttons |= kDown;
-    if (held("ArrowLeft")) pad->buttons |= kLeft;
-    if (held("ArrowRight")) pad->buttons |= kRight;
+    applyKeys();
+    pad->stickX = (held(aRight) ? 1.0f : 0.0f) - (held(aLeft) ? 1.0f : 0.0f);
+    pad->stickY = (held(aUp) ? 1.0f : 0.0f) - (held(aDown) ? 1.0f : 0.0f);
+    if (held(aA)) pad->buttons |= kA;
+    if (held(aB) || sMouseR) pad->buttons |= kB;
+    // Z is not Ctrl by default: Ctrl+W/D/S with the movement keys are the
+    // browser's (close the tab, bookmark, save), and a page cannot stop Ctrl+W.
+    if (held(aZ)) pad->buttons |= kZ;
+    if (held(aC)) pad->buttons |= kC;
+    if (held(aPlus)) pad->buttons |= kPlus;  // Esc is the page's: it shows the cursor
+    if (held(aMinus)) pad->buttons |= kMinus;
+    if (held(aOne)) pad->buttons |= kOne;
+    if (held(aTwo)) pad->buttons |= kTwo;
+    if (held(aHome)) pad->buttons |= kHome;
+    if (held(aPadUp)) pad->buttons |= kUp;
+    if (held(aPadDown)) pad->buttons |= kDown;
+    if (held(aPadLeft)) pad->buttons |= kLeft;
+    if (held(aPadRight)) pad->buttons |= kRight;
     // Spin: a shake of the remote, alternating acceleration each frame.
-    if (held("KeyJ") || held("ShiftLeft") || sMouseL) {
+    if (held(aSpin) || sMouseL) {
         static unsigned sFlip = 0;
         float a = (++sFlip & 1) ? 2.5f : -2.5f;
         pad->accX = a;
@@ -364,6 +433,12 @@ void web_read_input(PortPadState* pad) {
     readGamepad(pad);
     readTouch(pad);
 }
+
+// Settings > Controls: the page writes the layout here, then commits it; the
+// event thread applies it at its next key or frame.
+extern "C" EMSCRIPTEN_KEEPALIVE char* web_keys_buffer(void) { return sKeysText; }
+extern "C" EMSCRIPTEN_KEEPALIVE int web_keys_buffer_size(void) { return (int)sizeof(sKeysText); }
+extern "C" EMSCRIPTEN_KEEPALIVE void web_keys_commit(void) { sKeysVersion.fetch_add(1); }
 
 // Render scale (P1-07): the page asks for a new EFB size (settings);
 // applied between frames on this thread, which owns the GL context.

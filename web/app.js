@@ -752,7 +752,7 @@ function drawTags() {
 
 function boot(args, env = {}) {
   // read by browser_env.js in preRun
-  window.smgEnv = { SMG_SCALE: store("smg.scale") || "auto", SMG_SKIP_HOLD: store("smg.skipHold") || "0", ...env };
+  window.smgEnv = { SMG_SCALE: store("smg.scale") || "auto", SMG_SKIP_HOLD: store("smg.skipHold") || "0", SMG_KEYS: controlsText(), ...env };
   // The game's shape is fixed for the run (port_screen_widen); the URL wins, as in browser_env.js.
   boot.aspect = window.smgEnv.SMG_ASPECT = params.get("SMG_ASPECT") || window.smgEnv.SMG_ASPECT || (store("smg.picture") === "ultrawide" ? "21:9" : "16:9");
   window.smgApplyPicture?.();
@@ -913,6 +913,177 @@ async function importSave(file) {
   window.smgLeaving = true;
   location.reload();
 }
+// Settings > Controls (P5-08): the keyboard layout, kept in localStorage
+// (smg.controls) so it is the preset on every visit.  The game gets it as
+// SMG_KEYS at boot and through _web_keys_buffer/_web_keys_commit when it
+// changes (present_web.cpp); the names match its actions.  Mouse buttons
+// stay fixed: left click spins, right click is B.
+const kControls = [
+  ["up", "Move forward", ["KeyW"]], ["down", "Move back", ["KeyS"]],
+  ["left", "Move left", ["KeyA"]], ["right", "Move right", ["KeyD"]],
+  ["a", "Jump (A)", ["Space"]], ["spin", "Spin (shake)", ["KeyJ", "ShiftLeft"]],
+  ["b", "B", ["KeyK"]], ["z", "Crouch (Z)", ["KeyQ"]], ["c", "Camera (C)", ["KeyC"]],
+  ["talk", "Talk", ["KeyE"]], ["plus", "Pause (+)", ["Enter"]], ["minus", "Minus (−)", ["Backspace"]],
+  ["one", "1 button", ["Digit1"]], ["two", "2 button", ["Digit2"]], ["home", "Home", ["KeyH"]],
+  ["dup", "D-pad up", ["ArrowUp"]], ["ddown", "D-pad down", ["ArrowDown"]],
+  ["dleft", "D-pad left", ["ArrowLeft"]], ["dright", "D-pad right", ["ArrowRight"]],
+];
+// The page's own keys: Esc frees the cursor (and cancels a rebind), Tab
+// opens the leaderboard, M the legend.
+const kReservedKeys = ["Escape", "Tab", "KeyM"];
+function defaultControls() {
+  return Object.fromEntries(kControls.map(([id, , keys]) => [id, [...keys]]));
+}
+function loadControls() {
+  const c = defaultControls();
+  try {
+    const saved = JSON.parse(store("smg.controls") || "{}");
+    for (const id in c) {
+      if (Array.isArray(saved[id]) && saved[id].every((k) => typeof k === "string")) c[id] = saved[id].filter((k) => !kReservedKeys.includes(k));
+    }
+  } catch {}
+  return c;
+}
+let controls = loadControls();
+function controlsText() {
+  return kControls.map(([id]) => `${id}=${controls[id].join(",")}`).join(";");
+}
+function keyName(code) {
+  if (!code) return "—";
+  const arrows = { ArrowUp: "↑", ArrowDown: "↓", ArrowLeft: "←", ArrowRight: "→" };
+  if (arrows[code]) return arrows[code];
+  if (/^Key[A-Z]$/.test(code)) return code.slice(3);
+  if (/^Digit\d$/.test(code)) return code.slice(5);
+  if (/^Numpad/.test(code)) return "Num " + code.slice(6);
+  return code.replace(/(Left|Right)$/, " $1").replace(/^(\w+) (Left|Right)$/, "$2 $1");
+}
+const keyNames = (id) => controls[id].map(keyName).join(" / ") || "—";
+// Hands the layout to the running game (no-op before it starts: SMG_KEYS covers that).
+function sendControls() {
+  if (!window.Module || !Module._web_keys_buffer || !Module.HEAPU8) return;
+  const bytes = new TextEncoder().encode(controlsText());
+  const size = Module._web_keys_buffer_size();
+  if (bytes.length >= size) return;
+  const ptr = Module._web_keys_buffer() >>> 0;
+  Module.HEAPU8.set(bytes, ptr);
+  Module.HEAPU8[ptr + bytes.length] = 0;
+  Module._web_keys_commit();
+}
+// The legend, top left while playing, from the current layout.
+function renderKeyLegend() {
+  const move = ["up", "left", "down", "right"].map((id) => keyName(controls[id][0]));
+  const isDefault = (ids) => ids.every((id) => controls[id].join() === kControls.find((c) => c[0] === id)[2].join());
+  const pad = ["dup", "ddown", "dleft", "dright"];
+  const rows = [
+    [move.join(" "), "move"],
+    [keyNames("a"), "jump (A)"],
+    [`${keyNames("spin")} / click`, "spin"],
+    [`${keyNames("b")} / right click`, "B"],
+    [keyNames("z"), "crouch (Z)"],
+    [keyNames("c"), "camera (C)"],
+    [keyNames("talk"), "talk"],
+    ["Mouse", "pointer"],
+    [isDefault(pad) ? "Arrows" : pad.map((id) => keyName(controls[id][0])).join(" "), "D-pad"],
+    [keyNames("plus"), "pause (+)"],
+    ["Esc", "show cursor"],
+    ["Tab / pad Y", "leaderboard"],
+    ["M", "hide this"],
+  ];
+  const keys = document.getElementById("keys");
+  keys.replaceChildren(...rows.flatMap(([k, what]) => {
+    const kbd = document.createElement("kbd"), span = document.createElement("span");
+    kbd.textContent = k;
+    span.textContent = what;
+    return [kbd, span];
+  }));
+}
+function setupControls() {
+  const list = document.getElementById("ctlList"), edit = document.getElementById("ctlEdit"), note = document.getElementById("ctlNote");
+  let listening = null;  // [id, button] waiting for a key
+  const tell = (text) => {
+    note.hidden = !text;
+    note.textContent = text || "";
+  };
+  const save = () => {
+    store("smg.controls", JSON.stringify(controls));
+    sendControls();
+    renderKeyLegend();
+    render();
+  };
+  const stopListening = () => {
+    listening?.[1].classList.remove("listening");
+    listening = null;
+  };
+  function render() {
+    list.replaceChildren(...kControls.flatMap(([id, label]) => {
+      const span = document.createElement("span"), btn = document.createElement("button");
+      span.textContent = label;
+      btn.textContent = keyNames(id);
+      btn.title = "Click, then press a key";
+      btn.onclick = () => {
+        if (listening?.[0] === id) return stopListening(), render();
+        stopListening();
+        render();
+        const b = list.querySelector(`button[data-id="${id}"]`);
+        b.textContent = "Press a key…";
+        b.classList.add("listening");
+        listening = [id, b];
+        tell("Press the new key, or Esc to cancel.");
+      };
+      btn.dataset.id = id;
+      return [span, btn];
+    }));
+  }
+  // Ahead of the game's own key listener (registered later, on the same
+  // window, also in the capture phase), so the key that is being bound does
+  // not also reach the game.
+  window.addEventListener("keydown", (e) => {
+    if (!listening) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if (e.repeat) return;
+    const [id] = listening;
+    stopListening();
+    if (e.code === "Escape") {
+      tell("");
+      return render();
+    }
+    if (kReservedKeys.includes(e.code) || !e.code) {
+      tell(`${keyName(e.code) || "That key"} belongs to the page (Esc, Tab and M). Pick another.`);
+      return render();
+    }
+    // A key presses one control: take it off any other.
+    const taken = kControls.filter(([other]) => other !== id && controls[other].includes(e.code)).map(([, label]) => label);
+    for (const [other] of kControls) if (other !== id) controls[other] = controls[other].filter((k) => k !== e.code);
+    controls[id] = [e.code];
+    tell(taken.length ? `${keyName(e.code)} was on ${taken.join(", ")}, which now has no key${taken.length > 1 ? "s" : ""} until you set one.`
+      : /Control|Meta/.test(e.code) ? "Careful: Ctrl or Cmd with the movement keys can trigger browser shortcuts (Ctrl+W closes the tab)." : "");
+    save();
+  }, true);
+  window.addEventListener("keyup", (e) => {
+    if (listening) e.stopImmediatePropagation();
+  }, true);
+  edit.onclick = () => {
+    const open = list.hidden;
+    list.hidden = !open;
+    edit.setAttribute("aria-expanded", String(open));
+    edit.textContent = open ? "Done" : "Change keys";
+    if (!open) {
+      stopListening();
+      tell("");
+    }
+    render();
+  };
+  document.getElementById("ctlReset").onclick = () => {
+    stopListening();
+    controls = defaultControls();
+    tell("Keys set back to the defaults.");
+    save();
+  };
+  render();
+  renderKeyLegend();
+}
+
 function setupSettings() {
   const gear = document.getElementById("gear"), panel = document.getElementById("settings");
   gear.onclick = () => {
@@ -992,9 +1163,10 @@ function setupSettings() {
   showKeys.onchange = applyKeys;
   keyHint.onclick = toggleKeys;
   window.addEventListener("keydown", (e) => {
-    if (e.code === "KeyM" && !e.repeat && document.body.classList.contains("playing") && !e.target.closest?.("input, select, textarea")) toggleKeys();
+    if (e.code === "KeyM" && !e.repeat && document.body.classList.contains("playing") && !e.target.closest?.("input, select, textarea") && !document.querySelector("#ctlList .listening")) toggleKeys();
   }, true);
   applyKeys();
+  setupControls();
   // Esc brings the system cursor back over the game (the game hides it and
   // draws its own pointer) so the gear can be reached; a click on the game
   // hides it again, and that click is not passed to the game.

@@ -665,7 +665,7 @@ Starter list, unordered: switches, launch stars (fired), coins (collected), 1-up
 
 ### P5-08 Rebind the keyboard controls in Settings
 - lane: A
-- status: in_progress
+- status: done
 - owner: A
 - started: 2026-10-14
 - blocked_by:
@@ -674,6 +674,7 @@ Starter list, unordered: switches, launch stars (fired), coins (collected), 1-up
 - what: Asked for by the user. Settings lists each Wii control with its keys; click one and press a key to rebind it. The layout is kept in localStorage, so it is the preset on every visit, and the controls legend shows it. Reset restores the defaults.
 - done when: a rebound key moves Mario, survives a reload, and the old key no longer acts.
 - log:
+  - 2026-10-14 (A): done. present_web.cpp maps KeyboardEvent.code -> actions from a table (defaults as before), set by SMG_KEYS at boot and _web_keys_buffer/_web_keys_commit live. Settings > Change keys / Default keys; layout in localStorage `smg.controls`; the legend is built from it. Esc, Tab, M reserved; a key moved to a new control leaves the old one. Verified headless (POSLOG): with up=KeyI, I moves Mario and W does not; rebinding up to L in the UI mid-game, W then did nothing and L moved him, and the layout was saved. Mouse buttons stay fixed; desktop (SDL) build unchanged.
 
 ### P5-05 Local 2-player (two real players, one machine)
 - lane: shared

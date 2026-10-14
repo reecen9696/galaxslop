@@ -209,6 +209,13 @@
   body.playing #keyHint { display: block; }
   #keyHint:hover { opacity: .8; }
   #keys kbd { font: 600 11px ui-monospace, monospace; text-align: right; color: #cfe8ff; }
+  /* Settings > Controls (P5-08): one row per Wii control, its keys on a button that listens for the next key */
+  #ctlList { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; align-items: center; margin-top: 6px; }
+  #ctlList[hidden] { display: none; }
+  #ctlList span { color: var(--fg); font-size: 13px; }
+  #ctlList button { min-width: 96px; padding: 3px 8px; font: 600 12px ui-monospace, monospace; color: var(--ink); background: var(--face);
+    border: 2px solid var(--wii-blue); border-radius: 8px; cursor: pointer; }
+  #ctlList button.listening { background: var(--wii-blue); color: #fff; }
   body.free-cursor canvas { cursor: default; }  /* Esc: the system pointer back, to reach settings */
 
   /* ---- first-visit loading screen: Luma over the bar, in space ---- */
@@ -348,20 +355,7 @@
 <div id="roombar"></div>
 <div id="keyHint" role="button"></div>
 <div id="topleft">
-  <div id="keys">
-    <kbd>W A S D</kbd><span>move</span>
-    <kbd>Space</kbd><span>jump (A)</span>
-    <kbd>Shift / click</kbd><span>spin</span>
-    <kbd>K / right click</kbd><span>B</span>
-    <kbd>Q</kbd><span>crouch (Z)</span>
-    <kbd>C</kbd><span>camera (C)</span>
-    <kbd>Mouse</kbd><span>pointer</span>
-    <kbd>Arrows</kbd><span>D-pad</span>
-    <kbd>Enter</kbd><span>pause (+)</span>
-    <kbd>Esc</kbd><span>show cursor</span>
-    <kbd>Tab / pad Y</kbd><span>leaderboard</span>
-    <kbd>M</kbd><span>hide this</span>
-  </div>
+  <div id="keys"></div>
   <div id="perfbox"></div>
 </div>
 <!-- The leaderboard button's Power Star. -->
@@ -393,6 +387,9 @@
   <label for="skipHold">Hold A to skip cutscenes and dialogue</label>
   <select id="skipHold"><option value="0">Off (holding A only speeds up text, as on the Wii)</option><option value="1">After 1 second</option><option value="2">After 2 seconds</option></select>
   <label class="inline"><input id="showKeys" type="checkbox"> Show controls</label>
+  <div class="row"><button id="ctlEdit" class="wii-btn" aria-expanded="false" aria-controls="ctlList">Change keys</button><button id="ctlReset" class="wii-btn">Default keys</button></div>
+  <div id="ctlList" hidden></div>
+  <p id="ctlNote" class="note" hidden></p>
   <label class="inline"><input id="touchCtl" type="checkbox"> Touch controls</label>
   <label class="inline"><input id="names" type="checkbox"> Show player names</label>
   <label class="inline"><input id="perf" type="checkbox"> Show frame times</label>
