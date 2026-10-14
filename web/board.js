@@ -156,23 +156,13 @@
     return all.map((p) => ({ ...p, s: pick(p) })).sort((a, b) => points(b.s) - points(a.s) || (a.me ? -1 : b.me ? 1 : 0));
   }
 
-  const icon = (id) => `<svg aria-hidden="true"><use href="#${id}"/></svg>`;
-  const galaxyName = (stage) => mine.names?.[stage] || pretty(stage);
   function render() {
     for (const t of tabs) t.setAttribute("aria-selected", String(t.dataset.tab === tab));
-    const list = rows();
-    const title = tab === "total"
-      ? `All galaxies<small>Everything picked up, every run</small>`
-      : lastStage ? `${esc(galaxyName(lastStage))}<small>Best run in this galaxy</small>` : `No galaxy yet<small>Enter a galaxy to start a run</small>`;
-    let html = `<p class="bd-sub">${title}</p><table><thead><tr><th></th><th>Player</th><th>${icon("i-coin")}Coins</th><th>${icon("i-bit")}Star Bits</th></tr></thead><tbody>`;
-    list.forEach((p, i) => {
-      const rank = i < 3 && points(p.s) > 0 ? `<span class="bd-rank bd-r${i + 1}">${icon(`i-rank${i + 1}`)}<b>${i + 1}</b></span>` : `<span class="bd-rank">${i + 1}</span>`;
-      html += `<tr${p.me ? ' class="bd-me"' : ""}><td>${rank}</td><td>${esc(p.name)}</td><td class="bd-coins">${p.s.coins}</td><td class="bd-bits">${p.s.bits}</td></tr>`;
+    let html = `<table><thead><tr><th></th><th>Player</th><th>Coins</th><th>Star Bits</th></tr></thead><tbody>`;
+    rows().forEach((p, i) => {
+      html += `<tr${p.me ? ' class="bd-me"' : ""}><td>${i + 1}</td><td>${esc(p.name)}</td><td>${p.s.coins}</td><td>${p.s.bits}</td></tr>`;
     });
     html += "</tbody></table>";
-    html += inRoom()
-      ? `<p class="bd-note">Players in room ${esc(roombar.dataset.room)} right now. Each counts only what they picked up themselves.</p>`
-      : `<p class="bd-note">Just you for now. Play in a room to see your friends here.</p>`;
     if (body.innerHTML !== html) body.innerHTML = html;
   }
 

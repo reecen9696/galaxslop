@@ -144,51 +144,24 @@
   body.playing #boardBtn { display: block; }
   #boardBtn:hover, #boardBtn[aria-expanded="true"] { border-color: var(--wii-blue); box-shadow: 0 0 10px var(--wii-blue); color: var(--wii-blue-deep); }
   body.playing #roombar { right: 120px; max-width: min(520px, calc(100vw - 144px)); }
-  /* The board itself reads like the game's own screens: deep space, gold title, coin and star bit icons. */
-  #board { position: fixed; top: 64px; right: 12px; z-index: 5; width: min(400px, calc(100vw - 24px)); display: none;
-    padding: 0 16px 14px; color: #fff; border-radius: 20px; overflow: hidden auto; max-height: calc(100vh - 76px);
-    -webkit-user-select: none; user-select: none;
-    background:
-      radial-gradient(1.5px 1.5px at 8% 14%, #fff, transparent), radial-gradient(1px 1px at 23% 63%, #cfe3ff, transparent),
-      radial-gradient(1.5px 1.5px at 44% 28%, #fff6c8, transparent), radial-gradient(1px 1px at 62% 82%, #fff, transparent),
-      radial-gradient(2px 2px at 78% 18%, #fff, transparent), radial-gradient(1px 1px at 90% 57%, #d8e8ff, transparent),
-      radial-gradient(1px 1px at 33% 92%, #fff, transparent), radial-gradient(1.5px 1.5px at 95% 90%, #fff6c8, transparent),
-      radial-gradient(ellipse at 30% 0%, #3a3f9e 0%, transparent 60%), radial-gradient(ellipse at 100% 100%, #4a1f6e 0%, transparent 55%),
-      linear-gradient(#141b4d, #0a0d29);
-    border: 2px solid #9fdcff; box-shadow: 0 0 0 2px #1a3f8a, 0 0 18px #34bdef99, 0 8px 28px #000c; }
-  #board h2 { display: flex; align-items: center; gap: 8px; margin: 0 -16px 12px; padding: 12px 12px 10px 14px; }
-  #board h2 span { flex: 1; font-size: 22px; font-weight: 700; letter-spacing: .02em; color: #ffe14d;
-    background: linear-gradient(#fff7b0 0%, #ffe14d 45%, #f5a300 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 0 #7a3c00) drop-shadow(0 0 6px #ffb30066); }
-  #board h2 .bd-star { width: 30px; height: 30px; flex: none; filter: drop-shadow(0 0 6px #ffd23faa); }
-  #boardClose { width: 30px; height: 30px; padding: 0; min-height: 0; font-size: 15px; line-height: 1; border-width: 2px; border-radius: 50%; }
-  #board .bd-tabs { display: flex; gap: 8px; padding: 3px; background: #00000059; border-radius: 22px; box-shadow: inset 0 1px 3px #000a; }
-  #board .bd-tab { flex: 1; font-size: 14px; font-weight: 600; padding: 7px 8px; min-height: 0; border: 0; border-radius: 19px;
-    color: #b9c6ee; background: transparent; box-shadow: none; }
+  /* The board: two tabs and the table, on one flat colour. */
+  #board { position: fixed; top: 64px; right: 12px; z-index: 5; width: min(360px, calc(100vw - 24px)); display: none;
+    padding: 10px 12px 12px; color: #fff; background: #151a3a; border: 2px solid #9fdcff; border-radius: 16px;
+    box-shadow: 0 6px 20px #000a; max-height: calc(100vh - 76px); overflow-y: auto; -webkit-user-select: none; user-select: none; }
+  #board .bd-top { display: flex; align-items: center; gap: 8px; }
+  #board .bd-tabs { flex: 1; display: flex; gap: 4px; padding: 3px; background: #0c1028; border-radius: 20px; }
+  #board .bd-tab { flex: 1; font: inherit; font-size: 14px; font-weight: 600; padding: 6px 8px; border: 0; border-radius: 17px; cursor: pointer;
+    color: #aab3d6; background: transparent; }
   #board .bd-tab:hover { color: #fff; }
-  #board .bd-tab[aria-selected="true"] { color: #0b2a5c; background: linear-gradient(#ffffff, #bfeaff 50%, #7fd2fb 52%, #b6e7ff); box-shadow: 0 0 10px #34bdefcc; }
-  #board .bd-sub { margin: 12px 2px 6px; font-size: 15px; font-weight: 600; color: #fff; text-shadow: 0 0 8px #6fb8ff; }
-  #board .bd-sub small { display: block; font-size: 12px; font-weight: 400; color: #9fb0dd; text-shadow: none; }
-  #board table { width: 100%; border-collapse: separate; border-spacing: 0 4px; font-size: 15px; font-variant-numeric: tabular-nums; }
-  #board th { font-weight: 500; font-size: 12px; color: #9fb0dd; text-align: right; padding: 0 8px; white-space: nowrap; }
-  #board th svg { width: 18px; height: 18px; vertical-align: -4px; margin-right: 3px; }
-  #board td { text-align: right; padding: 6px 8px; background: #ffffff12; font-weight: 600; }
-  #board td:first-child { border-radius: 12px 0 0 12px; width: 30px; text-align: center; padding: 3px 4px; }
-  #board td:last-child { border-radius: 0 12px 12px 0; }
+  #board .bd-tab[aria-selected="true"] { color: #0b2a5c; background: #9fdcff; }
+  #boardClose { width: 30px; height: 30px; flex: none; padding: 0; min-height: 0; font-size: 15px; line-height: 1; border-width: 2px; border-radius: 50%; }
+  #board table { width: 100%; margin-top: 8px; border-collapse: collapse; font-size: 15px; font-variant-numeric: tabular-nums; }
+  #board th { font-weight: 500; font-size: 12px; color: #aab3d6; text-align: right; padding: 4px 8px; white-space: nowrap; }
+  #board td { text-align: right; padding: 7px 8px; border-top: 1px solid #ffffff14; }
   #board th:nth-child(2), #board td:nth-child(2) { text-align: left; width: 100%; overflow-wrap: anywhere; }
-  #board td.bd-coins { color: #ffd84a; }
-  #board td.bd-bits { color: #ff9be0; }
-  #board .bd-rank { position: relative; display: inline-grid; place-items: center; width: 28px; height: 28px; font-size: 12px; font-weight: 700; color: #9fb0dd; }
-  #board .bd-rank svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-  #board .bd-rank b { position: relative; top: 1px; color: #5a3000; }
-  #board .bd-r2 b { color: #3d4452; }
-  #board .bd-r3 b { color: #4a2308; }
-  #board tr.bd-me td { background: #34bdef3d; box-shadow: inset 0 1px 0 #9fdcff88, inset 0 -1px 0 #9fdcff88; }
-  #board tr.bd-me td:first-child { box-shadow: inset 1px 1px 0 #9fdcff88, inset 0 -1px 0 #9fdcff88; }
-  #board tr.bd-me td:last-child { box-shadow: inset -1px 1px 0 #9fdcff88, inset 0 -1px 0 #9fdcff88; }
-  #board tr.bd-me td:nth-child(2)::after { content: " (you)"; font-weight: 400; color: #9fdcff; font-size: 12px; }
-  #board .bd-note { margin: 10px 2px 0; color: #9fb0dd; font-size: 12px; line-height: 1.4; }
-  #boardTimer { display: none; height: 4px; margin: 12px 0 0; border-radius: 2px; background: linear-gradient(90deg, #fff7b0, #ffd23f); box-shadow: 0 0 6px #ffd23f; transform-origin: left; }
+  #board td:first-child { width: 20px; color: #aab3d6; text-align: center; }
+  #board tr.bd-me td { background: #ffffff12; font-weight: 600; }
+  #boardTimer { display: none; height: 3px; margin-top: 10px; border-radius: 2px; background: #9fdcff; transform-origin: left; }
   #board.bd-auto #boardTimer { display: block; animation: bd-shrink 6s linear forwards; }
   @keyframes bd-shrink { from { transform: scaleX(1); } to { transform: scaleX(0); } }
   #roombar { display: none; position: fixed; top: 12px; right: 66px; z-index: 3; max-width: min(520px, calc(100vw - 90px));
@@ -389,26 +362,17 @@
   </div>
   <div id="perfbox"></div>
 </div>
-<!-- Leaderboard icons (board.js): a Power Star, a coin, a star bit, and the rank stars. -->
+<!-- The leaderboard button's Power Star. -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <linearGradient id="g-gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff7a8"/><stop offset=".5" stop-color="#ffd21f"/><stop offset="1" stop-color="#f29a00"/></linearGradient>
-    <linearGradient id="g-silver" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#cfd6e2"/><stop offset="1" stop-color="#8d97a8"/></linearGradient>
-    <linearGradient id="g-bronze" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd6a8"/><stop offset=".5" stop-color="#e09455"/><stop offset="1" stop-color="#a5561f"/></linearGradient>
-    <linearGradient id="g-bit" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe0f6"/><stop offset=".45" stop-color="#ff6fcf"/><stop offset="1" stop-color="#b02a8f"/></linearGradient>
     <path id="p-star" d="M12 1.6l3.1 6.6 7.2.9-5.3 5 1.4 7.2L12 17.8l-6.4 3.5L7 14.1l-5.3-5 7.2-.9z" stroke-linejoin="round"/>
     <symbol id="i-star" viewBox="0 0 24 24"><use href="#p-star" fill="url(#g-gold)" stroke="#c46a00" stroke-width="1.2"/><ellipse cx="10.2" cy="11" rx=".9" ry="1.7" fill="#3a1d00"/><ellipse cx="13.8" cy="11" rx=".9" ry="1.7" fill="#3a1d00"/></symbol>
-    <symbol id="i-coin" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="8" ry="10" fill="url(#g-gold)" stroke="#b86e00" stroke-width="1.2"/><ellipse cx="12" cy="12" rx="4.2" ry="6.4" fill="none" stroke="#e08a00" stroke-width="1.4"/><path d="M9.5 6.5q-2 5.5 0 11" stroke="#fffbe0" stroke-width="1.2" fill="none" opacity=".8"/></symbol>
-    <symbol id="i-bit" viewBox="0 0 24 24"><path d="M12 2l2.6 5.4L20.5 6l-2.6 5.6L22 16l-6 .6L12 22l-4-5.4-6-.6 4.1-4.4L3.5 6l5.9 1.4z" fill="url(#g-bit)" stroke="#8a1f70" stroke-width="1" stroke-linejoin="round"/><path d="M12 6l1.4 3.3L12 12l-1.4-2.7z" fill="#fff" opacity=".75"/></symbol>
-    <symbol id="i-rank1" viewBox="0 0 24 24"><use href="#p-star" fill="url(#g-gold)" stroke="#b86e00" stroke-width="1"/></symbol>
-    <symbol id="i-rank2" viewBox="0 0 24 24"><use href="#p-star" fill="url(#g-silver)" stroke="#6b7486" stroke-width="1"/></symbol>
-    <symbol id="i-rank3" viewBox="0 0 24 24"><use href="#p-star" fill="url(#g-bronze)" stroke="#7a3a10" stroke-width="1"/></symbol>
   </defs>
 </svg>
 <button id="boardBtn" aria-label="Leaderboard" title="Leaderboard (Tab, or Y on a gamepad)" aria-expanded="false"><svg aria-hidden="true"><use href="#i-star"/></svg></button>
 <div id="board" role="dialog" aria-label="Leaderboard">
-  <h2><svg class="bd-star" aria-hidden="true"><use href="#i-star"/></svg><span>Leaderboard</span><button id="boardClose" class="wii-btn" aria-label="Close">✕</button></h2>
-  <div class="bd-tabs" role="tablist"><button class="bd-tab" role="tab" data-tab="galaxy">This galaxy</button><button class="bd-tab" role="tab" data-tab="total">Overall</button></div>
+  <div class="bd-top"><div class="bd-tabs" role="tablist"><button class="bd-tab" role="tab" data-tab="galaxy">This Galaxy</button><button class="bd-tab" role="tab" data-tab="total">All Galaxies</button></div><button id="boardClose" class="wii-btn" aria-label="Close">✕</button></div>
   <div id="boardBody"></div>
   <div id="boardTimer"></div>
 </div>
