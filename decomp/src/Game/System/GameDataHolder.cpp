@@ -15,6 +15,7 @@
 #ifdef TARGET_PC
 #include "Game/Util/HashUtil.hpp"
 #include "net/client/progress.h"
+#include "port/board.h"
 #endif
 
 extern const u8 StoryEventBCSV[];
@@ -227,6 +228,10 @@ void GameDataHolder::setPowerStar(const char* pGalaxyName, s32 scenarioNum, bool
     // Co-op (P3-02, D-022): a star got here is shared with the room.
     if (set && !had && !port_net_progress_is_applying()) {
         port_net_progress_send(net::kProgressStar, MR::getHashCode(pGalaxyName), (u8)scenarioNum, 0);
+    }
+    // Leaderboard (P5-07): a star got here (again or not) ends the run.
+    if (set && !port_net_progress_is_applying()) {
+        port_board_star();
     }
 #endif
 }

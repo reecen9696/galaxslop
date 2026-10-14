@@ -443,3 +443,19 @@ port needs a second root for its own files. An overlay keeps the game code
 unchanged: `ObjectData/Barney.arc` is mounted like any other archive.
 Revisit: if mods should be loadable at run time (a folder the player picks)
 rather than built in; or if a cooked mod should go into OPFS with the disc.
+
+## D-027 (2026-10-14, lane A, asked for by the user): The leaderboard's scores live in each player's browser; the relay only lists who is online
+What: P5-07 ranks the coins and star bits each player picked up themselves
+(the game's own counters, hooked in `ScenePlayingResult`; world sync's
+remote pickups never touch them), best run per galaxy and in total. The page
+keeps them in localStorage (`smg.board`) and, in a room, posts them to the
+relay (`/board/<room>/<id>`, memory only); the room's board shows the
+players in the room now, each with their saved scores.
+Why: the user wanted scores that last when a player leaves and comes back,
+also in a new room the next day, and players shown only while online. Kept
+by the player, they survive relay restarts and new rooms with no server
+storage. Cost: scores are per browser (not per save, not moved by Export
+save) and are what each client says (a modified page can post anything).
+Revisit: if strangers share rooms (then the relay should count pickups from
+world events), or if scores should travel with Export save.
+

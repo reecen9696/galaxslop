@@ -5,6 +5,7 @@
 // (a cooked game folder the page loads by itself; own machine or LAN only).
 import { createServer } from "node:http";
 import { WebSocketServer, type WebSocket } from "ws";
+import { Board, boardHandler } from "./board.ts";
 import { Relay, type Conn } from "./relay.ts";
 import { reportHandler } from "./report.ts";
 import { staticHandler } from "./static.ts";
@@ -15,15 +16,19 @@ export function startServer(port: number, log: (m: string) => void = console.log
     .map((s) => s.trim())
     .filter(Boolean);
   const fixedRooms = (process.env.ROOMS ?? "").split(",").filter((s) => s.trim());
-  const relay = new Relay({ log, fixedRooms });
+  let board: Board | undefined;
+  const relay = new Relay({ log, fixedRooms, onLeave: (code, id) => board?.forget(code, id) });
+  board = new Board((code) => relay.members(code));
   const serve = process.env.STATIC_DIR ? staticHandler(process.env.STATIC_DIR, process.env.GAME_DIR) : (_req: unknown, res: { writeHead: (n: number) => { end: () => void } }) => res.writeHead(426).end();
   // /healthz: for the host's health check, with or without STATIC_DIR.
   // /room/<code>: whether a room exists and how full it is, so the lobby
   // refuses a wrong code before starting the game (any origin may ask: the
   // dev page is on another port).  /report: logs players send (report.ts).
+  // /board: the room's leaderboard (board.ts).
   const report = reportHandler(log);
+  const boardHttp = boardHandler(board);
   const http = createServer((req, res) => {
-    if (report(req, res)) return;
+    if (report(req, res) || boardHttp(req, res)) return;
     const room = /^\/room\/([A-Za-z0-9]{1,16})$/.exec(req.url ?? "");
     if (req.url === "/healthz") res.writeHead(200, { "Content-Type": "text/plain" }).end("ok\n");
     else if (room) {

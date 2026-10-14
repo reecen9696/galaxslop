@@ -630,14 +630,16 @@ function onNetLine(t) {
   let m;
   if ((m = /^net: power star (\S+) (\d+) from (.+)$/.exec(t))) return toast(`${m[3]} got a Power Star (${m[1].replace(/Galaxy$/, " Galaxy")}, star ${m[2]})`);
   if ((m = /^net: grand star (\d+) from (.+)$/.exec(t))) return toast(`${m[2]} got Grand Star ${m[1]}`);
-  if ((m = /^net: joined room (\S+) as player/.exec(t))) {
+  if ((m = /^net: joined room (\S+) as player (\d+)/.exec(t))) {
     roombar.dataset.room = m[1];
+    roombar.dataset.you = m[2];  // the leaderboard posts under this id (board.js)
   } else if (/^net: .+ (joined \(player|left$)/.test(t)) {
     // the count comes from the game's remote list; just redraw
   } else if (/^net: connected to /.test(t)) {
     roombar.dataset.state = "joining…";
   } else if (/^net: connection lost/.test(t) || (m = /^net: relay closed the connection/.exec(t))) {
     roombar.dataset.room = "";
+    roombar.dataset.you = "";
     roombar.dataset.state = "reconnecting…";
   } else if ((m = /^net: relay error \d+: (.+)$/.exec(t))) {
     roombar.dataset.state = "!" + m[1];

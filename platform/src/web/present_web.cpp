@@ -24,6 +24,7 @@
 #include "../gx/gl_renderer.h"
 #include "net/client/net_client.h"
 #include "net/puppet/puppet_tint.h"
+#include "port/board.h"
 #include "port/port.h"
 #include "port/talk.h"
 
@@ -536,6 +537,9 @@ extern "C" EMSCRIPTEN_KEEPALIVE RemoteList* web_remote_list(void) {
     return &sRemotes;
 }
 extern "C" EMSCRIPTEN_KEEPALIVE void web_follow(int slot) { port_net_request_follow(slot); }
+
+// Leaderboard (P5-07): the local player's pickups per run (port/board.h).
+extern "C" EMSCRIPTEN_KEEPALIVE PortBoard* web_board(void) { return port_board(); }
 
 // Shader warm-up (P1-06): every program key the renderer builds is saved to
 // OPFS; the next session compiles them in the background from the loading

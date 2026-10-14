@@ -25,6 +25,7 @@ The web build **already has gamepad support** implemented using Emscripten's nat
 | `btn14` (Left)| `kLeft`        |
 | `btn15` (Right)| `kRight`      |
 | `btn16`       | `kHome`        |
+| `face3` (Y)   | none: the page's leaderboard (web/board.js) |
 | `bp11` (Plus) | `kPlus`        |
 
 ### Nunchuk (Right Joycon - Stick & C/Z)

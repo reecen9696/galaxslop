@@ -20,6 +20,7 @@
 #include "Game/Util/SceneUtil.hpp"
 #include "Game/Util/SequenceUtil.hpp"
 #include "net/client/net_client.h"
+#include "port/board.h"
 #include "port/heap_routing.h"
 #include "port/port.h"
 #include <atomic>
@@ -735,6 +736,7 @@ extern "C" void port_net_follow_update() {
         sLastScenario = MR::getCurrentScenarioNo();
         port_log("net: now in %s %d", MR::getCurrentStageName(), (int)sLastScenario);
     }
+    port_board_stage(MR::getCurrentStageName(), MR::getCurrentScenarioNo());  // leaderboard runs (P5-07)
     s32 slot = sFollowSlot.exchange(-1);
     if (slot < 0 || slot >= net::kMaxRemotes) {
         return;

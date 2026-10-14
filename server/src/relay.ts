@@ -69,6 +69,8 @@ export interface RelayOptions {
   now?: () => number;
   random?: () => number;
   log?: (msg: string) => void;
+  // A player left a room (the leaderboard forgets their scores).
+  onLeave?: (code: string, id: number) => void;
 }
 
 export class Relay {
@@ -77,11 +79,13 @@ export class Relay {
   private readonly now: () => number;
   private readonly random: () => number;
   private readonly log: (msg: string) => void;
+  private readonly onLeave: (code: string, id: number) => void;
 
   constructor(opts: RelayOptions = {}) {
     this.now = opts.now ?? Date.now;
     this.random = opts.random ?? Math.random;
     this.log = opts.log ?? (() => {});
+    this.onLeave = opts.onLeave ?? (() => {});
     for (const code of opts.fixedRooms ?? []) {
       const c = code.trim().toUpperCase();
       if (c) this.rooms.set(c, { code: c, fixed: true, hostId: 0, players: new Map(), emptySince: null, log: [], logKeys: new Set() });
@@ -191,6 +195,12 @@ export class Relay {
   roomInfo(code: string): { players: number; max: number } | null {
     const room = this.rooms.get(code.toUpperCase());
     return room ? { players: room.players.size, max: MAX_PLAYERS } : null;
+  }
+
+  // Who is in a room now (the leaderboard lists only them).
+  members(code: string): PlayerInfo[] | null {
+    const room = this.rooms.get(code.toUpperCase());
+    return room ? [...room.players.values()].map((p) => p.info!) : null;
   }
 
   private onHello(c: Client, data: Uint8Array): void {
@@ -316,6 +326,7 @@ export class Relay {
     if (!room || !c.info) return;
     room.players.delete(c.info.id);
     c.room = undefined;
+    this.onLeave(room.code, c.info.id);
     const left = encodePlayerLeft(c.info.id);
     for (const other of room.players.values()) other.conn.send(left);
     if (room.players.size === 0) room.emptySince = this.now();

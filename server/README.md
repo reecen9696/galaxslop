@@ -22,6 +22,9 @@ join a known room without passing a code around).
 - `src/relay.ts`: rooms (6-character codes without 0/O/1/I/L, max 5
   players), relaying, ping, the 15 s silence drop, 60 messages/s limit.
   Transport-independent.
+- `src/board.ts`: the leaderboard (P5-07, D-027): `POST /board/<room>/<id>`
+  stores a player's scores while they are in the room, `GET /board/<room>`
+  lists those of the players in it now. Memory only; the page keeps the scores.
 - `src/main.ts`: the WebSocket server.
 
 Deployment is P3-05 (a container on a cheap host, D-010).

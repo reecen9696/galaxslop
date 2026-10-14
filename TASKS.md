@@ -651,7 +651,7 @@ Starter list, unordered: switches, launch stars (fired), coins (collected), 1-up
 
 ### P5-07 Leaderboard: coins and star bits per player
 - lane: shared
-- status: in_progress
+- status: done
 - owner: A
 - started: 2026-10-14
 - blocked_by:
@@ -660,6 +660,7 @@ Starter list, unordered: switches, launch stars (fired), coins (collected), 1-up
 - what: Asked for by the user. A leaderboard of the coins and star bits each player picked up themselves (not the shared counters): this galaxy (best run) and overall (all runs). Opened by a button next to the settings gear, Tab, or the gamepad's Y; shows by itself for a few seconds after a star. Scores live in each player's browser, so they last across sessions and rooms; in a room the relay shows those of the players online now.
 - done when: the board opens three ways, fills from real pickups, survives a reload, and shows two players in one room.
 - log:
+  - 2026-10-14 (A): done (D-027). Game: port/board.h, counted in ScenePlayingResult::incCoin/incStarPiece (gains only), runs split by GameDataFunction's stage hook and GameDataHolder::setPowerStar; read by web/board.js through _web_board. Relay: server/src/board.ts + Relay onLeave/members (vitest). Verified headless: two clients in one room each saw their own pickups (Sam 3 coins/1 bit = HUD) and the other's; a player who left dropped off; PETARI_FAKESTAR showed the board for 6 s; Tab opens it; seeded scores load after a reload. Not tried: gamepad Y on a real pad. Note: smoke.mjs SIGKILLs Chrome, so localStorage written late in a run is lost there (not in a normal close).
 
 ### P5-05 Local 2-player (two real players, one machine)
 - lane: shared
