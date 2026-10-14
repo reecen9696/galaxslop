@@ -43,6 +43,14 @@ void port_world_item_collected(void* actor);
 void port_world_item_collected2(void* actor, int purple);
 // Coin.cpp: count a purple coin another player took.
 void port_coin_count_purple(void);
+// ChipGroup::noticeGet: the local player took chip `index` (registration
+// order) of a star chip group.  Counted for everyone.
+void port_world_chip_got(int chipType, int groupId, int index);
+// ChipGroup.cpp: another player took it: gone and counted here; 0 if it was
+// already.
+int port_chip_take_remote(int chipType, int groupId, int index);
+// Debug (mode 106): take the nearest star chip; 0 if none.
+int port_chip_debug_take_nearest(float x, float y, float z);
 // Coin / StarPiece::makeActorAppeared: items to match pickups against.
 void port_world_item_appeared(void* actor);
 // Scene init: the NameObj remote drops are made for (declared coins and
@@ -119,6 +127,7 @@ enum : uint8_t {
     kWorldStarGot = 8,          // a player grabbed power star `id`: everyone in the level gets it
     kWorldBossHit = 9,          // a hit on a boss: id = placement id or ordinal, pos = sender offset,
                                 // a = msg | sensor index << 16, b = sender sensor type | placed << 16
+    kWorldChipGot = 10,         // a star chip taken: id = type << 24 | index << 16 | group (u16)
 };
 // Placement id: FNV-1a of the name and the position rounded to whole units.
 uint32_t worldPlacementId(const char* name, float x, float y, float z);

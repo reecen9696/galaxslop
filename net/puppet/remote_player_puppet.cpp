@@ -1131,6 +1131,12 @@ void applyDebugModes() {
     if (!MR::isExistMario()) {
         return;
     }
+    if (mode == 106) {  // take the nearest star chip (world sync test)
+        sPending = -1;
+        const TVec3f& p = *MR::getPlayerPos();
+        port_log("puppet: debug: take the nearest star chip: %s", port_chip_debug_take_nearest(p.x, p.y, p.z) ? "taken" : "none in reach");
+        return;
+    }
     if (mode == 105) {  // hit the nearest boss (world sync test)
         sPending = -1;
         const TVec3f& p = *MR::getPlayerPos();

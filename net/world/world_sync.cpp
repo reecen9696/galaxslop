@@ -135,7 +135,7 @@ World& world() {
 
 bool hasEnemySensor(LiveActor* actor) {
     // Collectibles that register an enemy sensor (ChipBase: blue and yellow
-    // star chips, "...チップ") are per player, not defeats.
+    // star chips, "...チップ") are not defeats (kWorldChipGot syncs them).
     if (actor->mName != nullptr && strstr(actor->mName, "\x83\x60\x83\x62\x83\x76") != nullptr) {
         return false;
     }
@@ -208,7 +208,7 @@ bool currentStage(uint32_t* pStage, uint8_t* pScenario) {
 void remember(const Event& e) {
     World& w = world();
     bool byId = e.kind == kWorldEnemyDefeated || e.kind == kWorldItemCollected;
-    if ((byId && e.id == 0) || (!byId && e.kind != kWorldSwitch && e.kind != kWorldEventStar)) {
+    if ((byId && e.id == 0) || (!byId && e.kind != kWorldSwitch && e.kind != kWorldEventStar && e.kind != kWorldChipGot)) {
         return;
     }
     if (e.stage != w.historyStage || e.scenario != w.historyScenario) {
@@ -545,6 +545,23 @@ extern "C" void port_world_item_collected2(void* actorPtr, int purple) {
     send(e);
     remember(e);
     if (logging()) port_log("world: collected %s (%s %08x), told the room", actor->mName, e.id ? "id" : "spawned", e.id);
+}
+
+extern "C" void port_world_chip_got(int chipType, int groupId, int index) {
+    World& w = world();
+    if (!enabled() || !w.live) {
+        return;
+    }
+    Event e{};
+    if (!currentStage(&e.stage, &e.scenario)) {
+        return;
+    }
+    e.kind = kWorldChipGot;
+    e.id = (uint32_t)(chipType & 0xFF) << 24 | (uint32_t)(index & 0xFF) << 16 | ((uint32_t)groupId & 0xFFFFu);
+    PortHostAllocScope host;
+    send(e);
+    remember(e);
+    if (logging()) port_log("world: took %s chip %d of group %d, told the room", chipType == 0 ? "blue" : "yellow", index, groupId);
 }
 
 extern "C" void port_world_actor_dead(void* actorPtr) {
@@ -927,6 +944,13 @@ extern "C" void port_world_update(void) {
             w.applyingSwitch = true;
             applySwitch(e);
             w.applyingSwitch = false;
+            remember(e);
+            continue;
+        }
+        if (e.kind == kWorldChipGot) {
+            int type = (int)(e.id >> 24), index = (int)((e.id >> 16) & 0xFF), group = (int16_t)(e.id & 0xFFFF);
+            if (port_chip_take_remote(type, group, index) && logging())
+                port_log("world: %s chip %d of group %d taken by another player", type == 0 ? "blue" : "yellow", index, group);
             remember(e);
             continue;
         }
