@@ -6,6 +6,7 @@
 #include "Game/Util/SceneUtil.hpp"
 #include "Game/Util/ScreenUtil.hpp"
 #ifdef TARGET_PC
+#include "Game/Util/MessageUtil.hpp"
 #include "port/board.h"
 #include <cstdio>
 #include <cstring>
@@ -114,6 +115,25 @@ extern "C" void port_board_stage(const char* stage, int scenario) {
         return;
     }
     startRun(stage, scenario);
+    // The galaxy's name in the game's language (16-bit chars) as UTF-8, up
+    // to the first message tag or control character.
+    const wchar_t* name = MR::getGalaxyNameOnCurrentLanguage(stage);
+    char* out = sBoard.curName;
+    char* end = sBoard.curName + sizeof(sBoard.curName) - 4;
+    for (const wchar_t* p = name; p != nullptr && *p >= 0x20 && out < end; p++) {
+        u32 c = (u16)*p;
+        if (c < 0x80) {
+            *out++ = (char)c;
+        } else if (c < 0x800) {
+            *out++ = (char)(0xC0 | (c >> 6));
+            *out++ = (char)(0x80 | (c & 0x3F));
+        } else {
+            *out++ = (char)(0xE0 | (c >> 12));
+            *out++ = (char)(0x80 | ((c >> 6) & 0x3F));
+            *out++ = (char)(0x80 | (c & 0x3F));
+        }
+    }
+    *out = 0;
 }
 
 extern "C" void port_board_star(void) {

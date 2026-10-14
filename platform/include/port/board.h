@@ -20,6 +20,7 @@ struct PortBoard {
     uint32_t stars;  // stars the local player got
     PortBoardRun cur;
     PortBoardRun prev;  // the run that just ended, with its final counts
+    char curName[64];   // cur.stage as the game names it, UTF-8 ("Good Egg Galaxy")
 };
 
 #ifdef __cplusplus
